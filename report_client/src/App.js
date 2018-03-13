@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import StuffList from './StuffList';
 
+import appRoutes from "./routes/app.js";
+
 class App extends Component {
     state = {users: []}
 
