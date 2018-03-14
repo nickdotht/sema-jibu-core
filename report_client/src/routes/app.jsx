@@ -6,6 +6,9 @@ import Icons from "views/Icons/Icons.jsx";
 import Maps from "views/Maps/Maps.jsx";
 import NotificationsPage from "views/Notifications/Notifications.jsx";
 
+import water from "assets/img/sema/sema-water-icon.png";
+import logoFb from "logo.svg";
+
 import {
     Dashboard,
     Person,
@@ -19,43 +22,43 @@ import {
 const appRoutes = [
     {
         path: "/dashboard",
-        sidebarName: "Dashboard",
-        navbarName: "Material Dashboard",
+        sidebarName: "Water Operations",
+        navbarName: "Water Operations",
         icon: Dashboard,
         component: DashboardPage
     },
     {
         path: "/user",
-        sidebarName: "User Profile",
-        navbarName: "Profile",
+        sidebarName: "Sales",
+        navbarName: "Sales",
         icon: Person,
         component: UserProfile
     },
     {
         path: "/table",
-        sidebarName: "Table List",
-        navbarName: "Table List",
+        sidebarName: "Distribution Map",
+        navbarName: "Distribution Map",
         icon: ContentPaste,
         component: TableList
     },
     {
         path: "/typography",
-        sidebarName: "Typography",
-        navbarName: "Typography",
+        sidebarName: "Delivery Schedule",
+        navbarName: "Delivery Schedule",
         icon: LibraryBooks,
         component: Typography
     },
     {
         path: "/icons",
-        sidebarName: "Icons",
-        navbarName: "Icons",
+        sidebarName: "Inventory Management",
+        navbarName: "Inventory Management",
         icon: BubbleChart,
         component: Icons
     },
     {
         path: "/maps",
-        sidebarName: "Maps",
-        navbarName: "Map",
+        sidebarName: "Financials",
+        navbarName: "Financials",
         icon: LocationOn,
         component: Maps
     },
