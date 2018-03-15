@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var seama_user = require('./routes/seama_user');
+var seama_kiosks = require('./routes/seama_kiosks');
 
 var app = express();
 
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 app.use('/seama_user', seama_user);
+app.use('/seama_kiosks', seama_kiosks);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
