@@ -1,8 +1,8 @@
 import {combineReducers} from 'redux';
-import stuff from './stuffReducer';
+import seamaUser from './seamaUserReducer';
 
 const rootReducer = combineReducers({
-    stuff
+    seamaUser
 });
 
 export default rootReducer;

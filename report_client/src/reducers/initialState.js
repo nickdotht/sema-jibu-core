@@ -1,3 +1,3 @@
 export default {
-    stuff: []
+    seamaUser: "SeamaUser"
 };

@@ -1,9 +1,9 @@
-import * as types from './actionTypes';
+import * as types from 'actions/actionTypes';
 
 
 export function receiveStuff(json) {
     var array = json.map( name => name.username)
-    return {type: types.RECEIVE_STUFF, stuff: array};
+    return {type: types.RECEIVE_SEMA_USER, stuff: array};
 }
 
 export function fetchStuff() {
@@ -13,4 +13,9 @@ export function fetchStuff() {
         .then(json => dispatch(receiveStuff(json)));
     };
 }
+
+export function fetchSeamaUser() {
+    return {type: types.RECEIVE_SEMA_USER, seamaUser: "Whiskey"};
+}
+
 
