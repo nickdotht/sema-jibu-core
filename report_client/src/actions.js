@@ -14,8 +14,21 @@ export function fetchStuff() {
     };
 }
 
-export function fetchSeamaUser() {
-    return {type: types.RECEIVE_SEMA_USER, seamaUser: "Whiskey"};
+export function receiveSeamaUser(json) {
+    var name = json.seamaUser
+    return {type: types.RECEIVE_SEMA_USER, seamaUser: name};
 }
+
+export function fetchSeamaUser() {
+    return dispatch => {
+        return fetch('/seama_user')
+            .then(response => response.json())
+            .then(json => dispatch(receiveSeamaUser(json)));
+    };
+}
+
+// export function fetchSeamaUser() {
+//     return {type: types.RECEIVE_SEMA_USER, seamaUser: "Whiskey"};
+// }
 
 
