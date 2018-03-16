@@ -47,4 +47,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+// For development, return mock data rather than DB access
+    app.set('mockIt', true);
+
 module.exports = app;
