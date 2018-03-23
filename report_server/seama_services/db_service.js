@@ -10,8 +10,8 @@ function dbService(req, res, next) {
     }else{
         console.log("dbConnection exists ");
         next();
-
     }
+    console.log("XXXXXXXX", req.sessionStore.sessions);
 }
 
 function createConnection( sessionData, req, next ){
