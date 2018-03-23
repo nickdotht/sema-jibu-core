@@ -9,8 +9,18 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var seama_user = require('./routes/seama_user');
 var seama_kiosks = require('./routes/seama_kiosks');
+var session = require('express-session');
+var dbService = require('./seama_services/db_service').dbService;
 
 var app = express();
+app.use(session({ secret: 'seama-secret-token', cookie: { maxAge: 60000 }}));
+
+app.use(function (req, res, next) {
+//    console.log("dbService");
+    dbService( req, res, next);
+
+});
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -47,6 +57,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+// ------------Seam development ---------------
 // For development, return mock data rather than DB access
     app.set('mockIt', true);
 
