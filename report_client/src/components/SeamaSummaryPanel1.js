@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import { Panel } from 'react-bootstrap';
 import 'App.css';
-import SeamaWaterQualityContainer from "./SeamaWaterQualityContainer";
 
 var SeamaPanel1Style = {
     borderRadius: "25px",
@@ -30,10 +29,3 @@ class SeamaSummaryPanel1 extends Component {
 export default SeamaSummaryPanel1;
 
 
-// #rcorners2 {
-//     border-radius: 25px;
-//     border: 2px solid #73AD21;
-//     padding: 20px;
-//     width: 200px;
-//     height: 150px;
-// }

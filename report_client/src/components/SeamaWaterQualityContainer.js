@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 import 'App.css';
 import SeamaSummaryPanel1 from "./SeamaSummaryPanel1";
+import SeamaWaterOperationsChart from "./SeamaWaterOperationsChart";
 
 var SeamaWaterQualityContainerStyle = {
     background:"#f0f0f0",
@@ -41,9 +42,9 @@ class SeamaWaterQualityContainer extends Component {
                             <SeamaSummaryPanel1 title="Flowrate" units={"GPM"} value={this.props.seamaState.seamaWaterQuality["flowRate"]}></SeamaSummaryPanel1>
                         </Col>
                     </Row>
-                    <Row className="show-grid" style={{background:"cyan"}}>
+                    <Row className="show-grid" style={{background:"white", height:"70vh"}}>
                         <Col xs={12} md={12} >
-                            <code>&lt;{'Col xs={1} md={8}'} /&gt;</code>
+                            <SeamaWaterOperationsChart chartData={this.props.seamaState.seamaWaterQuality["production"]}></SeamaWaterOperationsChart>
                         </Col>
                     </Row>
                 </Grid>

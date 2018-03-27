@@ -27,6 +27,18 @@ class App extends Component {
                 totalProduction:"N/A",
                 sitePressure:"N/A",
                 flowRate:"N/A",
+                production :{
+                    labels: ["red", "green", "blue", "black"],
+                    datasets: [
+                        {
+                            label: "Color",
+                            data: [100, 200, 300, 250, 120, 400]
+                        },
+                    ],
+                    backgroundColor: ['rgb(200, 200, 250)'],
+
+                }
+
             }
         };
         RestServices.initializeState(this);
