@@ -24,14 +24,6 @@ class SeamaWaterQualityContainer extends Component {
     constructor(props, context) {
         super(props, context);
 
-
-        this.state = {
-            Summary: {
-                totalGallons:20,
-                sitePressure:42.4,
-                flowRate: 7.24
-            }
-        };
     }
 
     render() {
@@ -40,13 +32,13 @@ class SeamaWaterQualityContainer extends Component {
                 <Grid style={SeamaGridStyle}>
                     <Row className="show-grid" style={{height:"30vh", background:"pink"}}>
                         <Col xs={4} md={4} >
-                            <SeamaSummaryPanel1 title="Total Production" units={"Gallons"} value={this.state.Summary.totalGallons}></SeamaSummaryPanel1>
+                            <SeamaSummaryPanel1 title="Total Production" units={"Gallons"} value={this.props.seamaState.seamaWaterQuality["totalProduction"]}></SeamaSummaryPanel1>
                         </Col>
                         <Col xs={4} md={4} >
-                            <SeamaSummaryPanel1 title="Site Pressure" units={"PSI"} value={this.state.Summary.sitePressure}></SeamaSummaryPanel1>
+                            <SeamaSummaryPanel1 title="Site Pressure" units={"PSI"} value={this.props.seamaState.seamaWaterQuality["sitePressure"]}></SeamaSummaryPanel1>
                         </Col>
                         <Col xs={4} md={4} >
-                            <SeamaSummaryPanel1 title="Flowrate" units={"GPM"} value={this.state.Summary.flowRate}></SeamaSummaryPanel1>
+                            <SeamaSummaryPanel1 title="Flowrate" units={"GPM"} value={this.props.seamaState.seamaWaterQuality["flowRate"]}></SeamaSummaryPanel1>
                         </Col>
                     </Row>
                     <Row className="show-grid" style={{background:"cyan"}}>

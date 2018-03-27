@@ -10,27 +10,11 @@ var dividerStyle = {}
 class SeamaToolbar extends Component {
     constructor(props, context) {
         super(props, context);
-
+        console.log("SeamaToolbar-constructor");
         this.handleSelect = this.handleSelect.bind(this);
         this.buildMenuItems = this.buildMenuItems.bind(this);
 
-        this.state = {
-            title: "fooyxxx",
-            temp:"xxxxxxx",
-            Menu: {3.1: "Action",
-                3.2: "fred was here  ddd",
-                3.3: "Barbara was here",
-                3.4: "Seperator..."
-            }
-
-        };
-        console.log("boo");
-        this.menuItems = [];
-        var keys = Object.keys(this.state.Menu);
-        for( var i = 0; i < keys.length; i++ ){
-            console.log( this.state.Menu[keys[i]]);
-            this.menuItems.push(<MenuItem eventKey={keys[i]}style={menuStyle}>{this.state.Menu[keys[i]]}</MenuItem>);
-        }
+        this.state = {title: "--Kiosks--"};
     }
 
     componentDidMount() {
@@ -41,6 +25,8 @@ class SeamaToolbar extends Component {
     handleSelect(eventKey, foo){
         console.log(eventKey, this.props.seamaState.seamaKiosk[eventKey].name);
         this.setState({title: this.props.seamaState.seamaKiosk[eventKey].name});
+        var kioskParams = {kioskID:this.props.seamaState.seamaKiosk[eventKey].id};
+        RestServices.fetchWaterQuality(kioskParams);
     };
 
     buildMenuItems(){

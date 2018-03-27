@@ -22,7 +22,12 @@ class App extends Component {
                 sitePressure:42.4,
                 flowRate: 7.24
             },
-            seamaUser:"N/A"
+            seamaUser:"N/A",
+            seamaWaterQuality:{
+                totalProduction:"N/A",
+                sitePressure:"N/A",
+                flowRate:"N/A",
+            }
         };
         RestServices.initializeState(this);
     }
@@ -32,7 +37,7 @@ class App extends Component {
       <div className="App">
           <SeamaToolbar seamaState={this.state}/>
           <SeamaSidebar/>
-          <SeamaWaterQualityContainer/>
+          <SeamaWaterQualityContainer seamaState={this.state}/>
      </div>
     );
   }

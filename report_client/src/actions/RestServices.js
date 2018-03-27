@@ -35,3 +35,25 @@ export function fetchSeamaKiosks() {
         });
 }
 
+export function receiveWaterQuality(json) {
+    var waterQuality = json;
+    rootComponent.setState( {seamaWaterQuality:json});
+    console.log("receiveSeamaWaterQuality - ", json)
+}
+
+export function fetchWaterQuality( params) {
+    var urlParms = queryParams(params);
+    var url = '/seama_water_quality?' + urlParms;
+    return fetch(url)
+        .then(response => response.json())
+        .then(json => receiveWaterQuality(json))
+        .catch(function(error){
+            console.log("fetchWaterQuality failed", error);
+        });
+}
+
+function queryParams(params) {
+    return Object.keys(params)
+        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+        .join('&');
+}

@@ -9,6 +9,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var seama_user = require('./routes/seama_user');
 var seama_kiosks = require('./routes/seama_kiosks');
+var seama_water_quality = require('./routes/seama_water_quality');
 var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
 
@@ -38,6 +39,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/seama_user', seama_user);
 app.use('/seama_kiosks', seama_kiosks);
+app.use('/seama_water_quality', seama_water_quality);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -59,6 +61,6 @@ app.use(function(err, req, res, next) {
 
 // ------------Seam development ---------------
 // For development, return mock data rather than DB access
-    app.set('mockIt', true);
+    app.set('mockIt', false);
 
 module.exports = app;
