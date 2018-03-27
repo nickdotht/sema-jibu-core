@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Navbar, Jumbotron, Button, Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
+import * as RestServices from "actions/RestServices"
 
 var menuStyle = {}
 var dividerStyle = {}
@@ -31,6 +32,10 @@ class SeamaToolbar extends Component {
         }
     }
 
+    componentDidMount() {
+        RestServices.fetchSeamaUser('/users');
+    }
+
     handleSelect(eventKey, foo){
         console.log(eventKey, this.state.Menu[eventKey]);
         this.setState({title: this.state.Menu[eventKey]});
@@ -40,7 +45,7 @@ class SeamaToolbar extends Component {
         return (
             <div>
                 <Navbar>
-                    <button>fred</button>
+                    <Button>{this.props.seamaState.seamaUser}</Button>
                     <Navbar.Header >
                         <Navbar.Brand>
                             <a  href="#home">React-Bootstrap</a>
