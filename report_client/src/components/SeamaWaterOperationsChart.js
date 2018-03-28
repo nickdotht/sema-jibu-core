@@ -31,7 +31,13 @@ class SeamaWaterOperationsChart extends Component {
                                 ticks: {
                                     beginAtZero:true
                                 }
+                            }],
+                            xAxes: [{
+                                displayFormats: {
+                                    day: 'MMM D'
+                                }
                             }]
+
                         }
 
                     }}

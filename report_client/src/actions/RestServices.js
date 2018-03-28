@@ -36,8 +36,7 @@ export function fetchSeamaKiosks() {
 }
 
 export function receiveWaterQuality(json) {
-    var waterQuality = json;
-    rootComponent.setState( {seamaWaterQuality:json});
+    rootComponent.updateWaterQualityState(json);
     console.log("receiveSeamaWaterQuality - ", json)
 }
 

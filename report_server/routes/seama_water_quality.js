@@ -14,7 +14,6 @@ router.get('/', function(req, res, next) {
         var sessData = req.session;
         var connection = connectionTable[sessData.id];
         getTotalProduction(connection, res, req.query, {});
-//        res.json({totalProduction: totalProduction})
     }
 });
 
@@ -93,9 +92,42 @@ function getFlowRate(connection, res, params, results) {
             if( Array.isArray(result) && result.length >=1 ) {
                 results.flowRate = result[0].value;
             }
+            getProduction(connection, res, params, results);
+        }
+    });
+}
+
+function getProduction(connection, res, params, results) {
+    // Notes on constants TBD....
+    // 127 gallons ??
+    var sql = "SELECT reading.created_date, reading.sampling_site_id, measurement.parameter_id, measurement.value \
+        FROM reading \
+        INNER JOIN measurement \
+        ON reading.id = measurement.reading_id \
+        WHERE reading.kiosk_id = ? AND measurement.parameter_id = 127 AND reading.sampling_site_id = 70 \
+        ORDER BY reading.created_date DESC \
+        LIMIT 30";
+
+    connection.query(sql, [params.kioskID], function (err, result, fields) {
+        if (err) {
+            res.status(401).send('No Database access')
+        } else {
+             if( Array.isArray(result) && result.length >=1 ) {
+                 var timeTicks = result.map(getDate);
+                 var values = result.map(getValue);
+                 results.production = {x_axis:timeTicks, datasets:[{label:"raw_data", data:values}]};
+                 console.log("foo");
+            }
             res.json(results);
         }
     });
+}
+
+function getValue( item, index ){
+    return item.value;
+}
+function getDate( item, index ){
+    return item.created_date;
 }
 
 module.exports = router;

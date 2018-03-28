@@ -6,6 +6,7 @@ import SeamaToolbar from "./components/SeamaToolbar";
 import SeamaSidebar from "./components/SeamaSidebar";
 import SeamaWaterQualityContainer from "./components/SeamaWaterQualityContainer";
 import * as RestServices from "actions/RestServices"
+import moment from 'moment';
 
 var menuStyle = { background:"blue"}
 var dividerStyle = { background:"white"}
@@ -45,14 +46,41 @@ class App extends Component {
     }
 
     render() {
-    return (
-      <div className="App">
-          <SeamaToolbar seamaState={this.state}/>
-          <SeamaSidebar/>
-          <SeamaWaterQualityContainer seamaState={this.state}/>
-     </div>
-    );
-  }
+        return (
+          <div className="App">
+              <SeamaToolbar seamaState={this.state}/>
+              <SeamaSidebar/>
+              <SeamaWaterQualityContainer seamaState={this.state}/>
+         </div>
+        );
+    }
+    updateWaterQualityState( waterQuality){
+        console.log("updateWaterQualityState");
+        var foo = moment("2017-01-23T13:56:24.000Z");
+        var newWaterQuality = {};
+        newWaterQuality.flowRate = waterQuality.flowRate;
+        newWaterQuality.sitePressure = waterQuality.sitePressure;
+        newWaterQuality.totalProduction = waterQuality.totalProduction;
+        if( ! waterQuality.hasOwnProperty("production")){
+            // FIXUP/TDOD - We need default properties... chart will break if it is called with no data
+            newWaterQuality.production = {
+                labels: [],
+                datasets: [
+                    {
+                        label: "",
+                        data: []
+                    },
+                ],
+            }
+        }else{
+            newWaterQuality.production = {
+                labels:waterQuality.production.x_axis,
+                datasets: waterQuality.production.datasets
+
+            }
+        }
+        this.setState( {seamaWaterQuality:newWaterQuality});
+    }
 }
 
 export default App;
