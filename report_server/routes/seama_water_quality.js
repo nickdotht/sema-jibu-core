@@ -114,8 +114,9 @@ function getProduction(connection, res, params, results) {
         } else {
              if( Array.isArray(result) && result.length >=1 ) {
                  var timeTicks = result.map(getDate);
+                 timeTicks = timeTicks.reverse();
                  var values = result.map(getValue);
-                 results.production = {x_axis:timeTicks, datasets:[{label:"raw_data", data:values}]};
+                 results.production = {x_axis:timeTicks, datasets:[{label:"Total Production", data:values}]};
                  console.log("foo");
             }
             res.json(results);

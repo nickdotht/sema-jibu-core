@@ -80,6 +80,20 @@ class App extends Component {
             newWaterQuality.production.datasets[0].backgroundColor = 'rgb(53, 91, 183)';
             newWaterQuality.production.labels = newWaterQuality.production.labels.map(function(time)
                 {return moment(time ).format("MMM Do YY")});
+
+            // Create the line series. This needs to be a trend line, dummy for now
+            var lineSet = {
+                label: "Forecast",
+                data: newWaterQuality.production.datasets[0].data.map(function (value) {
+                    return (value * .8)
+                }),
+                type: "line",
+                borderColor:'rgb(231, 113, 50)',
+                fill:false,
+                pointRadius:0,
+                borderWidth:5
+            }
+            newWaterQuality.production.datasets.unshift(lineSet )
         }
         this.setState( {seamaWaterQuality:newWaterQuality});
     }
