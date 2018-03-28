@@ -27,7 +27,7 @@ class SeamaSummaryPanel1 extends Component {
         return (<div style={SeamaPanel2Style}>
                 <Panel style={SeamaPanel1Style}>
                     <Panel.Body>
-                        <Panel.Title componentClass="h3">{this.props.title}</Panel.Title>
+                        <Panel.Title componentClass="h3" style={{marginBottom:"5px"}}>{this.props.title}</Panel.Title>
                         <p style={{fontSize:"x-large"}}>{SeamaSummaryPanel1.format(this.props.value)}</p>
                         <p>{this.props.units}</p>
                     </Panel.Body>

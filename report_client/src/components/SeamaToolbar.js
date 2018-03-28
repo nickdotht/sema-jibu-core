@@ -1,11 +1,24 @@
 import React, { Component } from 'react';
-import { Navbar, Jumbotron, Button, Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
+import { Navbar, Label, Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
 import * as RestServices from "actions/RestServices"
 
 var menuStyle = {}
 var dividerStyle = {}
 
+const ImageStyle = {
+    resize:"both",
+    width:"180px",
+    height:"60px",
+};
+
+const LabelStyle = {
+    float:"right",
+    background:"none",
+    color:"rgb(119, 119, 119)",
+    marginTop:"20px",
+    fontSize:"14px"
+};
 
 class SeamaToolbar extends Component {
     constructor(props, context) {
@@ -43,19 +56,15 @@ class SeamaToolbar extends Component {
     render() {
         return (
             <div>
-                <Navbar>
-                    <Button>{this.props.seamaState.seamaUser}</Button>
+                <Navbar style={{background:"rgba(200,200,200,.5"}}>
                     <Navbar.Header >
                         <Navbar.Brand>
-                            <a  href="#home">React-Bootstrap</a>
+                            {<img src={require('images/dlo_image.png')} alt="logo" style={ImageStyle} />}
                         </Navbar.Brand>
                     </Navbar.Header>
-                    <Nav style={{color:"white !important"}}>
+                    <Nav >
                         <NavItem style={{color:"white !important"}} eventKey={1} href="#">
-                            Linkaa
-                        </NavItem>
-                        <NavItem eventKey={2} href="#">
-                            Linkcc
+                            Kiosk
                         </NavItem>
                         <NavDropdown eventKey={3} title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >
                             {this.buildMenuItems()}
@@ -67,6 +76,12 @@ class SeamaToolbar extends Component {
                             {/*<MenuItem eventKey={3.4} style={menuStyle}>{this.state.Menu["3.4"]}</MenuItem>*/}
                         </NavDropdown>
                     </Nav>
+                    <Label  eventKey={1} href="#" style={LabelStyle}>
+                        Logout
+                    </Label>
+                    <Label  eventKey={1} href="#" style={LabelStyle}>
+                        Fred O'Leary
+                    </Label>
                 </Navbar>
             </div>
         );
