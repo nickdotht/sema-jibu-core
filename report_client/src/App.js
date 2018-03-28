@@ -76,8 +76,10 @@ class App extends Component {
             newWaterQuality.production = {
                 labels:waterQuality.production.x_axis,
                 datasets: waterQuality.production.datasets
-
             }
+            foo = newWaterQuality.production.labels.map(function(time){return moment(time ).format("MMM Do YY")});
+            newWaterQuality.production.labels = foo;
+            console.log("foo")
         }
         this.setState( {seamaWaterQuality:newWaterQuality});
     }
