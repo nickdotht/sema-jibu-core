@@ -32,18 +32,18 @@ class SeamaWaterQualityContainer extends Component {
             <div fluid="true" style={SeamaWaterQualityContainerStyle}>
                 <Grid style={SeamaGridStyle}>
                     <Row className="show-grid" style={{height:"30vh", background:"rgb(171,193,222"}}>
-                        <Col xs={4} md={4} >
+                        <Col xs={4} md={4} style={{height:"100%"}} >
                             <SeamaSummaryPanel1 title="Total Production" units={"Gallons"} value={this.props.seamaState.seamaWaterQuality["totalProduction"]}></SeamaSummaryPanel1>
                         </Col>
-                        <Col xs={4} md={4} >
+                        <Col xs={4} md={4} style={{height:"100%"}}>
                             <SeamaSummaryPanel1 title="Site Pressure" units={"PSI"} value={this.props.seamaState.seamaWaterQuality["sitePressure"]}></SeamaSummaryPanel1>
                         </Col>
-                        <Col xs={4} md={4} >
+                        <Col xs={4} md={4} style={{height:"100%"}}>
                             <SeamaSummaryPanel1 title="Flowrate" units={"GPM"} value={this.props.seamaState.seamaWaterQuality["flowRate"]}></SeamaSummaryPanel1>
                         </Col>
                     </Row>
                     <Row className="show-grid" style={{background:"white", height:"70vh"}}>
-                        <Col xs={12} md={12} >
+                        <Col xs={12} md={12} style={{height:"100%"}}>
                             <SeamaWaterOperationsChart chartData={this.props.seamaState.seamaWaterQuality["production"]}></SeamaWaterOperationsChart>
                         </Col>
                     </Row>
