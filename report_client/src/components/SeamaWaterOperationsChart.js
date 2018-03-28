@@ -4,19 +4,6 @@ import {Bar, Line} from 'react-chartjs-2';
 class SeamaWaterOperationsChart extends Component {
     constructor(props, context) {
         super(props, context);
-        this.state = {
-            chartData:{
-                labels:[ "red", "green", "blue", "black"],
-                datasets:[
-                    {
-                        label: "Color",
-                        data:[100, 200, 300, 250, 120, 400]
-                    },
-                ],
-                backgroundColor :['rgb(200, 200, 250)'],
-
-            }
-        }
     }
     render() {
         return (<div className = "chart">
@@ -38,6 +25,11 @@ class SeamaWaterOperationsChart extends Component {
                                 }
                             }]
 
+                        },
+                        title: {
+                            display: true,
+                            text: 'Production (Gallons)',
+                            position:"bottom"
                         }
 
                     }}

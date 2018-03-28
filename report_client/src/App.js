@@ -29,15 +29,15 @@ class App extends Component {
                 sitePressure:"N/A",
                 flowRate:"N/A",
                 production :{
-                    labels: ["red", "green", "blue", "black"],
+                    labels: [],
                     datasets: [
                         {
-                            label: "Color",
-                            data: [100, 200, 300, 250, 120, 400]
+                            label: "",
+                            data: [],
+                            backgroundColor: 'rgb(53, 91, 183)',
                         },
-                    ],
-                    backgroundColor: ['rgb(200, 200, 250)'],
 
+                    ],
                 }
 
             }
@@ -77,9 +77,9 @@ class App extends Component {
                 labels:waterQuality.production.x_axis,
                 datasets: waterQuality.production.datasets
             }
-            foo = newWaterQuality.production.labels.map(function(time){return moment(time ).format("MMM Do YY")});
-            newWaterQuality.production.labels = foo;
-            console.log("foo")
+            newWaterQuality.production.datasets[0].backgroundColor = 'rgb(53, 91, 183)';
+            newWaterQuality.production.labels = newWaterQuality.production.labels.map(function(time)
+                {return moment(time ).format("MMM Do YY")});
         }
         this.setState( {seamaWaterQuality:newWaterQuality});
     }

@@ -31,7 +31,7 @@ class SeamaWaterQualityContainer extends Component {
         return (
             <div fluid="true" style={SeamaWaterQualityContainerStyle}>
                 <Grid style={SeamaGridStyle}>
-                    <Row className="show-grid" style={{height:"30vh", background:"pink"}}>
+                    <Row className="show-grid" style={{height:"30vh", background:"rgb(171,193,222"}}>
                         <Col xs={4} md={4} >
                             <SeamaSummaryPanel1 title="Total Production" units={"Gallons"} value={this.props.seamaState.seamaWaterQuality["totalProduction"]}></SeamaSummaryPanel1>
                         </Col>
