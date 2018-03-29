@@ -63,7 +63,10 @@ class SeamaToolbar extends Component {
                         </Navbar.Brand>
                     </Navbar.Header>
                     <Nav >
-                        <NavItem style={{color:"white !important"}} eventKey={1} href="#">
+                        <NavItem>
+                            Version {this.props.seamaState.Version}
+                        </NavItem>
+                        <NavItem  eventKey={1} href="#">
                             Kiosk
                         </NavItem>
                         <NavDropdown eventKey={3} title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >

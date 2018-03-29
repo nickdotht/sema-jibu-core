@@ -18,6 +18,7 @@ class App extends Component {
         super(props, context);
 
         this.state = {
+            Version: "0.0.0.1",
             Summary: {
                 totalGallons:20,
                 sitePressure:42.4,
