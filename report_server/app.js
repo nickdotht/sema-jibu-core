@@ -33,7 +33,12 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Use for static html
+//app.use(express.static(path.join(__dirname, 'public')));
+
+// Use for react
+app.use(express.static(path.join(__dirname, 'public_react/build/')));
 
 app.use('/', index);
 app.use('/users', users);

@@ -6,7 +6,7 @@ function dbService(req, res, next) {
     console.log("sessData", JSON.stringify(sessData));
     if( !connectionTable[sessData.id]){
         console.log("Creating dbConnection");
-        createConnection( sessData, req, next);
+        createConnection( sessData, req, res, next);
     }else{
         console.log("dbConnection exists ");
         next();
@@ -14,7 +14,7 @@ function dbService(req, res, next) {
     console.log("XXXXXXXX", req.sessionStore.sessions);
 }
 
-function createConnection( sessionData, req, next ){
+function createConnection( sessionData, req, res, next ){
     var con = mysql.createConnection({
         host: "104.131.40.239",
         port: "3306",
