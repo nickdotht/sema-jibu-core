@@ -4,7 +4,6 @@ import 'App.css';
 import * as RestServices from "actions/RestServices"
 
 var menuStyle = {}
-var dividerStyle = {}
 
 const ImageStyle = {
     resize:"both",
@@ -12,12 +11,19 @@ const ImageStyle = {
     height:"60px",
 };
 
-const LabelStyle = {
+const LabelStyleLeft = {
+    float:"left",
+    background:"none",
+    marginTop:"15px",
+    fontSize:"14px",
+    fontWeight: "normal"
+};
+const LabelStyleRight = {
     float:"right",
     background:"none",
-    color:"rgb(119, 119, 119)",
-    marginTop:"20px",
-    fontSize:"14px"
+    marginTop:"15px",
+    fontSize:"14px",
+    fontWeight: "normal"
 };
 
 class SeamaToolbar extends Component {
@@ -56,33 +62,27 @@ class SeamaToolbar extends Component {
     render() {
         return (
             <div>
-                <Navbar style={{background:"rgba(200,200,200,.5"}}>
+                <Navbar bsStyle="inverse">
                     <Navbar.Header >
                         <Navbar.Brand>
                             {<img src={require('images/dlo_image.png')} alt="logo" style={ImageStyle} />}
                         </Navbar.Brand>
                     </Navbar.Header>
+                    <Label  eventKey={1} href="#" style={LabelStyleLeft}>
+                        Version {this.props.seamaState.Version}
+                    </Label>
+                    <Label  eventKey={1} href="#" style={LabelStyleLeft}>
+                        Kiosk
+                    </Label>
                     <Nav >
-                        <NavItem>
-                            Version {this.props.seamaState.Version}
-                        </NavItem>
-                        <NavItem  eventKey={1} href="#">
-                            Kiosk
-                        </NavItem>
                         <NavDropdown eventKey={3} title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >
                             {this.buildMenuItems()}
-                            {/*{this.menuItems}*/}
-                            {/*<MenuItem eventKey={3.1} style={menuStyle}>{this.state.Menu["3.1"]}</MenuItem>*/}
-                            {/*<MenuItem eventKey={3.2} style={menuStyle}>{this.state.Menu["3.2"]}</MenuItem>*/}
-                            {/*<MenuItem eventKey={3.3} style={menuStyle}>{this.state.Menu["3.3"]}</MenuItem>*/}
-                            {/*<MenuItem divider style={dividerStyle} />*/}
-                            {/*<MenuItem eventKey={3.4} style={menuStyle}>{this.state.Menu["3.4"]}</MenuItem>*/}
                         </NavDropdown>
                     </Nav>
-                    <Label  eventKey={1} href="#" style={LabelStyle}>
+                    <Label  eventKey={1} href="#" style={LabelStyleRight}>
                         Logout
                     </Label>
-                    <Label  eventKey={1} href="#" style={LabelStyle}>
+                    <Label  eventKey={1} href="#" style={LabelStyleRight}>
                         Fred O'Leary
                     </Label>
                 </Navbar>
