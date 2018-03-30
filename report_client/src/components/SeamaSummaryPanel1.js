@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { Panel } from 'react-bootstrap';
 import 'App.css';
+import 'css/Seama.css';
 
 const SeamaPanel1Style = {
     borderRadius: "25px",
@@ -10,22 +11,11 @@ const SeamaPanel1Style = {
     borderWidth:"medium",
     margin:"0"
 };
-const SeamaPanel2Style = {
-    position:"absolute",
-    width:"50%",
-    height:"50%",
-    margin:"auto",
-    left:"0",
-    top:"0",
-    right:"0",
-    bottom:"0"
-
-};
 
 class SeamaSummaryPanel1 extends Component {
     render() {
-        return (<div style={SeamaPanel2Style}>
-                <Panel style={SeamaPanel1Style}>
+        return (<div className="SeamaSummaryPanelContainer">
+                <Panel className="SeamaSummaryPanel">
                     <Panel.Body>
                         <Panel.Title componentClass="h3" style={{marginBottom:"5px"}}>{this.props.title}</Panel.Title>
                         <p style={{fontSize:"x-large"}}>{SeamaSummaryPanel1.format(this.props.value)}</p>

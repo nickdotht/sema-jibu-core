@@ -53,14 +53,14 @@ class SeamaWaterQualityContainer extends Component {
                         <div className="row">
                             <Grid style={SeamaGridStyle}>
                                 <Row className="show-grid" style={{height:"30vh", background:"rgb(171,193,222"}}>
-                                    <Col xs={4} md={4} style={{height:"100%"}} >
+                                    <Col xs={4} md={4} style={{height:"100%", display:"table"}} >
                                         <SeamaSummaryPanel1 title="Total Production" units={"Gallons"} value={this.props.seamaState.seamaWaterQuality["totalProduction"]}></SeamaSummaryPanel1>
                                     </Col>
-                                    <Col xs={4} md={4} style={{height:"100%"}}>
+                                    <Col xs={4} md={4} style={{height:"100%", display:"table"}}>
                                         <SeamaSummaryPanel1 title="Site Pressure" units={"PSI"} value={this.props.seamaState.seamaWaterQuality["sitePressure"]}></SeamaSummaryPanel1>
                                     </Col>
-                                    <Col xs={4} md={4} style={{height:"100%"}}>
-                                        <SeamaSummaryPanel1 title="Flowrate" units={"GPM"} value={this.props.seamaState.seamaWaterQuality["flowRate"]}></SeamaSummaryPanel1>
+                                    <Col xs={4} md={4} style={{height:"100%", display:"table"}}>
+                                        <SeamaSummaryPanel1 title="Flow Rate" units={"GPM"} value={this.props.seamaState.seamaWaterQuality["flowRate"]}></SeamaSummaryPanel1>
                                     </Col>
                                 </Row>
                                 <Row className="show-grid" style={{background:"white", height:"70vh"}}>
