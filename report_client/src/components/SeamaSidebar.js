@@ -4,7 +4,7 @@ import 'App.css';
 
 const SeamaSidebarStyle = {
     background:"rgb(24,55,106)",
-    position:"fixed",
+//    position:"fixed",
     width:"240px",
     height:"100%",
     // top:"52px",
@@ -57,13 +57,13 @@ class SeamaSidebar extends Component {
                     {<img src={require('images/sema-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
                 </div>
                 <ListGroup>
-                    <CustomComponent1 href="#" active style={SeamaListStyleActive}><i class="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}></i>Water Operations</CustomComponent1>
-                    <CustomComponent2 href="#" active style={SeamaListStyleInactive}><i class="	glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}></i>Sales</CustomComponent2>
-                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}></i>Distribution Map</CustomComponent2>
-                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-time" style={{paddingRight:"15px"}}></i>Delivery Schedule</CustomComponent2>
-                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-inbox" style={{paddingRight:"15px"}}></i>Inventory Management</CustomComponent2>
-                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-usd" style={{paddingRight:"15px"}}></i>Financials</CustomComponent2>
-                </ListGroup>;
+                    <CustomComponent1 href="#" active style={SeamaListStyleActive}><i class="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}/>Water Operations</CustomComponent1>
+                    <CustomComponent2 href="#" active style={SeamaListStyleInactive}><i class="	glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>Sales</CustomComponent2>
+                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>Distribution Map</CustomComponent2>
+                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-time" style={{paddingRight:"15px"}}/>Delivery Schedule</CustomComponent2>
+                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-inbox" style={{paddingRight:"15px"}}/>Inventory Management</CustomComponent2>
+                    <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-usd" style={{paddingRight:"15px"}}/>Financials</CustomComponent2>
+                </ListGroup>
             </div>
         );
     }
