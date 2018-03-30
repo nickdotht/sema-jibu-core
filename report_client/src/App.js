@@ -25,9 +25,9 @@ class App extends Component {
                 flowRate:"N/A"
             }
         };
-        this.initializeEmptyChart( this.state.seamaWaterQuality, "production");
-        this.initializeEmptyChart( this.state.seamaWaterQuality, "chlorine");
-        this.initializeEmptyChart( this.state.seamaWaterQuality, "tds");
+        App.initializeEmptyChart( this.state.seamaWaterQuality, "production");
+        App.initializeEmptyChart( this.state.seamaWaterQuality, "chlorine");
+        App.initializeEmptyChart( this.state.seamaWaterQuality, "tds");
         RestServices.initializeState(this);
     }
 
@@ -65,6 +65,7 @@ class App extends Component {
                 }),
                 type: "line",
                 borderColor:'rgb(231, 113, 50)',
+                backgroundColor:'rgb(231, 113, 50)',
                 fill:false,
                 pointRadius:0,
                 borderWidth:5
@@ -84,6 +85,9 @@ class App extends Component {
             newWaterQuality.chlorine.datasets[0].borderColor='rgb(53, 91, 183)';
             newWaterQuality.chlorine.labels = newWaterQuality.chlorine.labels.map(function(time)
                 {return moment(time ).format("MMM Do YY")});
+            App.createGuide(newWaterQuality.chlorine.datasets, 6.0, "red", "High");
+            App.createGuide(newWaterQuality.chlorine.datasets, 2.0, "yellow", "Low");
+            App.createGuide(newWaterQuality.chlorine.datasets, 4.0, "green", "ideal");
         }
         if( ! waterQuality.hasOwnProperty("tds")){
             newWaterQuality.tds = { labels: [], datasets: [ { label: "", data: [],},]}
@@ -97,13 +101,33 @@ class App extends Component {
             newWaterQuality.tds.datasets[0].pointRadius=0;
             newWaterQuality.tds.datasets[0].borderColor='rgb(53, 91, 183)';
             newWaterQuality.tds.labels = newWaterQuality.tds.labels.map(function(time)
-            {return moment(time ).format("MMM Do YY")});
+                {return moment(time ).format("MMM Do YY")});
+            App.createGuide(newWaterQuality.tds.datasets, 1200, "red", "Shutdown");
+            App.createGuide(newWaterQuality.tds.datasets, 900, "yellow", "Risk");
+            App.createGuide(newWaterQuality.tds.datasets, 600, "rgb(198,209,232", "Fair");
+            App.createGuide(newWaterQuality.tds.datasets, 300, "green", "Good");
         }
 
         this.setState( {seamaWaterQuality:newWaterQuality});
     }
-    initializeEmptyChart( state, key ){
+    static initializeEmptyChart( state, key ){
         state[key] = { labels: [], datasets: [ { label: "", data: [],},]}
+    }
+    static createGuide( datasets, yValue, color, label){
+        let guideData = new Array(datasets[0].data.length);
+        guideData.fill( yValue);
+        let guide = {
+            label: label,
+            data: guideData,
+            type: "line",
+            borderColor:color,
+            backgroundColor:color,
+            fill:false,
+            pointRadius:0,
+            borderWidth:2
+        };
+        datasets.push(guide )
+
     }
 }
 

@@ -9,14 +9,15 @@ class SeamaWaterChlorineChart extends Component {
         return (<div className = "chart">
                 <Line
                     data={this.props.chartData}
-                    height={410}
+                    height={310}
                     width={200}
                     options={{
                         maintainAspectRatio: false,
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    beginAtZero:true
+                                    beginAtZero:true,
+                                    max:7.0
                                 }
                             }],
                             xAxes: [{

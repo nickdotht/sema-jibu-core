@@ -172,7 +172,7 @@ function getTDS(connection, res, params, results) {
                 var timeTicks = result.map(getDate);
                 timeTicks = timeTicks.reverse();
                 var values = result.map(getValue);
-                results.tds = {x_axis:timeTicks, datasets:[{label:"Total Disolved Solids", data:values}]};
+                results.tds = {x_axis:timeTicks, datasets:[{label:"TDS", data:values}]};
                 console.log("getTDS - completed");
             }
             res.json(results);

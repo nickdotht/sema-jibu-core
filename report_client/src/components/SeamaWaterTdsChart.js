@@ -9,14 +9,15 @@ class SeamaWaterTdsChart extends Component {
         return (<div className = "chart">
                 <Line
                     data={this.props.chartData}
-                    height={410}
+                    height={310}
                     width={200}
                     options={{
                         maintainAspectRatio: false,
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    beginAtZero:true
+                                    beginAtZero:true,
+                                    max:1400
                                 }
                             }],
                             xAxes: [{
@@ -28,7 +29,7 @@ class SeamaWaterTdsChart extends Component {
                         },
                         title: {
                             display: true,
-                            text: 'TDS Level',
+                            text: 'Total Disolved Solids Level',
                             position:"bottom"
                         }
 
