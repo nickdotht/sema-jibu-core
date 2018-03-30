@@ -50,7 +50,6 @@ class App extends Component {
         return (
           <div className="App">
               <SeamaToolbar seamaState={this.state}/>
-              <SeamaSidebar/>
               <SeamaWaterQualityContainer seamaState={this.state}/>
          </div>
         );

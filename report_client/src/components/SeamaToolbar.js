@@ -62,7 +62,7 @@ class SeamaToolbar extends Component {
     render() {
         return (
             <div>
-                <Navbar bsStyle="inverse">
+                <Navbar bsStyle="inverse" style={{marginBottom:"0px"}}>
                     <Navbar.Header >
                         <Navbar.Brand>
                             {<img src={require('images/dlo_image.png')} alt="logo" style={ImageStyle} />}

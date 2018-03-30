@@ -5,12 +5,12 @@ import 'App.css';
 const SeamaSidebarStyle = {
     background:"rgb(24,55,106)",
     position:"fixed",
-    width:"250px",
+    width:"240px",
     height:"100%",
-    top:"52px",
-    borderRight:"1px",
-    borderRightColor:"#e0e0e0",
-    borderRightStyle:"solid"
+    // top:"52px",
+    // borderRight:"1px",
+    // borderRightColor:"#e0e0e0",
+    // borderRightStyle:"solid"
 };
 
 const SeamaListStyleActive = {
@@ -29,7 +29,7 @@ const SeamaListStyleInactive = {
 
 const ImageStyle = {
     resize:"both",
-    width:"249px",
+    width:"240px",
     height:"80px",
 };
 
