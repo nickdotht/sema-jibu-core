@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
-import { Navbar, Jumbotron, Button, Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
-import logo from './logo.svg';
 import './App.css';
 import SeamaToolbar from "./components/SeamaToolbar";
-import SeamaSidebar from "./components/SeamaSidebar";
 import SeamaWaterQualityContainer from "./components/SeamaWaterQualityContainer";
 import * as RestServices from "actions/RestServices"
 import moment from 'moment';
-
-var menuStyle = { background:"blue"}
-var dividerStyle = { background:"white"}
 
 
 class App extends Component {
@@ -56,8 +50,7 @@ class App extends Component {
     }
     updateWaterQualityState( waterQuality){
         console.log("updateWaterQualityState");
-        var foo = moment("2017-01-23T13:56:24.000Z");
-        var newWaterQuality = {};
+        let newWaterQuality = {};
         newWaterQuality.flowRate = waterQuality.flowRate;
         newWaterQuality.sitePressure = waterQuality.sitePressure;
         newWaterQuality.totalProduction = waterQuality.totalProduction;
@@ -65,6 +58,7 @@ class App extends Component {
             // FIXUP/TDOD - We need default properties... chart will break if it is called with no data
             newWaterQuality.production = {
                 labels: [],
+                x_axis:[],
                 datasets: [
                     {
                         label: "",
@@ -76,13 +70,13 @@ class App extends Component {
             newWaterQuality.production = {
                 labels:waterQuality.production.x_axis,
                 datasets: waterQuality.production.datasets
-            }
+            };
             newWaterQuality.production.datasets[0].backgroundColor = 'rgb(53, 91, 183)';
             newWaterQuality.production.labels = newWaterQuality.production.labels.map(function(time)
                 {return moment(time ).format("MMM Do YY")});
 
             // Create the line series. This needs to be a trend line, dummy for now
-            var lineSet = {
+            let lineSet = {
                 label: "Forecast",
                 data: newWaterQuality.production.datasets[0].data.map(function (value) {
                     return (value * .8)
@@ -92,7 +86,7 @@ class App extends Component {
                 fill:false,
                 pointRadius:0,
                 borderWidth:5
-            }
+            };
             newWaterQuality.production.datasets.unshift(lineSet )
         }
         this.setState( {seamaWaterQuality:newWaterQuality});
