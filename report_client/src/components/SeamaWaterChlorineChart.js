@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import {Bar, Line} from 'react-chartjs-2';
 
-class SeamaWaterOperationsChart extends Component {
+class SeamaWaterChlorineChart extends Component {
     constructor(props, context) {
         super(props, context);
     }
     render() {
         return (<div className = "chart">
-                <Bar
+                <Line
                     data={this.props.chartData}
                     height={410}
                     width={200}
@@ -28,7 +28,7 @@ class SeamaWaterOperationsChart extends Component {
                         },
                         title: {
                             display: true,
-                            text: 'Production (Gallons)',
+                            text: 'Chlorine Level (PPM)',
                             position:"bottom"
                         }
 
@@ -38,4 +38,4 @@ class SeamaWaterOperationsChart extends Component {
         );
     }
 }
-export default SeamaWaterOperationsChart;
+export default SeamaWaterChlorineChart;

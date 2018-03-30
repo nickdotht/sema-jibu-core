@@ -22,21 +22,12 @@ class App extends Component {
             seamaWaterQuality:{
                 totalProduction:"N/A",
                 sitePressure:"N/A",
-                flowRate:"N/A",
-                production :{
-                    labels: [],
-                    datasets: [
-                        {
-                            label: "",
-                            data: [],
-                            backgroundColor: 'rgb(53, 91, 183)',
-                        },
-
-                    ],
-                }
-
+                flowRate:"N/A"
             }
         };
+        this.initializeEmptyChart( this.state.seamaWaterQuality, "production");
+        this.initializeEmptyChart( this.state.seamaWaterQuality, "chlorine");
+        this.initializeEmptyChart( this.state.seamaWaterQuality, "tds");
         RestServices.initializeState(this);
     }
 
@@ -56,16 +47,7 @@ class App extends Component {
         newWaterQuality.totalProduction = waterQuality.totalProduction;
         if( ! waterQuality.hasOwnProperty("production")){
             // FIXUP/TDOD - We need default properties... chart will break if it is called with no data
-            newWaterQuality.production = {
-                labels: [],
-                x_axis:[],
-                datasets: [
-                    {
-                        label: "",
-                        data: []
-                    },
-                ],
-            }
+            newWaterQuality.production = { labels: [], datasets: [ { label: "", data: [],},]}
         }else{
             newWaterQuality.production = {
                 labels:waterQuality.production.x_axis,
@@ -89,7 +71,39 @@ class App extends Component {
             };
             newWaterQuality.production.datasets.unshift(lineSet )
         }
+        if( ! waterQuality.hasOwnProperty("chlorine")){
+            newWaterQuality.chlorine = { labels: [], datasets: [ { label: "", data: [],},]}
+        }else{
+            newWaterQuality.chlorine = {
+                labels:waterQuality.chlorine.x_axis,
+                datasets: waterQuality.chlorine.datasets
+            };
+            newWaterQuality.chlorine.datasets[0].backgroundColor='rgb(53, 91, 183)';
+            newWaterQuality.chlorine.datasets[0].fill=false;
+            newWaterQuality.chlorine.datasets[0].pointRadius=0;
+            newWaterQuality.chlorine.datasets[0].borderColor='rgb(53, 91, 183)';
+            newWaterQuality.chlorine.labels = newWaterQuality.chlorine.labels.map(function(time)
+                {return moment(time ).format("MMM Do YY")});
+        }
+        if( ! waterQuality.hasOwnProperty("tds")){
+            newWaterQuality.tds = { labels: [], datasets: [ { label: "", data: [],},]}
+        }else{
+            newWaterQuality.tds = {
+                labels:waterQuality.tds.x_axis,
+                datasets: waterQuality.tds.datasets
+            };
+            newWaterQuality.tds.datasets[0].backgroundColor='rgb(53, 91, 183)';
+            newWaterQuality.tds.datasets[0].fill=false;
+            newWaterQuality.tds.datasets[0].pointRadius=0;
+            newWaterQuality.tds.datasets[0].borderColor='rgb(53, 91, 183)';
+            newWaterQuality.tds.labels = newWaterQuality.tds.labels.map(function(time)
+            {return moment(time ).format("MMM Do YY")});
+        }
+
         this.setState( {seamaWaterQuality:newWaterQuality});
+    }
+    initializeEmptyChart( state, key ){
+        state[key] = { labels: [], datasets: [ { label: "", data: [],},]}
     }
 }
 

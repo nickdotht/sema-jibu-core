@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Grid, Row, Col } from 'react-bootstrap';
 import 'App.css';
 import SeamaSummaryPanel1 from "./SeamaSummaryPanel1";
-import SeamaWaterOperationsChart from "./SeamaWaterOperationsChart";
+import SeamaWaterOperationsChart from "./SeamaWaterProductionChart";
 import SeamaSidebar from "./SeamaSidebar";
 
 var SeamaWaterQualityContainerStyle = {
