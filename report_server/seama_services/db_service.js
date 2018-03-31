@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 var connectionTable = {};
 function dbService(req, res, next) {
-    console.log("dbService Entry");
+    console.log("dbService Entry route=", req.route);
     var sessData = req.session;
     console.log("sessData", JSON.stringify(sessData));
     if( !connectionTable[sessData.id]){

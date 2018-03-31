@@ -16,11 +16,11 @@ var dbService = require('./seama_services/db_service').dbService;
 var app = express();
 app.use(session({ secret: 'seama-secret-token', cookie: { maxAge: 60000 }}));
 
-app.use(function (req, res, next) {
-//    console.log("dbService");
-    dbService( req, res, next);
-
-});
+// app.use(function (req, res, next) {
+// //    console.log("dbService");
+//     dbService( req, res, next);
+//
+// });
 
 
 // view engine setup
@@ -42,9 +42,9 @@ app.use(express.static(path.join(__dirname, 'public_react/build/')));
 
 app.use('/', index);
 app.use('/users', users);
-app.use('/seama_user', seama_user);
-app.use('/seama_kiosks', seama_kiosks);
-app.use('/seama_water_quality', seama_water_quality);
+// app.use('/seama_user', seama_user);
+app.use('/untapped/kiosks', dbService, seama_kiosks);
+app.use('/untapped/water-quality', dbService, seama_water_quality);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

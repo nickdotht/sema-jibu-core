@@ -5,20 +5,20 @@ export function initializeState( root){
     rootComponent = root;
 }
 
-export function receiveSeamaUser(json) {
-    var name = json.seamaUser;
-    rootComponent.setState( {seamaUser:name});
-    console.log("receiveSeamaUser - ", name)
-}
-
-export function fetchSeamaUser() {
-    return fetch('/seama_user')
-        .then(response => response.json())
-        .then(json => receiveSeamaUser(json))
-        .catch(function(error){
-            console.log("fetchSeamaUser failed", error);
-        });
-}
+// export function receiveSeamaUser(json) {
+//     var name = json.seamaUser;
+//     rootComponent.setState( {seamaUser:name});
+//     console.log("receiveSeamaUser - ", name)
+// }
+//
+// export function fetchSeamaUser() {
+//     return fetch('/seama_user')
+//         .then(response => response.json())
+//         .then(json => receiveSeamaUser(json))
+//         .catch(function(error){
+//             console.log("fetchSeamaUser failed", error);
+//         });
+// }
 
 export function receiveSeamaKiosks(json) {
     var kiosk = json.kiosks;
@@ -27,7 +27,7 @@ export function receiveSeamaKiosks(json) {
 }
 
 export function fetchSeamaKiosks() {
-    return fetch('/seama_kiosks')
+    return fetch('/untapped/kiosks')
         .then(response => response.json())
         .then(json => receiveSeamaKiosks(json))
         .catch(function(error){
@@ -42,7 +42,7 @@ export function receiveWaterQuality(json) {
 
 export function fetchWaterQuality( params) {
     var urlParms = queryParams(params);
-    var url = '/seama_water_quality?' + urlParms;
+    var url = '/untapped/water-quality?' + urlParms;
     return fetch(url)
         .then(response => response.json())
         .then(json => receiveWaterQuality(json))
