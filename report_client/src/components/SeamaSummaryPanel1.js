@@ -14,12 +14,12 @@ const SeamaPanel1Style = {
 
 class SeamaSummaryPanel1 extends Component {
     render() {
-        return (<div className="SeamaSummaryPanelContainer">
+        return (<div style={{width:"60%"}}>
                 <Panel className="SeamaSummaryPanel">
-                    <Panel.Body>
-                        <Panel.Title componentClass="h3" style={{marginBottom:"5px"}}>{this.props.title}</Panel.Title>
-                        <p style={{fontSize:"x-large"}}>{SeamaSummaryPanel1.format(this.props.value)}</p>
-                        <p>{this.props.units}</p>
+                    <Panel.Body  style={{padding:"7px"}}>
+                        <Panel.Title componentClass="h3" style={{margin:"0"}}>{this.props.title}</Panel.Title>
+                        <p style={{fontSize:"x-large",margin:"0" }}>{SeamaSummaryPanel1.format(this.props.value)}</p>
+                        <p style={{margin:"0"}}>{this.props.units}</p>
                     </Panel.Body>
                 </Panel>
             </div>
