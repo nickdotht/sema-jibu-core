@@ -9,7 +9,7 @@ class SeamaWaterTdsChart extends Component {
         return (<div className = "chart">
                 <Line
                     data={this.props.chartData}
-                    height={310}
+                    height={410}
                     width={200}
                     options={{
                         maintainAspectRatio: false,
