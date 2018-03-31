@@ -7,8 +7,9 @@ import SeamaWaterTdsChart from "./SeamaWaterTdsChart";
 import SeamaSidebar from "./SeamaSidebar";
 import 'css/Seama.css';
 import SeamaWaterQualityNavigation from "./SeamaWaterQualityNavigation";
-
-
+import { Alert } from 'react-bootstrap';
+import SeamaServiceError from "./SeamaServiceError";
+import SeamaDatabaseError from "./SeamaDatabaseError";
 
 class SeamaWaterQualityContainer extends Component {
     constructor(props, context) {
@@ -17,6 +18,22 @@ class SeamaWaterQualityContainer extends Component {
     }
 
     render() {
+        // return this.showWaterQuality();
+        return this.showContent();
+    }
+    showContent(props){
+        if( this.props.seamaState.hasOwnProperty("healthCheck")){
+            if( this.props.seamaState.healthCheck.server != "Ok" ){
+                return SeamaServiceError(props);
+            }else  if( this.props.seamaState.healthCheck.database != "Ok" ){
+                return SeamaDatabaseError(props)
+            }
+        }
+        return this.showWaterQuality();
+
+    }
+
+    showWaterQuality( props ){
         return (
             <div className="WaterQualityContainer">
                 <div className ="SeamaSidebarItem">
@@ -38,7 +55,7 @@ class SeamaWaterQualityContainer extends Component {
                 </div>
                 <div className = "WaterQualityChartContainer">
                     <div className= "WaterQualityMainChartItem">
-                         <SeamaWaterProductionChart chartData={this.props.seamaState.seamaWaterQuality["production"]}/>
+                        <SeamaWaterProductionChart chartData={this.props.seamaState.seamaWaterQuality["production"]}/>
                     </div>
                     <div className= "WaterQualitySecondaryChart1Item">
                         <SeamaWaterChlorineChart chartData={this.props.seamaState.seamaWaterQuality["chlorine"]}/>
@@ -50,6 +67,7 @@ class SeamaWaterQualityContainer extends Component {
 
             </div>
         );
+
     }
 }
 
