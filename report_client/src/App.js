@@ -39,6 +39,9 @@ class App extends Component {
          </div>
         );
     }
+    udpdateHealthCheck( status){
+        this.setState( status);
+    }
     updateWaterQualityState( waterQuality){
         console.log("updateWaterQualityState");
         let newWaterQuality = {};

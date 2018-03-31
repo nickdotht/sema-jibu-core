@@ -37,7 +37,7 @@ class SeamaToolbar extends Component {
     }
 
     componentDidMount() {
-        // RestServices.fetchSeamaUser();
+        RestServices.fetchHealthCheck();
         RestServices.fetchSeamaKiosks();
     }
 

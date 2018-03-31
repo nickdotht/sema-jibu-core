@@ -5,20 +5,21 @@ export function initializeState( root){
     rootComponent = root;
 }
 
-// export function receiveSeamaUser(json) {
-//     var name = json.seamaUser;
-//     rootComponent.setState( {seamaUser:name});
-//     console.log("receiveSeamaUser - ", name)
-// }
-//
-// export function fetchSeamaUser() {
-//     return fetch('/seama_user')
-//         .then(response => response.json())
-//         .then(json => receiveSeamaUser(json))
-//         .catch(function(error){
-//             console.log("fetchSeamaUser failed", error);
-//         });
-// }
+export function receiveHealthCheck(json) {
+    rootComponent.udpdateHealthCheck( {healthCheck:json});
+    console.log("receiveSeamaUser - ", json.toString())
+}
+
+export function fetchHealthCheck() {
+    return fetch('/untapped/health-check')
+        .then(response => response.json())
+        .then(json => receiveHealthCheck(json))
+        .catch(function(error){
+            // This means the service isn't running.
+            console.log("fetchHealthCheck failed", error);
+            rootComponent.setState( {healthCheck:{server:"failed", database:"n/a" }});
+        });
+}
 
 export function receiveSeamaKiosks(json) {
     var kiosk = json.kiosks;
