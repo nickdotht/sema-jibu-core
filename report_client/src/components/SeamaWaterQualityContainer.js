@@ -17,29 +17,29 @@ class SeamaWaterQualityContainer extends Component {
 
     render() {
         return (
-            <div className="SeamaGridContainer">
-                <div className ="SeamaSidebar">
+            <div className="WaterQualityContainer">
+                <div className ="SeamaSidebarItem">
                     <SeamaSidebar/>
                 </div>
-                <div className = "SeamaSummaryContainer">
-                    <div className ="SeamaWaterQualitySummary">
+                <div className = "WaterQualitySummaryContainer">
+                    <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Total Production" units={"Gallons"} value={this.props.seamaState.seamaWaterQuality["totalProduction"]}/>
                     </div>
-                    <div className ="SeamaWaterQualitySummary">
+                    <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Site Pressure" units={"PSI"} value={this.props.seamaState.seamaWaterQuality["sitePressure"]}/>
                     </div>
-                    <div className ="SeamaWaterQualitySummary">
+                    <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Flow Rate" units={"GPM"} value={this.props.seamaState.seamaWaterQuality["flowRate"]}/>
                     </div>
                 </div>
-                <div className = "SeamaChartContainer">
-                    <div className= "SeamaWaterQualityMainChart">
+                <div className = "WaterQualityChartContainer">
+                    <div className= "WaterQualityMainChartItem">
                          <SeamaWaterProductionChart chartData={this.props.seamaState.seamaWaterQuality["production"]}/>
                     </div>
-                    <div className= "SeamaWaterQualitySecondaryChart1">
+                    <div className= "WaterQualitySecondaryChart1Item">
                         <SeamaWaterChlorineChart chartData={this.props.seamaState.seamaWaterQuality["chlorine"]}/>
                     </div>
-                    <div className= "SeamaWaterQualitySecondaryChart2">
+                    <div className= "WaterQualitySecondaryChart2Item">
                         <SeamaWaterTdsChart chartData={this.props.seamaState.seamaWaterQuality["tds"]}/>
                     </div>
                 </div>

@@ -4,18 +4,11 @@ import { Panel } from 'react-bootstrap';
 import 'App.css';
 import 'css/Seama.css';
 
-const SeamaPanel1Style = {
-    borderRadius: "25px",
-    borderColor:"rgb(101,139,194)",
-    borderStyle:"solid",
-    borderWidth:"medium",
-    margin:"0"
-};
 
 class SeamaSummaryPanel1 extends Component {
     render() {
         return (<div style={{width:"60%"}}>
-                <Panel className="SeamaSummaryPanel">
+                <Panel className="WaterQualitySummaryPanel">
                     <Panel.Body  style={{padding:"7px"}}>
                         <Panel.Title componentClass="h3" style={{margin:"0"}}>{this.props.title}</Panel.Title>
                         <p style={{fontSize:"x-large",margin:"0" }}>{SeamaSummaryPanel1.format(this.props.value)}</p>
