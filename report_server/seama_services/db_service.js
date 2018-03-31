@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 var connectionTable = {};
 function dbService(req, res, next) {
-    console.log("dbService Entry route=", req.route);
+    console.log("dbService Entry");
     var sessData = req.session;
     console.log("sessData", JSON.stringify(sessData));
     if( !connectionTable[sessData.id]){
@@ -27,7 +27,7 @@ function createConnection( sessionData, req, res, next ){
 
     con.connect(function (err) {
         if (err) {
-            res.status(401).send('Not Authorized')
+            res.status(500).send('Not Authorized');
             sessionData.dbConnection = null;
         } else {
             console.log("Connected! - calling next");

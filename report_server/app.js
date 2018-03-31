@@ -6,8 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
-var seama_user = require('./routes/seama_user');
+var seama_health_check = require('./routes/seama_health_check');
+// var seama_user = require('./routes/seama_user');
 var seama_kiosks = require('./routes/seama_kiosks');
 var seama_water_quality = require('./routes/seama_water_quality');
 var session = require('express-session');
@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public_react/build/')));
 
 app.use('/', index);
-app.use('/users', users);
+app.use('/untapped/health-check', seama_health_check);
 // app.use('/seama_user', seama_user);
 app.use('/untapped/kiosks', dbService, seama_kiosks);
 app.use('/untapped/water-quality', dbService, seama_water_quality);
@@ -54,7 +54,7 @@ app.use(function(req, res, next) {
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res ) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
