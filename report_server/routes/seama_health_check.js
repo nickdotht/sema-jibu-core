@@ -1,6 +1,7 @@
 var express = require('express');
 var mysql = require('mysql');
 var router = express.Router();
+var sqlConfig = require('../seama_services/db_service').sqlConfig;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -11,13 +12,7 @@ router.get('/', function(req, res, next) {
 });
 
 function testConnection( req, res ){
-    var con = mysql.createConnection({
-        host: "104.131.40.239",
-        port: "3306",
-        database: "dlo",
-        user: "app",
-        password: "password"
-    });
+    var con = mysql.createConnection(sqlConfig);
 
     con.connect(function (err) {
         if (err) {

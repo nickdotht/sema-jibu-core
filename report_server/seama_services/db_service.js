@@ -1,5 +1,14 @@
 var mysql = require('mysql');
 var connectionTable = {};
+
+const sqlConfig = {
+    host: "104.131.40.239",
+    port: "3306",
+    database: "dlo",
+    user: "app",
+    password: "password"
+}
+
 function dbService(req, res, next) {
     console.log("dbService Entry");
     var sessData = req.session;
@@ -15,13 +24,7 @@ function dbService(req, res, next) {
 }
 
 function createConnection( sessionData, req, res, next ){
-    var con = mysql.createConnection({
-        host: "104.131.40.239",
-        port: "3306",
-        database: "dlo",
-        user: "app",
-        password: "password"
-    });
+    var con = mysql.createConnection(sqlConfig);
 
     connectionTable[sessionData.id] = con;
 
@@ -38,5 +41,6 @@ function createConnection( sessionData, req, res, next ){
 
 module.exports = {
     dbService:dbService,
-    connectionTable:connectionTable
+    connectionTable:connectionTable,
+    sqlConfig:sqlConfig
 };
