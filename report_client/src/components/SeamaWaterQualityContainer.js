@@ -6,6 +6,7 @@ import SeamaWaterChlorineChart from "./SeamaWaterChlorineChart";
 import SeamaWaterTdsChart from "./SeamaWaterTdsChart";
 import SeamaSidebar from "./SeamaSidebar";
 import 'css/Seama.css';
+import SeamaWaterQualityNavigation from "./SeamaWaterQualityNavigation";
 
 
 
@@ -31,6 +32,9 @@ class SeamaWaterQualityContainer extends Component {
                     <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Flow Rate" units={"GPM"} value={this.props.seamaState.seamaWaterQuality["flowRate"]}/>
                     </div>
+                </div>
+                <div className ="WaterQualityNavigtionItem">
+                    <SeamaWaterQualityNavigation/>
                 </div>
                 <div className = "WaterQualityChartContainer">
                     <div className= "WaterQualityMainChartItem">
