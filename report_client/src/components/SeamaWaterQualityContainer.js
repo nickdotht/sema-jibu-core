@@ -4,10 +4,8 @@ import SeamaSummaryPanel1 from "./SeamaSummaryPanel1";
 import SeamaWaterProductionChart from "./SeamaWaterProductionChart";
 import SeamaWaterChlorineChart from "./SeamaWaterChlorineChart";
 import SeamaWaterTdsChart from "./SeamaWaterTdsChart";
-import SeamaSidebar from "./SeamaSidebar";
-import 'css/Seama.css';
+import 'css/SeamaWaterOperations.css';
 import SeamaWaterQualityNavigation from "./SeamaWaterQualityNavigation";
-import { Alert } from 'react-bootstrap';
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 
@@ -33,12 +31,9 @@ class SeamaWaterQualityContainer extends Component {
 
     }
 
-    showWaterQuality( props ){
+    showWaterQuality( ){
         return (
             <div className="WaterQualityContainer">
-                <div className ="SeamaSidebarItem">
-                    <SeamaSidebar/>
-                </div>
                 <div className = "WaterQualitySummaryContainer">
                     <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Total Production" units={"Gallons"} value={this.props.seamaState.seamaWaterQuality["totalProduction"]}/>

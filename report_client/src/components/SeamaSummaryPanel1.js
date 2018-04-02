@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Panel } from 'react-bootstrap';
 import 'App.css';
-import 'css/Seama.css';
+import 'css/SeamaWaterOperations.css';
 
 
 class SeamaSummaryPanel1 extends Component {

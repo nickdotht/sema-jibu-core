@@ -3,7 +3,7 @@ import { Navbar, Label, Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap
 import 'App.css';
 import * as RestServices from "actions/RestServices"
 
-var menuStyle = {}
+const menuStyle = {};
 
 const ImageStyle = {
     resize:"both",
@@ -41,27 +41,27 @@ class SeamaToolbar extends Component {
         RestServices.fetchSeamaKiosks();
     }
 
-    handleSelect(eventKey, foo){
+    handleSelect(eventKey){
         console.log(eventKey, this.props.seamaState.seamaKiosk[eventKey].name);
         this.setState({title: this.props.seamaState.seamaKiosk[eventKey].name});
-        var kioskParams = {kioskID:this.props.seamaState.seamaKiosk[eventKey].id};
+        let kioskParams = {kioskID:this.props.seamaState.seamaKiosk[eventKey].id};
         RestServices.fetchWaterQuality(kioskParams);
     };
 
     buildMenuItems(){
-         var menuItems = [];
+        let menuItems = [];
         if( this.props.seamaState.seamaKiosk){
-            var keys = Object.keys(this.props.seamaState.seamaKiosk);
-            for( var i = 0; i < keys.length; i++ ){
-                var kiosk = this.props.seamaState.seamaKiosk[keys[i]];
-                 menuItems.push(<MenuItem eventKey={keys[i]}style={menuStyle}>{kiosk.name}</MenuItem>);
+            let keys = Object.keys(this.props.seamaState.seamaKiosk);
+            for( let i = 0; i < keys.length; i++ ){
+                let kiosk = this.props.seamaState.seamaKiosk[keys[i]];
+                 menuItems.push(<MenuItem eventKey={keys[i]} style={menuStyle}>{kiosk.name}</MenuItem>);
             }
         }
         return menuItems;
     }
     render() {
         return (
-            <div>
+            <div className="SeamaNavToolbar" >
                 <Navbar bsStyle="inverse" style={{marginBottom:"0px"}}>
                     <Navbar.Header >
                         <Navbar.Brand>

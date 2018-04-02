@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
+import './css/SeamaNav.css'
 import SeamaToolbar from "./components/SeamaToolbar";
-import SeamaWaterQualityContainer from "./components/SeamaWaterQualityContainer";
+import SeamaMain from "./components/SeamaMain";
+import SeamaSidebar from "./components/SeamaSidebar";
 import * as RestServices from "actions/RestServices"
 import moment from 'moment';
 
@@ -33,9 +35,10 @@ class App extends Component {
 
     render() {
         return (
-          <div className="App">
+          <div className="SeamaNav">
               <SeamaToolbar seamaState={this.state}/>
-              <SeamaWaterQualityContainer seamaState={this.state}/>
+              <SeamaSidebar seamaState={this.state}/>
+              <SeamaMain seamaState={this.state}/>
          </div>
         );
     }
