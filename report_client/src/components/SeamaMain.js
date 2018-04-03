@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import SeamaWaterQualityContainer from "./SeamaWaterQualityContainer";
+import SeamaWaterQualityContainer from "./SeamaWaterQuality";
 import SeamaSales from "./SeamaSales";
 import SeamaDistributionMap from "./SeamaDistributionMap";
 import SeamaDeliverySchedule from "./SeamaDeliverySchedule";

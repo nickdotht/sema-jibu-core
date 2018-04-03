@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Nav, NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
 import 'css/CustomDropdown.css';
-import * as RestServices from "actions/RestServices"
 
 
 class SeamaWaterQualityNavigation extends Component {

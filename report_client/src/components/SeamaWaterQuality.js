@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import 'App.css';
-import SeamaSummaryPanel1 from "./SeamaSummaryPanel1";
-import SeamaWaterProductionChart from "./SeamaWaterProductionChart";
-import SeamaWaterChlorineChart from "./SeamaWaterChlorineChart";
-import SeamaWaterTdsChart from "./SeamaWaterTdsChart";
+import SeamaSummaryPanel1 from "./WaterQuality/SeamaSummaryPanel1";
+import SeamaWaterProductionChart from "./WaterQuality/SeamaWaterProductionChart";
+import SeamaWaterChlorineChart from "./WaterQuality/SeamaWaterChlorineChart";
+import SeamaWaterTdsChart from "./WaterQuality/SeamaWaterTdsChart";
 import 'css/SeamaWaterOperations.css';
-import SeamaWaterQualityNavigation from "./SeamaWaterQualityNavigation";
+import SeamaWaterQualityNavigation from "./WaterQuality/SeamaWaterQualityNavigation";
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 
