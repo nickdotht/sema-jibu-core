@@ -21,12 +21,6 @@ const SeamaListStyleActive = {
     color:"white"
 };
 
-const SeamaListStyleInactive = {
-    textAlign:"left",
-    paddingLeft:"20px",
-    color:"rgba(255,255,255,.7)",
-    backgroundColor:"rgb(24,55,106)"
-};
 
 const ImageStyle = {
     resize:"both",
@@ -42,34 +36,13 @@ function CustomComponent1({ children }) {
         </li>
     );
 }
-function CustomComponent2({ children }) {
-    return (
-        <li className="list-group-item" onClick={() => {}} style={SeamaListStyleInactive}>
-            {children}
-        </li>
-    );
-}
-
-class SeamaSidebar extends Component {
-    render() {
-        return (
-            <div className="SeamaNavSidebar" style={SeamaSidebarStyle}>
-                <div>
-                    {<img src={require('images/sema-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
-                </div>
-                <header>
-                    <nav>
-                        <ul>
-                            <li><Link to='/'>Water Operations</Link></li>
-                            <li><Link to='/Sales'>Sales</Link></li>
-                            <li><Link to='/DistributionMap'>Distribution Map</Link></li>
-                        </ul>
-                    </nav>
-                </header>
-            </div>
-        );
-    }
-}
+// function CustomComponent2({ children }) {
+//     return (
+//         <li className="list-group-item" onClick={() => {}} style={SeamaListStyleInactive}>
+//             {children}
+//         </li>
+//     );
+// }
 
 // class SeamaSidebar extends Component {
 //     render() {
@@ -78,20 +51,45 @@ class SeamaSidebar extends Component {
 //                 <div>
 //                     {<img src={require('images/sema-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
 //                 </div>
-//                 <ListGroup>
-//                     <CustomComponent1  href="#" active style={SeamaListStyleActive}><i class="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}/>
-//                         <Link to='/'>Water Operations</Link></CustomComponent1>
-//                     <CustomComponent1 href="#" active style={SeamaListStyleActive}><i class="	glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
-//                         <Link to='/'>Sales</Link></CustomComponent1>
-//                     <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>Distribution Map</CustomComponent2>
-//                     <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-time" style={{paddingRight:"15px"}}/>Delivery Schedule</CustomComponent2>
-//                     <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-inbox" style={{paddingRight:"15px"}}/>Inventory Management</CustomComponent2>
-//                     <CustomComponent2 href="#" disabled style={SeamaListStyleInactive}><i class="glyphicon glyphicon-usd" style={{paddingRight:"15px"}}/>Financials</CustomComponent2>
-//                 </ListGroup>
+//                 <header>
+//                     <nav>
+//                         <ul>
+//                             <li><Link to='/'>Water Operations</Link></li>
+//                             <li><Link to='/Sales'>Sales</Link></li>
+//                             <li><Link to='/DistributionMap'>Distribution Map</Link></li>
+//                         </ul>
+//                     </nav>
+//                 </header>
 //             </div>
 //         );
 //     }
 // }
-//
+
+class SeamaSidebar extends Component {
+    render() {
+        return (
+            <div className="SeamaNavSidebar" style={SeamaSidebarStyle}>
+                <div>
+                    {<img src={require('images/sema-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
+                </div>
+                <ListGroup>
+                    <CustomComponent1><i className="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}/>
+                        <Link to='/'>Water Operations</Link></CustomComponent1>
+                    <CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
+                        <Link to='/Sales'>Sales</Link></CustomComponent1>
+                    <CustomComponent1><i className="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>
+                        <Link to='/DistributionMap'>Distribution Map</Link></CustomComponent1>
+                    <CustomComponent1><i className="glyphicon glyphicon-time" style={{paddingRight:"15px"}}/>
+                        <Link to='/DeliverySchedule'>Delivery Schedule</Link></CustomComponent1>
+                    <CustomComponent1><i className="glyphicon glyphicon-inbox" style={{paddingRight:"15px"}}/>
+                        <Link to='/InventoryManagement'>Inventory Management</Link></CustomComponent1>
+                    <CustomComponent1><i className="glyphicon glyphicon-usd" style={{paddingRight:"15px"}}/>
+                        <Link to='/Financials'>Financials</Link></CustomComponent1>
+                </ListGroup>
+            </div>
+        );
+    }
+}
+
 
 export default SeamaSidebar;

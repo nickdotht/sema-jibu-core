@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import 'App.css';
-import 'css/SeamaDistributionMap.css';
+import 'css/SeamaFinancials.css';
 
-class SeamaDistributionMap extends Component {
+class SeamaFinancials extends Component {
     constructor(props, context) {
         super(props, context);
-        console.log("SeamaDistributionMap - Constructor");
+        console.log("SeamaSales - Constructor");
     }
 
     render() {
-        return this.showDistributionMap();
+        return this.showFinancials();
     }
 
-    showDistributionMap(){
+    showFinancials(){
         return (
-            <div className="DistributionMap">
+            <div className="Financials">
                 <h2 style={{textAlign:"center", color:"white"}}>Not Yet Implemented</h2>
             </div>
         );
@@ -22,4 +22,4 @@ class SeamaDistributionMap extends Component {
     }
 }
 
-export default SeamaDistributionMap;
+export default SeamaFinancials;

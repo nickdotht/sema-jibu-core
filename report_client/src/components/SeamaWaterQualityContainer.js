@@ -16,14 +16,13 @@ class SeamaWaterQualityContainer extends Component {
     }
 
     render() {
-        // return this.showWaterQuality();
         return this.showContent();
     }
     showContent(props){
         if( this.props.seamaState.hasOwnProperty("healthCheck")){
-            if( this.props.seamaState.healthCheck.server != "Ok" ){
+            if( this.props.seamaState.healthCheck.server !== "Ok" ){
                 return SeamaServiceError(props);
-            }else  if( this.props.seamaState.healthCheck.database != "Ok" ){
+            }else  if( this.props.seamaState.healthCheck.database !== "Ok" ){
                 return SeamaDatabaseError(props)
             }
         }

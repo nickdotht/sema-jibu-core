@@ -1,20 +1,20 @@
 import React, { Component } from 'react';
 import 'App.css';
-import 'css/SeamaSales.css';
+import 'css/SeamaInventoryManagement.css';
 
-class SeamaSales extends Component {
+class SeamaInventoryManagement extends Component {
     constructor(props, context) {
         super(props, context);
         console.log("SeamaSales - Constructor");
     }
 
     render() {
-        return this.showSales();
+         return this.showInventoryManagement();
     }
 
-    showSales(){
+    showInventoryManagement(){
         return (
-            <div className="Sales">
+            <div className="InventoryManagement">
                 <h2 style={{textAlign:"center", color:"white"}}>Not Yet Implemented</h2>
             </div>
         );
@@ -22,4 +22,4 @@ class SeamaSales extends Component {
     }
 }
 
-export default SeamaSales;
+export default SeamaInventoryManagement;
