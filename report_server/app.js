@@ -14,7 +14,7 @@ var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
 
 var app = express();
-app.use(session({ secret: 'seama-secret-token', cookie: { maxAge: 60000 }}));
+app.use(session({ secret: 'seama-secret-token', cookie: { maxAge: 45000, "secure": false,rolling:true }}));
 
 // app.use(function (req, res, next) {
 // //    console.log("dbService");

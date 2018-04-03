@@ -11,7 +11,7 @@ export function receiveHealthCheck(json) {
 }
 
 export function fetchHealthCheck() {
-    return fetch('/untapped/health-check')
+    return fetch('/untapped/health-check', {credentials: 'include'})
         .then(response => response.json())
         .then(json => receiveHealthCheck(json))
         .catch(function(error){
@@ -28,7 +28,7 @@ export function receiveSeamaKiosks(json) {
 }
 
 export function fetchSeamaKiosks() {
-    return fetch('/untapped/kiosks')
+    return fetch('/untapped/kiosks', {credentials: 'include'})
         .then(response => response.json())
         .then(json => receiveSeamaKiosks(json))
         .catch(function(error){
@@ -44,7 +44,7 @@ export function receiveWaterQuality(json) {
 export function fetchWaterQuality( params) {
     var urlParms = queryParams(params);
     var url = '/untapped/water-quality?' + urlParms;
-    return fetch(url)
+    return fetch(url, {credentials: 'include'})
         .then(response => response.json())
         .then(json => receiveWaterQuality(json))
         .catch(function(error){
