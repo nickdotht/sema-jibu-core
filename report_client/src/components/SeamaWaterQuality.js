@@ -9,7 +9,7 @@ import SeamaWaterQualityNavigation from "./WaterQuality/SeamaWaterQualityNavigat
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 
-class SeamaWaterQualityContainer extends Component {
+class SeamaWaterQuality extends Component {
     constructor(props, context) {
         super(props, context);
 
@@ -65,4 +65,4 @@ class SeamaWaterQualityContainer extends Component {
     }
 }
 
-export default SeamaWaterQualityContainer;
+export default SeamaWaterQuality;
