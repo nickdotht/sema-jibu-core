@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import {Line} from 'react-chartjs-2';
 
 class SeamaWaterChlorineChart extends Component {
-    constructor(props, context) {
-        super(props, context);
-    }
+
     render() {
         return (<div className = "chart">
                 <Line

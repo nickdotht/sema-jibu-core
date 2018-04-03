@@ -6,6 +6,8 @@ import SeamaMain from "./components/SeamaMain";
 import SeamaSidebar from "./components/SeamaSidebar";
 import * as RestServices from "actions/RestServices"
 import moment from 'moment';
+// import SeamaDatabaseError from "./components/SeamaDatabaseErrr";
+import SeamaLogIn from "components/SeamaLog";
 
 
 class App extends Component {
@@ -15,6 +17,7 @@ class App extends Component {
 
         this.state = {
             Version: "0.0.0.2",
+            LogState: "NotLoggedIn", // NotLoggedIn, LoggedIn, LoggedOut, NoService, BadCredentials
             Summary: {
                 totalGallons:20,
                 sitePressure:42.4,
@@ -34,6 +37,21 @@ class App extends Component {
     }
 
     render() {
+        return this.showContentOrLogin();
+    }
+    showContentOrLogin(props){
+        if( this.state.LogState !== "LoggedIn" ){
+            return this.showLogin();
+        }else{
+            return this.showContent()
+        }
+    }
+    showLogin(){
+        return(
+                <SeamaLogIn seamaState={this.state}/>
+            );
+    }
+    showContent() {
         return (
           <div className="SeamaNav">
               <SeamaToolbar seamaState={this.state}/>
@@ -42,8 +60,14 @@ class App extends Component {
          </div>
         );
     }
+
+
     udpdateHealthCheck( status){
         this.setState( status);
+    }
+
+    updateLogin( login ){
+        this.setState(login);
     }
     updateWaterQualityState( waterQuality){
         console.log("updateWaterQualityState");

@@ -57,3 +57,26 @@ function queryParams(params) {
         .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
         .join('&');
 }
+
+export function receiveLogin(json) {
+    rootComponent.updateLogin(json);
+    console.log("receiveLogin - ", json)
+}
+
+export function fetchUserRole(user, password) {
+    // Note user basic authentication for now
+    const encodedCredentials = new Buffer(user + ':' + password).toString('base64');
+    const authValue = "Basic "+ encodedCredentials;
+
+    return fetch('/untapped/login', {headers: new Headers({'Authorization':authValue})})
+        .then(response => response.json())
+        .then(json => receiveLogin(json))
+        .catch(function(error){
+            console.log("receiveLogin failed", error);
+            rootComponent.updateLogin({LogState: "NoService" });
+        });
+}
+
+export function clearLogin(){
+    rootComponent.updateLogin({LogState: "NotLoggedIn" });
+}

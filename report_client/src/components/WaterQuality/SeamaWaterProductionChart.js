@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import {Bar} from 'react-chartjs-2';
 
 class SeamaWaterProductionChart extends Component {
-    constructor(props, context) {
-        super(props, context);
-    }
     render() {
         return (<div className = "chart">
                 <Bar

@@ -10,10 +10,6 @@ import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 
 class SeamaWaterQuality extends Component {
-    constructor(props, context) {
-        super(props, context);
-
-    }
 
     render() {
         return this.showContent();
