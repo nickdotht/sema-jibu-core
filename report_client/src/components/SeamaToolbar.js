@@ -59,6 +59,12 @@ class SeamaToolbar extends Component {
         }
         return menuItems;
     }
+    logOut (){
+        console.log("logOut");
+        RestServices.clearLogin();
+
+    }
+
     render() {
         return (
             <div className="SeamaNavToolbar" >
@@ -79,7 +85,7 @@ class SeamaToolbar extends Component {
                             {this.buildMenuItems()}
                         </NavDropdown>
                     </Nav>
-                    <Label  eventKey={1} href="#" style={LabelStyleRight}>
+                    <Label  eventKey={1} onClick={this.logOut} href="#" style={LabelStyleRight}>
                         Logout
                     </Label>
                     <Label  eventKey={1} href="#" style={LabelStyleRight}>

@@ -12,6 +12,11 @@ router.get('/', function(req, res ) {
         if( credentials[0] === "administrator".toLowerCase() &&
             credentials[1] === "dloHaiti" ){
             res.json({LogState: "LoggedIn"});
+            // var fooRes = res;
+            // setTimeout(function(){
+            //     fooRes.json({LogState: "LoggedIn"});
+            // }, 3000)
+
         }else{
             res.json({LogState: "BadCredentials"});
         }

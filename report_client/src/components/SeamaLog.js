@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form, FormGroup, Col, FormControl, Button, Alert } from 'react-bootstrap';
+import {RingLoader, BarLoader, ClipLoader, BounceLoader} from 'react-spinners';
 import * as RestServices from "actions/RestServices"
 import 'css/SeamaLog.css';
 
@@ -12,6 +13,7 @@ class SeamaLogIn extends Component {
 
     handleClick(event){
         console.log("SeamaLogIn - handleClick");
+        RestServices.receiveLogin({LogState:"loading"});    // Causes spinner to show
         RestServices.fetchUserRole(this.inputUser.value, this.inputPassword.value);
         event.preventDefault();
 //        RestServices.fetchWaterQuality(kioskParams);
@@ -38,7 +40,11 @@ class SeamaLogIn extends Component {
                                     style={{width: "100%", color: "white", background: "rgb(40,88,167)"}}>Sign in</Button>
                         </Col>
                     </FormGroup>
+                    <div>
+                        <BounceLoader color={'red'} loading={this.props.seamaState.LogState ==="loading"} />
+                    </div>
                 </Form>
+
                 { this.props.seamaState.LogState === "NoService" ? <NoService
                     header="Service Not Currently Available"
                     message="The Service is not currently available. Please try again later."/> : null }
