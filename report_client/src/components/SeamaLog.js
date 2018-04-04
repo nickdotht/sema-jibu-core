@@ -9,8 +9,14 @@ class SeamaLogIn extends Component {
         super(props, context);
         console.log("SeamaLogIn-constructor");
         this.handleClick = this.handleClick.bind(this);
+        this.handler = this.handler.bind(this)
+        this.state ={
+            show:"normal"
+        }
     }
-
+    handler( newState ){
+        this.setState({show:newState});
+    }
     handleClick(event){
         console.log("SeamaLogIn - handleClick");
         RestServices.receiveLogin({LogState:"loading"});    // Causes spinner to show
@@ -22,7 +28,7 @@ class SeamaLogIn extends Component {
     render(){
         return (
             <div className="LogIn">
-                <Form horizontal style={{margin: "auto", width: "30%", padding: "10% 0"}}>
+                <Form horizontal className={this.state.show}>
                     <FormGroup controlId="formUser">
                         <Col sm={10}>
                             <FormControl type="text" placeholder="User" inputRef={ref => { this.inputUser = ref; }}/>
@@ -46,9 +52,11 @@ class SeamaLogIn extends Component {
                 </Form>
 
                 { this.props.seamaState.LogState === "NoService" ? <NoService
+                    parent={this.handler}
                     header="Service Not Currently Available"
                     message="The Service is not currently available. Please try again later."/> : null }
                 { this.props.seamaState.LogState === "BadCredentials" ? <NoService
+                    parent={this.handler}
                     header="Invalid Credentials"
                     message="User name and/or password are not valid"/> : null }
             </div>
@@ -64,10 +72,14 @@ class NoService extends Component {
         console.log("NoService-constructor");
         this.handleClick = this.handleClick.bind(this);
     }
+    componentDidMount() {
+        this.props.parent("dimmed");
+    }
 
     handleClick(event){
         console.log("SeamaLogIn - handleClick");
         RestServices.clearLogin();
+        this.props.parent("normal");
         event.preventDefault();
     };
 
