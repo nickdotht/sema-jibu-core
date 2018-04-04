@@ -9,15 +9,24 @@ import moment from 'moment';
 // import SeamaDatabaseError from "./components/SeamaDatabaseErrr";
 import SeamaLogIn from "components/SeamaLog";
 
-
+var globalVar = {}
 class App extends Component {
 
     constructor(props, context) {
         super(props, context);
+        console.log("App Constructor, saveLogState");
+        this.onUnload = this.onUnload.bind(this);
+        var loginState =  "NotLoggedIn";
+        if(typeof(window.sessionStorage) !== "undefined") {
+            if( sessionStorage.getItem("saveLogState" )){
+                loginState = sessionStorage.getItem("saveLogState" )
+                console.log("saveLogState:", loginState);
+            }
+        }
 
         this.state = {
-            Version: "0.0.0.2",
-            LogState: "NotLoggedIn", // NotLoggedIn, LoggedIn, LoggedOut, NoService, BadCredentials
+            Version: "0.0.0.3",
+            LogState: loginState, // NotLoggedIn, LoggedIn, LoggedOut, NoService, BadCredentials
             Summary: {
                 totalGallons:20,
                 sitePressure:42.4,
@@ -34,6 +43,17 @@ class App extends Component {
         App.initializeEmptyChart( this.state.seamaWaterQuality, "chlorine");
         App.initializeEmptyChart( this.state.seamaWaterQuality, "tds");
         RestServices.initializeState(this);
+    }
+
+    componentDidMount() {
+        window.addEventListener("beforeunload", this.onUnload)
+    }
+
+    onUnload(event) { // the method that will be used for both add and remove event
+        if(typeof(window.sessionStorage) !== "undefined") {
+            sessionStorage.setItem("saveLogState", this.state.LogState );
+        }
+        console.log("onUnload", JSON.stringify(globalVar))
     }
 
     render() {
