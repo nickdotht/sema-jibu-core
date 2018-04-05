@@ -7,8 +7,8 @@ class SeamaWaterChlorineChart extends Component {
         return (<div className = "chart">
                 <Line
                     data={this.props.chartData}
-                    height="300"
-                    width="400"
+                    height={300}
+                    width={200}
                     options={{
                         maintainAspectRatio: false,
                         scales: {
