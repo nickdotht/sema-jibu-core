@@ -15,7 +15,8 @@ class SeamaDistributionMap extends Component {
     showDistributionMap(){
         return (
             <div className="DistributionMap">
-                <h2 style={{textAlign:"center", color:"white"}}>Not Yet Implemented</h2>
+                <img src = {require('images/seama-distribution-mock.png')} alt="" style={{marginLeft:"auto", marginRight:"auto"}}></img>
+                {/*<h2 style={{textAlign:"center", color:"white"}}>Not Yet Implemented</h2>*/}
             </div>
         );
 
