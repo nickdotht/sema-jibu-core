@@ -5,31 +5,30 @@ var sqlConfig = require('../seama_services/db_service').sqlConfig;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-    console.log("health-check");
+	console.log('health-check');
 
-    testConnection(req, res, next)
-
+	testConnection(req, res, next);
 });
 
-function testConnection( req, res ){
-    var con = mysql.createConnection(sqlConfig);
+function testConnection(req, res) {
+	var con = mysql.createConnection(sqlConfig);
 
-    con.connect(function (err) {
-        if (err) {
-            console.log("Database Connection failed!");
-            res.json({
-                server: "Ok",
-                database: "Failed",
-                err: err.toString()
-            });
-        } else {
-            console.log("Database Connected!");
-            res.json({
-                server: "Ok",
-                database: "Ok"
-            });
-        }
-    });
+	con.connect(function(err) {
+		if (err) {
+			console.log('Database Connection failed!');
+			res.json({
+				server: 'Ok',
+				database: 'Failed',
+				err: err.toString()
+			});
+		} else {
+			console.log('Database Connected!');
+			res.json({
+				server: 'Ok',
+				database: 'Ok'
+			});
+		}
+	});
 }
 
 module.exports = router;

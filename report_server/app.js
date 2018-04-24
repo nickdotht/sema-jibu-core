@@ -14,14 +14,18 @@ var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
 
 var app = express();
-app.use(session({ secret: 'seama-secret-token', cookie: { maxAge: 45000, "secure": false,rolling:true }}));
+app.use(
+	session({
+		secret: 'seama-secret-token',
+		cookie: { maxAge: 45000, secure: false, rolling: true }
+	})
+);
 
 // app.use(function (req, res, next) {
 // //    console.log("dbService");
 //     dbService( req, res, next);
 //
 // });
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -48,24 +52,24 @@ app.use('/untapped/water-quality', dbService, seama_water_quality);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+	var err = new Error('Not Found');
+	err.status = 404;
+	next(err);
 });
 
 // error handler
-app.use(function(err, req, res ) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use(function(err, req, res) {
+	// set locals, only providing error in development
+	res.locals.message = err.message;
+	res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+	// render the error page
+	res.status(err.status || 500);
+	res.render('error');
 });
 
 // ------------Seam development ---------------
 // For development, return mock data rather than DB access
-    app.set('mockIt', false);
+app.set('mockIt', false);
 
 module.exports = app;
