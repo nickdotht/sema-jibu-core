@@ -15,7 +15,8 @@ class SeamaWaterChlorineChart extends Component {
                             yAxes: [{
                                 ticks: {
                                     beginAtZero:true,
-                                    max:7.0
+									max: 1.1,
+									stepSize: 0.1,
                                 }
                             }],
                             xAxes: [{

@@ -19,8 +19,8 @@ export function initializeWaterOperations() {
 }
 
 export function fetchWaterOperations( params ) {
-	var urlParms = queryParams(params);
-	var url = '/untapped/water-quality?' + urlParms;
+	const urlParms = queryParams(params);
+	const url = '/untapped/water-quality?' + urlParms;
 
 	return (dispatch) => {
 		return fetch(url, {credentials: 'include'})
@@ -38,20 +38,20 @@ export function fetchWaterOperations( params ) {
 
 				}
 			})
-			.catch(function(error){
+			.catch(function(){
 				// This means the service isn't running.
 				dispatch(receiveWaterOperations(initializeWaterOperations()))
 			});
 	};
 }
-var queryParams =(params) => {
+const queryParams =(params) => {
 	return Object.keys(params)
 		.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
 		.join('&');
-}
+};
 
 
-var updateWaterQualityState = waterQuality => {
+const updateWaterQualityState = waterQuality => {
 
 	console.log("updateWaterQualityState");
 	let newWaterQuality = {};
@@ -97,9 +97,9 @@ var updateWaterQualityState = waterQuality => {
 		newWaterQuality.chlorine.datasets[0].borderColor='rgb(53, 91, 183)';
 		newWaterQuality.chlorine.labels = newWaterQuality.chlorine.labels.map(function(time)
 		{return moment(time ).format("MMM Do YY")});
-		createGuide(newWaterQuality.chlorine.datasets, 6.0, "red", "High");
-		createGuide(newWaterQuality.chlorine.datasets, 2.0, "yellow", "Low");
-		createGuide(newWaterQuality.chlorine.datasets, 4.0, "green", "ideal");
+		createGuide(newWaterQuality.chlorine.datasets, 0.9, "red", "High");
+		createGuide(newWaterQuality.chlorine.datasets, 0.4, "yellow", "Low");
+		createGuide(newWaterQuality.chlorine.datasets, 0.6, "green", "ideal");
 	}
 	if( ! waterQuality.hasOwnProperty("tds")){
 		newWaterQuality.tds = createBlankChart();
@@ -124,7 +124,7 @@ var updateWaterQualityState = waterQuality => {
 };
 
 
-var createGuide = ( datasets, yValue, color, label) =>{
+const createGuide = ( datasets, yValue, color, label) =>{
 	let guideData = new Array(datasets[0].data.length);
 	guideData.fill( yValue);
 	let guide = {
@@ -139,7 +139,7 @@ var createGuide = ( datasets, yValue, color, label) =>{
 	};
 	datasets.push(guide )
 
-}
-var createBlankChart = () => {
+};
+const createBlankChart = () => {
 	return { labels: [], datasets: [ { label: "", data: [],},]}
 };
