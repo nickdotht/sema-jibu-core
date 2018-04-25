@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Form, FormGroup, Col, FormControl, Button, Alert } from 'react-bootstrap';
-import {RingLoader, BarLoader, ClipLoader, BounceLoader} from 'react-spinners';
-import * as RestServices from "actions/RestServices"
+import {BounceLoader} from 'react-spinners';
 import 'css/SeamaLog.css';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -13,7 +12,7 @@ class SeamaLogIn extends Component {
         super(props, context);
         console.log("SeamaLogIn-constructor");
         this.handleClick = this.handleClick.bind(this);
-        this.handler = this.handler.bind(this)
+        this.handler = this.handler.bind(this);
         this.state ={
             show:"normal"
         }
@@ -69,8 +68,6 @@ class SeamaLogIn extends Component {
 
         );
     };
-    noService (){
-    }
 }
 class NoService extends Component {
     constructor(props, context) {
@@ -106,7 +103,6 @@ SeamaLogIn.propTypes = {
 };
 
 function mapStateToProps(state) {
-	console.log("SeamaLog.mapStateToProps", JSON.stringify(state))
 	return {
 		logState: state.logIn.LogState
 	};

@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Navbar, Label, Nav,NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
-import * as RestServices from "actions/RestServices"
-import SeamaHealthCheck from "./SeamaHealthCheck"
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as loginActions from 'actions/LoginActions';
@@ -53,7 +51,7 @@ class SeamaToolbar extends Component {
         console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
         this.setState({title: this.props.kiosk.kiosks[eventKey].name});
         let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
-		this.props.waterOperatiosActions.fetchWaterOperations(kioskParams);
+		this.props.waterOperationsActions.fetchWaterOperations(kioskParams);
     };
 
     buildMenuItems(){
@@ -84,7 +82,7 @@ class SeamaToolbar extends Component {
                         </Navbar.Brand>
                     </Navbar.Header>
                     <Label style={LabelStyleLeft}>
-                        Version {this.props.seamaState.Version}
+                        Version {this.props.Version}
                     </Label>
                     <Label style={LabelStyleLeft}>
                         Kiosk
@@ -121,7 +119,7 @@ function mapDispatchToProps(dispatch) {
 		loginActions: bindActionCreators(loginActions, dispatch),
 		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
 		kioskActions: bindActionCreators(kioskActions, dispatch),
-		waterOperatiosActions: bindActionCreators(waterOperationsActions, dispatch)
+		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch)
 	};
 }
 

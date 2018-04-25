@@ -11,7 +11,7 @@ import SeamaDatabaseError from "./SeamaDatabaseError";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as waterOperationsActions from 'actions/WaterOperationsActions';
-import waterOperations from "../reducers/WaterOperationsReducer";
+import * as healthCheckActions from 'actions/healthCheckActions';
 
 class SeamaWaterQuality extends Component {
 
@@ -19,13 +19,11 @@ class SeamaWaterQuality extends Component {
         return this.showContent();
     }
     showContent(props){
-        if( this.props.seamaState.hasOwnProperty("healthCheck")){
-            if( this.props.seamaState.healthCheck.server !== "Ok" ){
-                return SeamaServiceError(props);
-            }else  if( this.props.seamaState.healthCheck.database !== "Ok" ){
-                return SeamaDatabaseError(props)
-            }
-        }
+		if( this.props.healthCheck.server !== "Ok" ){
+			return SeamaServiceError(props);
+		}else  if( this.props.healthCheck.database !== "Ok" ){
+			return SeamaDatabaseError(props)
+		}
         return this.showWaterQuality();
 
     }
@@ -58,7 +56,6 @@ class SeamaWaterQuality extends Component {
                         <SeamaWaterTdsChart chartData={this.props.waterOperations.tds}/>
                     </div>
                 </div>
-
             </div>
         );
 
@@ -67,13 +64,15 @@ class SeamaWaterQuality extends Component {
 
 function mapStateToProps(state) {
 	return {
-		waterOperations:state.waterOperations
+		waterOperations:state.waterOperations,
+		healthCheck: state.healthCheck
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		waterOperatiosActions: bindActionCreators(waterOperationsActions, dispatch)
+		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch),
+		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
 	};
 }
 

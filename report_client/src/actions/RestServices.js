@@ -1,9 +1,9 @@
-var rootComponent;
-
-export function initializeState( root){
-    console.log("Initializing rest services")
-    rootComponent = root;
-}
+// var rootComponent;
+//
+// export function initializeState( root){
+//     console.log("Initializing rest services")
+//     rootComponent = root;
+// }
 
 // export function receiveHealthCheck(json) {
 //     rootComponent.udpdateHealthCheck( {healthCheck:json});
@@ -36,27 +36,27 @@ export function initializeState( root){
 //         });
 // }
 
-export function receiveWaterQuality(json) {
-    rootComponent.updateWaterQualityState(json);
-    console.log("receiveSeamaWaterQuality - ", json)
-}
-
-export function fetchWaterQuality( params) {
-    var urlParms = queryParams(params);
-    var url = '/untapped/water-quality?' + urlParms;
-    return fetch(url, {credentials: 'include'})
-        .then(response => response.json())
-        .then(json => receiveWaterQuality(json))
-        .catch(function(error){
-            console.log("fetchWaterQuality failed", error);
-        });
-}
-
-function queryParams(params) {
-    return Object.keys(params)
-        .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-        .join('&');
-}
+// export function receiveWaterQuality(json) {
+//     rootComponent.updateWaterQualityState(json);
+//     console.log("receiveSeamaWaterQuality - ", json)
+// }
+//
+// export function fetchWaterQuality( params) {
+//     var urlParms = queryParams(params);
+//     var url = '/untapped/water-quality?' + urlParms;
+//     return fetch(url, {credentials: 'include'})
+//         .then(response => response.json())
+//         .then(json => receiveWaterQuality(json))
+//         .catch(function(error){
+//             console.log("fetchWaterQuality failed", error);
+//         });
+// }
+//
+// function queryParams(params) {
+//     return Object.keys(params)
+//         .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+//         .join('&');
+// }
 
 // export function receiveLogin(json) {
 //     rootComponent.updateLogin(json);
