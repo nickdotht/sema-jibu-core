@@ -6,6 +6,7 @@ import SeamaHealthCheck from "./SeamaHealthCheck"
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as loginActions from 'actions/LoginActions';
+import * as healthCheckActions from 'actions/healthCheckActions';
 
 const menuStyle = {};
 
@@ -42,7 +43,7 @@ class SeamaToolbar extends Component {
     }
 
     componentDidMount() {
-        RestServices.fetchHealthCheck();
+		this.props.healthCheckActions.fetchHealthCheck();
         RestServices.fetchSeamaKiosks();
     }
 
@@ -80,10 +81,10 @@ class SeamaToolbar extends Component {
                             {<img src={require('images/dlo_image.png')} alt="logo" style={ImageStyle} />}
                         </Navbar.Brand>
                     </Navbar.Header>
-                    <Label  eventKey={1} href="#" style={LabelStyleLeft}>
+                    <Label style={LabelStyleLeft}>
                         Version {this.props.seamaState.Version}
                     </Label>
-                    <Label  eventKey={1} href="#" style={LabelStyleLeft}>
+                    <Label style={LabelStyleLeft}>
                         Kiosk
                     </Label>
                     <Nav >
@@ -91,11 +92,11 @@ class SeamaToolbar extends Component {
                             {this.buildMenuItems()}
                         </NavDropdown>
                     </Nav>
-                    <SeamaHealthCheck/>
+					<Label style={LabelStyleRight}> Server: {this.props.healthCheck.server}</Label>
                     <Label  eventKey={1} onClick={this.logOut} href="#" style={LabelStyleRight}>
                         Logout
                     </Label>
-                    <Label  eventKey={1} href="#" style={LabelStyleRight}>
+                    <Label style={LabelStyleRight}>
                         Fred O'Leary
                     </Label>
                 </Navbar>
@@ -107,13 +108,15 @@ class SeamaToolbar extends Component {
 function mapStateToProps(state) {
 	console.log("SeamaLog.mapStateToProps", JSON.stringify(state))
 	return {
-		logState: state.logIn.LogState
+		logState: state.logIn.LogState,
+		healthCheck: state.healthCheck
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		loginActions: bindActionCreators(loginActions, dispatch)
+		loginActions: bindActionCreators(loginActions, dispatch),
+		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
 	};
 }
 
