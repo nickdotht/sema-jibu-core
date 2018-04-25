@@ -28,10 +28,9 @@ class App extends Component {
 				}
             }
         }
-//		this.props.logState = loginState;
         this.state = {
             Version: "0.0.0.3",
-            LogState: loginState, // NotLoggedIn, LoggedIn, LoggedOut, NoService, BadCredentials
+            // LogState: loginState, // NotLoggedIn, LoggedIn, LoggedOut, NoService, BadCredentials
             // Summary: {
             //     totalGallons:20,
             //     sitePressure:42.4,
@@ -86,13 +85,13 @@ class App extends Component {
     }
 
 
-    udpdateHealthCheck( status){
-        this.setState( status);
-    }
+    // udpdateHealthCheck( status){
+    //     this.setState( status);
+    // }
 
-    updateLogin( login ){
-        this.setState(login);
-    }
+    // updateLogin( login ){
+    //     this.setState(login);
+    // }
     updateWaterQualityState( waterQuality){
         console.log("updateWaterQualityState");
         let newWaterQuality = {};

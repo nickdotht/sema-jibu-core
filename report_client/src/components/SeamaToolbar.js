@@ -7,6 +7,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as loginActions from 'actions/LoginActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
+import * as kioskActions from 'actions/KioskActions';
 
 const menuStyle = {};
 
@@ -44,22 +45,22 @@ class SeamaToolbar extends Component {
 
     componentDidMount() {
 		this.props.healthCheckActions.fetchHealthCheck();
-        RestServices.fetchSeamaKiosks();
+		this.props.kioskActions.fetchKiosks();
     }
 
     handleSelect(eventKey){
-        console.log(eventKey, this.props.seamaState.seamaKiosk[eventKey].name);
-        this.setState({title: this.props.seamaState.seamaKiosk[eventKey].name});
-        let kioskParams = {kioskID:this.props.seamaState.seamaKiosk[eventKey].id};
+        console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
+        this.setState({title: this.props.kiosk.kiosks[eventKey].name});
+        let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
         RestServices.fetchWaterQuality(kioskParams);
     };
 
     buildMenuItems(){
         let menuItems = [];
-        if( this.props.seamaState.seamaKiosk){
-            let keys = Object.keys(this.props.seamaState.seamaKiosk);
+        if( this.props.kiosk.kiosks){
+            let keys = Object.keys(this.props.kiosk.kiosks);
             for( let i = 0; i < keys.length; i++ ){
-                let kiosk = this.props.seamaState.seamaKiosk[keys[i]];
+                let kiosk = this.props.kiosk.kiosks[keys[i]];
                  menuItems.push(<MenuItem eventKey={keys[i]} style={menuStyle}>{kiosk.name}</MenuItem>);
             }
         }
@@ -109,14 +110,16 @@ function mapStateToProps(state) {
 	console.log("SeamaLog.mapStateToProps", JSON.stringify(state))
 	return {
 		logState: state.logIn.LogState,
-		healthCheck: state.healthCheck
+		healthCheck: state.healthCheck,
+		kiosk:state.kiosk,
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
 		loginActions: bindActionCreators(loginActions, dispatch),
-		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
+		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
+		kioskActions: bindActionCreators(kioskActions, dispatch)
 	};
 }
 

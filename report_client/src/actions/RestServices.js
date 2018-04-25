@@ -21,20 +21,20 @@ export function initializeState( root){
 //         });
 // }
 
-export function receiveSeamaKiosks(json) {
-    var kiosk = json.kiosks;
-    rootComponent.setState( {seamaKiosk:kiosk});
-    console.log("receiveSeamaUser - ", kiosk)
-}
-
-export function fetchSeamaKiosks() {
-    return fetch('/untapped/kiosks', {credentials: 'include'})
-        .then(response => response.json())
-        .then(json => receiveSeamaKiosks(json))
-        .catch(function(error){
-            console.log("fetchSeamaKiosks failed", error);
-        });
-}
+// export function receiveSeamaKiosks(json) {
+//     var kiosk = json.kiosks;
+//     rootComponent.setState( {seamaKiosk:kiosk});
+//     console.log("receiveSeamaUser - ", kiosk)
+// }
+//
+// export function fetchSeamaKiosks() {
+//     return fetch('/untapped/kiosks', {credentials: 'include'})
+//         .then(response => response.json())
+//         .then(json => receiveSeamaKiosks(json))
+//         .catch(function(error){
+//             console.log("fetchSeamaKiosks failed", error);
+//         });
+// }
 
 export function receiveWaterQuality(json) {
     rootComponent.updateWaterQualityState(json);
