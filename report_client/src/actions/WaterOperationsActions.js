@@ -114,10 +114,10 @@ const updateWaterQualityState = waterQuality => {
 		newWaterQuality.tds.datasets[0].borderColor='rgb(53, 91, 183)';
 		newWaterQuality.tds.labels = newWaterQuality.tds.labels.map(function(time)
 		{return moment(time ).format("MMM Do YY")});
-		createGuide(newWaterQuality.tds.datasets, 1200, "red", "Shutdown");
-		createGuide(newWaterQuality.tds.datasets, 900, "yellow", "Risk");
-		createGuide(newWaterQuality.tds.datasets, 600, "rgb(198,209,232", "Fair");
-		createGuide(newWaterQuality.tds.datasets, 300, "green", "Good");
+		createGuide(newWaterQuality.tds.datasets, 150, "red", "Shutdown");
+		createGuide(newWaterQuality.tds.datasets, 70, "yellow", "Risk");
+		createGuide(newWaterQuality.tds.datasets, 110, "rgb(198,209,232", "Fair");
+		createGuide(newWaterQuality.tds.datasets, 30, "green", "Good");
 	}
 
 	return newWaterQuality;

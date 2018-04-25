@@ -15,7 +15,8 @@ class SeamaWaterTdsChart extends Component {
                             yAxes: [{
                                 ticks: {
                                     beginAtZero:true,
-                                    max:1400
+                                    max:210,
+									stepSize: 30,
                                 }
                             }],
                             xAxes: [{
