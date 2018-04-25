@@ -8,8 +8,10 @@ import * as RestServices from "actions/RestServices"
 import moment from 'moment';
 // import SeamaDatabaseError from "./components/SeamaDatabaseErrr";
 import SeamaLogIn from "components/SeamaLog";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as loginActions from 'actions/LoginActions';
 
-var globalVar = {}
 class App extends Component {
 
     constructor(props, context) {
@@ -21,17 +23,20 @@ class App extends Component {
             if( sessionStorage.getItem("saveLogState" )){
                 loginState = sessionStorage.getItem("saveLogState" )
                 console.log("saveLogState:", loginState);
+                if( loginState !=  "NotLoggedIn"){
+					this.props.loginActions.setLogin(loginState);
+				}
             }
         }
-
+//		this.props.logState = loginState;
         this.state = {
             Version: "0.0.0.3",
             LogState: loginState, // NotLoggedIn, LoggedIn, LoggedOut, NoService, BadCredentials
-            Summary: {
-                totalGallons:20,
-                sitePressure:42.4,
-                flowRate: 7.24
-            },
+            // Summary: {
+            //     totalGallons:20,
+            //     sitePressure:42.4,
+            //     flowRate: 7.24
+            // },
             seamaUser:"N/A",
             seamaWaterQuality:{
                 totalProduction:"N/A",
@@ -51,16 +56,15 @@ class App extends Component {
 
     onUnload(event) { // the method that will be used for both add and remove event
         if(typeof(window.sessionStorage) !== "undefined") {
-            sessionStorage.setItem("saveLogState", this.state.LogState );
+            sessionStorage.setItem("saveLogState", this.props.logState );
         }
-        console.log("onUnload", JSON.stringify(globalVar))
     }
 
     render() {
         return this.showContentOrLogin();
     }
-    showContentOrLogin(props){
-        if( this.state.LogState !== "LoggedIn" ){
+    showContentOrLogin(){
+        if( this.props.logState !== "LoggedIn" ){
             return this.showLogin();
         }else{
             return this.showContent()
@@ -181,4 +185,23 @@ class App extends Component {
     }
 }
 
-export default App;
+function mapDispatchToProps(dispatch) {
+	return {
+		loginActions: bindActionCreators(loginActions, dispatch)
+	};
+}
+
+function mapStateToProps(state) {
+	console.log("App.mapStateToProps", JSON.stringify(state))
+	return {
+		logState: state.logIn.LogState
+	};
+}
+
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(App);
+
+

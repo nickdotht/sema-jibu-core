@@ -3,6 +3,10 @@ import { Form, FormGroup, Col, FormControl, Button, Alert } from 'react-bootstra
 import {RingLoader, BarLoader, ClipLoader, BounceLoader} from 'react-spinners';
 import * as RestServices from "actions/RestServices"
 import 'css/SeamaLog.css';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import PropTypes from 'prop-types';
+import * as loginActions from 'actions/LoginActions';
 
 class SeamaLogIn extends Component {
     constructor(props, context) {
@@ -14,13 +18,17 @@ class SeamaLogIn extends Component {
             show:"normal"
         }
     }
-    handler( newState ){
+    handler( newState, clear ){
         this.setState({show:newState});
+        if( clear ){
+			this.props.loginActions.setLogin("NotLoggedIn");
+		}
     }
     handleClick(event){
         console.log("SeamaLogIn - handleClick");
-        RestServices.receiveLogin({LogState:"loading"});    // Causes spinner to show
-        RestServices.fetchUserRole(this.inputUser.value, this.inputPassword.value);
+//        RestServices.receiveLogin({LogState:"loading"});    // Causes spinner to show
+		this.props.loginActions.fetchLogin(this.inputUser.value, this.inputPassword.value);
+//        RestServices.fetchUserRole(this.inputUser.value, this.inputPassword.value);
         event.preventDefault();
 //        RestServices.fetchWaterQuality(kioskParams);
     };
@@ -47,15 +55,15 @@ class SeamaLogIn extends Component {
                         </Col>
                     </FormGroup>
                     <div>
-                        <BounceLoader color={'red'} loading={this.props.seamaState.LogState ==="loading"} />
+                        <BounceLoader color={'red'} loading={this.props.logState ==="loading"} />
                     </div>
                 </Form>
 
-                { this.props.seamaState.LogState === "NoService" ? <NoService
+                { this.props.logState === "NoService" ? <NoService
                     parent={this.handler}
                     header="Service Not Currently Available"
                     message="The Service is not currently available. Please try again later."/> : null }
-                { this.props.seamaState.LogState === "BadCredentials" ? <NoService
+                { this.props.logState === "BadCredentials" ? <NoService
                     parent={this.handler}
                     header="Invalid Credentials"
                     message="User name and/or password are not valid"/> : null }
@@ -73,13 +81,12 @@ class NoService extends Component {
         this.handleClick = this.handleClick.bind(this);
     }
     componentDidMount() {
-        this.props.parent("dimmed");
+        this.props.parent("dimmed", false);
     }
 
     handleClick(event){
         console.log("SeamaLogIn - handleClick");
-        RestServices.clearLogin();
-        this.props.parent("normal");
+        this.props.parent("normal", true);
         event.preventDefault();
     };
 
@@ -94,4 +101,26 @@ class NoService extends Component {
     }
 
 }
-export default SeamaLogIn;
+
+SeamaLogIn.propTypes = {
+	loginActions: PropTypes.object,
+	logState: PropTypes.object
+};
+
+function mapStateToProps(state) {
+	console.log("SeamaLog.mapStateToProps", JSON.stringify(state))
+	return {
+		logState: state.logIn.LogState
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return {
+		loginActions: bindActionCreators(loginActions, dispatch)
+	};
+}
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(SeamaLogIn);

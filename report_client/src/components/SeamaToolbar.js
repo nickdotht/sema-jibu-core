@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Navbar, Label, Nav,NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
 import * as RestServices from "actions/RestServices"
+import SeamaHealthCheck from "./SeamaHealthCheck"
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as loginActions from 'actions/LoginActions';
 
 const menuStyle = {};
 
@@ -32,6 +36,7 @@ class SeamaToolbar extends Component {
         console.log("SeamaToolbar-constructor");
         this.handleSelect = this.handleSelect.bind(this);
         this.buildMenuItems = this.buildMenuItems.bind(this);
+		this.logOut = this.logOut.bind(this);
 
         this.state = {title: "--Kiosks--"};
     }
@@ -61,7 +66,8 @@ class SeamaToolbar extends Component {
     }
     logOut (){
         console.log("logOut");
-        RestServices.clearLogin();
+		this.props.loginActions.setLogin("NotLoggedIn" );
+
 
     }
 
@@ -85,6 +91,7 @@ class SeamaToolbar extends Component {
                             {this.buildMenuItems()}
                         </NavDropdown>
                     </Nav>
+                    <SeamaHealthCheck/>
                     <Label  eventKey={1} onClick={this.logOut} href="#" style={LabelStyleRight}>
                         Logout
                     </Label>
@@ -97,4 +104,21 @@ class SeamaToolbar extends Component {
     }
 }
 
-export default SeamaToolbar;
+function mapStateToProps(state) {
+	console.log("SeamaLog.mapStateToProps", JSON.stringify(state))
+	return {
+		logState: state.logIn.LogState
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return {
+		loginActions: bindActionCreators(loginActions, dispatch)
+	};
+}
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(SeamaToolbar);
+
