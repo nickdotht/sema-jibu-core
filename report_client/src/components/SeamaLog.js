@@ -27,11 +27,8 @@ class SeamaLogIn extends Component {
     handleClick(event){
         console.log("SeamaLogIn - handleClick");
 		this.props.loginActions.setLogin("loading");
-//        RestServices.receiveLogin({LogState:"loading"});    // Causes spinner to show
 		this.props.loginActions.fetchLogin(this.inputUser.value, this.inputPassword.value);
-//        RestServices.fetchUserRole(this.inputUser.value, this.inputPassword.value);
         event.preventDefault();
-//        RestServices.fetchWaterQuality(kioskParams);
     };
 
     render(){

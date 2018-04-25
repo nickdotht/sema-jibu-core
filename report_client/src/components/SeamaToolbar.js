@@ -8,6 +8,7 @@ import {bindActionCreators} from "redux";
 import * as loginActions from 'actions/LoginActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import * as kioskActions from 'actions/KioskActions';
+import * as waterOperationsActions from 'actions/WaterOperationsActions';
 
 const menuStyle = {};
 
@@ -52,7 +53,7 @@ class SeamaToolbar extends Component {
         console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
         this.setState({title: this.props.kiosk.kiosks[eventKey].name});
         let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
-        RestServices.fetchWaterQuality(kioskParams);
+		this.props.waterOperatiosActions.fetchWaterOperations(kioskParams);
     };
 
     buildMenuItems(){
@@ -107,11 +108,11 @@ class SeamaToolbar extends Component {
 }
 
 function mapStateToProps(state) {
-	console.log("SeamaLog.mapStateToProps", JSON.stringify(state))
 	return {
 		logState: state.logIn.LogState,
 		healthCheck: state.healthCheck,
 		kiosk:state.kiosk,
+		waterOperations:state.waterOperations
 	};
 }
 
@@ -119,7 +120,8 @@ function mapDispatchToProps(dispatch) {
 	return {
 		loginActions: bindActionCreators(loginActions, dispatch),
 		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
-		kioskActions: bindActionCreators(kioskActions, dispatch)
+		kioskActions: bindActionCreators(kioskActions, dispatch),
+		waterOperatiosActions: bindActionCreators(waterOperationsActions, dispatch)
 	};
 }
 

@@ -36,7 +36,7 @@ class App extends Component {
             //     sitePressure:42.4,
             //     flowRate: 7.24
             // },
-            seamaUser:"N/A",
+            // seamaUser:"N/A",
             seamaWaterQuality:{
                 totalProduction:"N/A",
                 sitePressure:"N/A",
@@ -191,7 +191,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state) {
-	console.log("App.mapStateToProps", JSON.stringify(state))
 	return {
 		logState: state.logIn.LogState
 	};
