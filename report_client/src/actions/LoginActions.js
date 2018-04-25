@@ -36,7 +36,6 @@ export function fetchLogin(user, password) {
 				var data = {LogState: "NoService" }
 				dispatch(receiveLogin(data))
 			});
-		;
 	};
 }
 

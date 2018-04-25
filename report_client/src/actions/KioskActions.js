@@ -27,7 +27,6 @@ export function fetchKiosks() {
 				// This means the service isn't running.
 				dispatch(receiveKiosks({kiosks: []}))
 			});
-		;
 	};
 }
 
