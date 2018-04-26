@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import 'App.css';
 import 'css/SeamaSales.css';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as healthCheckActions from 'actions/healthCheckActions';
+import { withRouter } from 'react-router'
 
 class SeamaSales extends Component {
     constructor(props, context) {
@@ -24,4 +28,20 @@ class SeamaSales extends Component {
     }
 }
 
-export default SeamaSales;
+function mapStateToProps(state) {
+	return {
+		healthCheck: state.healthCheck
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return {
+		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
+	};
+}
+
+export default withRouter(connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(SeamaSales));
+

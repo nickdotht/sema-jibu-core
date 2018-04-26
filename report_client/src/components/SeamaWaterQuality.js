@@ -12,6 +12,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as waterOperationsActions from 'actions/WaterOperationsActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
+import { withRouter } from 'react-router'
 
 class SeamaWaterQuality extends Component {
 
@@ -76,8 +77,8 @@ function mapDispatchToProps(dispatch) {
 	};
 }
 
-export default connect(
+export default withRouter(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(SeamaWaterQuality);
+)(SeamaWaterQuality));
 

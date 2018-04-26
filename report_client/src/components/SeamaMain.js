@@ -10,8 +10,8 @@ import SeamaFinancials from "./SeamaFinancials";
 const Main = (props) => (
     <main>
         <Switch>
-            <Route exact path='/' render={(routeProps) =>(<SeamaWaterQuality {...routeProps } {...props} /> )}/>
-            <Route path='/Sales' render={(routeProps) =>(<SeamaSales {...routeProps } {...props} /> )}/>
+            <Route exact path='/' component={SeamaWaterQuality}/>
+            <Route path='/Sales' component={SeamaSales}/>
             <Route path='/DistributionMap' render={(routeProps) =>(<SeamaDistributionMap {...routeProps } {...props} /> )}/>
             <Route path='/DeliverySchedule' render={(routeProps) =>(<SeamaDeliverySchedule {...routeProps } {...props} /> )}/>
             <Route path='/InventoryManagement' render={(routeProps) =>(<SeamaInventoryManagement {...routeProps } {...props} /> )}/>

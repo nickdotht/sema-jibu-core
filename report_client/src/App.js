@@ -8,6 +8,7 @@ import SeamaLogIn from "components/SeamaLog";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as loginActions from 'actions/LoginActions';
+import { withRouter } from 'react-router'
 
 const Version = "0.0.0.5";
 class App extends Component {
@@ -77,9 +78,9 @@ function mapStateToProps(state) {
 }
 
 
-export default connect(
+export default withRouter(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(App);
+)(App));
 
 
