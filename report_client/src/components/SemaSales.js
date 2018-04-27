@@ -8,6 +8,7 @@ import { withRouter } from 'react-router'
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 import SemaSummaryPanel from "./Sales/SemaSummaryPanel";
+import SalesMapContainer from './Sales/SalesMapContainer';
 
 class SemaSales extends Component {
     constructor(props, context) {
@@ -43,19 +44,8 @@ class SemaSales extends Component {
 					</div>
 				</div>
 				<div className = "SalesContentContainer">
-					<div className= "SalesMapItem">
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
-						<p>Map goes here</p>
+					<div className= "SalesMapItem" id="salesMapId">
+						<SalesMapContainer google={this.props.google} />
 					</div>
 					<div className= "SalesListItem">
 						<p>List goes here</p>
