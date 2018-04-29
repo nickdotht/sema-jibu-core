@@ -7,6 +7,7 @@ import * as loginActions from 'actions/LoginActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import * as kioskActions from 'actions/KioskActions';
 import * as waterOperationsActions from 'actions/WaterOperationsActions';
+import { withRouter } from 'react-router'
 
 const menuStyle = {};
 
@@ -123,8 +124,8 @@ function mapDispatchToProps(dispatch) {
 	};
 }
 
-export default connect(
+export default withRouter(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(SeamaToolbar);
+)(SeamaToolbar));
 

@@ -7,8 +7,10 @@ import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router'
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
-import SemaSummaryPanel from "./Sales/SemaSummaryPanel";
+import SemaSummaryPanel from "./Sales/SalesSummaryPanel";
 import SalesMapContainer from './Sales/SalesMapContainer';
+import SalesRetailerList from './Sales/SalesRetailerList';
+import * as salesActions from 'actions/SalesActions';
 
 class SemaSales extends Component {
     constructor(props, context) {
@@ -48,7 +50,7 @@ class SemaSales extends Component {
 						<SalesMapContainer google={this.props.google} />
 					</div>
 					<div className= "SalesListItem">
-						<p>List goes here</p>
+						<SalesRetailerList/>
 					</div>
 					<div className= "SalesBottonLeftItem">
 						<p>Bottom left</p>
@@ -71,12 +73,14 @@ class SemaSales extends Component {
 
 function mapStateToProps(state) {
 	return {
+		sales:state.sales,
 		healthCheck: state.healthCheck
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
+		salesActions: bindActionCreators(salesActions, dispatch),
 		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
 	};
 }
