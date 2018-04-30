@@ -8,6 +8,7 @@ import SeamaLogIn from "components/SeamaLog";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as loginActions from 'actions/LoginActions';
+import * as kioskActions from 'actions/KioskActions';
 import { withRouter } from 'react-router'
 
 const Version = "0.0.0.5";
@@ -29,8 +30,9 @@ class App extends Component {
         }
     }
 	componentWillMount() {
+    	let self = this;
 		this.unlisten = this.props.history.listen((location, action) => {
-			console.log("on route change");
+			console.log("on route change", self);
 		});
 	}
 	componentWillUnmount() {
@@ -75,13 +77,15 @@ class App extends Component {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		loginActions: bindActionCreators(loginActions, dispatch)
+		loginActions: bindActionCreators(loginActions, dispatch),
+		kioskActions: bindActionCreators(kioskActions, dispatch)
 	};
 }
 
 function mapStateToProps(state) {
 	return {
-		logState: state.logIn.LogState
+		logState: state.logIn.LogState,
+		kiosk:state.kiosk
 	};
 }
 

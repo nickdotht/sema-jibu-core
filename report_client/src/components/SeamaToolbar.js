@@ -52,6 +52,7 @@ class SeamaToolbar extends Component {
         console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
         this.setState({title: this.props.kiosk.kiosks[eventKey].name});
         let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
+        this.props.kioskActions.selectKiosk(kioskParams);
 		this.props.waterOperationsActions.fetchWaterOperations(kioskParams);
     };
 
