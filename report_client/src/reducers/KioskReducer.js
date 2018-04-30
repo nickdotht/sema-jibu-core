@@ -5,7 +5,7 @@ export default function kiosk(state = {kiosks:[], selectedKiosk:""}, action) {
 	switch (action.type) {
 		case RECEIVE_KIOSKS:
 			newState = action.kiosks;
-			newState.selectedKiosk = "";
+			newState.selectedKiosk = {kioskID:""};
 			console.log('RECEIVE_KIOSKS Action');
 			return newState;
 		case SELECT_KIOSK:

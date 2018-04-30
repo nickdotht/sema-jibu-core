@@ -9,6 +9,7 @@ export function receiveWaterOperations(data) {
 
 export function initializeWaterOperations() {
 	return {
+		loaded:false,
 		totalProduction:"N/A",
 		sitePressure:"N/A",
 		flowRate:"N/A",
@@ -55,6 +56,7 @@ const updateWaterQualityState = waterQuality => {
 
 	console.log("updateWaterQualityState");
 	let newWaterQuality = {};
+	newWaterQuality.loaded =true;
 	newWaterQuality.flowRate = waterQuality.flowRate;
 	newWaterQuality.sitePressure = waterQuality.sitePressure;
 	newWaterQuality.totalProduction = waterQuality.totalProduction;

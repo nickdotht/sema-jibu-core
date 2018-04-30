@@ -10,6 +10,8 @@ import {bindActionCreators} from "redux";
 import * as loginActions from 'actions/LoginActions';
 import * as kioskActions from 'actions/KioskActions';
 import { withRouter } from 'react-router'
+import * as waterOperationsActions from 'actions/WaterOperationsActions';
+import * as salesActions from 'actions/SalesActions';
 
 const Version = "0.0.0.5";
 class App extends Component {
@@ -33,6 +35,19 @@ class App extends Component {
     	let self = this;
 		this.unlisten = this.props.history.listen((location, action) => {
 			console.log("on route change", self);
+			switch( location.pathname ){
+				case "/":
+					if( ! this.props.waterOperations.loaded ){
+						this.props.waterOperationsActions.fetchWaterOperations(this.props.kiosk.selectedKiosk);
+					}
+					break;
+				case "/Sales":
+					if( ! this.props.sales.loaded ){
+						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
+					}
+					break;
+
+			}
 		});
 	}
 	componentWillUnmount() {
@@ -78,14 +93,18 @@ class App extends Component {
 function mapDispatchToProps(dispatch) {
 	return {
 		loginActions: bindActionCreators(loginActions, dispatch),
-		kioskActions: bindActionCreators(kioskActions, dispatch)
+		kioskActions: bindActionCreators(kioskActions, dispatch),
+		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch),
+		salesActions: bindActionCreators(salesActions, dispatch)
 	};
 }
 
 function mapStateToProps(state) {
 	return {
 		logState: state.logIn.LogState,
-		kiosk:state.kiosk
+		kiosk:state.kiosk,
+		waterOperations:state.waterOperations,
+		sales:state.sales
 	};
 }
 

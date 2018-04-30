@@ -36,13 +36,19 @@ class SemaSales extends Component {
 			<div className="SalesContainer">
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
-						<SemaSummaryPanel title="New Customers" units={"Gallons"} value="1000"/>
+						<SemaSummaryPanel title="New Customers" label={" of Monthly goal"}
+										  value={this.props.sales.newCustomers.thisPeriod}
+										  delta = {calcChange(this.props.sales.newCustomers.thisPeriod, this.props.sales.newCustomers.lastPeriod)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SemaSummaryPanel title="Total Revenue" units={"PSI"} value="2000"/>
+						<SemaSummaryPanel title="Total Revenue" label={" to last Month"}
+										  value={this.props.sales.totalRevenue.total}
+										  delta = {calcChange(this.props.sales.totalRevenue.thisPeriod, this.props.sales.totalRevenue.lastPeriod)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SemaSummaryPanel title="Net Income" units={"GPM"} value="3000"/>
+						<SemaSummaryPanel title="Net Income" label={" to last Month"}
+										  value={this.props.sales.netIncome.total}
+										  delta = {calcChange(this.props.sales.netIncome.thisPeriod, this.props.sales.netIncome.lastPeriod)} />
 					</div>
 				</div>
 				<div className = "SalesContentContainer">
@@ -69,6 +75,14 @@ class SemaSales extends Component {
         );
 
     }
+}
+const calcChange = (now, last) => {
+	if( typeof now === "string" || typeof last === "string"){
+		return "N/A"
+	}else{
+		return parseFloat(((now/last)*100 -100).toFixed(2));
+	}
+
 }
 
 function mapStateToProps(state) {

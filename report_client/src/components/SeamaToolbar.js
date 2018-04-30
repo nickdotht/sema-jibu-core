@@ -7,6 +7,7 @@ import * as loginActions from 'actions/LoginActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import * as kioskActions from 'actions/KioskActions';
 import * as waterOperationsActions from 'actions/WaterOperationsActions';
+import * as salesActions from 'actions/SalesActions';
 import { withRouter } from 'react-router'
 
 const menuStyle = {};
@@ -52,8 +53,21 @@ class SeamaToolbar extends Component {
         console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
         this.setState({title: this.props.kiosk.kiosks[eventKey].name});
         let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
-        this.props.kioskActions.selectKiosk(kioskParams);
-		this.props.waterOperationsActions.fetchWaterOperations(kioskParams);
+        if( kioskParams.kioskID != this.props.kiosk.selectedKiosk.kioskID) {
+			this.props.kioskActions.selectKiosk(kioskParams);
+			this.props.waterOperations.loaded = false;
+			this.props.sales.loaded = false;
+			switch (this.props.location.pathname) {
+				case "/":
+					this.props.waterOperationsActions.fetchWaterOperations(kioskParams);
+					break;
+				case "/Sales":
+					this.props.salesActions.fetchSales(kioskParams);
+					break;
+
+			}
+
+		}
     };
 
     buildMenuItems(){
@@ -112,7 +126,8 @@ function mapStateToProps(state) {
 		logState: state.logIn.LogState,
 		healthCheck: state.healthCheck,
 		kiosk:state.kiosk,
-		waterOperations:state.waterOperations
+		waterOperations:state.waterOperations,
+		sales:state.sales
 	};
 }
 
@@ -121,7 +136,8 @@ function mapDispatchToProps(dispatch) {
 		loginActions: bindActionCreators(loginActions, dispatch),
 		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
 		kioskActions: bindActionCreators(kioskActions, dispatch),
-		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch)
+		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch),
+		salesActions: bindActionCreators(salesActions, dispatch)
 	};
 }
 
