@@ -56,7 +56,7 @@ class SemaSales extends Component {
 						<SalesMapContainer google={this.props.google} />
 					</div>
 					<div className= "SalesListItem">
-						<SalesRetailerList/>
+						<SalesRetailerList retailers={this.props.sales.retailSales}/>
 					</div>
 					<div className= "SalesBottonLeftItem">
 						<p>Bottom left</p>

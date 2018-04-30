@@ -48,6 +48,12 @@ export function fetchSales( params ) {
 	// 		});
 	// };
 }
+
+export function forceUpdate() {
+	console.log("forceUpdate - ")
+	return {type: allActions.FORCE_SALES_UPDATE};
+}
+
 const queryParams =(params) => {
 	return Object.keys(params)
 		.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
@@ -67,7 +73,8 @@ const createDummySales = () => {
 		netIncome: {total:9123, period:"month", thisPeriod: 1000, lastPeriod: 1600},
 		retailSales: [
 			{name:"Celine S", id:"abc123", total:9123, period:"month", thisPeriod: 1000, lastPeriod: 1600, gps:"18.59737,-72.32735"},
-			{name:"St Piere Tom", id:"def123", total:8233, period:"month", thisPeriod: 1500, lastPeriod: 1400, gps:"18.59537,-72.32335"}
+			{name:"St Piere Tom", id:"def123", total:8233, period:"month", thisPeriod: 1500, lastPeriod: 1400, gps:"18.6035165,-72.2583092"},
+			{name:"Stevenson M", id:"defd123", total:6233, period:"month", thisPeriod: 1300, lastPeriod: 1100, gps:"18.82680 -72.55183"}
 
 		],
 

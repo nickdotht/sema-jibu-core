@@ -42,6 +42,11 @@ class App extends Component {
 					}
 					break;
 				case "/Sales":
+					// Hack to force the google map to update.
+					let self = this;
+					setTimeout(()=> {
+						self.props.salesActions.forceUpdate();
+					}, 100);
 					if( ! this.props.sales.loaded ){
 						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
 					}

@@ -15,26 +15,28 @@ export default class SalesRetailerList extends Component {
 				</tr>
 				</thead>
 				<tbody>
-				<tr>
-					<td>1.</td>
-					<td>Mark</td>
-					<td>20,000</td>
-					<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-up"/></td>
-				</tr>
-				<tr>
-					<td>2.</td>
-					<td>Jacob</td>
-					<td>21,000</td>
-					<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-down"/></td>
-				</tr>
-				<tr>
-					<td>3.</td>
-					<td >Larry the Bird</td>
-					<td>21,200</td>
-					<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-up"/></td>
-				</tr>
+					{this.buildTableRows()}
 				</tbody>
 			</Table>
 		)
+	}
+	buildTableRows(){
+		var rows = [];
+		this.props.retailers.forEach( function(retailer, index) {
+			rows.push(<tr>
+						<td>{index+1}.</td>
+						<td>{retailer.name}</td>
+						<td>{retailer.thisPeriod}</td>
+						{this.calcTrend(retailer.thisPeriod, retailer.lastPeriod)}
+					</tr>
+			)
+		}.bind(this));
+		return rows;
+	}
+	calcTrend( now, last ){
+		if( now > last ){
+			return (<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-up"/></td>);
+		}
+		return (<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-down"/></td>);
 	}
 }
