@@ -5,6 +5,10 @@ export function receiveKiosks(data) {
 	return {type: allActions.RECEIVE_KIOSKS, kiosks: data};
 }
 
+export function selectKiosk(kiosk) {
+	console.log("selectKiosk - ", kiosk)
+	return {type: allActions.SELECT_KIOSK, selectedKiosk: kiosk};
+}
 
 export function fetchKiosks() {
 	return (dispatch) => {
