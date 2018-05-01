@@ -78,8 +78,8 @@ export class SalesMapContainer extends Component {
 					const lat = parseFloat(gps[0]);
 					const lng = parseFloat(gps[1]);
 					const scaleVal = ()=> {
-						// Convert sales to a range for the marker scales. Min sales scale = 20. Max sales scale = 100
-						return 20 + 80 *  (retailer.total-minSales)/(maxSales-minSales)
+						// Convert sales to a range for the marker scales. Min sales scale = 20. Max sales scale = 80
+						return 20 + 60 *  (retailer.total-minSales)/(maxSales-minSales)
 					};
 					let marker = new google.maps.Marker({ // creates a new Google maps Marker object.
 						position: {lat: lat, lng: lng}, // sets position of marker to specified location
