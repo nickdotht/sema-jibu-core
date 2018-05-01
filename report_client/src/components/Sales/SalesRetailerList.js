@@ -21,16 +21,16 @@ export default class SalesRetailerList extends Component {
 		)
 	}
 	buildTableRows(){
-		var rows = [];
-		this.props.retailers.forEach( function(retailer, index) {
+		let rows = [];
+		this.props.retailers.forEach( (retailer, index) => {
 			rows.push(<tr>
 						<td>{index+1}.</td>
 						<td>{retailer.name}</td>
-						<td>{retailer.thisPeriod}</td>
+						<td>{retailer.total}</td>
 						{this.calcTrend(retailer.thisPeriod, retailer.lastPeriod)}
 					</tr>
 			)
-		}.bind(this));
+		});
 		return rows;
 	}
 	calcTrend( now, last ){

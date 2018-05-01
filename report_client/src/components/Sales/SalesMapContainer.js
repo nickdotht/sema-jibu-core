@@ -19,7 +19,7 @@ export class SalesMapContainer extends Component {
 			if( self.state.lastWidth !== self.state.parentDiv.offsetWidth ){
 				console.log("SalesMapContainer- Parent Width", self.state.parentDiv.offsetWidth);
 				self.state.lastWidth = self.state.parentDiv.offsetWidth;
-				if( self.state.lastWidth != 0 ){
+				if( self.state.lastWidth !== 0 ){
 					document.getElementById('mapId').style["width"] = self.state.lastWidth + "px";
 				}
 			}
@@ -63,9 +63,56 @@ export class SalesMapContainer extends Component {
 			});
 
 			this.map = new maps.Map(node, mapConfig); // creates a new Google map on the specified node (ref='map') with the specified configuration set above.
+			let markers = [];
+			let maxSales = Number.MIN_SAFE_INTEGER;
+			let minSales = Number.MAX_SAFE_INTEGER;
+			this.props.retailers.forEach( retailer => {
+				if( retailer.total > maxSales ) maxSales = retailer.total;
+				if( retailer.total < minSales ) minSales = retailer.total;
 
+			});
+			this.props.retailers.forEach( retailer => { // iterate through locations saved in state
+				let gps = retailer.gps.split(',');
+
+				if( gps && gps.length == 2) {
+					const lat = parseFloat(gps[0]);
+					const lng = parseFloat(gps[1]);
+					const scaleVal = ()=> {
+						// Convert sales to a range for the marker scales. Min sales scale = 20. Max sales scale = 100
+						return 20 + 80 *  (retailer.total-minSales)/(maxSales-minSales)
+					};
+					let marker = new google.maps.Marker({ // creates a new Google maps Marker object.
+						position: {lat: lat, lng: lng}, // sets position of marker to specified location
+						map: this.map, // sets markers to appear on the map we just created on line 35
+						title: retailer.name, // the title of the marker is set to the name of the location
+						label: {
+							text: retailer.name,
+							color: "white"
+						},
+
+						icon: {
+							path: google.maps.SymbolPath.CIRCLE,
+							scale: scaleVal(),
+							fillColor: 'blue',
+							fillOpacity: 0.5,
+							strokeOpacity: 0.5,
+							strokeWeight: 0
+						}
+					});
+					markers.push( marker);
+				}
+			});
+			if( markers.length > 0 ) {
+				// Zoom the map to fit all markers
+				let bounds = new google.maps.LatLngBounds();
+				for (let i = 0; i < markers.length; i++) {
+					bounds.extend(markers[i].getPosition());
+				}
+				this.map.fitBounds(bounds);
+			}
 		}
 	}
+
 
 	render() {
 		const style = { // MUST specify dimensions of the Google map or it will not work. Also works best when style is specified inside the render function and created as an object

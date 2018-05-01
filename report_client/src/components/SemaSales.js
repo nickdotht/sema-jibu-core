@@ -53,7 +53,7 @@ class SemaSales extends Component {
 				</div>
 				<div className = "SalesContentContainer">
 					<div className= "SalesMapItem" id="salesMapId">
-						<SalesMapContainer google={this.props.google} />
+						<SalesMapContainer google={this.props.google} retailers={this.props.sales.retailSales} />
 					</div>
 					<div className= "SalesListItem">
 						<SalesRetailerList retailers={this.props.sales.retailSales}/>
@@ -83,7 +83,7 @@ const calcChange = (now, last) => {
 		return parseFloat(((now/last)*100 -100).toFixed(2));
 	}
 
-}
+};
 
 function mapStateToProps(state) {
 	return {
