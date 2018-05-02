@@ -54,6 +54,7 @@ class SeamaToolbar extends Component {
         this.setState({title: this.props.kiosk.kiosks[eventKey].name});
         let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
         if( kioskParams.kioskID != this.props.kiosk.selectedKiosk.kioskID) {
+			kioskParams.period = "month";	// TODO - Should be derived from toolbar time/date filter UI
 			this.props.kioskActions.selectKiosk(kioskParams);
 			this.props.waterOperations.loaded = false;
 			this.props.sales.loaded = false;

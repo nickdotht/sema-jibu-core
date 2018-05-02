@@ -48,6 +48,7 @@ class App extends Component {
 						self.props.salesActions.forceUpdate();
 					}, 100);
 					if( ! this.props.sales.loaded ){
+						this.props.kiosk.selectedKiosk.period="month";	// TODO Derive from filter
 						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
 					}
 					break;
