@@ -1,0 +1,83 @@
+var express = require('express');
+var router = express.Router();
+var mysql = require('mysql');
+var connectionTable = require('../seama_services/db_service').connectionTable;
+
+/* GET data for sales_by_channel  */
+
+
+var sqlSalesByChannel=
+	'SELECT sales_channel.id,  sales_channel.name\
+	FROM sales_channel';
+
+router.get('/', function(req, response, next) {
+	console.log('Sales_by_channel - ', req.query.kioskID);
+	var sessData = req.session;
+	var connection = connectionTable[sessData.id];
+	var results = initResults()
+	connection.query(sqlSalesByChannel, [req.query.kioskID], function(err, sqlResult, fields) {
+		if( err ){
+			console.log( JSON.stringify(err));
+			yieldResults( response, results );
+		}else {
+			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+				var salesChannelArray = sqlResult.map(row => {
+					return {name: row.name, id: row.id};
+				});
+				execSqlSalesByChannelQuery(salesChannelArray, 0, connection, [req.query.kioskID], response, results);
+
+			}else{
+				yieldResults( response, results );
+			}
+		}
+	});
+
+});
+const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlParams, response, results ) =>{
+
+	var sqlQuery = 'SELECT * \
+		FROM receipt \
+		WHERE receipt.kiosk_id = ? AND receipt.sales_channel_id = ? \
+		ORDER BY receipt.created_date DESC \
+		LIMIT 30';
+	let chanelParams = [...sqlParams];
+	chanelParams.push(salesChannelArray[index].id)
+	connection.query(sqlQuery, chanelParams, function(err, sqlResult, fields) {
+		if( err ){
+			console.log( JSON.stringify(err));
+			yieldResults( response, results );
+		}else{
+			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+				console.log( "boo")
+				results.salesByChannel.labels.push(salesChannelArray[index].name );
+				var salesData = sqlResult.map(row =>{ return {x:row.created_date, y:row.customer_amount}} );
+				// DO THIS ONLY IF THE SORT IS DESCENDING!!!
+				var salesData = salesData.reverse();
+
+				results.salesByChannel.datasets.push({label:salesChannelArray[index].name, data:salesData});
+			}
+			index++;
+			if( index == salesChannelArray.length ){
+				// All done
+				yieldResults( response, results );
+			}else{
+				execSqlSalesByChannelQuery( salesChannelArray, index, connection, sqlParams, response, results);
+			}
+		}
+	});
+
+}
+const yieldResults =(response, results ) =>{
+	response.json(results);
+}
+
+const initResults = () =>{
+	return {
+		salesByChannel: { labels: [], datasets: []}
+
+	}
+};
+
+
+
+module.exports = router;

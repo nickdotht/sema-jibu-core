@@ -53,7 +53,7 @@ class SeamaToolbar extends Component {
         console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
         this.setState({title: this.props.kiosk.kiosks[eventKey].name});
         let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
-        if( kioskParams.kioskID != this.props.kiosk.selectedKiosk.kioskID) {
+        if( kioskParams.kioskID !== this.props.kiosk.selectedKiosk.kioskID) {
 			kioskParams.period = "month";	// TODO - Should be derived from toolbar time/date filter UI
 			this.props.kioskActions.selectKiosk(kioskParams);
 			this.props.waterOperations.loaded = false;
@@ -65,7 +65,8 @@ class SeamaToolbar extends Component {
 				case "/Sales":
 					this.props.salesActions.fetchSales(kioskParams);
 					break;
-
+				default:
+					console.log("Not implemented:", this.props.location.pathname);
 			}
 
 		}

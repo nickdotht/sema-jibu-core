@@ -1,4 +1,4 @@
-import { RECEIVE_SALES} from 'actions/ActionTypes';
+import { RECEIVE_SALES, RECEIVE_SALES_BY_CHANNEL} from 'actions/ActionTypes';
 import {initializeSales} from 'actions/SalesActions'
 import {FORCE_SALES_UPDATE} from "actions/ActionTypes";
 
@@ -8,6 +8,11 @@ export default function sales(state =init(), action) {
 		case RECEIVE_SALES:
 			newState = action.data;
 			console.log('RECEIVE_SALES Action');
+			return newState;
+		case RECEIVE_SALES_BY_CHANNEL:
+			console.log('RECEIVE_SALES_BY_CHANNEL Action');
+			newState = {...state}; /// CAREFULL ---
+			newState.salesByChannel = action.data.salesByChannel;
 			return newState;
 		case FORCE_SALES_UPDATE:
 			// Simply resets the state with a new version to force an update

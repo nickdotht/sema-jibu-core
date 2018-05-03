@@ -84,6 +84,7 @@ class SemaSales extends Component {
 						</div>
 						<div className= "SalesBottomRight">
 							<SalesByChannelChart chartData={this.props.sales.salesByChannel}/>
+							{/*<SalesByChannelChart chartData={foobar(this.props)}/>*/}
 						</div>
 					</div>
 					{/*<div className= "SalesBottonRightItem">*/}
@@ -95,6 +96,9 @@ class SemaSales extends Component {
         );
     }
 }
+// const foobar = (p)=>{
+// 	return p.sales.salesByChannel;
+// }
 const formatDollar = amount =>{
 	let suffix = "";
 	if( typeof amount === "string") return amount;

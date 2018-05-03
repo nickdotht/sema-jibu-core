@@ -33,6 +33,10 @@ var sqlRetailers =
 	ON customer_account.id = sales_channel_customer_accounts.customer_account_id \
 	WHERE customer_account.kiosk_id = ?';
 
+var sqlSalesByChannel=
+	'SELECT sales_channel.id,  sales_channel.name\
+	FROM sales_channel';
+
 router.get('/', function(req, res, next) {
 	console.log('Sales - ', req.query.kioskID);
 	var sessData = req.session;
@@ -43,15 +47,15 @@ router.get('/', function(req, res, next) {
 		{sqlQuery: sqlLastSale, completeAndNext: getLastSaleToLastPeriod, nextFn:execSqlQuery},
 		{sqlQuery: sqlPeriodSale, completeAndNext: getLastSalesPeriodToPrevSalesPeriod, nextFn:execSqlQuery},
 		{sqlQuery: sqlPeriodSale, completeAndNext: getPrevSalesPeriodToRetailers, nextFn:execSqlQuery},
-		{sqlQuery: sqlRetailers, completeAndNext: getRetailersToDone, nextFn:finish}
+		{sqlQuery: sqlRetailers, completeAndNext: getRetailersToDone, nextFn:finish},
 
 	];
 	execSqlQuery(queryMap, 0, connection, [req.query.kioskID], res, req.query, initResults() );
 });
 
 const execSqlQuery =(queryMap, index, connection, sqlParams, response, httpParams, results ) => {
-	console.log( "SQL",  queryMap[index]);
-	console.log( "Params", [...sqlParams]);
+	console.log( "SQL",  queryMap[index], "Params", [...sqlParams]);
+
 	connection.query(queryMap[index].sqlQuery, sqlParams, function(err, sqlResult, fields) {
 		if( err ){
 			console.log( JSON.stringify(err));
@@ -117,7 +121,7 @@ const getRetailersToDone =(queryMap, index, connection, response, httpParams, re
 	if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
 		let retailers = [];
 		sqlResult.forEach( row  =>{
-			if( row.gps_coordinates != "") {
+//			if( row.gps_coordinates != "") {
 				let retailer = {
 					name: row.contact_name,
 					id: row.id,
@@ -128,15 +132,13 @@ const getRetailersToDone =(queryMap, index, connection, response, httpParams, re
 					gps: row.gps_coordinates
 				}
 				retailers.push(retailer);
-			}
+//			}
 		});
 		results.retailSales = retailers;
 	}
-	// Set params for next query (if there is a next query)
+	// Set params for next query SalesByChannel
 	queryMap[index].nextFn( queryMap, index+1, connection, [], response, httpParams, results);
 }
-
-
 
 const finish =(queryMap, index, connection, [], response,  httpParams, results ) =>{
 	yieldResults(response, results );
@@ -156,6 +158,7 @@ const  calcFirstDate = ( lastDate, period ) =>{
 	return firstDate;
 }
 
+
 function initResults() {
 	return {
 		newCustomers: {period: "N/A", thisPeriod: "N/A", lastPeriod: "N/A"},
@@ -170,7 +173,7 @@ function initResults() {
 		],
 		totalCustomers: "N/A",
 		litersPerCustomer: {period: "N/A", value: "N/A"},
-		salesByChannel: { labels: [], datasets: [ { label: "", data: [],},]}
+		salesByChannel: { labels: [], datasets: []}
 
 	}
 };
