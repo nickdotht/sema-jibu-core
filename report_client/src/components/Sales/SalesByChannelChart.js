@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Line} from 'react-chartjs-2';
+import moment from "moment/moment";
 
 var s1 = {
 	label: 's1',
@@ -54,7 +55,7 @@ class SalesByChannelChart extends Component {
 									displayFormats: {
 										day: 'MMM D'
 									},
-									min: '2017-10-01'
+									min: this.calcMinDate()
 								}
 							}]
                         },
@@ -69,7 +70,28 @@ class SalesByChannelChart extends Component {
         );
     }
     calcMinDate= ()=>{
-    	return '2017-01-01';
+    	let minDate = '2017-01-01T12:00:00.000Z';
+    	let first = true;
+    	let firstDate = null;
+    	if( this.props.chartData && this.props.chartData.datasets){
+			this.props.chartData.datasets.forEach( dataset => {
+				if( dataset.data.length > 0 ) {	// The first point in the chart
+					let nextDate = new Date(Date.parse(dataset.data[0].x))
+					if( first ){
+						firstDate = nextDate;
+						first = false;
+					} else{
+						if( nextDate.getTime() < firstDate.getTime()){
+							firstDate = nextDate;
+						}
+					}
+				}
+			})
+			if( firstDate){
+				minDate = firstDate.toISOString();
+			}
+		}
+    	return minDate;
 	}
 }
 export default SalesByChannelChart;

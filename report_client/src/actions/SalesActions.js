@@ -72,9 +72,12 @@ export function fetchSales( params ) {
 }
 
 const formatChartData = (chartData) =>{
-	console.log("foo");
 	chartData.salesByChannel.datasets.forEach( (dataSet, index) => {
 		dataSet.pointRadius = 0;
+		dataSet.cubicInterpolationMode = "monotone";
+		dataSet.borderColor='rgb(53, 91, 183)';
+		dataSet.borderWidth=2;
+		dataSet.type = "line";
 		// chartData.salesByChannel.datasets[index].data = dataSet.data.map( item =>{
 		// 	return {x:moment(item.x).format("MMM Do YY"), y:item.y}
 		// })
