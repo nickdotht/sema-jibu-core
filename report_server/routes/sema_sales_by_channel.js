@@ -24,7 +24,7 @@ router.get('/', function(req, response, next) {
 				var salesChannelArray = sqlResult.map(row => {
 					return {name: row.name, id: row.id};
 				});
-				execSqlSalesByChannelQuery(salesChannelArray, 0, connection, [req.query.kioskID], response, results);
+				execSqlSalesByChannelQuery(salesChannelArray, 0, connection, req.query, response, results);
 
 			}else{
 				yieldResults( response, results );
@@ -34,25 +34,36 @@ router.get('/', function(req, response, next) {
 
 });
 const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlParams, response, results ) =>{
-
-	var sqlQuery = 'SELECT * \
+	let sqlQuery = "";
+	let chanelParams =[];
+	let sortDesc = true;
+	if( sqlParams.hasOwnProperty('firstdate') && sqlParams.hasOwnProperty('lastdate')){
+		sortDesc = false;
+		sqlQuery = 'SELECT * \
+		FROM receipt \
+		WHERE receipt.kiosk_id = ? AND receipt.sales_channel_id = ? \
+		AND receipt.created_date BETWEEN ? AND ? \
+		ORDER BY receipt.created_date';
+		chanelParams = [sqlParams.kioskID, salesChannelArray[index].id, new Date(sqlParams.firstdate), new Date(sqlParams.lastdate)];
+	}else {
+		sqlQuery = 'SELECT * \
 		FROM receipt \
 		WHERE receipt.kiosk_id = ? AND receipt.sales_channel_id = ? \
 		ORDER BY receipt.created_date DESC \
 		LIMIT 30';
-	let chanelParams = [...sqlParams];
-	chanelParams.push(salesChannelArray[index].id)
+		chanelParams = [sqlParams.kioskID, salesChannelArray[index].id];
+	}
 	connection.query(sqlQuery, chanelParams, function(err, sqlResult, fields) {
 		if( err ){
 			console.log( JSON.stringify(err));
 			yieldResults( response, results );
 		}else{
 			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-				console.log( "boo")
-				results.salesByChannel.labels.push(salesChannelArray[index].name );
+				// results.salesByChannel.labels.push(salesChannelArray[index].name );
 				var salesData = sqlResult.map(row =>{ return {x:row.created_date, y:row.customer_amount}} );
-				// DO THIS ONLY IF THE SORT IS DESCENDING!!!
-				var salesData = salesData.reverse();
+				if( sortDesc ) {
+					var salesData = salesData.reverse();
+				}
 
 				results.salesByChannel.datasets.push({label:salesChannelArray[index].name, data:salesData});
 			}
@@ -73,7 +84,8 @@ const yieldResults =(response, results ) =>{
 
 const initResults = () =>{
 	return {
-		salesByChannel: { labels: [], datasets: []}
+		// salesByChannel: { labels: [], datasets: []}
+		salesByChannel: { datasets: []}
 
 	}
 };

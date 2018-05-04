@@ -39,23 +39,14 @@ class SalesByChannelChart extends Component {
                                     beginAtZero:true,
                                 }
                             }],
-                            // xAxes: [{
-								// type: 'time',
-                            //     displayFormats: {
-                            //         day: 'MMM D'
-                            //     },
-								// time: {
-								// 	unit: 'day'
-								// }
-                            // }]
 							xAxes: [{
 								type: 'time',
 								time: {
-									unit: 'month',
+									unit: 'week',
 									displayFormats: {
 										day: 'MMM D'
 									},
-									min: this.calcMinDate()
+//									min: this.calcMinDate()
 								}
 							}]
                         },
@@ -69,29 +60,29 @@ class SalesByChannelChart extends Component {
             </div>
         );
     }
-    calcMinDate= ()=>{
-    	let minDate = '2017-01-01T12:00:00.000Z';
-    	let first = true;
-    	let firstDate = null;
-    	if( this.props.chartData && this.props.chartData.datasets){
-			this.props.chartData.datasets.forEach( dataset => {
-				if( dataset.data.length > 0 ) {	// The first point in the chart
-					let nextDate = new Date(Date.parse(dataset.data[0].x))
-					if( first ){
-						firstDate = nextDate;
-						first = false;
-					} else{
-						if( nextDate.getTime() < firstDate.getTime()){
-							firstDate = nextDate;
-						}
-					}
-				}
-			})
-			if( firstDate){
-				minDate = firstDate.toISOString();
-			}
-		}
-    	return minDate;
-	}
+    // calcMinDate= ()=>{
+    	// let minDate = '2017-01-01T12:00:00.000Z';
+    	// let first = true;
+    	// let firstDate = null;
+    	// if( this.props.chartData && this.props.chartData.datasets){
+	// 		this.props.chartData.datasets.forEach( dataset => {
+	// 			if( dataset.data.length > 0 ) {	// The first point in the chart
+	// 				let nextDate = new Date(Date.parse(dataset.data[0].x))
+	// 				if( first ){
+	// 					firstDate = nextDate;
+	// 					first = false;
+	// 				} else{
+	// 					if( nextDate.getTime() < firstDate.getTime()){
+	// 						firstDate = nextDate;
+	// 					}
+	// 				}
+	// 			}
+	// 		})
+	// 		if( firstDate){
+	// 			minDate = firstDate.toISOString();
+	// 		}
+	// 	}
+    	// return minDate;
+	// }
 }
 export default SalesByChannelChart;

@@ -11,9 +11,8 @@ export default function sales(state =init(), action) {
 			return newState;
 		case RECEIVE_SALES_BY_CHANNEL:
 			console.log('RECEIVE_SALES_BY_CHANNEL Action');
-			newState = {...state}; /// CAREFULL ---
-			newState.salesByChannel = action.data.salesByChannel;
-			return newState;
+			// Merge sales by channel into state
+			return  {...state, salesByChannel:action.data.salesByChannel};
 		case FORCE_SALES_UPDATE:
 			// Simply resets the state with a new version to force an update
 			newState = {...state};
