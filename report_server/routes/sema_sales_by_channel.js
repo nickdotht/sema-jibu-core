@@ -18,7 +18,7 @@ router.get('/', function(req, response, next) {
 	connection.query(sqlSalesByChannel, [req.query.kioskID], function(err, sqlResult, fields) {
 		if( err ){
 			console.log( JSON.stringify(err));
-			yieldResults( response, results );
+			yieldError( response, 500, results );
 		}else {
 			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
 				var salesChannelArray = sqlResult.map(row => {
@@ -56,7 +56,7 @@ const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlPa
 	connection.query(sqlQuery, chanelParams, function(err, sqlResult, fields) {
 		if( err ){
 			console.log( JSON.stringify(err));
-			yieldResults( response, results );
+			yieldError( response, 500,results );
 		}else{
 			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
 				// results.salesByChannel.labels.push(salesChannelArray[index].name );
@@ -82,6 +82,10 @@ const yieldResults =(response, results ) =>{
 	response.json(results);
 }
 
+const yieldError = (response, httpErrorCode, results ) =>{
+	response.status(httpErrorCode);
+	response.json(results);
+}
 const initResults = () =>{
 	return {
 		// salesByChannel: { labels: [], datasets: []}
