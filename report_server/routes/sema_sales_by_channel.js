@@ -1,38 +1,47 @@
 var express = require('express');
 var router = express.Router();
-var mysql = require('mysql');
-var connectionTable = require('../seama_services/db_service').connectionTable;
+const connectionTable = require('../seama_services/db_service').connectionTable;
 
 /* GET data for sales_by_channel  */
 
 
-var sqlSalesByChannel=
+const sqlSalesByChannel=
 	'SELECT sales_channel.id,  sales_channel.name\
 	FROM sales_channel';
 
-router.get('/', function(req, response, next) {
+router.get('/', function(req, response ) {
 	console.log('Sales_by_channel - ', req.query.kioskID);
-	var sessData = req.session;
-	var connection = connectionTable[sessData.id];
-	var results = initResults()
-	connection.query(sqlSalesByChannel, [req.query.kioskID], function(err, sqlResult, fields) {
-		if( err ){
-			console.log( JSON.stringify(err));
-			yieldError( response, 500, results );
-		}else {
-			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-				var salesChannelArray = sqlResult.map(row => {
-					return {name: row.name, id: row.id};
-				});
-				execSqlSalesByChannelQuery(salesChannelArray, 0, connection, req.query, response, results);
-
-			}else{
-				yieldResults( response, results );
-			}
-		}
+	let sessData = req.session;
+	let connection = connectionTable[sessData.id];
+	let results = initResults();
+	getSalesChannels(connection).then( ( salesChannel) =>{
+		execSqlSalesByChannelQuery(salesChannel, 0, connection, req.query, response, results);
+	}).catch( (err ) => {
+		yieldError( err, response, 500, results );
 	});
-
 });
+
+const getSalesChannels = (connection ) => {
+	return new Promise((resolve, reject) => {
+		connection.query(sqlSalesByChannel, function(err, sqlResult ) {
+			if( err ){
+				reject(err);
+			}else {
+				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+					let salesChannel = sqlResult.map(row => {
+						return {name: row.name, id: row.id};
+					});
+					resolve(salesChannel);
+
+				}else{
+					resolve([]);
+				}
+			}
+		});
+	})
+};
+
+
 const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlParams, response, results ) =>{
 	let sqlQuery = "";
 	let chanelParams =[];
@@ -53,22 +62,22 @@ const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlPa
 		LIMIT 30';
 		chanelParams = [sqlParams.kioskID, salesChannelArray[index].id];
 	}
-	connection.query(sqlQuery, chanelParams, function(err, sqlResult, fields) {
+	connection.query(sqlQuery, chanelParams, function(err, sqlResult ) {
 		if( err ){
 			console.log( JSON.stringify(err));
-			yieldError( response, 500,results );
+			yieldError( err, response, 500,results );
 		}else{
 			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
 				// results.salesByChannel.labels.push(salesChannelArray[index].name );
-				var salesData = sqlResult.map(row =>{ return {x:row.created_date, y:row.customer_amount}} );
+				let salesData = sqlResult.map(row =>{ return {x:row.created_date, y:row.customer_amount}} );
 				if( sortDesc ) {
-					var salesData = salesData.reverse();
+					salesData = salesData.reverse();
 				}
 
 				results.salesByChannel.datasets.push({label:salesChannelArray[index].name, data:salesData});
 			}
 			index++;
-			if( index == salesChannelArray.length ){
+			if( index === salesChannelArray.length ){
 				// All done
 				yieldResults( response, results );
 			}else{
@@ -77,15 +86,16 @@ const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlPa
 		}
 	});
 
-}
+};
 const yieldResults =(response, results ) =>{
 	response.json(results);
-}
+};
 
-const yieldError = (response, httpErrorCode, results ) =>{
+const yieldError = (err, response, httpErrorCode, results ) =>{
+	console.log( "Error:", err.message, "HTTP Error code: ", httpErrorCode);
 	response.status(httpErrorCode);
 	response.json(results);
-}
+};
 const initResults = () =>{
 	return {
 		// salesByChannel: { labels: [], datasets: []}
