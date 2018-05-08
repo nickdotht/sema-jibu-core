@@ -23,7 +23,9 @@ export default class SalesRetailerList extends Component {
 	buildTableRows(){
 		let rows = [];
 		this.props.retailers.forEach( (retailer, index) => {
-			rows.push(<tr>
+			// rows.push(<tr {this.calcColor(retailer.thisPeriod, retailer.lastPeriod)}>
+			// rows.push(<tr style={{color:"red"}}>
+			rows.push(<tr style={this.calcColor(retailer.thisPeriod, retailer.lastPeriod)}>
 						<td>{index+1}.</td>
 						<td>{retailer.name}</td>
 						<td>{retailer.total}</td>
@@ -36,7 +38,20 @@ export default class SalesRetailerList extends Component {
 	calcTrend( now, last ){
 		if( now > last ){
 			return (<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-up"/></td>);
+		}else if( now < last ) {
+			return (<td style={{textAlign: "center"}}><i className="glyphicon glyphicon-arrow-down"/></td>);
+		}else{
+			return (<td style={{textAlign: "center"}}><i className="glyphicon glyphicon-minus"/></td>);
 		}
-		return (<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-down"/></td>);
 	}
+	calcColor( now, last ){
+		if( now > last ){
+			return ( {color:"green"});
+		}else if( now < last ) {
+			return ( {color:"red"});
+		}else{
+			return ( {color:"gray"});
+		}
+	}
+
 }

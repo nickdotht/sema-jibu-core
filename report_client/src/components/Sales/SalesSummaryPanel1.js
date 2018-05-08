@@ -11,7 +11,7 @@ class SalesSummaryPanel1 extends Component {
                     <Panel.Body  style={{padding:"7px"}}>
                         <Panel.Title componentClass="h3" style={{margin:"0"}}>{this.props.title}</Panel.Title>
                         <p style={{fontSize:"x-large",margin:"0" }}>{SalesSummaryPanel1.format(this.props.value)}</p>
-                        <p style={SalesSummaryPanel1.calcDeltaStyle(this.props.delta)}>{this.props.delta} {this.props.label}</p>
+                        <p style={SalesSummaryPanel1.calcDeltaStyle(this.props.valueColor)}>{this.props.delta} {this.props.label}</p>
                     </Panel.Body>
                 </Panel>
             </div>
@@ -21,21 +21,14 @@ class SalesSummaryPanel1 extends Component {
         if( typeof value === "string") return value;
         return Math.round(value);
     }
-    static calcDeltaStyle( value ){
-    	if( typeof value=== "string") {
-			return {margin: "0", color:"gray"}
-		}else if( value == 0 ){
-			return {margin: "0"}
-		}else if( value < 0 ){
-			return {margin: "0", color:"red"}
-		}else{
-			return {margin: "0", color:"green"}
-		}
+    static calcDeltaStyle( color ){
+		return {margin: "0", color:color}
 	}
 }
 SalesSummaryPanel1.propTypes ={
 	label:PropTypes.string,
-	title:PropTypes.string
+	title:PropTypes.string,
+	delta:PropTypes.string,
 }
 export default SalesSummaryPanel1;
 

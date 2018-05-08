@@ -31,7 +31,14 @@ function createConnection(sessionData, req, res, next) {
 
 	con.connect(function(err) {
 		if (err) {
-			res.status(500).send('Not Authorized');
+			console.log( JSON.stringify(err));
+			switch( err.code ){
+				case "ER_ACCESS_DENIED_ERROR":
+					res.status(401).send('Not Authorized');
+					break;
+				default:
+					res.status(503).send('Service unavailable');
+			}
 			sessionData.dbConnection = null;
 		} else {
 			console.log('Connected! - calling next');

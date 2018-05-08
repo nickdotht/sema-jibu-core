@@ -39,18 +39,21 @@ class SemaSales extends Component {
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="New Customers" label={" of Monthly goal"}
-										  value={this.props.sales.newCustomers.thisPeriod}
-										  delta = {calcChange(this.props.sales.newCustomers.thisPeriod, this.props.sales.newCustomers.lastPeriod)} />
+										  	value={this.props.sales.newCustomers.thisPeriod}
+										  	delta = {calcChange(this.props.sales.newCustomers.thisPeriod, this.props.sales.newCustomers.lastPeriod)}
+						                  	valueColor = {calcColor(this.props.sales.newCustomers.thisPeriod, this.props.sales.newCustomers.lastPeriod)} />
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Revenue" label={" to last Month"}
-										  value={this.props.sales.totalRevenue.total}
-										  delta = {calcChange(this.props.sales.totalRevenue.thisPeriod, this.props.sales.totalRevenue.lastPeriod)} />
+										  	value={formatDollar(this.props.sales.totalRevenue.total)}
+										  	delta = {calcChange(this.props.sales.totalRevenue.thisPeriod, this.props.sales.totalRevenue.lastPeriod)}
+											valueColor = {calcColor(this.props.sales.totalRevenue.thisPeriod, this.props.sales.totalRevenue.lastPeriod)} />
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Net Income" label={" to last Month"}
-										  value={this.props.sales.netIncome.total}
-										  delta = {calcChange(this.props.sales.netIncome.thisPeriod, this.props.sales.netIncome.lastPeriod)} />
+										  	value={this.props.sales.netIncome.total}
+										  	delta = {calcChange(this.props.sales.netIncome.thisPeriod, this.props.sales.netIncome.lastPeriod)}
+											valueColor = {calcColor(this.props.sales.netIncome.thisPeriod, this.props.sales.netIncome.lastPeriod)} />
 					</div>
 				</div>
 				<div className = "SalesContentContainer">
@@ -81,6 +84,7 @@ class SemaSales extends Component {
 						</div>
 						<div className= "SalesBottomRight">
 							<SalesByChannelChart chartData={this.props.sales.salesByChannel}/>
+							{/*<SalesByChannelChart chartData={foobar(this.props)}/>*/}
 						</div>
 					</div>
 					{/*<div className= "SalesBottonRightItem">*/}
@@ -92,6 +96,26 @@ class SemaSales extends Component {
         );
     }
 }
+// const foobar = (p)=>{
+// 	return p.sales.salesByChannel;
+// }
+const formatDollar = amount =>{
+	let suffix = "";
+	if( typeof amount === "string") return amount;
+	if( amount > 1000){
+		amount = amount/1000;
+		suffix = "k";
+	}
+	var formatter = new Intl.NumberFormat('en-US', {
+		style: 'currency',
+		currency: 'HTG',
+		minimumFractionDigits: 2,
+		// the default value for minimumFractionDigits depends on the currency
+		// and is usually already 2
+	});
+	return formatter.format(amount) + suffix;
+};
+
 const formatTotalCustomers = total =>{
 	if( typeof total === "string"){
 		return total;
@@ -125,12 +149,23 @@ const formatCustomerGrowth = newCustomers =>{
 
 
 const calcChange = (now, last) => {
-	if( typeof now === "string" || typeof last === "string"){
+	if( typeof now === "string" ||
+		typeof last === "string" ||
+		!now || !last ){
 		return "N/A"
 	}else{
-		return parseFloat(((now/last)*100 -100).toFixed(2));
+		return ((now/last)*100 -100).toFixed(2) + "%";
 	}
 
+};
+const calcColor = (now, last) => {
+	if( typeof now === "string" || typeof last === "string"){
+		return "gray"
+	}else{
+		if(now > last ) return "green";
+		else if(now < last ) return "red";
+	}
+	return "gray"
 };
 
 function mapStateToProps(state) {

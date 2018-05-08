@@ -10,6 +10,8 @@ var seama_health_check = require('./routes/seama_health_check');
 var seama_login = require('./routes/seama_login');
 var seama_kiosks = require('./routes/seama_kiosks');
 var seama_water_quality = require('./routes/seama_water_quality');
+var sema_sales = require('./routes/sema_sales');
+var sema_sales_by_channel = require('./routes/sema_sales_by_channel');
 var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
 
@@ -49,6 +51,8 @@ app.use('/untapped/health-check', seama_health_check);
 app.use('/untapped/login', seama_login);
 app.use('/untapped/kiosks', dbService, seama_kiosks);
 app.use('/untapped/water-quality', dbService, seama_water_quality);
+app.use('/untapped/sales', dbService, sema_sales);
+app.use('/untapped/sales-by-channel', dbService, sema_sales_by_channel);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

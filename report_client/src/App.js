@@ -37,7 +37,7 @@ class App extends Component {
 			console.log("on route change", self);
 			switch( location.pathname ){
 				case "/":
-					if( ! this.props.waterOperations.loaded ){
+					if( ! this.props.waterOperations.loaded && this.props.kiosk.selectedKiosk.kioskID  ){
 						this.props.waterOperationsActions.fetchWaterOperations(this.props.kiosk.selectedKiosk);
 					}
 					break;
@@ -47,7 +47,8 @@ class App extends Component {
 					setTimeout(()=> {
 						self.props.salesActions.forceUpdate();
 					}, 100);
-					if( ! this.props.sales.loaded ){
+					if( ! this.props.sales.loaded && this.props.kiosk.selectedKiosk.kioskID ) {
+						this.props.kiosk.selectedKiosk.period = "month";	// TODO Derive from filter
 						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
 					}
 					break;
