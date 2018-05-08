@@ -199,7 +199,8 @@ const updateSales = ( retailer_id, retailers, sqlResults ) =>{
 	const retailerIndex = retailers.findIndex(retailer => retailer.id === retailer_id);
 	// Sql Index = index into sales result for the retailer, retailerIndex is the object to populate
 	if(sqlIndex !== -1 &&  retailerIndex !== -1) {
-		// Do NOT use current month. It may not be complete.
+		retailers[retailerIndex].total = sqlResults[sqlIndex]["SUM(customer_amount)"];
+		// Do NOT use current month for trending. It may not be complete.
 		let nowDate = new Date(Date.now());
 		if (nowDate.getFullYear() === sqlResults[sqlIndex].created_date.getFullYear() &&
 			nowDate.getMonth() === sqlResults[sqlIndex].created_date.getMonth()) {

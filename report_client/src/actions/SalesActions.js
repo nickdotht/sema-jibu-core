@@ -1,8 +1,8 @@
 import * as allActions from './ActionTypes';
-import moment from "moment/moment";
 
 export function receiveSales(data) {
 	console.log("receiveSales - ", data.toString());
+	data.loaded = true;
 	return {type: allActions.RECEIVE_SALES, data};
 }
 
@@ -49,7 +49,7 @@ export function fetchSales( params ) {
 			.then(response => {
 				if(response.status === 200){
 					dispatch(receiveSales(response.data));
-					var salesByChannelUrl = '/untapped/sales-by-channel?' + urlParms;
+					let salesByChannelUrl = '/untapped/sales-by-channel?' + urlParms;
 					return fetch(salesByChannelUrl, {credentials: 'include'})
 						.then(response =>
 							response.json().then(data => ({
@@ -90,7 +90,7 @@ const getStartEndDates = parms =>{
 		}
 	}
 	return null;
-}
+};
 const colors = [
 	"rgb(0, 179, 0)",
 	"rgb(0, 0, 230)",
@@ -113,7 +113,7 @@ const formatChartData = (chartData) =>{
 		// 	return {x:moment(item.x).format("MMM Do YY"), y:item.y}
 		// })
 	});
-}
+};
 
 export function forceUpdate() {
 	console.log("forceUpdate - ");
