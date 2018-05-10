@@ -14,18 +14,18 @@ const sqlTotalRevenue =
 	WHERE receipt.kiosk_id = ?';
 
 const sqlRevenueByPeriod =
-	'SELECT   SUM(customer_amount), created_date \
+	'SELECT   SUM(customer_amount), YEAR(created_date) \
 	FROM      receipt \
 	WHERE     kiosk_id=? \
 	GROUP BY  YEAR(created_date), MONTH(created_date) \
-	ORDER BY DATE(created_date) DESC';
+	ORDER BY  YEAR(created_date) DESC';
 
 const sqlLitersPerCustomer =
-	'SELECT    SUM(total_gallons), COUNT(customer_account_id), created_date \
+	'SELECT    SUM(total_gallons), COUNT(customer_account_id), YEAR(created_date) \
 	FROM      receipt \
 	WHERE     kiosk_id=?\
 	GROUP BY  YEAR(created_date), MONTH(created_date)\
-	ORDER BY DATE(created_date) DESC';
+	ORDER BY  YEAR(created_date) DESC';
 
 // TODO This query isn't correct. It does NOT resolve retailers
 const sqlRetailers =
@@ -36,13 +36,13 @@ const sqlRetailers =
 	WHERE customer_account.kiosk_id = ? AND customer_account.gps_coordinates != ""';
 
 const sqlRetailerRevenue =
-	'SELECT SUM(customer_amount), created_date, customer_account_id, customer_account.contact_name \
+	'SELECT SUM(customer_amount), YEAR(receipt.created_date), MONTH(receipt.created_date),  customer_account_id, customer_account.contact_name \
 	FROM receipt \
 	INNER JOIN customer_account \
 	ON customer_account_id = customer_account.id \
-	WHERE customer_account.kiosk_id = ? AND datediff(curdate(), created_date) < 70 AND customer_account_id in( ? )\
-	GROUP BY  YEAR(created_date), MONTH(created_date), customer_account_id \
-	ORDER BY customer_account_id, created_date DESC';
+	WHERE customer_account.kiosk_id = ? AND datediff(curdate(), receipt.created_date) < 70 AND customer_account_id in( ? )\
+	GROUP BY  YEAR(receipt.created_date), MONTH(receipt.created_date), customer_account_id \
+	ORDER BY customer_account_id, YEAR(receipt.created_date) DESC';
 
 router.get('/', function(request, response) {
 	console.log('Sales - ', request.query.kioskID);
@@ -50,13 +50,28 @@ router.get('/', function(request, response) {
 	let connection = connectionTable[sessData.id];
 	let results = initResults();
 
-	getTotalCustomers(connection, request.query, results).then( () =>{
-		getTotalRevenue(connection, request.query, results).then( () => {
-			getRevenueByPeriod(connection, request.query, results).then(() => {
-				getLitersPerCustomer(connection, request.query, results).then(() => {
-					getRetailers(connection, request.query, results).then(() => {
-						getRetailerRevenue(connection, request.query, results).then(() => {
-							yieldResults(response, results);
+	request.check("kioskID", "Parameter kioskID is missing").exists();
+
+	request.getValidationResult().then(function(result) {
+		if (!result.isEmpty()) {
+			var errors = result.array().map((elem) => {
+				return elem.msg;
+			});
+			response.status(400).send(errors.toString());
+		} else {
+			getTotalCustomers(connection, request.query, results).then(() => {
+				getTotalRevenue(connection, request.query, results).then(() => {
+					getRevenueByPeriod(connection, request.query, results).then(() => {
+						getLitersPerCustomer(connection, request.query, results).then(() => {
+							getRetailers(connection, request.query, results).then(() => {
+								getRetailerRevenue(connection, request.query, results).then(() => {
+									yieldResults(response, results);
+								}).catch(err => {
+									yieldError(err, response, 500, results);
+								})
+							}).catch(err => {
+								yieldError(err, response, 500, results);
+							})
 						}).catch(err => {
 							yieldError(err, response, 500, results);
 						})
@@ -68,14 +83,9 @@ router.get('/', function(request, response) {
 				})
 			}).catch(err => {
 				yieldError(err, response, 500, results);
-			})
-		}).catch(err => {
-			yieldError(err, response, 500, results);
-		})
-	}).catch( err  => {
-		yieldError( err, response, 500, results );
+			});
+		}
 	});
-
 });
 
 const getTotalCustomers = (connection, requestParams, results ) => {
@@ -101,6 +111,9 @@ const getTotalRevenue = (connection, requestParams, results ) => {
 			} else {
 				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
 					results.totalRevenue.total = sqlResult[0]["SUM(customer_amount)"];
+					if( results.totalRevenue.total === null ){
+						results.totalRevenue.total = "N/A";
+					}
 				}
 				resolve();
 			}
@@ -177,20 +190,26 @@ const getRetailers = (connection, requestParams, results ) => {
 
 const getRetailerRevenue = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
-		let inSet = results.retailSales.map(retailer => {return retailer.id});
-
-		connection.query(sqlRetailerRevenue, [requestParams.kioskID, inSet], function (err, sqlResult ) {
-			if (err) {
-				reject(err);
-			} else {
-				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-					inSet.forEach(retailerId => {
-						updateSales(retailerId, results.retailSales, sqlResult)
-					});
-				}
-				resolve();
-			}
+		let inSet = results.retailSales.map(retailer => {
+			return retailer.id
 		});
+		if (inSet.length > 0) {
+			connection.query(sqlRetailerRevenue, [requestParams.kioskID, inSet], function (err, sqlResult) {
+				if (err) {
+					reject(err);
+				} else {
+					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+						inSet.forEach(retailerId => {
+							updateSales(retailerId, results.retailSales, sqlResult)
+						});
+					}
+					resolve();
+				}
+			});
+		}else{
+			// No retailers => no sales
+			resolve();
+		}
 	});
 };
 
@@ -202,8 +221,8 @@ const updateSales = ( retailer_id, retailers, sqlResults ) =>{
 		retailers[retailerIndex].total = sqlResults[sqlIndex]["SUM(customer_amount)"];
 		// Do NOT use current month for trending. It may not be complete.
 		let nowDate = new Date(Date.now());
-		if (nowDate.getFullYear() === sqlResults[sqlIndex].created_date.getFullYear() &&
-			nowDate.getMonth() === sqlResults[sqlIndex].created_date.getMonth()) {
+		if (nowDate.getFullYear() === sqlResults[sqlIndex]["YEAR(receipt.created_date)"] &&
+			nowDate.getMonth() === sqlResults[sqlIndex]["MONTH(receipt.created_date)"]) {
 			sqlIndex += 1;
 		}
 		if ((sqlIndex + 1) < sqlResults.length && // There must be two or more periods
