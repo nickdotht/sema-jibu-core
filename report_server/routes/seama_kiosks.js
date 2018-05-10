@@ -1,12 +1,11 @@
-var express = require('express');
-var router = express.Router();
-var mysql = require('mysql');
-var connectionTable = require('../seama_services/db_service').connectionTable;
+const express = require('express');
+const router = express.Router();
+const connectionTable = require('../seama_services/db_service').connectionTable;
 
-/* GET users listing. */
+/* GET kiosks in the database. */
 
 router.get('/', function(req, res, next) {
-	var mockit = req.app.get('mockIt');
+	let mockit = req.app.get('mockIt');
 	if (mockit) {
 		res.json({
 			kiosks: [
@@ -90,11 +89,11 @@ router.get('/', function(req, res, next) {
 			]
 		});
 	} else {
-		var sessData = req.session;
-		var connection = connectionTable[sessData.id];
-		connection.query('SELECT * FROM kiosk', function(err, result, fields) {
+		const sessData = req.session;
+		const connection = connectionTable[sessData.id];
+		connection.query('SELECT * FROM kiosk', function(err, result ) {
 			if (err) {
-				res.status(401).send('No Database access');
+				res.status(500).send(err.message);
 			} else {
 				res.json({ kiosks: result });
 			}

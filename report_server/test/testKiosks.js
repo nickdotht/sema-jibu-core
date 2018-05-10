@@ -3,6 +3,7 @@ const expect = require('chai').expect;
 const chai = require('chai');
 chaiHttp = require('chai-http');
 chai.use(chaiHttp);
+const should = chai.should();
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 

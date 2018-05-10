@@ -1,28 +1,25 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-/* GET users listing. */
+/* Process login. */
 router.get('/', function(req, res) {
-	console.log('seama_login');
-	var auth = req.header('authorization');
+	console.log('sema_login');
+	let auth = req.header('authorization');
 	try {
 		auth = auth.substr('Basic '.length);
 		auth = Buffer.from(auth, 'base64').toString();
-		var credentials = auth.split(':');
+		const credentials = auth.split(':');
 		if (
 			credentials[0] === 'administrator'.toLowerCase() &&
 			credentials[1] === 'dloHaiti'
-		) {
+		)
+		{
 			res.json({ LogState: 'LoggedIn' });
-			// var fooRes = res;
-			// setTimeout(function(){
-			//     fooRes.json({LogState: "LoggedIn"});
-			// }, 3000)
 		} else {
-			res.json({ LogState: 'BadCredentials' });
+			res.status(401).send("Invalid Credentials");
 		}
 	} catch (ex) {
-		res.json({ LogState: 'NoService' });
+		res.status(400).send("Missing/bad headers");
 	}
 });
 
