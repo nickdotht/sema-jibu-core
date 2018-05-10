@@ -1,5 +1,5 @@
-var mysql = require('mysql');
-var connectionTable = {};
+const mysql = require('mysql');
+const connectionTable = {};
 
 const sqlConfig = {
 	host: '104.131.40.239',
@@ -25,7 +25,8 @@ function dbService(req, res, next) {
 }
 
 function createConnection(sessionData, req, res, next) {
-	var con = mysql.createConnection(sqlConfig);
+	var dbConfig = getSQLConfig(req);
+	var con = mysql.createConnection(dbConfig);
 
 	connectionTable[sessionData.id] = con;
 
@@ -75,9 +76,19 @@ function checkExpiredSessions(req) {
 		console.log('checkExpiredSessions ', ex);
 	}
 }
-
+function getSQLConfig(req){
+	if( req.app.get("env") === "test"){
+		console.log( "Test environment"); // TODO Test config should not be static!!!
+		sqlConfig.host = '192.168.50.92';
+		sqlConfig.database = 'jibu1';
+		sqlConfig.user = 'fred';
+		sqlConfig.password =  'jibu1';
+	}
+	console.log("SQL host:", sqlConfig.host, "SQL database:", sqlConfig.database );
+	return sqlConfig;
+}
 module.exports = {
 	dbService: dbService,
 	connectionTable: connectionTable,
-	sqlConfig: sqlConfig
+	getSQLConfig: getSQLConfig
 };

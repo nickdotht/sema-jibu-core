@@ -1,7 +1,7 @@
-var express = require('express');
-var mysql = require('mysql');
-var router = express.Router();
-var sqlConfig = require('../seama_services/db_service').sqlConfig;
+const express = require('express');
+const mysql = require('mysql');
+const router = express.Router();
+const getSQLConfig = require('../seama_services/db_service').getSQLConfig;
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -11,8 +11,7 @@ router.get('/', function(req, res, next) {
 });
 
 function testConnection(req, res) {
-	var con = mysql.createConnection(sqlConfig);
-
+	var con = mysql.createConnection(getSQLConfig(req));
 	con.connect(function(err) {
 		if (err) {
 			console.log('Database Connection failed!');
