@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const connectionTable = require('../seama_services/db_service').connectionTable;
 const sprintf = require('sprintf-js').sprintf;
-
+const customerAccountHasCreatedDate = require('../seama_services/db_service').customerAccountHasCreatedDate;
 
 /* GET data for sales view. */
 const sqlTotalCustomers =
@@ -16,18 +16,25 @@ const sqlTotalRevenue =
 	WHERE receipt.kiosk_id = ?';
 
 const sqlRevenueByPeriod =
-	'SELECT   SUM(customer_amount), YEAR(created_date) \
+	'SELECT   SUM(customer_amount), DATE(created_date) \
 	FROM      receipt \
 	WHERE     kiosk_id=? \
-	GROUP BY  YEAR(created_date), %s(created_date) \
-	ORDER BY  YEAR(created_date) DESC';
+	GROUP BY  DATE(created_date), %s(created_date) \
+	ORDER BY  DATE(created_date) DESC';
+
+const sqlCustomersByPeriod =
+	'SELECT   COUNT(id), DATE(created_date), %s(created_date) \
+	FROM      customer_account \
+	WHERE     kiosk_id=? \
+	GROUP BY  DATE(created_date), %s(created_date) \
+	ORDER BY  DATE(created_date) DESC';
 
 const sqlLitersPerCustomer =
-	'SELECT    SUM(total_gallons), COUNT(customer_account_id), YEAR(created_date) \
+	'SELECT    SUM(total_gallons), COUNT(customer_account_id), DATE(created_date) \
 	FROM      receipt \
 	WHERE     kiosk_id=?\
-	GROUP BY  YEAR(created_date), MONTH(created_date)\
-	ORDER BY  YEAR(created_date) DESC';
+	GROUP BY  DATE(created_date), MONTH(created_date)\
+	ORDER BY  DATE(created_date) DESC';
 
 // TODO This query isn't correct. It does NOT resolve retailers
 const sqlRetailers =
@@ -68,8 +75,12 @@ router.get('/', function(request, response) {
 					getRevenueByPeriod(connection, request.query, results).then(() => {
 						getLitersPerCustomer(connection, request.query, results).then(() => {
 							getRetailers(connection, request.query, results).then(() => {
-								getRetailerRevenue(connection, request.query, results).then(() => {
-									yieldResults(response, results);
+								getCustomersByPeriod(connection, request.query, results).then(() => {
+									getRetailerRevenue(connection, request.query, results).then(() => {
+										yieldResults(response, results);
+									}).catch(err => {
+										yieldError(err, response, 500, results);
+									})
 								}).catch(err => {
 									yieldError(err, response, 500, results);
 								})
@@ -142,6 +153,30 @@ const getRevenueByPeriod = (connection, requestParams, results ) => {
 		});
 	});
 };
+
+const getCustomersByPeriod = (connection, requestParams, results ) => {
+	return new Promise((resolve, reject) => {
+		if (customerAccountHasCreatedDate()) {
+			results.newCustomers.period = requestParams.groupby;
+			const sql = sprintf(sqlCustomersByPeriod, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
+			connection.query(sql, [requestParams.kioskID], function (err, sqlResult) {
+				if (err) {
+					reject(err);
+				} else {
+					if (Array.isArray(sqlResult) && sqlResult.length > 1) {
+						results.newCustomers.thisPeriod = sqlResult[0]["COUNT(id)"];
+						results.newCustomers.lastPeriod = sqlResult[1]["COUNT(id)"];
+					}
+					resolve();
+				}
+			});
+		}else{
+			// Database schema doesn't have created_date for customer accounts
+			resolve();
+		}
+	});
+};
+
 const getLitersPerCustomer = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
 		results.litersPerCustomer.period = "month";		// TODO Does this need to be variable
