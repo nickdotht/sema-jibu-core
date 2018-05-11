@@ -27,12 +27,12 @@ export function initializeSales() {
 }
 
 export function fetchSales( params ) {
-	// TODO - May want to fix up how period is passed
 	let startEndDate = getStartEndDates( params );
 	if( startEndDate ){
 		params.firstdate=startEndDate[0];
 		params.lastdate=startEndDate[1];
 	}
+
 	const urlParms = queryParams(params);
 	const url = '/untapped/sales?' + urlParms;
 	// return (dispatch) => {

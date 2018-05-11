@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const connectionTable = require('../seama_services/db_service').connectionTable;
+const sprintf = require('sprintf-js').sprintf;
+
 
 /* GET data for sales view. */
 const sqlTotalCustomers =
@@ -17,7 +19,7 @@ const sqlRevenueByPeriod =
 	'SELECT   SUM(customer_amount), YEAR(created_date) \
 	FROM      receipt \
 	WHERE     kiosk_id=? \
-	GROUP BY  YEAR(created_date), MONTH(created_date) \
+	GROUP BY  YEAR(created_date), %s(created_date) \
 	ORDER BY  YEAR(created_date) DESC';
 
 const sqlLitersPerCustomer =
@@ -36,12 +38,12 @@ const sqlRetailers =
 	WHERE customer_account.kiosk_id = ? AND customer_account.gps_coordinates != ""';
 
 const sqlRetailerRevenue =
-	'SELECT SUM(customer_amount), YEAR(receipt.created_date), MONTH(receipt.created_date),  customer_account_id, customer_account.contact_name \
+	'SELECT SUM(customer_amount), YEAR(receipt.created_date), %s(receipt.created_date),  customer_account_id, customer_account.contact_name \
 	FROM receipt \
 	INNER JOIN customer_account \
 	ON customer_account_id = customer_account.id \
 	WHERE customer_account.kiosk_id = ? AND datediff(curdate(), receipt.created_date) < 70 AND customer_account_id in( ? )\
-	GROUP BY  YEAR(receipt.created_date), MONTH(receipt.created_date), customer_account_id \
+	GROUP BY  YEAR(receipt.created_date), %s(receipt.created_date), customer_account_id \
 	ORDER BY customer_account_id, YEAR(receipt.created_date) DESC';
 
 router.get('/', function(request, response) {
@@ -51,12 +53,14 @@ router.get('/', function(request, response) {
 	let results = initResults();
 
 	request.check("kioskID", "Parameter kioskID is missing").exists();
+	request.check("groupby", "Parameter groupby is missing").exists();
 
 	request.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
 			var errors = result.array().map((elem) => {
 				return elem.msg;
 			});
+			console.log("VALIDATION ERROR: ",errors.toString());
 			response.status(400).send(errors.toString());
 		} else {
 			getTotalCustomers(connection, request.query, results).then(() => {
@@ -123,8 +127,9 @@ const getTotalRevenue = (connection, requestParams, results ) => {
 
 const getRevenueByPeriod = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
-		results.totalRevenue.period = "month";		// TODO Does this need to be variable
-		connection.query(sqlRevenueByPeriod, [requestParams.kioskID], function (err, sqlResult ) {
+		results.totalRevenue.period = requestParams.groupby;
+		const sql = sprintf(sqlRevenueByPeriod, requestParams.groupby.toUpperCase());
+		connection.query(sql, [requestParams.kioskID], function (err, sqlResult ) {
 			if (err) {
 				reject(err);
 			} else {
@@ -146,8 +151,8 @@ const getLitersPerCustomer = (connection, requestParams, results ) => {
 			} else {
 				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
 					try {
-						// Convert to liters to gallons
-						results.litersPerCustomer.value = (sqlResult[0]["SUM(total_gallons)"] *3.785411784 )/ sqlResult[0]["COUNT(customer_account_id)"];
+						// Value is in galleons
+						results.litersPerCustomer.value = sqlResult[0]["SUM(total_gallons)"]/ sqlResult[0]["COUNT(customer_account_id)"];
 					}catch( ex ){
 						console.error('getLitersPerCustomer:', error);
 					}
@@ -194,7 +199,8 @@ const getRetailerRevenue = (connection, requestParams, results ) => {
 			return retailer.id
 		});
 		if (inSet.length > 0) {
-			connection.query(sqlRetailerRevenue, [requestParams.kioskID, inSet], function (err, sqlResult) {
+			const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
+			connection.query(sql, [requestParams.kioskID, inSet], function (err, sqlResult) {
 				if (err) {
 					reject(err);
 				} else {
