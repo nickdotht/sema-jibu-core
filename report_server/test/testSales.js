@@ -33,13 +33,13 @@ describe('Testing Sales API', function () {
 				.get('/untapped/sales?kioskID=9999&groupby=month')
 				.end(function(err, res) {
 					res.should.have.status(200);
-					res.body.litersPerCustomer.should.have.property('value').eql('N/A');
+					res.body.gallonsPerCustomer.should.have.property('value').eql('N/A');
 					res.body.netIncome.should.have.property('total').eql('N/A');
-					res.body.netIncome.should.have.property('thisPeriod').eql('N/A');
-					res.body.netIncome.should.have.property('lastPeriod').eql('N/A');
+					res.body.netIncome.period1.should.have.property('periodValue').eql('N/A');
+					res.body.netIncome.period2.should.have.property('periodValue').eql('N/A');
 					expect(res.body.retailSales).to.be.an('array');
 					expect(res.body.retailSales).to.be.empty;
-					res.body.totalRevenue.should.have.property('total').eql('N/A');
+					res.body.totalRevenue.period1.should.have.property('periodValue').eql('N/A');
 					res.body.should.have.property('totalCustomers').eql(0);
 					done(err);
 				});
@@ -49,7 +49,7 @@ describe('Testing Sales API', function () {
 	// There should be one sale of 4 gallons (15.141 liters) worth 15 dollars
 	// There are five total customers for this Kiosk.
 	// The latest two months show 1 customer created in each month
-	describe('GET /untapped/Sales - UnitTest KioskID = 115', function() {
+	describe('GET /untapped/Sales - UnitTest KioskID', function() {
 		it('Should get info for one customer with one sale', function testLoginNoAuth(done) {
 			chai.request(server)
 				.get('/untapped/kiosks')
@@ -62,16 +62,30 @@ describe('Testing Sales API', function () {
 						.get(url)
 						.end(function (err, res) {
 							res.should.have.status(200);
-							res.body.litersPerCustomer.should.have.property('value').eql(4);
+							res.body.gallonsPerCustomer.should.have.property('value').eql(14/6);	// Assumes 14 gallons in latest month, 6 total customers
 							res.body.netIncome.should.have.property('total').eql('N/A');
-							res.body.netIncome.should.have.property('thisPeriod').eql('N/A');
-							res.body.netIncome.should.have.property('lastPeriod').eql('N/A');
+							res.body.netIncome.period1.should.have.property('periodValue').eql('N/A');
+							res.body.netIncome.period2.should.have.property('periodValue').eql('N/A');
 							expect(res.body.retailSales).to.be.an('array');
 							expect(res.body.retailSales).to.be.empty;
-							res.body.totalRevenue.should.have.property('total').eql(15);
-							res.body.newCustomers.should.have.property('thisPeriod').eql(1);
-							res.body.newCustomers.should.have.property('lastPeriod').eql(2);
+							res.body.newCustomers.period1.should.have.property('periodValue').eql(1);
+							res.body.newCustomers.period2.should.have.property('periodValue').eql(2);
 							res.body.should.have.property('totalCustomers').eql(6);
+							let testDate = new Date(res.body.newCustomers.period1.beginDate);
+							expect( testDate.getFullYear()).to.deep.equal(2018);
+							expect( testDate.getMonth()+1).to.deep.equal(5);
+
+							testDate = new Date(res.body.newCustomers.period2.beginDate);
+							expect( testDate.getFullYear()).to.deep.equal(2018);
+							expect( testDate.getMonth()+1).to.deep.equal(4);
+
+							res.body.totalRevenue.should.have.property('total').eql(35);
+							testDate = new Date(res.body.totalRevenue.period1.beginDate);
+							expect( testDate.getFullYear()).to.deep.equal(2018);
+							expect( testDate.getMonth()+1).to.deep.equal(1);
+							res.body.totalRevenue.period1.should.have.property('periodValue').eql(35);
+
+							res.body.totalRevenue.period2.should.have.property('beginDate').eql("N/A");
 							done(err);
 						});
 				});

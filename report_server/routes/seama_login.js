@@ -14,7 +14,7 @@ router.get('/', function(req, res) {
 			credentials[1] === 'dloHaiti'
 		)
 		{
-			res.json({ LogState: 'LoggedIn' });
+			res.json({ LogState: 'LoggedIn', version: req.app.get('sema_version')});
 		} else {
 			res.status(401).send("Invalid Credentials");
 		}

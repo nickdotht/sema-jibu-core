@@ -32,7 +32,8 @@ describe('Testing Login', function () {
 				.get('/untapped/login')
 				.auth('administrator', 'dloHaiti')
 				.end(function(err, res) {
-					res.should.have.status(200);	// No Auth headers!
+					res.should.have.status(200);	// Correct Auth!
+					res.body.should.have.property('version').eql('0.0.0.2');
 					done(err);
 				});
 		});
@@ -43,7 +44,7 @@ describe('Testing Login', function () {
 				.get('/untapped/login')
 				.auth('administrator', 'xxxx')
 				.end(function(err, res) {
-					res.should.have.status(401);	// No Auth headers!
+					res.should.have.status(401);	// Invalid Auth!
 					done(err);
 				});
 		});
