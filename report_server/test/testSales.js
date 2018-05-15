@@ -65,7 +65,7 @@ describe('Testing Sales API', function () {
 							res.body.netIncome.period1.should.have.property('periodValue').eql('N/A');
 							res.body.netIncome.period2.should.have.property('periodValue').eql('N/A');
 							expect(res.body.retailSales).to.be.an('array');
-							expect(res.body.retailSales).to.be.empty;
+							expect(res.body.retailSales.length).to.equal(1);
 							res.body.newCustomers.period1.should.have.property('periodValue').eql(1);
 							res.body.newCustomers.period2.should.have.property('periodValue').eql(2);
 							res.body.should.have.property('totalCustomers').eql(6);

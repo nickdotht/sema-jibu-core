@@ -72,47 +72,49 @@ export class SalesMapContainer extends Component {
 
 			});
 			this.props.retailers.forEach( retailer => { // iterate through locations saved in state
-				let gps = retailer.gps.split(',');
+				if(retailer.gps ){
+					let gps = retailer.gps.split(',');
 
-				if( gps && gps.length === 2) {
-					const lat = parseFloat(gps[0]);
-					const lng = parseFloat(gps[1]);
-					const scaleVal = ()=> {
-						// Convert sales to a range for the marker scales. Min sales scale = 20. Max sales scale = 80
-						if(typeof retailer.total === "number"  )
-							return 20 + 60 *  (retailer.total-minSales)/(maxSales-minSales);
-						return 20;
-					};
-					const colorVal = ()=> {
-						// produce color based on trend
-						if(typeof retailer.thisPeriod === "number" && typeof retailer.thisPeriod === "number" ){
-							if( retailer.thisPeriod > retailer.lastPeriod ){
-								return "green";
-							}else if( retailer.thisPeriod < retailer.lastPeriod ){
-								return "red";
+					if( gps && gps.length === 2) {
+						const lat = parseFloat(gps[0]);
+						const lng = parseFloat(gps[1]);
+						const scaleVal = ()=> {
+							// Convert sales to a range for the marker scales. Min sales scale = 20. Max sales scale = 80
+							if(typeof retailer.total === "number"  )
+								return 20 + 60 *  (retailer.total-minSales)/(maxSales-minSales);
+							return 20;
+						};
+						const colorVal = ()=> {
+							// produce color based on trend
+							if(typeof retailer.thisPeriod === "number" && typeof retailer.thisPeriod === "number" ){
+								if( retailer.thisPeriod > retailer.lastPeriod ){
+									return "green";
+								}else if( retailer.thisPeriod < retailer.lastPeriod ){
+									return "red";
+								}
 							}
-						}
-						return "gray";
-					};
-					let marker = new google.maps.Marker({ // creates a new Google maps Marker object.
-						position: {lat: lat, lng: lng}, // sets position of marker to specified location
-						map: this.map, // sets markers to appear on the map we just created on line 35
-						title: retailer.name, // the title of the marker is set to the name of the location
-						label: {
-							text: retailer.name,
-							color: "white"
-						},
+							return "gray";
+						};
+						let marker = new google.maps.Marker({ // creates a new Google maps Marker object.
+							position: {lat: lat, lng: lng}, // sets position of marker to specified location
+							map: this.map, // sets markers to appear on the map we just created on line 35
+							title: retailer.name, // the title of the marker is set to the name of the location
+							label: {
+								text: retailer.name,
+								color: "white"
+							},
 
-						icon: {
-							path: google.maps.SymbolPath.CIRCLE,
-							scale: scaleVal(),
-							fillColor: colorVal(),
-							fillOpacity: 0.5,
-							strokeOpacity: 0.5,
-							strokeWeight: 0
-						}
-					});
-					markers.push( marker);
+							icon: {
+								path: google.maps.SymbolPath.CIRCLE,
+								scale: scaleVal(),
+								fillColor: colorVal(),
+								fillOpacity: 0.5,
+								strokeOpacity: 0.5,
+								strokeWeight: 0
+							}
+						});
+						markers.push( marker);
+					}
 				}
 			});
 			if( markers.length > 0 ) {

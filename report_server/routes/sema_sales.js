@@ -50,6 +50,12 @@ const sqlRetailerRevenue =
 	GROUP BY YEAR(receipt.created_date), %s(receipt.created_date), receipt.customer_account_id \
 	ORDER BY YEAR(receipt.created_date) DESC, %s(receipt.created_date)  DESC, SUM(receipt.customer_amount) DESC';
 
+const sqlLMostRecentReceipt =
+	'SELECT created_date FROM receipt \
+	WHERE kiosk_id = ? \
+	ORDER BY created_date DESC \
+	LIMIT 2';
+
 router.get('/', function(request, response) {
 	console.log('Sales - ', request.query.kioskID);
 	let sessData = request.session;
@@ -240,31 +246,56 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 
 const getRetailerRevenue = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
-		let endDate = new Date (Date.now());
+		let endDate =null;
 		if( requestParams.hasOwnProperty("enddate")){
 			endDate = Date.parse(requestParams.enddate);
+		}else{
+			// Use the most recent receipt as the end date. (Because there may be many receipts, we don't want the SQL query to span too much tine
 		}
-		let beginDate = calcBeginDate( endDate, requestParams.groupby );
-		const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
-		connection.query(sql, [requestParams.kioskID, beginDate, endDate], function (err, sqlResult) {
-			if (err) {
-				reject(err);
-			} else {
-				let index = 0;
-				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-					let year = endDate.getFullYear();
-					let month = endDate.getMonth() +1 ;	// range 1-12
-					while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_date)"] == month && sqlResult[index]["YEAR(receipt.created_date)"] == year ){
-						updateSales(results, sqlResult, index, month, requestParams.groupby, endDate);
-						index +=1;
+		getMostRecentReceipt( connection, requestParams, endDate ).then( (newEndDate) =>{
+			endDate = newEndDate;
+			let beginDate = calcBeginDate( endDate, requestParams.groupby );
+			const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
+			connection.query(sql, [requestParams.kioskID, beginDate, endDate], function (err, sqlResult) {
+				if (err) {
+					reject(err);
+				} else {
+					let index = 0;
+					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+						let year = endDate.getFullYear();
+						let month = endDate.getMonth() +1 ;	// range 1-12
+						while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_date)"] == month && sqlResult[index]["YEAR(receipt.created_date)"] == year ){
+							updateSales(results, sqlResult, index, month, requestParams.groupby, endDate);
+							index +=1;
+						}
 					}
+					console.log(index, " Resellers found");
+					resolve();
 				}
-				console.log(index, " Resellers found");
-				resolve();
-			}
-		});
+			});
+		})
 	});
 };
+
+const getMostRecentReceipt = ( connection, requestParams, endDate ) => {
+	return new Promise((resolve, reject) => {
+		if( endDate != null ){
+			resolve( endDate);
+		}else{
+			connection.query(sqlLMostRecentReceipt, [requestParams.kioskID], (err, sqlResult )=>{
+				if (err) {
+					resolve(new Date(Date.now()));
+				}else{
+					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+						endDate = new Date(sqlResult[0]["created_date"]);
+						resolve( endDate );
+					}
+					resolve(new Date(Date.now()));
+				}
+			})
+		}
+	});
+}
 
 const updateSales = ( results, sqlResult, index, month, period, endDate ) => {
 

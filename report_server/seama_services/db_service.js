@@ -2,11 +2,11 @@ const mysql = require('mysql');
 const connectionTable = {};
 
 const sqlConfig = {
-	host: '104.131.40.239',
+	host: '167.99.229.86',
 	port: '3306',
-	database: 'dlo',
-	user: 'app',
-	password: 'password'
+	database: 'sema',
+	user: 'dashboard',
+	password: 'Dashboard2018'
 };
 
 const schema ={
@@ -92,8 +92,8 @@ function checkExpiredSessions(req) {
 	}
 }
 function getSQLConfig(req){
-	if( true){
-//	if( req.app.get("env") === "test"){
+//	if( true){
+	if( req.app.get("env") === "test"){
 		console.log( "Test environment"); // TODO Test config should not be static!!!
 		sqlConfig.host = '192.168.50.92';
 		sqlConfig.database = 'jibu1';
