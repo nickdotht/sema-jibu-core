@@ -13,6 +13,7 @@ import SalesMapContainer from './Sales/SalesMapContainer';
 import SalesRetailerList from './Sales/SalesRetailerList';
 import * as salesActions from 'actions/SalesActions';
 import SalesByChannelChart from "./Sales/SalesByChannelChart";
+let dateFormat = require('dateformat');
 
 class SemaSales extends Component {
     constructor(props, context) {
@@ -61,6 +62,7 @@ class SemaSales extends Component {
 						<SalesMapContainer google={this.props.google} retailers={this.props.sales.retailSales} />
 					</div>
 					<div className= "SalesListItem">
+						<div><p style={{textAlign:"center"}}>{formatRetailSalesHeader(this.props.sales.retailSales)}</p></div>
 						<SalesRetailerList retailers={this.props.sales.retailSales}/>
 					</div>
 					<div className= "SalesBottomContainer">
@@ -99,6 +101,17 @@ class SemaSales extends Component {
 // const foobar = (p)=>{
 // 	return p.sales.salesByChannel;
 // }
+
+const formatRetailSalesHeader = (retailSales) =>{
+	if( retailSales.length > 0 ){
+		return "Data to " + dateFormat((new Date(Date.parse(retailSales[0].period1.endDate))), "dddd, mmm, d, yyyy");
+		//return retailSales[0].
+	}
+	return "No data available";
+};
+
+
+
 const formatDollar = amount =>{
 	let suffix = "";
 	if( typeof amount === "string") return amount;

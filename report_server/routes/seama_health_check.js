@@ -18,13 +18,15 @@ function testConnection(req, res) {
 			res.json({
 				server: 'Ok',
 				database: 'Failed',
+				version: req.app.get('sema_version'),
 				err: err.toString()
 			});
 		} else {
 			console.log('Database Connected!');
 			res.json({
 				server: 'Ok',
-				database: 'Ok'
+				database: 'Ok',
+				version: req.app.get('sema_version')
 			});
 		}
 	});

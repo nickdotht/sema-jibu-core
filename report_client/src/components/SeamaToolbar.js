@@ -110,7 +110,7 @@ class SeamaToolbar extends Component {
                             {this.buildMenuItems()}
                         </NavDropdown>
                     </Nav>
-					<Label style={LabelStyleRight}> Server: {this.props.healthCheck.server}</Label>
+					<Label style={LabelStyleRight}> Server: {this.showServer()}</Label>
                     <Label  eventKey={1} onClick={this.logOut} href="#" style={LabelStyleRight}>
                         Logout
                     </Label>
@@ -121,6 +121,12 @@ class SeamaToolbar extends Component {
             </div>
         );
     }
+	showServer () {
+		if (this.props.healthCheck.server === "Ok") {
+			return this.props.healthCheck.version;
+		}
+		return this.props.healthCheck.server;
+	}
 }
 
 function mapStateToProps(state) {
