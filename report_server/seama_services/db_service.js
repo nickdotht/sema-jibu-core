@@ -92,7 +92,8 @@ function checkExpiredSessions(req) {
 	}
 }
 function getSQLConfig(req){
-	if( req.app.get("env") === "test"){
+	if( true){
+//	if( req.app.get("env") === "test"){
 		console.log( "Test environment"); // TODO Test config should not be static!!!
 		sqlConfig.host = '192.168.50.92';
 		sqlConfig.database = 'jibu1';

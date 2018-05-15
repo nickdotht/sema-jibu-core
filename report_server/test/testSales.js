@@ -18,7 +18,7 @@ describe('Testing Sales API', function () {
 		done();
 	});
 	describe('GET /untapped/Sales - missing kioskID', function() {
-		it('Should fail with 400 error code', function testLoginNoAuth(done) {
+		it('Should fail with 400 error code', (done) => {
 			chai.request(server)
 				.get('/untapped/sales')
 				.end(function(err, res) {
@@ -46,11 +46,9 @@ describe('Testing Sales API', function () {
 		});
 	});
 
-	// There should be one sale of 4 gallons (15.141 liters) worth 15 dollars
-	// There are five total customers for this Kiosk.
-	// The latest two months show 1 customer created in each month
+	// Refer to the python script - populate_receipt for the expected results
 	describe('GET /untapped/Sales - UnitTest KioskID', function() {
-		it('Should get info for one customer with one sale', function testLoginNoAuth(done) {
+		it('Should get info for one customer with one sale', (done) => {
 			chai.request(server)
 				.get('/untapped/kiosks')
 				.end(function(err, res) {
@@ -62,7 +60,7 @@ describe('Testing Sales API', function () {
 						.get(url)
 						.end(function (err, res) {
 							res.should.have.status(200);
-							res.body.gallonsPerCustomer.should.have.property('value').eql(14/6);	// Assumes 14 gallons in latest month, 6 total customers
+							res.body.gallonsPerCustomer.should.have.property('value').eql(4/6);	// Assumes 6 customer, 4 gallons sold in the last month
 							res.body.netIncome.should.have.property('total').eql('N/A');
 							res.body.netIncome.period1.should.have.property('periodValue').eql('N/A');
 							res.body.netIncome.period2.should.have.property('periodValue').eql('N/A');
@@ -79,13 +77,43 @@ describe('Testing Sales API', function () {
 							expect( testDate.getFullYear()).to.deep.equal(2018);
 							expect( testDate.getMonth()+1).to.deep.equal(4);
 
-							res.body.totalRevenue.should.have.property('total').eql(35);
+							res.body.totalRevenue.should.have.property('total').eql(75);
 							testDate = new Date(res.body.totalRevenue.period1.beginDate);
 							expect( testDate.getFullYear()).to.deep.equal(2018);
-							expect( testDate.getMonth()+1).to.deep.equal(1);
-							res.body.totalRevenue.period1.should.have.property('periodValue').eql(35);
+							expect( testDate.getMonth()+1).to.deep.equal(4);
+							res.body.totalRevenue.period1.should.have.property('periodValue').eql(10);
 
-							res.body.totalRevenue.period2.should.have.property('beginDate').eql("N/A");
+							res.body.totalRevenue.period2.should.have.property('beginDate').eql("2018-03-01T08:00:00.000Z");
+							done(err);
+						});
+				});
+		});
+	});
+
+	describe('GET /untapped/Sales - UnitTest KioskID', function() {
+		it('Should get sales by retailer', (done) => {
+			chai.request(server)
+				.get('/untapped/kiosks')
+				.end(function(err, res) {
+					expect(res.body.kiosks).to.be.an('array');
+					res.body.kiosks[0].should.have.property('name').eql('UnitTest');
+					let url = "/untapped/sales?kioskID=%d&groupby=month&enddate=%s";
+					let endDate = new Date( 2018, 0,31);	// Sales data to Jan 31, 2018
+					url = sprintf( url, res.body.kiosks[0].id, endDate)
+					chai.request(server)
+						.get(url)
+						.end(function (err, res) {
+							res.should.have.status(200);
+							res.body.should.have.property('retailSales');
+							expect(res.body.retailSales).to.be.an('array');
+							expect(res.body.retailSales.length).to.equal(1);
+							expect(res.body.retailSales[0].name).to.equal("TestCustomer 6");
+							expect(res.body.retailSales[0].period1.periodValue).to.equal(35);
+
+							testDate = new Date(res.body.retailSales[0].period1.beginDate);
+							expect( testDate.getFullYear()).to.deep.equal(2018);
+							expect( testDate.getMonth()+1).to.deep.equal(1);
+
 							done(err);
 						});
 				});

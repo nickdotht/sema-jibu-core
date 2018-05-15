@@ -14,15 +14,13 @@ export function receiveSalesByChannel(data) {
 export function initializeSales() {
 	return {
 		loaded:false,
-		newCustomers: {period:"N/A", thisPeriod:"N/A", lastPeriod:"N/A"},
-		totalRevenue: {total:"N/A", period:"N/A", thisPeriod: "N/A", lastPeriod: "N/A"},
-		netIncome: {total:"N/A", period:"N/A", thisPeriod: "N/A", lastPeriod: "N/A"},
-		retailSales: [
-
-		],
-		totalCustomers:"N/A",
-		litersPerCustomer:{period:"N/A", value:"N/A"},
-		salesByChannel: createBlankChart()
+		newCustomers: {period: "N/A", period1:periodData(), period2:periodData()},
+		totalRevenue: {total: "N/A", period: "N/A", period1:periodData(), period2:periodData()},
+		netIncome: {total: "N/A",   period: "N/A",period1:periodData(), period2:periodData()},
+		retailSales: [],
+		totalCustomers: "N/A",
+		gallonsPerCustomer: {period: "N/A", value: "N/A"},
+		salesByChannel: {beginDate:"N/A", endDate: "N/A", datasets: []}
 	}
 }
 
@@ -128,6 +126,10 @@ const queryParams =(params) => {
 
 const createBlankChart = () => {
 	return { labels: [], datasets: [ { label: "", data: [],},]}
+};
+
+const periodData = ()=> {
+	return {beginDate : "N/A", endDate :"N/A", periodValue: "N/A"};
 };
 
 

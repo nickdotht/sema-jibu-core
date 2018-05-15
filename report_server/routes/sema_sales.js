@@ -241,10 +241,10 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 const getRetailerRevenue = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
 		let endDate = new Date (Date.now());
-		if( requestParams.hasOwnProperty("lastDate")){
-			endDate = Date.parse(requestParams.lastDate);
+		if( requestParams.hasOwnProperty("enddate")){
+			endDate = Date.parse(requestParams.enddate);
 		}
-		let beginDate = calcFirstDate( endDate, requestParams.groupby );
+		let beginDate = calcBeginDate( endDate, requestParams.groupby );
 		const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
 		connection.query(sql, [requestParams.kioskID, beginDate, endDate], function (err, sqlResult) {
 			if (err) {
@@ -254,7 +254,7 @@ const getRetailerRevenue = (connection, requestParams, results ) => {
 				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
 					let year = endDate.getFullYear();
 					let month = endDate.getMonth() +1 ;	// range 1-12
-					while( sqlResult[index]["MONTH(receipt.created_date)"] == month && sqlResult[index]["YEAR(receipt.created_date)"] == year ){
+					while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_date)"] == month && sqlResult[index]["YEAR(receipt.created_date)"] == year ){
 						updateSales(results, sqlResult, index, month, requestParams.groupby, endDate);
 						index +=1;
 					}
@@ -365,25 +365,16 @@ function initResults() {
 	}
 };
 
-// Calculate the date for the three periods that include lastDate, lastDate -1 and lastDate -2.
+// Calculate the date for the three periods that include endDate, endDate -1 and endDate -2.
 // Example for the monthly period; if the current date is June 6 2018, then the
-// previous three periods are April, May and June and the first Date is April 1, 2018
-const calcFirstDate = ( lastDate, period ) =>{
+// previous three periods are April, May and June and the beginDate is April 1, 2018
+const calcBeginDate = ( endDate, period ) =>{
 	switch( period ){
 		case 'month':
 		default:
-			let year = lastDate.getFullYear();
-			let month = lastDate.getMonth();
-			for( let i = 0; i < 2; i++){
-				// Note month range is 0->11
-				if( month == 0 ){
-					month = 11;
-					year -= 1;
-				}else{
-					month -= 1;
-				}
-			}
-			return new Date(year, month,1 )
+			let beginDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1 )
+			beginDate.addMonths(-2)
+			return beginDate;
 
 	}
 };
