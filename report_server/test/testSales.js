@@ -17,7 +17,7 @@ describe('Testing Sales API', function () {
 		delete require.cache[require.resolve('../bin/www')];
 		done();
 	});
-	describe('GET /untapped/Sales - missing kioskID', function() {
+	describe('GET /untapped/Sales - missing kioskID', ()=>{
 		it('Should fail with 400 error code', (done) => {
 			chai.request(server)
 				.get('/untapped/sales')
@@ -27,8 +27,8 @@ describe('Testing Sales API', function () {
 				});
 		});
 	});
-	describe('GET /untapped/Sales - unknown kioskID', function() {
-		it('Should succed with empty sales info becuase the kioskID does not exist', function testLoginNoAuth(done) {
+	describe('GET /untapped/Sales - unknown kioskID', () => {
+		it('Should succed with empty sales info becuase the kioskID does not exist', (done) =>{
 			chai.request(server)
 				.get('/untapped/sales?kioskID=9999&groupby=month')
 				.end(function(err, res) {
@@ -47,7 +47,7 @@ describe('Testing Sales API', function () {
 	});
 
 	// Refer to the python script - populate_receipt for the expected results
-	describe('GET /untapped/Sales - UnitTest KioskID', function() {
+	describe('GET /untapped/Sales - UnitTest KioskID', () => {
 		it('Should get info for one customer with one sale', (done) => {
 			chai.request(server)
 				.get('/untapped/kiosks')
@@ -90,7 +90,7 @@ describe('Testing Sales API', function () {
 		});
 	});
 
-	describe('GET /untapped/Sales - UnitTest KioskID', function() {
+	describe('GET /untapped/Sales - UnitTest KioskID', () =>{
 		it('Should get sales by retailer', (done) => {
 			chai.request(server)
 				.get('/untapped/kiosks')
