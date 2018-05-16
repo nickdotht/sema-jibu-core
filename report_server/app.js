@@ -78,4 +78,7 @@ app.use(function(err, req, res) {
 // For development, return mock data rather than DB access
 app.set('mockIt', false);
 
+// Version
+app.set('sema_version', '0.0.0.2')
+
 module.exports = app;

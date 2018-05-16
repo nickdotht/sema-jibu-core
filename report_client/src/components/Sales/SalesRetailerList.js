@@ -25,33 +25,35 @@ export default class SalesRetailerList extends Component {
 		this.props.retailers.forEach( (retailer, index) => {
 			// rows.push(<tr {this.calcColor(retailer.thisPeriod, retailer.lastPeriod)}>
 			// rows.push(<tr style={{color:"red"}}>
-			rows.push(<tr style={this.calcColor(retailer.thisPeriod, retailer.lastPeriod)}>
+			rows.push(<tr style={this.calcColor(retailer.period2.periodValue, retailer.period3.periodValue)}>
 						<td>{index+1}.</td>
 						<td>{retailer.name}</td>
-						<td>{retailer.total}</td>
-						{this.calcTrend(retailer.thisPeriod, retailer.lastPeriod)}
+						<td>{retailer.period1.periodValue}</td>
+						{this.calcTrend(retailer.period2.periodValue, retailer.period3.periodValue)}
 					</tr>
 			)
 		});
 		return rows;
 	}
 	calcTrend( now, last ){
-		if( now > last ){
-			return (<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-up"/></td>);
-		}else if( now < last ) {
-			return (<td style={{textAlign: "center"}}><i className="glyphicon glyphicon-arrow-down"/></td>);
-		}else{
-			return (<td style={{textAlign: "center"}}><i className="glyphicon glyphicon-minus"/></td>);
+		if( now !== "N/A " && last !== "N/A" ){
+			if( now > last ){
+				return (<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-up"/></td>);
+			}else if( now < last ) {
+				return (<td style={{textAlign: "center"}}><i className="glyphicon glyphicon-arrow-down"/></td>);
+			}
 		}
+		return (<td style={{textAlign: "center"}}><i className="glyphicon glyphicon-minus"/></td>);
 	}
 	calcColor( now, last ){
-		if( now > last ){
-			return ( {color:"green"});
-		}else if( now < last ) {
-			return ( {color:"red"});
-		}else{
-			return ( {color:"gray"});
+		if( now !== "N/A " && last !== "N/A" ){
+			if( now > last ){
+				return ( {color:"green"});
+			}else if( now < last ) {
+				return ( {color:"red"});
+			}
 		}
+		return ( {color:"gray"});
 	}
 
 }

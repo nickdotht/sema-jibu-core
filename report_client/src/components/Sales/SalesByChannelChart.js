@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Line} from 'react-chartjs-2';
 import moment from "moment/moment";
 
-var s1 = {
+const s1 = {
 	label: 's1',
 	borderColor: 'blue',
 	data: [
@@ -12,7 +12,7 @@ var s1 = {
 	]
 };
 
-var s2 = {
+const s2 = {
 	label: 's2',
 	borderColor: 'red',
 	data: [
@@ -46,7 +46,8 @@ class SalesByChannelChart extends Component {
 									displayFormats: {
 										day: 'MMM D'
 									},
-//									min: this.calcMinDate()
+									min: this.calcMinDate(this.props.chartData.beginDate),
+									max: this.calcMinDate(this.props.chartData.endDate)
 								}
 							}]
                         },
@@ -60,6 +61,14 @@ class SalesByChannelChart extends Component {
             </div>
         );
     }
+	calcMinDate= (val)=>{
+    	if( val !== "N/A"){
+			console.log("-----------------", val);
+			val = moment(val).format('YYYY-MM-D');
+		}
+    	return val;
+//    	console.log( this.props.chartData );
+	}
     // calcMinDate= ()=>{
     	// let minDate = '2017-01-01T12:00:00.000Z';
     	// let first = true;

@@ -1,29 +1,66 @@
 var express = require('express');
 var router = express.Router();
 const connectionTable = require('../seama_services/db_service').connectionTable;
+require('datejs');
 
 /* GET data for sales_by_channel  */
 
 
-const sqlSalesByChannel=
+const sqlSalesChannels=
 	'SELECT sales_channel.id,  sales_channel.name\
 	FROM sales_channel';
 
-router.get('/', function(req, response ) {
-	console.log('Sales_by_channel - ', req.query.kioskID);
-	let sessData = req.session;
+const sqlSalesByChannel = 'SELECT * \
+		FROM receipt \
+		WHERE receipt.kiosk_id = ? AND receipt.sales_channel_id = ? \
+		AND receipt.created_date BETWEEN ? AND ? \
+		ORDER BY receipt.created_date';
+
+
+router.get('/', function( request, response ) {
+	console.log('Sales_by_channel - ', request.query.kioskID);
+	let sessData = request.session;
 	let connection = connectionTable[sessData.id];
 	let results = initResults();
-	getSalesChannels(connection).then( ( salesChannel) =>{
-		execSqlSalesByChannelQuery(salesChannel, 0, connection, req.query, response, results);
-	}).catch( (err ) => {
-		yieldError( err, response, 500, results );
+
+	request.check("kioskID", "Parameter kioskID is missing").exists();
+	request.check("groupby", "Parameter groupby is missing").exists();
+
+	request.getValidationResult().then(function(result) {
+		if (!result.isEmpty()) {
+			var errors = result.array().map((elem) => {
+				return elem.msg;
+			});
+			console.log("VALIDATION ERROR: ", errors.toString());
+			response.status(400).send(errors.toString());
+		} else {
+			let endDate = null;
+			let beginDate = null;
+
+			if (request.query.hasOwnProperty('begindate') && request.query.hasOwnProperty('enddate')) {
+				endDate = Date.parse(request.query.enddate);
+				beginDate = Date.parse(request.query.begindate);
+			} else {
+				endDate = new Date(Date.now());
+				if (request.query.hasOwnProperty("enddate")) {
+					endDate = Date.parse(request.query.enddate);
+				}
+				beginDate = new Date(endDate.getFullYear(), 0)	// 	Default to start of the year
+			}
+			results.salesByChannel.beginDate = beginDate;
+			results.salesByChannel.endDate = endDate;
+			getSalesChannels(connection).then((salesChannel) => {
+				execSalesByChannel(salesChannel, 0, connection, request.query.kioskID, beginDate, endDate, response, results);
+			}).catch((err) => {
+				yieldError(err, response, 500, results);
+			});
+		}
 	});
 });
 
 const getSalesChannels = (connection ) => {
 	return new Promise((resolve, reject) => {
-		connection.query(sqlSalesByChannel, function(err, sqlResult ) {
+		connection.query(sqlSalesChannels, function(err, sqlResult ) {
 			if( err ){
 				reject(err);
 			}else {
@@ -42,37 +79,14 @@ const getSalesChannels = (connection ) => {
 };
 
 
-const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlParams, response, results ) =>{
-	let sqlQuery = "";
-	let chanelParams =[];
-	let sortDesc = true;
-	if( sqlParams.hasOwnProperty('firstdate') && sqlParams.hasOwnProperty('lastdate')){
-		sortDesc = false;
-		sqlQuery = 'SELECT * \
-		FROM receipt \
-		WHERE receipt.kiosk_id = ? AND receipt.sales_channel_id = ? \
-		AND receipt.created_date BETWEEN ? AND ? \
-		ORDER BY receipt.created_date';
-		chanelParams = [sqlParams.kioskID, salesChannelArray[index].id, new Date(sqlParams.firstdate), new Date(sqlParams.lastdate)];
-	}else {
-		sqlQuery = 'SELECT * \
-		FROM receipt \
-		WHERE receipt.kiosk_id = ? AND receipt.sales_channel_id = ? \
-		ORDER BY receipt.created_date DESC \
-		LIMIT 30';
-		chanelParams = [sqlParams.kioskID, salesChannelArray[index].id];
-	}
-	connection.query(sqlQuery, chanelParams, function(err, sqlResult ) {
+const execSalesByChannel = ( salesChannelArray, index, connection, kiosk, beginDate, endDate, response, results ) =>{
+	connection.query(sqlSalesByChannel, [kiosk, salesChannelArray[index].id, beginDate, endDate], function(err, sqlResult ) {
 		if( err ){
 			console.log( JSON.stringify(err));
 			yieldError( err, response, 500,results );
 		}else{
 			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-				// results.salesByChannel.labels.push(salesChannelArray[index].name );
 				let salesData = sqlResult.map(row =>{ return {x:row.created_date, y:row.customer_amount}} );
-				if( sortDesc ) {
-					salesData = salesData.reverse();
-				}
 
 				results.salesByChannel.datasets.push({label:salesChannelArray[index].name, data:salesData});
 			}
@@ -81,12 +95,12 @@ const execSqlSalesByChannelQuery = ( salesChannelArray, index, connection, sqlPa
 				// All done
 				yieldResults( response, results );
 			}else{
-				execSqlSalesByChannelQuery( salesChannelArray, index, connection, sqlParams, response, results);
+				execSalesByChannel( salesChannelArray, index, connection, kiosk, beginDate, endDate, response, results);
 			}
 		}
 	});
-
 };
+
 const yieldResults =(response, results ) =>{
 	response.json(results);
 };
@@ -99,7 +113,7 @@ const yieldError = (err, response, httpErrorCode, results ) =>{
 const initResults = () =>{
 	return {
 		// salesByChannel: { labels: [], datasets: []}
-		salesByChannel: { datasets: []}
+		salesByChannel: { beginDate:"N/A", endDate: "N/A", datasets: []}
 
 	}
 };

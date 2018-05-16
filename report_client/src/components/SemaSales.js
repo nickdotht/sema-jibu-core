@@ -13,6 +13,7 @@ import SalesMapContainer from './Sales/SalesMapContainer';
 import SalesRetailerList from './Sales/SalesRetailerList';
 import * as salesActions from 'actions/SalesActions';
 import SalesByChannelChart from "./Sales/SalesByChannelChart";
+let dateFormat = require('dateformat');
 
 class SemaSales extends Component {
     constructor(props, context) {
@@ -38,22 +39,22 @@ class SemaSales extends Component {
 			<div className="SalesContainer">
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="New Customers" label={" of Monthly goal"}
-										  	value={this.props.sales.newCustomers.thisPeriod}
-										  	delta = {calcChange(this.props.sales.newCustomers.thisPeriod, this.props.sales.newCustomers.lastPeriod)}
-						                  	valueColor = {calcColor(this.props.sales.newCustomers.thisPeriod, this.props.sales.newCustomers.lastPeriod)} />
+						<SalesSummaryPanel1 title="New Customers" label={" to last Month"}
+										  	value={this.props.sales.newCustomers.period1.periodValue}
+										  	delta = {calcChange(this.props.sales.newCustomers.period1.periodValue, this.props.sales.newCustomers.period2.periodValue)}
+						                  	valueColor = {calcColor(this.props.sales.newCustomers.period1.periodValue, this.props.sales.newCustomers.period2.periodValue)} />
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Revenue" label={" to last Month"}
 										  	value={formatDollar(this.props.sales.totalRevenue.total)}
-										  	delta = {calcChange(this.props.sales.totalRevenue.thisPeriod, this.props.sales.totalRevenue.lastPeriod)}
-											valueColor = {calcColor(this.props.sales.totalRevenue.thisPeriod, this.props.sales.totalRevenue.lastPeriod)} />
+										  	delta = {calcChange(this.props.sales.totalRevenue.period1.periodValue, this.props.sales.totalRevenue.period2.periodValue)}
+											valueColor = {calcColor(this.props.sales.totalRevenue.period1.periodValue, this.props.sales.totalRevenue.period2.periodValue)} />
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Net Income" label={" to last Month"}
 										  	value={this.props.sales.netIncome.total}
-										  	delta = {calcChange(this.props.sales.netIncome.thisPeriod, this.props.sales.netIncome.lastPeriod)}
-											valueColor = {calcColor(this.props.sales.netIncome.thisPeriod, this.props.sales.netIncome.lastPeriod)} />
+										  	delta = {calcChange(this.props.sales.netIncome.period1.periodValue, this.props.sales.netIncome.period2.periodValue)}
+											valueColor = {calcColor(this.props.sales.netIncome.period1.periodValue, this.props.sales.netIncome.period2.periodValue)} />
 					</div>
 				</div>
 				<div className = "SalesContentContainer">
@@ -61,6 +62,7 @@ class SemaSales extends Component {
 						<SalesMapContainer google={this.props.google} retailers={this.props.sales.retailSales} />
 					</div>
 					<div className= "SalesListItem">
+						<div><p style={{textAlign:"center"}}>{formatRetailSalesHeader(this.props.sales.retailSales)}</p></div>
 						<SalesRetailerList retailers={this.props.sales.retailSales}/>
 					</div>
 					<div className= "SalesBottomContainer">
@@ -72,9 +74,9 @@ class SemaSales extends Component {
 						</div>
 						<div className= "SalesBottomLeftMiddle">
 							<SalesSummaryPanel2 title="Liters/Customer"
-												value={formatLitersPerCustomer(this.props.sales.litersPerCustomer)}
+												value={formatLitersPerCustomer(this.props.sales.gallonsPerCustomer)}
 												valueColor = "green"
-												title2 = {formatLitersPerPeriod(this.props.sales.litersPerCustomer)} />
+												title2 = {formatLitersPerPeriod(this.props.sales.gallonsPerCustomer)} />
 						</div>
 						<div className= "SalesBottomLeftBottom">
 							<SalesSummaryPanel2 title="Customer Growth"
@@ -99,6 +101,17 @@ class SemaSales extends Component {
 // const foobar = (p)=>{
 // 	return p.sales.salesByChannel;
 // }
+
+const formatRetailSalesHeader = (retailSales) =>{
+	if( retailSales.length > 0 ){
+		return "Data to " + dateFormat((new Date(Date.parse(retailSales[0].period1.endDate))), "dddd, mmm, d, yyyy");
+		//return retailSales[0].
+	}
+	return "No data available";
+};
+
+
+
 const formatDollar = amount =>{
 	let suffix = "";
 	if( typeof amount === "string") return amount;
@@ -106,7 +119,7 @@ const formatDollar = amount =>{
 		amount = amount/1000;
 		suffix = "k";
 	}
-	var formatter = new Intl.NumberFormat('en-US', {
+	let formatter = new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: 'HTG',
 		minimumFractionDigits: 2,
@@ -139,11 +152,11 @@ const formatLitersPerPeriod = litersPerCustomer =>{
 };
 
 const formatCustomerGrowth = newCustomers =>{
-	if( typeof newCustomers.thisPeriod === "string" ||
-		typeof newCustomers.lastPeriod === "string"){
+	if( typeof newCustomers.period1.periodValue === "string" ||
+		typeof newCustomers.period2.periodValue === "string"){
 		return "N/A";
 	}else{
-		return ((newCustomers.thisPeriod/newCustomers.lastPeriod *100) -100).toFixed(2) + "%"
+		return ((newCustomers.period1.periodValue/newCustomers.period2.periodValue *100) -100).toFixed(2) + "%"
 	}
 };
 

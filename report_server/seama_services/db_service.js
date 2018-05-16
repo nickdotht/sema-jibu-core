@@ -2,11 +2,16 @@ const mysql = require('mysql');
 const connectionTable = {};
 
 const sqlConfig = {
-	host: '104.131.40.239',
+	host: '167.99.229.86',
 	port: '3306',
-	database: 'dlo',
-	user: 'app',
-	password: 'password'
+	database: 'sema',
+	user: 'dashboard',
+	password: 'Dashboard2018'
+};
+
+const schema ={
+	schemaLoaded :false,
+	customer_account_columns:[]
 };
 
 function dbService(req, res, next) {
@@ -43,7 +48,17 @@ function createConnection(sessionData, req, res, next) {
 			sessionData.dbConnection = null;
 		} else {
 			console.log('Connected! - calling next');
-			next();
+			if( ! schema.schemaLoaded ){
+				schema.schemaLoaded = true;
+				loadSchema(con).then(() => {
+					next();
+				}).catch(err => {
+					console.log( err.message);
+					next();
+				});
+			}else{
+				next();
+			}
 		}
 	});
 }
@@ -77,6 +92,7 @@ function checkExpiredSessions(req) {
 	}
 }
 function getSQLConfig(req){
+//	if( true){
 	if( req.app.get("env") === "test"){
 		console.log( "Test environment"); // TODO Test config should not be static!!!
 		sqlConfig.host = '192.168.50.92';
@@ -87,8 +103,24 @@ function getSQLConfig(req){
 	console.log("SQL host:", sqlConfig.host, "SQL database:", sqlConfig.database );
 	return sqlConfig;
 }
+
+const loadSchema = (connection ) => {
+	return new Promise((resolve, reject) => {
+		connection.query("SHOW COLUMNS FROM customer_account", function (err, rows, sqlResult) {
+			if(!err){
+				schema.customer_account_columns = rows.map( row =>{return row.Field});
+			}
+			resolve();
+		});
+	});
+};
+
+const customerAccountHasCreatedDate = () => {
+	return schema.customer_account_columns.indexOf('created_date') == -1 ? false : true;
+}
 module.exports = {
 	dbService: dbService,
 	connectionTable: connectionTable,
-	getSQLConfig: getSQLConfig
+	getSQLConfig: getSQLConfig,
+	customerAccountHasCreatedDate
 };
