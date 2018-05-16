@@ -4,7 +4,7 @@ const connectionTable = require('../seama_services/db_service').connectionTable;
 
 /* GET kiosks in the database. */
 
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
 	let mockit = req.app.get('mockIt');
 	if (mockit) {
 		res.json({
