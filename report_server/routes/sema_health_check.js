@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
 });
 
 function testConnection(req, res) {
-	var con = mysql.createConnection(getSQLConfig(req));
+	const con = mysql.createConnection(getSQLConfig(req));
 	con.connect(function(err) {
 		if (err) {
 			console.log('Database Connection failed!');
