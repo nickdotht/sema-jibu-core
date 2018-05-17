@@ -12,6 +12,7 @@ export function initializeWaterOperations() {
 		loaded:false,
 		totalProduction:"N/A",
 		sitePressure:"N/A",
+		latestDate:"N/A",
 		flowRate:"N/A",
 		production: createBlankChart(),
 		chlorine: createBlankChart(),
@@ -58,6 +59,7 @@ const updateWaterQualityState = waterQuality => {
 	let newWaterQuality = {};
 	newWaterQuality.loaded =true;
 	newWaterQuality.flowRate = waterQuality.flowRate;
+	newWaterQuality.latestDate = waterQuality.latestDate;
 	newWaterQuality.sitePressure = waterQuality.sitePressure;
 	newWaterQuality.totalProduction = waterQuality.totalProduction;
 	if( waterQuality.production.datasets.length == 0 ){

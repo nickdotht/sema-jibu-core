@@ -39,22 +39,22 @@ class SemaSales extends Component {
 			<div className="SalesContainer">
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="New Customers" label={" to last Month"}
-										  	value={this.props.sales.newCustomers.period1.periodValue}
-										  	delta = {calcChange(this.props.sales.newCustomers.period1.periodValue, this.props.sales.newCustomers.period2.periodValue)}
-						                  	valueColor = {calcColor(this.props.sales.newCustomers.period1.periodValue, this.props.sales.newCustomers.period2.periodValue)} />
+						<SalesSummaryPanel1 title="New Customers" date={this.props.sales.newCustomers.periods[1].beginDate}
+										  	value={this.props.sales.newCustomers.periods[0].periodValue}
+										  	delta = {calcChange(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)}
+						                  	valueColor = {calcColor(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="Total Revenue" label={" to last Month"}
+						<SalesSummaryPanel1 title="Total Revenue" date={this.props.sales.totalRevenue.periods[1].beginDate}
 										  	value={formatDollar(this.props.sales.totalRevenue.total)}
-										  	delta = {calcChange(this.props.sales.totalRevenue.period1.periodValue, this.props.sales.totalRevenue.period2.periodValue)}
-											valueColor = {calcColor(this.props.sales.totalRevenue.period1.periodValue, this.props.sales.totalRevenue.period2.periodValue)} />
+										  	delta = {calcChange(this.props.sales.totalRevenue.periods[1].periodValue, this.props.sales.totalRevenue.periods[2].periodValue)}
+											valueColor = {calcColor(this.props.sales.totalRevenue.periods[1].periodValue, this.props.sales.totalRevenue.periods[2].periodValue)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="Net Income" label={" to last Month"}
+						<SalesSummaryPanel1 title="Net Income" date={this.props.sales.netIncome.periods[1].beginDate}
 										  	value={this.props.sales.netIncome.total}
-										  	delta = {calcChange(this.props.sales.netIncome.period1.periodValue, this.props.sales.netIncome.period2.periodValue)}
-											valueColor = {calcColor(this.props.sales.netIncome.period1.periodValue, this.props.sales.netIncome.period2.periodValue)} />
+										  	delta = {calcChange(this.props.sales.netIncome.periods[1].periodValue, this.props.sales.netIncome.periods[2].periodValue)}
+											valueColor = {calcColor(this.props.sales.netIncome.periods[1].periodValue, this.props.sales.netIncome.periods[2].periodValue)} />
 					</div>
 				</div>
 				<div className = "SalesContentContainer">
@@ -104,7 +104,7 @@ class SemaSales extends Component {
 
 const formatRetailSalesHeader = (retailSales) =>{
 	if( retailSales.length > 0 ){
-		return "Data to " + dateFormat((new Date(Date.parse(retailSales[0].period1.endDate))), "dddd, mmm, d, yyyy");
+		return "Data to " + dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "dddd mmm, d, yyyy");
 		//return retailSales[0].
 	}
 	return "No data available";
@@ -152,11 +152,11 @@ const formatLitersPerPeriod = litersPerCustomer =>{
 };
 
 const formatCustomerGrowth = newCustomers =>{
-	if( typeof newCustomers.period1.periodValue === "string" ||
-		typeof newCustomers.period2.periodValue === "string"){
+	if( typeof newCustomers.periods[1].periodValue === "string" ||
+		typeof newCustomers.periods[2].periodValue === "string"){
 		return "N/A";
 	}else{
-		return ((newCustomers.period1.periodValue/newCustomers.period2.periodValue *100) -100).toFixed(2) + "%"
+		return ((newCustomers.periods[1].periodValue/newCustomers.periods[2].periodValue *100) -100).toFixed(2) + "%"
 	}
 };
 

@@ -102,6 +102,7 @@ router.get('/', function(request, response) {
 			getParametersAndSiteIds(connection ).then( () => {
 				getMostRecentReading(connection, request.query, endDate).then((newEndDate) => {
 					endDate = newEndDate;
+					results.latestDate = endDate;
 					beginDate = new Date(newEndDate.getFullYear(), newEndDate.getMonth(), 1);	// 	Default to start of previous month
 					beginDate.addMonths(-1);
 					getTotalProduction(connection, request.query, results).then(() => {
@@ -375,7 +376,7 @@ const yieldError = (err, response, httpErrorCode, results ) =>{
 };
 
 const initResults = () => {
-	return {totalProduction: "N/A", sitePressure:"N/A", flowRate:"N/A",
+	return {totalProduction: "N/A", sitePressure:"N/A", flowRate:"N/A", latestDate:"N/A",
 		production:initEmptyChart(), chlorine:initEmptyChart(), tds:initEmptyChart()};
 
 };

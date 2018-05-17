@@ -7,9 +7,6 @@ require('datejs');
 const semaLog = require('../seama_services/sema_logger');
 
 const PeriodData = require('../seama_services/datetime_services').PeriodData;
-const init3Periods = require('../seama_services/datetime_services').init3Periods;
-const CalcBeginDate = require('../seama_services/datetime_services').CalcBeginDate;
-const UpdatePeriodDates = require('../seama_services/datetime_services').UpdatePeriodDates;
 
 
 
@@ -64,6 +61,12 @@ const sqlLMostRecentReceipt =
 	ORDER BY created_date DESC \
 	LIMIT 2';
 
+const sqlLMostRecentCustomer =
+	'SELECT created_date FROM customer_amount \
+	WHERE kiosk_id = ? \
+	ORDER BY created_date DESC \
+	LIMIT 2';
+
 router.get('/', function(request, response) {
 	semaLog.info('sales - Enter, kiosk_id:',request.query.kioskID );
 	let sessData = request.session;
@@ -87,17 +90,18 @@ router.get('/', function(request, response) {
 			}
 			// Use the most recent receipt as the end date if now is specified (Because there may
 			// be many receipts, we don't want the SQL query to span too much tine}
-			getMostRecentReceipt(connection, request.query, endDate).then((newEndDate) => {
-				request.query.enddate = newEndDate;
-				request.query.periodBeginDate = CalcBeginDate( newEndDate, request.query.groupby, 2 );
-
-				getTotalCustomers(connection, request.query, results).then(() => {
-					getTotalRevenue(connection, request.query, results).then(() => {
-						getRevenueByPeriod(connection, request.query, results).then(() => {
-							getGallonsPerCustomer(connection, request.query, results).then(() => {
-								getCustomersByPeriod(connection, request.query, results).then(() => {
-									getRetailerRevenue(connection, request.query, results).then(() => {
-										yieldResults(response, results);
+			getMostRecentReceipt(connection, request.query, endDate).then((receiptEndDate) => {
+				getMostRecentCustomer(connection, request.query, endDate).then((customerEndDate) => {
+					getTotalCustomers(connection, request.query, results).then(() => {
+						getTotalRevenue(connection, request.query, results).then(() => {
+							getRevenueByPeriod(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
+								getGallonsPerCustomer(connection, request.query, results).then(() => {
+									getCustomersByPeriod(connection, request.query, (endDate) ? endDate : customerEndDate, results).then(() => {
+										getRetailerRevenue(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
+											yieldResults(response, results);
+										}).catch(err => {
+											yieldError(err, response, 500, results);
+										})
 									}).catch(err => {
 										yieldError(err, response, 500, results);
 									})
@@ -112,7 +116,7 @@ router.get('/', function(request, response) {
 						})
 					}).catch(err => {
 						yieldError(err, response, 500, results);
-					})
+					});
 				}).catch(err => {
 					yieldError(err, response, 500, results);
 				});
@@ -154,52 +158,74 @@ const getTotalRevenue = (connection, requestParams, results ) => {
 	});
 };
 
-const getRevenueByPeriod = (connection, requestParams, results ) => {
+const getRevenueByPeriod = (connection, requestParams, endDate, results ) => {
 	return new Promise((resolve, reject) => {
 		results.totalRevenue.period = requestParams.groupby;
-		UpdatePeriodDates( results.totalRevenue.periods, requestParams.enddate, requestParams.groupby );
+		PeriodData.UpdatePeriodDates( results.totalRevenue.periods, endDate, requestParams.groupby );
 		const sql = sprintf(sqlRevenueByPeriod, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
 		connection.query(sql, [requestParams.kioskID], function (err, sqlResult ) {
 			if (err) {
 				reject(err);
 			} else {
-				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-					results.totalRevenue.periods[0].setValue(sqlResult[0]["SUM(customer_amount)"]);
+				try{
+					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+						results.totalRevenue.periods[0].setValue(sqlResult[0]["SUM(customer_amount)"]);
+					}
+					if (Array.isArray(sqlResult) && sqlResult.length > 1) {
+						if( PeriodData.IsExpected( results.totalRevenue.periods[1], new Date( sqlResult[1]["YEAR(created_date)"], sqlResult[1]["MONTH(created_date)"] -1 ))){
+							results.totalRevenue.periods[1].setValue( sqlResult[1]["SUM(customer_amount)"]);
+						}else{
+							results.totalRevenue.periods[1].setValue(0);
+						}
+					}
+					if (Array.isArray(sqlResult) && sqlResult.length > 2) {
+						if( PeriodData.IsExpected( results.totalRevenue.periods[2], new Date( sqlResult[2]["YEAR(created_date)"], sqlResult[2]["MONTH(created_date)"] -1 ))) {
+							results.totalRevenue.periods[2].setValue(sqlResult[2]["SUM(customer_amount)"]);
+						}else{
+							results.totalRevenue.periods[2].setValue(0);
+						}
+					}
+					resolve();
+				}catch( ex){
+					reject( {message:ex.message, stack:ex.stack});
 				}
-				if (Array.isArray(sqlResult) && sqlResult.length > 1) {
-					results.totalRevenue.periods[1].setValue( sqlResult[1]["SUM(customer_amount)"]);
-				}
-				if (Array.isArray(sqlResult) && sqlResult.length > 2) {
-					results.totalRevenue.periods[2].setValue( sqlResult[2]["SUM(customer_amount)"]);
-				}
-				resolve();
 			}
 		});
 	});
 };
 
-const getCustomersByPeriod = (connection, requestParams, results ) => {
+const getCustomersByPeriod = (connection, requestParams, endDate, results ) => {
 	return new Promise((resolve, reject) => {
 		if (customerAccountHasCreatedDate()) {
 			results.newCustomers.period = requestParams.groupby;
+			PeriodData.UpdatePeriodDates( results.newCustomers.periods, endDate, requestParams.groupby );
 			const sql = sprintf(sqlCustomersByPeriod, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
 			connection.query(sql, [requestParams.kioskID], function (err, sqlResult) {
 				if (err) {
 					reject(err);
 				} else {
-					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-						results.newCustomers.period1.setValue( sqlResult[0]["COUNT(id)"]);
-						let beginDate = new Date( sqlResult[0]["YEAR(created_date)"], sqlResult[0]["MONTH(created_date)"] -1, 1);
-						let  endDate = new Date( calcEndOfMonth( beginDate));
-						results.newCustomers.period1.setDates( beginDate, endDate );
+					try{
+						if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+							results.newCustomers.periods[0].setValue(sqlResult[0]["COUNT(id)"]);
+						}
+						if (Array.isArray(sqlResult) && sqlResult.length > 1) {
+							if( PeriodData.IsExpected( results.newCustomers.periods[1], new Date( sqlResult[1]["YEAR(created_date)"], sqlResult[1]["MONTH(created_date)"] -1 ))){
+								results.newCustomers.periods[1].setValue( sqlResult[1]["COUNT(id)"]);
+							}else{
+								results.newCustomers.periods[1].setValue(0);
+							}
+						}
+						if (Array.isArray(sqlResult) && sqlResult.length > 2) {
+							if( PeriodData.IsExpected( results.newCustomers.periods[2], new Date( sqlResult[2]["YEAR(created_date)"], sqlResult[2]["MONTH(created_date)"] -1 ))) {
+								results.newCustomers.periods[2].setValue(sqlResult[2]["COUNT(id)"]);
+							}else{
+								results.newCustomers.periods[2].setValue(0);
+							}
+						}
+						resolve();
+					}catch( ex){
+						reject( {message:ex.message, stack:ex.stack});
 					}
-					if (Array.isArray(sqlResult) && sqlResult.length > 1) {
-						results.newCustomers.period2.setValue( sqlResult[1]["COUNT(id)"]);
-						beginDate = new Date( sqlResult[1]["YEAR(created_date)"], sqlResult[1]["MONTH(created_date)"] -1, 1);
-						endDate = new Date( calcEndOfMonth( beginDate));
-						results.newCustomers.period2.setDates( beginDate, endDate );
-					}
-					resolve();
 				}
 			});
 		}else{
@@ -232,26 +258,29 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 
 
 
-const getRetailerRevenue = (connection, requestParams, results ) => {
+const getRetailerRevenue = (connection, requestParams, endDate, results ) => {
 	return new Promise((resolve, reject) => {
-		let endDate = requestParams.enddate;
 		let beginDate = calcBeginDate( endDate, requestParams.groupby );
 		const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
 		connection.query(sql, [requestParams.kioskID, beginDate, endDate], function (err, sqlResult) {
 			if (err) {
 				reject(err);
 			} else {
-				let index = 0;
-				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-					let year = endDate.getFullYear();
-					let month = endDate.getMonth() +1 ;	// range 1-12
-					while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_date)"] === month && sqlResult[index]["YEAR(receipt.created_date)"] === year ){
-						updateSales(results, sqlResult, index, month, requestParams.groupby, endDate);
-						index +=1;
+				try{
+					let index = 0;
+					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+						let year = endDate.getFullYear();
+						let month = endDate.getMonth() +1 ;	// range 1-12
+						while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_date)"] === month && sqlResult[index]["YEAR(receipt.created_date)"] === year ){
+							updateSales(results, sqlResult, index, month, requestParams.groupby, endDate);
+							index +=1;
+						}
 					}
+					semaLog.info(index, " Resellers found");
+					resolve();
+				}catch( ex){
+					reject( {message:ex.message, stack:ex.stack});
 				}
-				semaLog.info(index, " Resellers found");
-				resolve();
 			}
 		});
 	});
@@ -277,51 +306,56 @@ const getMostRecentReceipt = ( connection, requestParams, endDate ) => {
 	});
 };
 
+const getMostRecentCustomer = ( connection, requestParams, endDate ) => {
+	return new Promise((resolve ) => {
+		if (customerAccountHasCreatedDate()) {
+			if (endDate != null) {
+				resolve(endDate);
+			} else {
+				connection.query(sqlLMostRecentCustomer, [requestParams.kioskID], (err, sqlResult) => {
+					if (err) {
+						resolve(new Date(Date.now()));
+					} else {
+						if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+							endDate = new Date(sqlResult[0]["created_date"]);
+							resolve(endDate);
+						}
+						resolve(new Date(Date.now()));
+					}
+				})
+			}
+		}else{
+			resolve(endDate);
+		}
+	});
+};
+
 const updateSales = ( results, sqlResult, index, month, period, endDate ) => {
 
 	let retailer = {
 		name: sqlResult[index]["contact_name"],
 		id: sqlResult[index]["customer_account_id"],
 		period: period,
-		period1: new periodData(),
-		period2:  new periodData(),
-		period3:  new periodData(),
+		periods: PeriodData.init3Periods(),
 		gps: sqlResult[index]["gps_coordinates"]
 	};
 
-	retailer.period1.setValue( sqlResult[index]["SUM(receipt.customer_amount)"]);
+	PeriodData.UpdatePeriodDates( retailer.periods, endDate, period );
 
-	// NOTE - Period sales is calculated only for months
-	let period1EndDate = endDate;
-	let period1BeginDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1 );
-	retailer.period1.setDates( period1BeginDate, period1EndDate );
+	retailer.periods[0].setValue( sqlResult[index]["SUM(receipt.customer_amount)"]);
 
-	let period2BeginDate = new Date( period1BeginDate);
-	period2BeginDate.addMonths(-1);
-	let period2EndDate = new Date( calcEndOfMonth( period2BeginDate));
-
-	let period3BeginDate = new Date( period2BeginDate);
-	period3BeginDate.addMonths(-1);
-	let period3EndDate = new Date( calcEndOfMonth( period3BeginDate));
-
-
-	index = getPrevPeriodSales( retailer, sqlResult, index+1, period2BeginDate, retailer.period2 );
+	index = getPrevPeriodSales( retailer, sqlResult, index+1, retailer.periods[1] );
 	if( index !== -1 ){
-		retailer.period2.setDates( period2BeginDate, period2EndDate );
-		index = getPrevPeriodSales( retailer, sqlResult, index+1, period3BeginDate, retailer.period3 );
-		if( index !== -1 ) {
-			retailer.period3.setDates( period3BeginDate, period3EndDate );
-
-		}
+		index = getPrevPeriodSales( retailer, sqlResult, index+1, retailer.periods[2]  );
 	}
 	results.retailSales.push( retailer);
 };
 
-const getPrevPeriodSales = ( retailer, sqlResult, index, prevDate, nextPeriod ) => {
+const getPrevPeriodSales = ( retailer, sqlResult, index, nextPeriod ) => {
 	while( index < sqlResult.length ){
 		if( sqlResult[index]["customer_account_id"] === retailer.id &&
-			sqlResult[index]["YEAR(receipt.created_date)"] === prevDate.getFullYear() &&
-			sqlResult[index]["MONTH(receipt.created_date)"] === (prevDate.getMonth() +1) ){
+			sqlResult[index]["YEAR(receipt.created_date)"] === nextPeriod.beginDate.getFullYear() &&
+			sqlResult[index]["MONTH(receipt.created_date)"] === (nextPeriod.beginDate.getMonth() +1) ){
 			nextPeriod.setValue( sqlResult[index]["SUM(receipt.customer_amount)"] );
 			return index;
 		}
@@ -337,7 +371,11 @@ const yieldResults =(res, results ) =>{
 };
 
 const yieldError = (err, response, httpErrorCode, results ) =>{
-	semaLog.error("ERROR: ", err.message, "HTTP Error code: ", httpErrorCode);
+	let stackTrace = "NA";
+	if( err.hasOwnProperty("stack")){
+		stackTrace = err.stack;
+	}
+	semaLog.error("ERROR: ", err.message, "HTTP Error code: ", httpErrorCode, "Stack: ", stackTrace);
 	response.status(httpErrorCode);
 	response.json(results);
 };
@@ -346,9 +384,9 @@ const yieldError = (err, response, httpErrorCode, results ) =>{
 
 function initResults() {
 	return {
-		newCustomers: {period: "N/A", period1:new periodData(), period2:new periodData()},
-		totalRevenue: {total: "N/A", period: "N/A", periods:init3Periods(),    period1:new periodData(), period2:new periodData()},
-		netIncome: {total: "N/A",   period: "N/A",period1:new periodData(), period2:new periodData()},
+		newCustomers: {period: "N/A", periods:PeriodData.init3Periods()},
+		totalRevenue: {total: "N/A", period: "N/A", periods:PeriodData.init3Periods()},
+		netIncome: {total: "N/A",   period: "N/A",periods:PeriodData.init3Periods()},
 		retailSales: [],
 		totalCustomers: "N/A",
 		gallonsPerCustomer: {period: "N/A", value: "N/A"},
