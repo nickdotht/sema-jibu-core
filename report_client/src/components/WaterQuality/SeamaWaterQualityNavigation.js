@@ -20,25 +20,11 @@ class SeamaWaterQualityNavigation extends Component {
 
     handleSelect(eventKey){
         console.log(eventKey);
-        // this.setState({title: this.props.seamaState.seamaKiosk[eventKey].name});
-        // var kioskParams = {kioskID:this.props.seamaState.seamaKiosk[eventKey].id};
-        // RestServices.fetchWaterQuality(kioskParams);
     };
 
-    // buildMenuItems(){
-    //     var menuItems = [];
-    //     if( this.props.seamaState.seamaKiosk){
-    //         var keys = Object.keys(this.props.seamaState.seamaKiosk);
-    //         for( var i = 0; i < keys.length; i++ ){
-    //             var kiosk = this.props.seamaState.seamaKiosk[keys[i]];
-    //             menuItems.push(<MenuItem eventKey={keys[i]}style={menuStyle}>{kiosk.name}</MenuItem>);
-    //         }
-    //     }
-    //     return menuItems;
-    // }
     render() {
         return (
-            <div>
+            <div style={{display:"none"}}>
                 <Nav bsStyle="pills" >
                 <NavDropdown eventKey={7} title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >
                     <MenuItem eventKey={7.1} >LAST 30 DAYS</MenuItem>
