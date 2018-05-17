@@ -6,6 +6,13 @@ const customerAccountHasCreatedDate = require('../seama_services/db_service').cu
 require('datejs');
 const semaLog = require('../seama_services/sema_logger');
 
+const PeriodData = require('../seama_services/datetime_services').PeriodData;
+const init3Periods = require('../seama_services/datetime_services').init3Periods;
+const CalcBeginDate = require('../seama_services/datetime_services').CalcBeginDate;
+const UpdatePeriodDates = require('../seama_services/datetime_services').UpdatePeriodDates;
+
+
+
 // Note: inporting datejs will extend the native Date class
 
 /* GET data for sales view. */
@@ -82,6 +89,8 @@ router.get('/', function(request, response) {
 			// be many receipts, we don't want the SQL query to span too much tine}
 			getMostRecentReceipt(connection, request.query, endDate).then((newEndDate) => {
 				request.query.enddate = newEndDate;
+				request.query.periodBeginDate = CalcBeginDate( newEndDate, request.query.groupby, 2 );
+
 				getTotalCustomers(connection, request.query, results).then(() => {
 					getTotalRevenue(connection, request.query, results).then(() => {
 						getRevenueByPeriod(connection, request.query, results).then(() => {
@@ -148,23 +157,20 @@ const getTotalRevenue = (connection, requestParams, results ) => {
 const getRevenueByPeriod = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
 		results.totalRevenue.period = requestParams.groupby;
+		UpdatePeriodDates( results.totalRevenue.periods, requestParams.enddate, requestParams.groupby );
 		const sql = sprintf(sqlRevenueByPeriod, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
 		connection.query(sql, [requestParams.kioskID], function (err, sqlResult ) {
 			if (err) {
 				reject(err);
 			} else {
 				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-					results.totalRevenue.period1.setValue(sqlResult[0]["SUM(customer_amount)"]);
-					let beginDate = new Date(sqlResult[0]["YEAR(created_date)"], sqlResult[0]["MONTH(created_date)"] - 1, 1);
-					let endDate = new Date(calcEndOfMonth(beginDate));
-					results.totalRevenue.period1.setDates(beginDate, endDate);
+					results.totalRevenue.periods[0].setValue(sqlResult[0]["SUM(customer_amount)"]);
 				}
 				if (Array.isArray(sqlResult) && sqlResult.length > 1) {
-					results.totalRevenue.period2.setValue( sqlResult[1]["SUM(customer_amount)"]);
-					beginDate = new Date( sqlResult[1]["YEAR(created_date)"], sqlResult[1]["MONTH(created_date)"] -1, 1);
-					endDate = new Date( calcEndOfMonth( beginDate));
-					results.totalRevenue.period2.setDates( beginDate, endDate );
-
+					results.totalRevenue.periods[1].setValue( sqlResult[1]["SUM(customer_amount)"]);
+				}
+				if (Array.isArray(sqlResult) && sqlResult.length > 2) {
+					results.totalRevenue.periods[2].setValue( sqlResult[2]["SUM(customer_amount)"]);
 				}
 				resolve();
 			}
@@ -341,7 +347,7 @@ const yieldError = (err, response, httpErrorCode, results ) =>{
 function initResults() {
 	return {
 		newCustomers: {period: "N/A", period1:new periodData(), period2:new periodData()},
-		totalRevenue: {total: "N/A", period: "N/A", period1:new periodData(), period2:new periodData()},
+		totalRevenue: {total: "N/A", period: "N/A", periods:init3Periods(),    period1:new periodData(), period2:new periodData()},
 		netIncome: {total: "N/A",   period: "N/A",period1:new periodData(), period2:new periodData()},
 		retailSales: [],
 		totalCustomers: "N/A",
