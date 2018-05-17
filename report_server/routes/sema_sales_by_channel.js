@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const connectionTable = require('../seama_services/db_service').connectionTable;
 require('datejs');
-
+const semaLog = require('../seama_services/sema_logger');
 
 /* GET data for sales_by_channel  */
 
@@ -25,7 +25,7 @@ const sqlLMostRecentReceipt =
 
 
 router.get('/', function( request, response ) {
-	console.log('Sales_by_channel - ', request.query.kioskID);
+	semaLog.info( 'sales-by-channel Entry - kiosk: - ', request.query.kioskID );
 	let sessData = request.session;
 	let connection = connectionTable[sessData.id];
 	let results = initResults();
@@ -38,7 +38,7 @@ router.get('/', function( request, response ) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("VALIDATION ERROR: ", errors.toString());
+			semaLog.error("sales-by-channel VALIDATION ERROR: ", errors );
 			response.status(400).send(errors.toString());
 		} else {
 
@@ -88,7 +88,6 @@ const getSalesChannels = (connection ) => {
 const execSalesByChannel = ( salesChannelArray, index, connection, kiosk, beginDate, endDate, response, results ) =>{
 	connection.query(sqlSalesByChannel, [kiosk, salesChannelArray[index].id, beginDate, endDate], function(err, sqlResult ) {
 		if( err ){
-			console.log( JSON.stringify(err));
 			yieldError( err, response, 500,results );
 		}else{
 			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
@@ -128,11 +127,12 @@ const getMostRecentReceipt = ( connection, requestParams, endDate ) => {
 };
 
 const yieldResults =(response, results ) =>{
+	semaLog.info("sales-by-channel exit");
 	response.json(results);
 };
 
 const yieldError = (err, response, httpErrorCode, results ) =>{
-	console.log( "Error:", err.message, "HTTP Error code: ", httpErrorCode);
+	semaLog.error("sales-by-channel: ERROR: ", err.message, "HTTP Error code: ", httpErrorCode);
 	response.status(httpErrorCode);
 	response.json(results);
 };

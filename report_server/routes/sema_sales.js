@@ -4,6 +4,7 @@ const connectionTable = require('../seama_services/db_service').connectionTable;
 const sprintf = require('sprintf-js').sprintf;
 const customerAccountHasCreatedDate = require('../seama_services/db_service').customerAccountHasCreatedDate;
 require('datejs');
+const semaLog = require('../seama_services/sema_logger');
 
 // Note: inporting datejs will extend the native Date class
 
@@ -57,7 +58,7 @@ const sqlLMostRecentReceipt =
 	LIMIT 2';
 
 router.get('/', function(request, response) {
-	console.log('Sales - ', request.query.kioskID);
+	semaLog.info('sales - Enter, kiosk_id:',request.query.kioskID );
 	let sessData = request.session;
 	let connection = connectionTable[sessData.id];
 	let results = initResults();
@@ -70,7 +71,7 @@ router.get('/', function(request, response) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("VALIDATION ERROR: ",errors.toString());
+			semaLog.error("VALIDATION ERROR: ", errors );
 			response.status(400).send(errors.toString());
 		} else {
 			let endDate =null;
@@ -214,7 +215,7 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 					try {
 						results.gallonsPerCustomer.value = sqlResult[0]["SUM(total_gallons)"]/ results.totalCustomers;
 					}catch( ex ){
-						console.error('getGallonsPerCustomer:', error);
+						semaLog.error("getGallonsPerCustomer: ", ex);
 					}
 				}
 				resolve();
@@ -224,34 +225,6 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 };
 
 
-// const getRetailers = (connection, requestParams, results ) => {
-// 	return new Promise((resolve, reject) => {
-// 		connection.query(sqlRetailers, [requestParams.kioskID], function (err, sqlResult ) {
-// 			if (err) {
-// 				reject(err);
-// 			} else {
-// 				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
-// 					let retailers = [];
-// 					let period = (requestParams.period) ? requestParams.period : "month";
-// 					sqlResult.forEach(row => {
-// 						let retailer = {
-// 							name: row.contact_name,
-// 							id: row.id,
-// 							total: "N/A",
-// 							period: period,
-// 							thisPeriod: "N/A",
-// 							lastPeriod: "N/A",
-// 							gps: row.gps_coordinates
-// 						};
-// 						retailers.push(retailer);
-// 					});
-// 					results.retailSales = retailers;
-// 				}
-// 				resolve();
-// 			}
-// 		});
-// 	});
-// };
 
 const getRetailerRevenue = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
@@ -271,7 +244,7 @@ const getRetailerRevenue = (connection, requestParams, results ) => {
 						index +=1;
 					}
 				}
-				console.log(index, " Resellers found");
+				semaLog.info(index, " Resellers found");
 				resolve();
 			}
 		});
@@ -351,33 +324,14 @@ const getPrevPeriodSales = ( retailer, sqlResult, index, prevDate, nextPeriod ) 
 	return -1;
 };
 
-// const updateSalesx = ( retailer_id, retailers, sqlResults ) =>{
-// 	let sqlIndex = sqlResults.findIndex(sqlResult => sqlResult.customer_account_id === retailer_id);
-// 	const retailerIndex = retailers.findIndex(retailer => retailer.id === retailer_id);
-// 	// Sql Index = index into sales result for the retailer, retailerIndex is the object to populate
-// 	if(sqlIndex !== -1 &&  retailerIndex !== -1) {
-// 		retailers[retailerIndex].total = sqlResults[sqlIndex]["SUM(customer_amount)"];
-// 		// Do NOT use current month for trending. It may not be complete.
-// 		let nowDate = new Date(Date.now());
-// 		if (nowDate.getFullYear() === sqlResults[sqlIndex]["YEAR(receipt.created_date)"] &&
-// 			nowDate.getMonth() === sqlResults[sqlIndex]["MONTH(receipt.created_date)"]) {
-// 			sqlIndex += 1;
-// 		}
-// 		if ((sqlIndex + 1) < sqlResults.length && // There must be two or more periods
-// 			sqlResults[sqlIndex].customer_account_id === retailer_id &&		// And the next two belong to the this retailer
-// 			sqlResults[sqlIndex + 1].customer_account_id === retailer_id) {
-// 			retailers[retailerIndex].thisPeriod = sqlResults[sqlIndex]["SUM(customer_amount)"];
-// 			retailers[retailerIndex].lastPeriod = sqlResults[sqlIndex+1]["SUM(customer_amount)"];
-// 		}
-// 	}
-// };
 
 const yieldResults =(res, results ) =>{
+	semaLog.info("Sales exit");
 	res.json(results);
 };
 
 const yieldError = (err, response, httpErrorCode, results ) =>{
-	console.log( "Error:", err.message, "HTTP Error code: ", httpErrorCode);
+	semaLog.error("ERROR: ", err.message, "HTTP Error code: ", httpErrorCode);
 	response.status(httpErrorCode);
 	response.json(results);
 };

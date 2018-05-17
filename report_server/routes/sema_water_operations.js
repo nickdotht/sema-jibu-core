@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const connectionTable = require('../seama_services/db_service').connectionTable;
 require('datejs');
+const semaLog = require('../seama_services/sema_logger');
 
 let parameter_id_map = {};
 let sampling_site_id_map = {};
@@ -76,7 +77,8 @@ const sqlSamplingSite=
 /* GET water operations. */
 
 router.get('/', function(request, response) {
-	console.log('Water operations - ', request.query.kioskID);
+	semaLog.info( 'water-operations Entry - kiosk: - ', request.query.kioskID );
+
 	let sessData = request.session;
 	let connection = connectionTable[sessData.id];
 	let results = initResults();
@@ -89,7 +91,7 @@ router.get('/', function(request, response) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("Water operations - VALIDATION ERROR: ",errors.toString());
+			semaLog.error("water-operations VALIDATION ERROR: ", errors );
 			response.status(400).send(errors.toString());
 		} else {
 			let endDate = null;
@@ -331,7 +333,7 @@ const getParametersAndSiteIds = (connection) => {
 			sampling_site_id_map= {};
 			connection.query(sqlParameter, (err, sqlResult) => {
 				if (err) {
-					console.log( "Error resolving parameter ids");
+					semaLog.error("water-operations. Error resolving parameter ids ", err );
 					resolve();
 				} else {
 					if (Array.isArray(sqlResult)){
@@ -341,9 +343,8 @@ const getParametersAndSiteIds = (connection) => {
 						}, {});
 					}
 					connection.query(sqlSamplingSite, (err, sqlResult) => {
-
 						if (err) {
-							console.log( "Error resolving sampling site ids");
+							semaLog.error("water-operations. Error resolving sampling site ids ", err );
 							resolve();
 						}else{
 							sampling_site_id_map = sqlResult.reduce( (map, item) => {
@@ -363,11 +364,12 @@ const getParametersAndSiteIds = (connection) => {
 };
 
 const yieldResults =(res, results ) =>{
+	semaLog.info("water-operations - exit");
 	res.json(results);
 };
 
 const yieldError = (err, response, httpErrorCode, results ) =>{
-	console.log( "Error:", err.message, "HTTP Error code: ", httpErrorCode);
+	semaLog.error("water-operations: ERROR: ", err.message, "HTTP Error code: ", httpErrorCode);
 	response.status(httpErrorCode);
 	response.json(results);
 };

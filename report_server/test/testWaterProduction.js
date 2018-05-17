@@ -17,20 +17,20 @@ describe('Testing Water Production API', () => {
 		delete require.cache[require.resolve('../bin/www')];
 		done();
 	});
-	describe('GET /untapped/water-quality - missing kioskID', () => {
+	describe('GET /untapped/water-operations - missing kioskID', () => {
 		it('Should fail with 400 error code', (done) => {
 			chai.request(server)
-				.get('/untapped/water-quality')
+				.get('/untapped/water-operations')
 				.end(function(err, res) {
 					res.should.have.status(400);
 					done(err);
 				});
 		});
 	});
-	describe('GET /untapped/water-quality - unknown kioskID', () => {
+	describe('GET /untapped/water-operations - unknown kioskID', () => {
 		it('Should succeed with empty info becuase the kioskID does not exist', (done) => {
 			chai.request(server)
-				.get('/untapped/water-quality?kioskID=9999&groupby=month')
+				.get('/untapped/water-operations?kioskID=9999&groupby=month')
 				.end(function(err, res) {
 					res.should.have.status(200);
 					res.body.should.have.property('totalProduction').eql('N/A');
@@ -41,14 +41,14 @@ describe('Testing Water Production API', () => {
 		});
 	});
 
-	describe('GET /untapped/water-quality - UnitTest KioskID', () => {
+	describe('GET /untapped/water-operations - UnitTest KioskID', () => {
 		it('Should get info for water production with a valid kiosk', (done) => {
 			chai.request(server)
 				.get('/untapped/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					res.body.kiosks[0].should.have.property('name').eql('UnitTest');
-					let url = "/untapped/water-quality?kioskID=%d&groupby=month";
+					let url = "/untapped/water-operations?kioskID=%d&groupby=month";
 					url = sprintf( url, res.body.kiosks[0].id)
 					chai.request(server)
 						.get(url)

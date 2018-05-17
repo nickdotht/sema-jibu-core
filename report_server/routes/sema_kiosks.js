@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const connectionTable = require('../seama_services/db_service').connectionTable;
+const semaLog = require('../seama_services/sema_logger');
 
 /* GET kiosks in the database. */
 
 router.get('/', function(req, res) {
+	semaLog.info('kiosks - Enter');
 	let mockit = req.app.get('mockIt');
 	if (mockit) {
 		res.json({
@@ -93,8 +95,10 @@ router.get('/', function(req, res) {
 		const connection = connectionTable[sessData.id];
 		connection.query('SELECT * FROM kiosk', function(err, result ) {
 			if (err) {
+				semaLog.error( 'kiosks - failed', {err});
 				res.status(500).send(err.message);
 			} else {
+				semaLog.info( 'kiosks - succeeded');
 				res.json({ kiosks: result });
 			}
 		});

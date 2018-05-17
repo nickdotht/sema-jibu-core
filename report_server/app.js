@@ -15,8 +15,10 @@ var sema_sales = require('./routes/sema_sales');
 var sema_sales_by_channel = require('./routes/sema_sales_by_channel');
 var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
+const winston = require('winston');
 
 var app = express();
+
 app.use(
 	session({
 		secret: 'seama-secret-token',
@@ -80,5 +82,6 @@ app.set('mockIt', false);
 
 // Version
 app.set('sema_version', '0.0.0.2');
+
 
 module.exports = app;
