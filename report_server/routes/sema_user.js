@@ -1,9 +1,9 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-	var mockit = req.app.get('mockIt');
+router.get('/', function(req, res ) {
+	let mockit = req.app.get('mockIt');
 	console.log('seama_user - Entry - mockIt ', mockit);
 
 	if (mockit) {

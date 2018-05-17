@@ -3,18 +3,16 @@ const mysql = require('mysql');
 const router = express.Router();
 const getSQLConfig = require('../seama_services/db_service').getSQLConfig;
 
+const semaLog = require('../seama_services/sema_logger');
+
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-	console.log('health-check');
+router.get('/', function(req, res ) {
+	semaLog.log('info', 'health-check - Enter');
 
-	testConnection(req, res, next);
-});
-
-function testConnection(req, res) {
-	var con = mysql.createConnection(getSQLConfig(req));
+	const con = mysql.createConnection(getSQLConfig(req));
 	con.connect(function(err) {
 		if (err) {
-			console.log('Database Connection failed!');
+			semaLog.log('error', 'health-check - Failed; database failure');
 			res.json({
 				server: 'Ok',
 				database: 'Failed',
@@ -22,7 +20,7 @@ function testConnection(req, res) {
 				err: err.toString()
 			});
 		} else {
-			console.log('Database Connected!');
+			semaLog.log('info', 'health-check - succeeded');
 			res.json({
 				server: 'Ok',
 				database: 'Ok',
@@ -30,6 +28,6 @@ function testConnection(req, res) {
 			});
 		}
 	});
-}
+});
 
 module.exports = router;

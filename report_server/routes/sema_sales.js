@@ -4,6 +4,7 @@ const connectionTable = require('../seama_services/db_service').connectionTable;
 const sprintf = require('sprintf-js').sprintf;
 const customerAccountHasCreatedDate = require('../seama_services/db_service').customerAccountHasCreatedDate;
 require('datejs');
+const semaLog = require('../seama_services/sema_logger');
 
 // Note: inporting datejs will extend the native Date class
 
@@ -57,7 +58,7 @@ const sqlLMostRecentReceipt =
 	LIMIT 2';
 
 router.get('/', function(request, response) {
-	console.log('Sales - ', request.query.kioskID);
+	semaLog.info('sales - Enter, kiosk_id:',request.query.kioskID );
 	let sessData = request.session;
 	let connection = connectionTable[sessData.id];
 	let results = initResults();
@@ -67,19 +68,30 @@ router.get('/', function(request, response) {
 
 	request.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
-			var errors = result.array().map((elem) => {
+			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("VALIDATION ERROR: ",errors.toString());
+			semaLog.error("VALIDATION ERROR: ", errors );
 			response.status(400).send(errors.toString());
 		} else {
-			getTotalCustomers(connection, request.query, results).then(() => {
-				getTotalRevenue(connection, request.query, results).then(() => {
-					getRevenueByPeriod(connection, request.query, results).then(() => {
-						getGallonsPerCustomer(connection, request.query, results).then(() => {
-							getCustomersByPeriod(connection, request.query, results).then(() => {
-								getRetailerRevenue(connection, request.query, results).then(() => {
-									yieldResults(response, results);
+			let endDate =null;
+			if( request.query.hasOwnProperty("enddate")) {
+				endDate = new Date(Date.parse(request.query.enddate));
+			}
+			// Use the most recent receipt as the end date if now is specified (Because there may
+			// be many receipts, we don't want the SQL query to span too much tine}
+			getMostRecentReceipt(connection, request.query, endDate).then((newEndDate) => {
+				request.query.enddate = newEndDate;
+				getTotalCustomers(connection, request.query, results).then(() => {
+					getTotalRevenue(connection, request.query, results).then(() => {
+						getRevenueByPeriod(connection, request.query, results).then(() => {
+							getGallonsPerCustomer(connection, request.query, results).then(() => {
+								getCustomersByPeriod(connection, request.query, results).then(() => {
+									getRetailerRevenue(connection, request.query, results).then(() => {
+										yieldResults(response, results);
+									}).catch(err => {
+										yieldError(err, response, 500, results);
+									})
 								}).catch(err => {
 									yieldError(err, response, 500, results);
 								})
@@ -94,9 +106,7 @@ router.get('/', function(request, response) {
 					})
 				}).catch(err => {
 					yieldError(err, response, 500, results);
-				})
-			}).catch(err => {
-				yieldError(err, response, 500, results);
+				});
 			});
 		}
 	});
@@ -205,7 +215,7 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 					try {
 						results.gallonsPerCustomer.value = sqlResult[0]["SUM(total_gallons)"]/ results.totalCustomers;
 					}catch( ex ){
-						console.error('getGallonsPerCustomer:', error);
+						semaLog.error("getGallonsPerCustomer: ", ex);
 					}
 				}
 				resolve();
@@ -215,70 +225,34 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 };
 
 
-// const getRetailers = (connection, requestParams, results ) => {
-// 	return new Promise((resolve, reject) => {
-// 		connection.query(sqlRetailers, [requestParams.kioskID], function (err, sqlResult ) {
-// 			if (err) {
-// 				reject(err);
-// 			} else {
-// 				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
-// 					let retailers = [];
-// 					let period = (requestParams.period) ? requestParams.period : "month";
-// 					sqlResult.forEach(row => {
-// 						let retailer = {
-// 							name: row.contact_name,
-// 							id: row.id,
-// 							total: "N/A",
-// 							period: period,
-// 							thisPeriod: "N/A",
-// 							lastPeriod: "N/A",
-// 							gps: row.gps_coordinates
-// 						};
-// 						retailers.push(retailer);
-// 					});
-// 					results.retailSales = retailers;
-// 				}
-// 				resolve();
-// 			}
-// 		});
-// 	});
-// };
 
 const getRetailerRevenue = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
-		let endDate =null;
-		if( requestParams.hasOwnProperty("enddate")){
-			endDate = Date.parse(requestParams.enddate);
-		}else{
-			// Use the most recent receipt as the end date. (Because there may be many receipts, we don't want the SQL query to span too much tine
-		}
-		getMostRecentReceipt( connection, requestParams, endDate ).then( (newEndDate) =>{
-			endDate = newEndDate;
-			let beginDate = calcBeginDate( endDate, requestParams.groupby );
-			const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
-			connection.query(sql, [requestParams.kioskID, beginDate, endDate], function (err, sqlResult) {
-				if (err) {
-					reject(err);
-				} else {
-					let index = 0;
-					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-						let year = endDate.getFullYear();
-						let month = endDate.getMonth() +1 ;	// range 1-12
-						while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_date)"] == month && sqlResult[index]["YEAR(receipt.created_date)"] == year ){
-							updateSales(results, sqlResult, index, month, requestParams.groupby, endDate);
-							index +=1;
-						}
+		let endDate = requestParams.enddate;
+		let beginDate = calcBeginDate( endDate, requestParams.groupby );
+		const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
+		connection.query(sql, [requestParams.kioskID, beginDate, endDate], function (err, sqlResult) {
+			if (err) {
+				reject(err);
+			} else {
+				let index = 0;
+				if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+					let year = endDate.getFullYear();
+					let month = endDate.getMonth() +1 ;	// range 1-12
+					while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_date)"] === month && sqlResult[index]["YEAR(receipt.created_date)"] === year ){
+						updateSales(results, sqlResult, index, month, requestParams.groupby, endDate);
+						index +=1;
 					}
-					console.log(index, " Resellers found");
-					resolve();
 				}
-			});
-		})
+				semaLog.info(index, " Resellers found");
+				resolve();
+			}
+		});
 	});
 };
 
 const getMostRecentReceipt = ( connection, requestParams, endDate ) => {
-	return new Promise((resolve, reject) => {
+	return new Promise((resolve ) => {
 		if( endDate != null ){
 			resolve( endDate);
 		}else{
@@ -295,7 +269,7 @@ const getMostRecentReceipt = ( connection, requestParams, endDate ) => {
 			})
 		}
 	});
-}
+};
 
 const updateSales = ( results, sqlResult, index, month, period, endDate ) => {
 
@@ -316,20 +290,20 @@ const updateSales = ( results, sqlResult, index, month, period, endDate ) => {
 	let period1BeginDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1 );
 	retailer.period1.setDates( period1BeginDate, period1EndDate );
 
-	let period2BeginDate = new Date( period1BeginDate)
+	let period2BeginDate = new Date( period1BeginDate);
 	period2BeginDate.addMonths(-1);
 	let period2EndDate = new Date( calcEndOfMonth( period2BeginDate));
 
-	let period3BeginDate = new Date( period2BeginDate)
+	let period3BeginDate = new Date( period2BeginDate);
 	period3BeginDate.addMonths(-1);
 	let period3EndDate = new Date( calcEndOfMonth( period3BeginDate));
 
 
 	index = getPrevPeriodSales( retailer, sqlResult, index+1, period2BeginDate, retailer.period2 );
-	if( index != -1 ){
+	if( index !== -1 ){
 		retailer.period2.setDates( period2BeginDate, period2EndDate );
 		index = getPrevPeriodSales( retailer, sqlResult, index+1, period3BeginDate, retailer.period3 );
-		if( index != -1 ) {
+		if( index !== -1 ) {
 			retailer.period3.setDates( period3BeginDate, period3EndDate );
 
 		}
@@ -337,11 +311,11 @@ const updateSales = ( results, sqlResult, index, month, period, endDate ) => {
 	results.retailSales.push( retailer);
 };
 
-const getPrevPeriodSales = ( retailer, sqlResult, index, prevDate, nextPeriod, period ) => {
+const getPrevPeriodSales = ( retailer, sqlResult, index, prevDate, nextPeriod ) => {
 	while( index < sqlResult.length ){
-		if( sqlResult[index]["customer_account_id"] == retailer.id &&
-			sqlResult[index]["YEAR(receipt.created_date)"] == prevDate.getFullYear() &&
-			sqlResult[index]["MONTH(receipt.created_date)"] == (prevDate.getMonth() +1) ){
+		if( sqlResult[index]["customer_account_id"] === retailer.id &&
+			sqlResult[index]["YEAR(receipt.created_date)"] === prevDate.getFullYear() &&
+			sqlResult[index]["MONTH(receipt.created_date)"] === (prevDate.getMonth() +1) ){
 			nextPeriod.setValue( sqlResult[index]["SUM(receipt.customer_amount)"] );
 			return index;
 		}
@@ -350,33 +324,14 @@ const getPrevPeriodSales = ( retailer, sqlResult, index, prevDate, nextPeriod, p
 	return -1;
 };
 
-// const updateSalesx = ( retailer_id, retailers, sqlResults ) =>{
-// 	let sqlIndex = sqlResults.findIndex(sqlResult => sqlResult.customer_account_id === retailer_id);
-// 	const retailerIndex = retailers.findIndex(retailer => retailer.id === retailer_id);
-// 	// Sql Index = index into sales result for the retailer, retailerIndex is the object to populate
-// 	if(sqlIndex !== -1 &&  retailerIndex !== -1) {
-// 		retailers[retailerIndex].total = sqlResults[sqlIndex]["SUM(customer_amount)"];
-// 		// Do NOT use current month for trending. It may not be complete.
-// 		let nowDate = new Date(Date.now());
-// 		if (nowDate.getFullYear() === sqlResults[sqlIndex]["YEAR(receipt.created_date)"] &&
-// 			nowDate.getMonth() === sqlResults[sqlIndex]["MONTH(receipt.created_date)"]) {
-// 			sqlIndex += 1;
-// 		}
-// 		if ((sqlIndex + 1) < sqlResults.length && // There must be two or more periods
-// 			sqlResults[sqlIndex].customer_account_id === retailer_id &&		// And the next two belong to the this retailer
-// 			sqlResults[sqlIndex + 1].customer_account_id === retailer_id) {
-// 			retailers[retailerIndex].thisPeriod = sqlResults[sqlIndex]["SUM(customer_amount)"];
-// 			retailers[retailerIndex].lastPeriod = sqlResults[sqlIndex+1]["SUM(customer_amount)"];
-// 		}
-// 	}
-// };
 
 const yieldResults =(res, results ) =>{
+	semaLog.info("Sales exit");
 	res.json(results);
 };
 
 const yieldError = (err, response, httpErrorCode, results ) =>{
-	console.log( "Error:", err.message, "HTTP Error code: ", httpErrorCode);
+	semaLog.error("ERROR: ", err.message, "HTTP Error code: ", httpErrorCode);
 	response.status(httpErrorCode);
 	response.json(results);
 };
@@ -394,7 +349,7 @@ function initResults() {
 		salesByChannel: { labels: [], datasets: []}
 
 	}
-};
+}
 
 // Calculate the date for the three periods that include endDate, endDate -1 and endDate -2.
 // Example for the monthly period; if the current date is June 6 2018, then the
@@ -403,8 +358,8 @@ const calcBeginDate = ( endDate, period ) =>{
 	switch( period ){
 		case 'month':
 		default:
-			let beginDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1 )
-			beginDate.addMonths(-2)
+			let beginDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1 );
+			beginDate.addMonths(-2);
 			return beginDate;
 
 	}
@@ -412,7 +367,7 @@ const calcBeginDate = ( endDate, period ) =>{
 
 function periodData () {
 	this.beginDate = "N/A";
-	this.endDate = "N/A;"
+	this.endDate = "N/A;";
 	this.periodValue = "N/A";
 	this.setValue = periodValue =>{ this.periodValue = periodValue} ;
 	this.setDates = (beginDate, endDate ) => {

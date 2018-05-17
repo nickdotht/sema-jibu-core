@@ -21,7 +21,7 @@ export function initializeWaterOperations() {
 
 export function fetchWaterOperations( params ) {
 	const urlParms = queryParams(params);
-	const url = '/untapped/water-quality?' + urlParms;
+	const url = '/untapped/water-operations?' + urlParms;
 
 	return (dispatch) => {
 		return fetch(url, {credentials: 'include'})
@@ -60,7 +60,7 @@ const updateWaterQualityState = waterQuality => {
 	newWaterQuality.flowRate = waterQuality.flowRate;
 	newWaterQuality.sitePressure = waterQuality.sitePressure;
 	newWaterQuality.totalProduction = waterQuality.totalProduction;
-	if( ! waterQuality.hasOwnProperty("production")){
+	if( waterQuality.production.datasets.length == 0 ){
 		newWaterQuality.production = createBlankChart();
 	}else{
 		newWaterQuality.production = {
@@ -86,7 +86,7 @@ const updateWaterQualityState = waterQuality => {
 		};
 		newWaterQuality.production.datasets.unshift(lineSet )
 	}
-	if( ! waterQuality.hasOwnProperty("chlorine")){
+	if( waterQuality.chlorine.datasets.length == 0){
 		newWaterQuality.chlorine = createBlankChart();
 	}else{
 		newWaterQuality.chlorine = {
@@ -103,7 +103,7 @@ const updateWaterQualityState = waterQuality => {
 		createGuide(newWaterQuality.chlorine.datasets, 0.4, "yellow", "Low");
 		createGuide(newWaterQuality.chlorine.datasets, 0.6, "green", "ideal");
 	}
-	if( ! waterQuality.hasOwnProperty("tds")){
+	if( waterQuality.tds.datasets.length == 0){
 		newWaterQuality.tds = createBlankChart();
 	}else{
 		newWaterQuality.tds = {
@@ -143,5 +143,5 @@ const createGuide = ( datasets, yValue, color, label) =>{
 
 };
 const createBlankChart = () => {
-	return { labels: [], datasets: [ { label: "", data: [],},]}
+	return { x_axis: [], datasets: []}
 };

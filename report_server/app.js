@@ -7,16 +7,18 @@ var bodyParser = require('body-parser');
 var validator = require('express-validator');
 
 var index = require('./routes/index');
-var seama_health_check = require('./routes/seama_health_check');
-var seama_login = require('./routes/seama_login');
-var seama_kiosks = require('./routes/seama_kiosks');
-var seama_water_quality = require('./routes/seama_water_quality');
+var seama_health_check = require('./routes/sema_health_check');
+var seama_login = require('./routes/sema_login');
+var seama_kiosks = require('./routes/sema_kiosks');
+var seama_water_operations = require('./routes/sema_water_operations');
 var sema_sales = require('./routes/sema_sales');
 var sema_sales_by_channel = require('./routes/sema_sales_by_channel');
 var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
+const winston = require('winston');
 
 var app = express();
+
 app.use(
 	session({
 		secret: 'seama-secret-token',
@@ -52,7 +54,7 @@ app.use('/', index);
 app.use('/untapped/health-check', seama_health_check);
 app.use('/untapped/login', seama_login);
 app.use('/untapped/kiosks', dbService, seama_kiosks);
-app.use('/untapped/water-quality', dbService, seama_water_quality);
+app.use('/untapped/water-operations', dbService, seama_water_operations);
 app.use('/untapped/sales', dbService, sema_sales);
 app.use('/untapped/sales-by-channel', dbService, sema_sales_by_channel);
 
@@ -79,6 +81,7 @@ app.use(function(err, req, res) {
 app.set('mockIt', false);
 
 // Version
-app.set('sema_version', '0.0.0.2')
+app.set('sema_version', '0.0.0.2');
+
 
 module.exports = app;

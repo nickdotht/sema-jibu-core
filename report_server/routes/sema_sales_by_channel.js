@@ -1,7 +1,8 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const connectionTable = require('../seama_services/db_service').connectionTable;
 require('datejs');
+const semaLog = require('../seama_services/sema_logger');
 
 /* GET data for sales_by_channel  */
 
@@ -16,9 +17,15 @@ const sqlSalesByChannel = 'SELECT * \
 		AND receipt.created_date BETWEEN ? AND ? \
 		ORDER BY receipt.created_date';
 
+const sqlLMostRecentReceipt =
+	'SELECT created_date FROM receipt \
+	WHERE kiosk_id = ? \
+	ORDER BY created_date DESC \
+	LIMIT 2';
+
 
 router.get('/', function( request, response ) {
-	console.log('Sales_by_channel - ', request.query.kioskID);
+	semaLog.info( 'sales-by-channel Entry - kiosk: - ', request.query.kioskID );
 	let sessData = request.session;
 	let connection = connectionTable[sessData.id];
 	let results = initResults();
@@ -28,31 +35,30 @@ router.get('/', function( request, response ) {
 
 	request.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
-			var errors = result.array().map((elem) => {
+			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("VALIDATION ERROR: ", errors.toString());
+			semaLog.error("sales-by-channel VALIDATION ERROR: ", errors );
 			response.status(400).send(errors.toString());
 		} else {
-			let endDate = null;
-			let beginDate = null;
 
-			if (request.query.hasOwnProperty('begindate') && request.query.hasOwnProperty('enddate')) {
-				endDate = Date.parse(request.query.enddate);
-				beginDate = Date.parse(request.query.begindate);
-			} else {
-				endDate = new Date(Date.now());
-				if (request.query.hasOwnProperty("enddate")) {
-					endDate = Date.parse(request.query.enddate);
-				}
-				beginDate = new Date(endDate.getFullYear(), 0)	// 	Default to start of the year
+			let endDate =null;
+			let beginDate = null;
+			if( request.query.hasOwnProperty("enddate")) {
+				endDate = new Date(Date.parse(request.query.enddate));
 			}
-			results.salesByChannel.beginDate = beginDate;
-			results.salesByChannel.endDate = endDate;
-			getSalesChannels(connection).then((salesChannel) => {
-				execSalesByChannel(salesChannel, 0, connection, request.query.kioskID, beginDate, endDate, response, results);
-			}).catch((err) => {
-				yieldError(err, response, 500, results);
+
+			getMostRecentReceipt(connection, request.query, endDate).then((newEndDate) => {
+				endDate = newEndDate;
+				beginDate = new Date(newEndDate.getFullYear(), 0);	// 	Default to start of the year
+
+				results.salesByChannel.beginDate = beginDate;
+				results.salesByChannel.endDate = endDate;
+				getSalesChannels(connection).then((salesChannel) => {
+					execSalesByChannel(salesChannel, 0, connection, request.query.kioskID, beginDate, endDate, response, results);
+				}).catch((err) => {
+					yieldError(err, response, 500, results);
+				});
 			});
 		}
 	});
@@ -82,7 +88,6 @@ const getSalesChannels = (connection ) => {
 const execSalesByChannel = ( salesChannelArray, index, connection, kiosk, beginDate, endDate, response, results ) =>{
 	connection.query(sqlSalesByChannel, [kiosk, salesChannelArray[index].id, beginDate, endDate], function(err, sqlResult ) {
 		if( err ){
-			console.log( JSON.stringify(err));
 			yieldError( err, response, 500,results );
 		}else{
 			if (Array.isArray(sqlResult) && sqlResult.length > 0) {
@@ -101,12 +106,33 @@ const execSalesByChannel = ( salesChannelArray, index, connection, kiosk, beginD
 	});
 };
 
+const getMostRecentReceipt = ( connection, requestParams, endDate ) => {
+	return new Promise((resolve ) => {
+		if( endDate != null ){
+			resolve( endDate);
+		}else{
+			connection.query(sqlLMostRecentReceipt, [requestParams.kioskID], (err, sqlResult )=>{
+				if (err) {
+					resolve(new Date(Date.now()));
+				}else{
+					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+						endDate = new Date(sqlResult[0]["created_date"]);
+						resolve( endDate );
+					}
+					resolve(new Date(Date.now()));
+				}
+			})
+		}
+	});
+};
+
 const yieldResults =(response, results ) =>{
+	semaLog.info("sales-by-channel exit");
 	response.json(results);
 };
 
 const yieldError = (err, response, httpErrorCode, results ) =>{
-	console.log( "Error:", err.message, "HTTP Error code: ", httpErrorCode);
+	semaLog.error("sales-by-channel: ERROR: ", err.message, "HTTP Error code: ", httpErrorCode);
 	response.status(httpErrorCode);
 	response.json(results);
 };
