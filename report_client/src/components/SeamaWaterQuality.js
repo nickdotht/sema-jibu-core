@@ -35,18 +35,18 @@ class SeamaWaterQuality extends Component {
                 <div className = "WaterQualitySummaryContainer">
                     <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Total Production" units={"Gallons"}
-											value={this.props.waterOperations.totalProduction}
-											date={this.props.waterOperations.latestDate}/>
+											value={this.props.waterOperations.totalProduction.value}
+											date={this.props.waterOperations.totalProduction.date}/>
                     </div>
                     <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Site Pressure" units={"PSI"}
-											value={this.props.waterOperations.sitePressure}
-											date={this.props.waterOperations.latestDate}/>
+											value={this.props.waterOperations.sitePressureMembrane.value}
+											date={this.props.waterOperations.sitePressureMembrane.date}/>
                     </div>
                     <div className ="WaterQualitySummaryItem">
                         <SeamaSummaryPanel1 title="Flow Rate" units={"GPM"}
-											value={this.props.waterOperations.flowRate}
-											date={this.props.waterOperations.latestDate}/>
+											value={this.props.waterOperations.flowRateProduct.value}
+											date={this.props.waterOperations.flowRateProduct.date}/>
                     </div>
                 </div>
                 <div className ="WaterQualityNavigtionItem">
