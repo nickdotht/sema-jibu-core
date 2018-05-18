@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'App.css';
-import SeamaSummaryPanel1 from "./WaterQuality/SeamaSummaryPanel1";
+import SemaSummaryPanel1 from "./WaterQuality/SemaSummaryPanel1";
 import SeamaWaterProductionChart from "./WaterQuality/SeamaWaterProductionChart";
 import SeamaWaterChlorineChart from "./WaterQuality/SeamaWaterChlorineChart";
 import SeamaWaterTdsChart from "./WaterQuality/SeamaWaterTdsChart";
@@ -13,8 +13,9 @@ import {bindActionCreators} from "redux";
 import * as waterOperationsActions from 'actions/WaterOperationsActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router'
+import SemaSummaryPanel2 from "./WaterQuality/SemaSummaryPanel2";
 
-class SeamaWaterQuality extends Component {
+class SemaWaterOperations extends Component {
 
     render() {
         return this.showContent();
@@ -25,29 +26,43 @@ class SeamaWaterQuality extends Component {
 		}else  if( this.props.healthCheck.database !== "Ok" ){
 			return SeamaDatabaseError(props)
 		}
-        return this.showWaterQuality();
+        return this.showWaterOperations();
 
     }
 
-    showWaterQuality( ){
+    showWaterOperations( ){
         return (
             <div className="WaterQualityContainer">
-                <div className = "WaterQualitySummaryContainer">
-                    <div className ="WaterQualitySummaryItem">
-                        <SeamaSummaryPanel1 title="Total Production" units={"Gallons"}
-											value={this.props.waterOperations.totalProduction.value}
-											date={this.props.waterOperations.totalProduction.date}/>
-                    </div>
-                    <div className ="WaterQualitySummaryItem">
-                        <SeamaSummaryPanel1 title="Site Pressure" units={"PSI"}
-											value={this.props.waterOperations.sitePressureMembrane.value}
-											date={this.props.waterOperations.sitePressureMembrane.date}/>
-                    </div>
-                    <div className ="WaterQualitySummaryItem">
-                        <SeamaSummaryPanel1 title="Flow Rate" units={"GPM"}
-											value={this.props.waterOperations.flowRateProduct.value}
-											date={this.props.waterOperations.flowRateProduct.date}/>
-                    </div>
+                <div className = "WaterOperationsSummaryContainer">
+					<div className = "WaterOperationsProduction">
+						<div className ="WaterOperationsSummaryItem">
+							<SemaSummaryPanel1 title="Total Production" units={"Gallons"}
+											   value={this.props.waterOperations.totalProduction.value}
+											   valueColor=""
+											   date={this.props.waterOperations.totalProduction.date}/>
+						</div>
+					</div>
+					<div className = "WaterOperationsWastage">
+						<div className ="WaterOperationsSummaryItem">
+							<SemaSummaryPanel1 title="Total Wastage" units={"Gallons"}
+											   value={this.calculateWastage()}
+											   valueColor="red"
+											   date={this.props.waterOperations.fillStation.date}/>
+						</div>
+					</div>
+					<div className = "WaterOperationsPressure">
+						<div className = "WaterOperationsSummaryItem2">
+							<SemaSummaryPanel2 data={this.props.waterOperations}
+											   type="pressure"/>
+						</div>
+					</div>
+
+					<div className = "WaterOperationsFlow">
+						<div className = "WaterOperationsSummaryItem2">
+							<SemaSummaryPanel2 data={this.props.waterOperations}
+											   type="flowrate"/>
+						</div>
+					</div>
                 </div>
                 <div className ="WaterQualityNavigtionItem">
                     <SeamaWaterQualityNavigation/>
@@ -65,8 +80,15 @@ class SeamaWaterQuality extends Component {
                 </div>
             </div>
         );
-
     }
+    calculateWastage(){
+    	if( this.props.waterOperations.totalProduction.value === "N/A" ||
+			this.props.waterOperations.fillStation.value === "N/A" ){
+    		return "N/A";
+		}else{
+    		return this.props.waterOperations.totalProduction.value - this.props.waterOperations.fillStation.value;
+		}
+	}
 }
 
 function mapStateToProps(state) {
@@ -86,5 +108,5 @@ function mapDispatchToProps(dispatch) {
 export default withRouter(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(SeamaWaterQuality));
+)(SemaWaterOperations));
 

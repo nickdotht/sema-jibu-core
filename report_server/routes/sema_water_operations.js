@@ -262,11 +262,8 @@ function getProduction(connection, params, beginDate, endDate, results) {
 								date1.getMonth() === date2.getMonth()  &&
 								date1.getDate() === date2.getDate()) {
 
-								let prodvalue = Math.abs( result[i+1].value - result[i].value );
-								let timeTick = result[i].created_date;
-
-								prodValues.push(prodvalue);
-								timeTicks.push(timeTick);
+								prodValues.push(Math.abs( result[i+1].value - result[i].value ));
+								timeTicks.push(result[i].created_date);
 
 								i++;
 							}

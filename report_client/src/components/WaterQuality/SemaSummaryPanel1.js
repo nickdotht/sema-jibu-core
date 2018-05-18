@@ -5,14 +5,13 @@ import 'App.css';
 import 'css/SeamaWaterOperations.css';
 let dateFormat = require('dateformat');
 
-class SeamaSummaryPanel1 extends Component {
+class SemaSummaryPanel1 extends Component {
     render() {
-        return (<div style={{width:"60%"}}>
+        return (<div style={{width:"90%"}}>
                 <Panel className="WaterQualitySummaryPanel">
                     <Panel.Body  style={{padding:"7px"}}>
                         <Panel.Title componentClass="h3" style={{margin:"0"}}>{this.props.title}</Panel.Title>
-                        <p style={{fontSize:"x-large",margin:"0" }}>{this.format()}</p>
-                        <p style={{margin:"0"}}>{this.props.units}</p>
+						<p style={{fontSize:"large",margin:"0", color:this.props.valueColor }}>{this.format()}   <span style={{fontSize:"medium",margin:"0", color:"black" }}>{this.props.units}</span></p>
 						<p style={{margin:"0"}}>{this.formatDate()}</p>
                     </Panel.Body>
                 </Panel>
@@ -30,6 +29,6 @@ class SeamaSummaryPanel1 extends Component {
 	}
 
 }
-export default SeamaSummaryPanel1;
+export default SemaSummaryPanel1;
 
 
