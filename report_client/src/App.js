@@ -13,7 +13,7 @@ import { withRouter } from 'react-router'
 import * as waterOperationsActions from 'actions/WaterOperationsActions';
 import * as salesActions from 'actions/SalesActions';
 
-const Version = "0.0.0.5";
+const Version = "0.0.0.7";
 class App extends Component {
 
     constructor(props, context) {

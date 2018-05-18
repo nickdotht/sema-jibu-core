@@ -14,9 +14,9 @@ export function receiveSalesByChannel(data) {
 export function initializeSales() {
 	return {
 		loaded:false,
-		newCustomers: {period: "N/A", period1:periodData(), period2:periodData()},
-		totalRevenue: {total: "N/A", period: "N/A", period1:periodData(), period2:periodData()},
-		netIncome: {total: "N/A",   period: "N/A",period1:periodData(), period2:periodData()},
+		newCustomers: {period: "N/A", periods:PeriodData.init3Periods()},
+		totalRevenue: {total: "N/A", period: "N/A", periods:PeriodData.init3Periods()},
+		netIncome: {total: "N/A",   period: "N/A",periods:PeriodData.init3Periods()},
 		retailSales: [],
 		totalCustomers: "N/A",
 		gallonsPerCustomer: {period: "N/A", value: "N/A"},
@@ -133,22 +133,24 @@ const periodData = ()=> {
 };
 
 
-// const createDummySales = () => {
-// 	return {
-// 		loaded:true,
-// 		newCustomers: {period:"month", thisPeriod:120, lastPeriod:130},
-// 		totalRevenue: {total:76320, period:"month", thisPeriod: 3000, lastPeriod: 2600},
-// 		netIncome: {total:9123, period:"month", thisPeriod: 1000, lastPeriod: 1600},
-// 		retailSales: [
-// 			{name:"Celine S", id:"abc123", total:9123, period:"month", thisPeriod: 1000, lastPeriod: 1600, gps:"18.59737,-72.32735"},
-// 			{name:"St Piere Tom", id:"def123", total:8233, period:"month", thisPeriod: 1500, lastPeriod: 1400, gps:"18.6035165,-72.2583092"},
-// 			{name:"Stevenson M", id:"defd123", total:6233, period:"month", thisPeriod: 1300, lastPeriod: 1100, gps:"18.82680, -72.55183"},
-// 			{name:"Ysmail Millien", id:"defd123", total:5300, period:"month", thisPeriod: 900, lastPeriod: 10000, gps:"18.72928,-72.41854"}
-//
-// 		],
-//
-// 		totalCustomers: 12345,
-// 		litersPerCustomer:{period:"month", value:13.5},
-// 		salesByChannel: createBlankChart()
-// 	}
-// };
+class PeriodData {
+	constructor() {
+		this.beginDate = "N/A";
+		this.endDate = "N/A;";
+		this.periodValue = "N/A";
+	}
+
+	setValue(periodValue) {
+		this.periodValue = periodValue;
+	}
+
+	setDates(beginDate, endDate) {
+		this.endDate = endDate;
+		this.beginDate = beginDate;
+
+	}
+
+	static init3Periods() {
+		return [new PeriodData(), new PeriodData(), new PeriodData()];
+	}
+};

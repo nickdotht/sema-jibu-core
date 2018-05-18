@@ -10,9 +10,13 @@ export function receiveWaterOperations(data) {
 export function initializeWaterOperations() {
 	return {
 		loaded:false,
-		totalProduction:"N/A",
-		sitePressure:"N/A",
-		flowRate:"N/A",
+		totalProduction: {value:"N/A", date:"N/A"},
+		fillStation: {value:"N/A", date:"N/A"},
+		sitePressureIn: {value:"N/A", date:"N/A"},
+		sitePressureOut: {value:"N/A", date:"N/A"},
+		sitePressureMembrane: {value:"N/A", date:"N/A"},
+		flowRateFeed:{value:"N/A", date:"N/A"},
+		flowRateProduct:{value:"N/A", date:"N/A"},
 		production: createBlankChart(),
 		chlorine: createBlankChart(),
 		tds: createBlankChart()
@@ -57,9 +61,15 @@ const updateWaterQualityState = waterQuality => {
 	console.log("updateWaterQualityState");
 	let newWaterQuality = {};
 	newWaterQuality.loaded =true;
-	newWaterQuality.flowRate = waterQuality.flowRate;
-	newWaterQuality.sitePressure = waterQuality.sitePressure;
+
 	newWaterQuality.totalProduction = waterQuality.totalProduction;
+	newWaterQuality.fillStation = waterQuality.fillStation;
+	newWaterQuality.sitePressureIn = waterQuality.sitePressureIn;
+	newWaterQuality.sitePressureOut = waterQuality.sitePressureOut;
+	newWaterQuality.sitePressureMembrane = waterQuality.sitePressureMembrane;
+	newWaterQuality.flowRateFeed = waterQuality.flowRateFeed;
+	newWaterQuality.flowRateProduct = waterQuality.flowRateProduct;
+
 	if( waterQuality.production.datasets.length == 0 ){
 		newWaterQuality.production = createBlankChart();
 	}else{

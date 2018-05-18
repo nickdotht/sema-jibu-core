@@ -81,7 +81,7 @@ app.use(function(err, req, res) {
 app.set('mockIt', false);
 
 // Version
-app.set('sema_version', '0.0.0.2');
+app.set('sema_version', '0.0.0.7');
 
 
 module.exports = app;
