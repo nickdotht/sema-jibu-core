@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, TouchableHighlight } from "react-native";
 import { List, ListItem } from "react-native-elements";
 
 export default class CustomerList extends Component {
@@ -42,20 +42,24 @@ export default class CustomerList extends Component {
 	render() {
 		return (
 			<View style={{ flex: 1 }}>
-			<List>
 				<FlatList
-					data={this.state.data}
-					renderItem={({ item }) => (
-						<ListItem
-							roundAvatar
-							title={`${item.name.first} ${item.name.last}`}
-							subtitle={item.email}
-							avatar={{ uri: item.picture.thumbnail }}
-						/>
-					)}
-					keyExtractor={item => item.email}
+					data={[{key: 'aaaaaaa'}, {key: 'bbbbbbbb'}]}
+					renderItem={({item}) => <Text>{item.key}</Text>}
 				/>
-			</List>
+				{/*<FlatList*/}
+					{/*data={this.state.data}*/}
+					{/*renderItem={({item, separators}) => (*/}
+						{/*<TouchableHighlight*/}
+							{/*onPress={() => this._onPress(item)}*/}
+							{/*onShowUnderlay={separators.highlight}*/}
+							{/*onHideUnderlay={separators.unhighlight}>*/}
+							{/*<View style={{backgroundColor: 'white'}}>*/}
+								{/*<Text>{item.title}</Text>*/}
+							{/*</View>*/}
+						{/*</TouchableHighlight>*/}
+					{/*)}*/}
+					{/*keyExtractor={item => item.email}*/}
+				{/*/>*/}
 			</View>
 		);
 	}
