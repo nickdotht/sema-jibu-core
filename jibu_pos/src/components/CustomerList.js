@@ -41,6 +41,7 @@ export default class CustomerList extends Component {
 
 	render() {
 		return (
+			<View style={{ flex: 1 }}>
 			<List>
 				<FlatList
 					data={this.state.data}
@@ -52,8 +53,10 @@ export default class CustomerList extends Component {
 							avatar={{ uri: item.picture.thumbnail }}
 						/>
 					)}
+					keyExtractor={item => item.email}
 				/>
 			</List>
+			</View>
 		);
 	}
 }
