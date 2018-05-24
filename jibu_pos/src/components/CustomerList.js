@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, FlatList, TouchableHighlight } from "react-native";
+import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
 import { List, ListItem } from "react-native-elements";
 
 export default class CustomerList extends Component {
@@ -53,15 +53,33 @@ export default class CustomerList extends Component {
 							onPress={() => this._onPressItem(item)}
 							onShowUnderlay={separators.highlight}
 							onHideUnderlay={separators.unhighlight}>
-							<View style={{backgroundColor: 'white'}}>
-								<Text>{this.getfoo(item)}</Text>
-							</View>
+							{this.getRow(item)}
 						</TouchableHighlight>
 					)}
 					keyExtractor={item => item.email}
 				/>
 			</View>
 		);
+	}
+	getRow = (item) =>{
+		console.log("Email " + item.email);
+		return (
+			<View style={{flex: 1, flexDirection: 'row'}}>
+				<View style={{width: 450, height: 50, backgroundColor: 'powderblue'}}>
+					<Text>{item.email}</Text>
+				</View>
+				<View style={{width: 450, height: 50, backgroundColor: 'powderblue'}}>
+					<Text>{item.phone}</Text>
+				</View>
+			</View>
+		);
+
+		// 	{/*<View style={{backgroundColor: 'white'}}>*/}
+		// 		{/*<Text>{item.email}......{item.phone}</Text>*/}
+		// 		{/*<Text>{item.phone}</Text>*/}
+		// 	{/*</View>*/}
+        //
+		// );
 	}
 	getfoo = (item) =>{
 		console.log("getfoo");
@@ -72,4 +90,15 @@ export default class CustomerList extends Component {
 	}
 }
 
-
+const styles = StyleSheet.create({
+	list: {
+		justifyContent: 'center',
+		flexDirection: 'row',
+		flexWrap: 'wrap',
+	},
+	item: {
+		backgroundColor: 'red',
+		margin: 3,
+		width: 100
+	}
+});

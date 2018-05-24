@@ -2,12 +2,13 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { TabNavigator, createMaterialTopTabNavigator, createBottomTabNavigator } from 'react-navigation';
 import CustomerList from "./CustomerList";
+import {MultiColumnExample} from "./scratch";
 
 
 class AllScreen extends React.Component {
 	render() {
 		return (
-			<CustomerList filter='This is All'/>
+			<MultiColumnExample filter='This is All'/>
 		);
 	}
 }
