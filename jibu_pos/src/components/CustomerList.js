@@ -41,27 +41,34 @@ export default class CustomerList extends Component {
 
 	render() {
 		return (
-			<View style={{ flex: 1 }}>
-				<FlatList
-					data={[{key: 'aaaaaaa'}, {key: 'bbbbbbbb'}]}
-					renderItem={({item}) => <Text>{item.key}</Text>}
-				/>
+			<View >
 				{/*<FlatList*/}
-					{/*data={this.state.data}*/}
-					{/*renderItem={({item, separators}) => (*/}
-						{/*<TouchableHighlight*/}
-							{/*onPress={() => this._onPress(item)}*/}
-							{/*onShowUnderlay={separators.highlight}*/}
-							{/*onHideUnderlay={separators.unhighlight}>*/}
-							{/*<View style={{backgroundColor: 'white'}}>*/}
-								{/*<Text>{item.title}</Text>*/}
-							{/*</View>*/}
-						{/*</TouchableHighlight>*/}
-					{/*)}*/}
-					{/*keyExtractor={item => item.email}*/}
+					{/*data={[{key: 'aaaaaaa'}, {key: 'bbbbbbbb'}]}*/}
+					{/*renderItem={({item}) => <Text>{item.key}</Text>}*/}
 				{/*/>*/}
+				<FlatList
+					data={this.state.data}
+					renderItem={({item, separators}) => (
+						<TouchableHighlight
+							onPress={() => this._onPressItem(item)}
+							onShowUnderlay={separators.highlight}
+							onHideUnderlay={separators.unhighlight}>
+							<View style={{backgroundColor: 'white'}}>
+								<Text>{this.getfoo(item)}</Text>
+							</View>
+						</TouchableHighlight>
+					)}
+					keyExtractor={item => item.email}
+				/>
 			</View>
 		);
+	}
+	getfoo = (item) =>{
+		console.log("getfoo");
+		return item.email;
+	}
+	_onPressItem = (item) =>{
+		console.log("_onPressItem")
 	}
 }
 
