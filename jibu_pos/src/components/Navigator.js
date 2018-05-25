@@ -8,7 +8,7 @@ import {MultiColumnExample} from "./scratch";
 class AllScreen extends React.Component {
 	render() {
 		return (
-			<MultiColumnExample filter='This is All'/>
+			<CustomerList filter='This is All'/>
 		);
 	}
 }

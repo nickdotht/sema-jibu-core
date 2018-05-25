@@ -1,6 +1,5 @@
 import React, {Component}  from "react";
 import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
-import { List, ListItem } from "react-native-elements";
 
 export default class CustomerList extends Component {
 	constructor(props) {
@@ -48,12 +47,13 @@ export default class CustomerList extends Component {
 				{/*/>*/}
 				<FlatList
 					data={this.state.data}
-					renderItem={({item, separators}) => (
+					ListHeaderComponent = {this.showHeader}
+					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
 							onPress={() => this._onPressItem(item)}
 							onShowUnderlay={separators.highlight}
 							onHideUnderlay={separators.unhighlight}>
-							{this.getRow(item)}
+							{this.getRow(item, index, separators)}
 						</TouchableHighlight>
 					)}
 					keyExtractor={item => item.email}
@@ -61,44 +61,81 @@ export default class CustomerList extends Component {
 			</View>
 		);
 	}
-	getRow = (item) =>{
+	getRow = (item, index, separators) =>{
 		console.log("Email " + item.email);
 		return (
 			<View style={{flex: 1, flexDirection: 'row'}}>
-				<View style={{width: 450, height: 50, backgroundColor: 'powderblue'}}>
-					<Text>{item.email}</Text>
+				<View style={ [this.getRowBackground(index), {flex:2}]}>
+					<Text style={[styles.baseItem,styles.leftMargin]}>{item.name.first + ' ' + item.name.last}</Text>
 				</View>
-				<View style={{width: 450, height: 50, backgroundColor: 'powderblue'}}>
-					<Text>{item.phone}</Text>
+				<View style={ [this.getRowBackground(index), {flex:1.5}]}>
+					<Text style={[styles.baseItem]}>{item.phone}</Text>
+				</View>
+				<View style={ [this.getRowBackground(index), {flex:2}]}>
+					<Text style={[styles.baseItem]}>{item.name.first}</Text>
+				</View>
+				<View style={ [this.getRowBackground(index), {flex:.75}]}>
+					<Text style={[styles.baseItem]}>0</Text>
+				</View>
+				<View style={ [this.getRowBackground(index), {flex:1}]}>
+					<Text style={[styles.baseItem]}>Walk-up</Text>
 				</View>
 			</View>
 		);
+	};
 
-		// 	{/*<View style={{backgroundColor: 'white'}}>*/}
-		// 		{/*<Text>{item.email}......{item.phone}</Text>*/}
-		// 		{/*<Text>{item.phone}</Text>*/}
-		// 	{/*</View>*/}
-        //
-		// );
-	}
-	getfoo = (item) =>{
-		console.log("getfoo");
-		return item.email;
-	}
 	_onPressItem = (item) =>{
 		console.log("_onPressItem")
 	}
+	showHeader = () =>{
+		console.log("Displaying header");
+		return (
+			<View style={{flex: 1, flexDirection: 'row'}}>
+				<View style={ [styles.headerBackground, {flex: 2}]}>
+					<Text style={[styles.headerItem,styles.leftMargin]}>Name</Text>
+				</View>
+				<View style={[styles.headerBackground, {flex: 1.5}]}>
+					<Text style={[styles.headerItem]}>Telephone</Text>
+				</View>
+				<View style={ [styles.headerBackground, {flex: 2}]}>
+					<Text style={[styles.headerItem]}>Address</Text>
+				</View>
+				<View style={ [styles.headerBackground, {flex: .75}]}>
+					<Text style={[styles.headerItem]}>Credit</Text>
+				</View>
+				<View style={ [styles.headerBackground, {flex: 1}]}>
+					<Text style={[styles.headerItem, {flex: 1}, {flexDirection: 'row'}]}>Customer Type</Text>
+				</View>
+			</View>
+		);
+	};
+	getRowBackground = (index) =>{
+		return ((index % 2) == 0) ? styles.lightBackground: styles.darkBackground;
+	}
+
 }
 
 const styles = StyleSheet.create({
-	list: {
-		justifyContent: 'center',
-		flexDirection: 'row',
-		flexWrap: 'wrap',
+	baseItem:{
+		fontSize:18
 	},
-	item: {
-		backgroundColor: 'red',
-		margin: 3,
-		width: 100
+	leftMargin:{
+		left:10
+	},
+	headerItem:{
+		fontWeight:"bold",
+		fontSize:18
+	},
+	headerBackground:{
+		backgroundColor:'#C0C0C0'
+	},
+
+	lightBackground:{
+		backgroundColor:'white'
+	},
+	darkBackground:{
+		backgroundColor:'#F0F0F0'
 	}
+
+
 });
