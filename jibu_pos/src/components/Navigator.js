@@ -36,7 +36,7 @@ class CreditScreen extends React.Component {
 	}
 }
 
-export const Tab = createBottomTabNavigator({
+export const CustomerViews = createBottomTabNavigator({
 	All: {
 		screen: AllScreen,
 		navigationOptions: {
@@ -74,6 +74,10 @@ export const Tab = createBottomTabNavigator({
 		screen: CreditScreen,
 		navigationOptions: {
 			tabBarLabel: 'Credit',
+			activeTintColor: '#80ff80',
+			inactiveTintColor: '#008000',
+			inactiveBackgroundColor: 'white',
+
 			tabBarOnPress: (scene, jumpToIndex) => {
 				let output = "Credit-Tab " + scene.navigation.state.routeName;
 				console.log(output);
@@ -85,10 +89,11 @@ export const Tab = createBottomTabNavigator({
 },{
 	swipeEnabled: true,
 	tabBarOptions: {
-		activeTintColor: '#f2f2f2',
-		activeBackgroundColor: "#3EC426",
-		inactiveTintColor: '#666',
-		inactiveBackgroundColor: 'pink',
+		activeTintColor: '#F0F0F0',
+		activeBackgroundColor: "#18376A",
+		inactiveTintColor: '#000000',
+		inactiveBackgroundColor: 'white',
+		style: { borderTopColor:'black', borderTopWidth:3},
 		// style: {padding:0, margin:0, borderColor:'red', borderWidth:5, justifyContent: 'center', alignItems: 'center' },
 		labelStyle: {
 			fontSize: 18,

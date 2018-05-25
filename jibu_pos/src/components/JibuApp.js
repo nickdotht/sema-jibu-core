@@ -7,7 +7,8 @@ import {
 } from 'react-native';
 
 import Toolbar from './Toolbar';
-import {Tab} from './Navigator'
+import {CustomerViews} from './Navigator'
+import CustomerBar from "./CustomerBar";
 
 export default class JibuApp extends Component {
     render() {
@@ -15,7 +16,8 @@ export default class JibuApp extends Component {
 
             <View style={{ flex: 1 }}>
                 <Toolbar/>
-				<Tab/>
+				<CustomerBar/>
+				<CustomerViews/>
              </View>
         );
     }

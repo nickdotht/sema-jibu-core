@@ -21,7 +21,7 @@ export default class Toolbar extends Component {
 }
 const styles = StyleSheet.create({
     toolbar: {
-        backgroundColor: '#2196F3',
+        backgroundColor: '#2858a7',
         height: 56,
         alignSelf: 'stretch',
 
