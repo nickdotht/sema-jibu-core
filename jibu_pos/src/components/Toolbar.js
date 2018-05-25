@@ -11,6 +11,7 @@ export default class Toolbar extends Component {
                 style = {styles.toolbar}
                 logo={require('../images/dlo_image.png')}
                 title="Fred was here all day"
+				titleColor='white'
                 actions={[{title: 'Settings', icon: require('../images/settings.png'), show: 'always'}]}
                 onActionSelected={this.onActionSelected} />
         );
