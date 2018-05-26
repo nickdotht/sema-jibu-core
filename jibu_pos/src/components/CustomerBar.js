@@ -20,18 +20,26 @@ class SelectedCustomerDetails extends React.Component {
 				</View>
 				<View style={{ flexDirection:'row', height:40 }}>
 					<Text style={styles.selectedCustomerText}>Telephone #</Text>
-					<Text style={styles.selectedCustomerText}>(408)656-2041</Text>
+					<Text style={styles.selectedCustomerText}>{this.getPhone()}</Text>
 				</View>
 			</View>
 		);
 	}
 	getName (){
-		if( this.props.selectedCustomer.hasOwnProperty("name")){
-			return this.props.selectedCustomer.name.first + ' ' + this.props.selectedCustomer.name.last;
+		if( this.props.selectedCustomer.hasOwnProperty("contact_name")){
+			return this.props.selectedCustomer.contact_name;
 		}else{
 			return "";
 		}
 	};
+	getPhone (){
+		if( this.props.selectedCustomer.hasOwnProperty("phone_number")){
+			return this.props.selectedCustomer.phone_number;
+		}else{
+			return "";
+		}
+	};
+
 }
 class CustomerBarButton extends React.Component {
 	render() {

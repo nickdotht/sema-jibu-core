@@ -15,7 +15,7 @@ export function LoadCustomers( ) {
 	return (dispatch) => {
 		setTimeout(() => {
 			dispatch({type: CUSTOMERS_LOADED, data:mock_customers});
-		}, 2000);
+		}, 500);
 
 	};
 }

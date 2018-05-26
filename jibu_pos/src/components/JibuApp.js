@@ -24,6 +24,7 @@ class JibuApp extends Component {
 	}
 	componentDidMount() {
 		console.log("Mounted");
+		this.props.LoadCustomers();
 	}
     render() {
         return (
@@ -45,7 +46,8 @@ class JibuApp extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerReducer.SelectedCustomer
+		SelectedCustomer: state.customerReducer.SelectedCustomer,
+		customers: state.customerReducer.customers
 	};
 }
 

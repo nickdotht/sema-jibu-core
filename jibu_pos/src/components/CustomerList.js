@@ -9,40 +9,40 @@ class CustomerList extends Component {
 		super(props);
 
 		this.state = {
-			loading: false,
-			data: [],
-			page: 1,
-			seed: 1,
-			error: null,
-			refreshing: false,
+			// loading: false,
+			// data: [],
+			// page: 1,
+			// seed: 1,
+			// error: null,
+			// refreshing: false,
 
 			refresh: false,
 			selectedCustomer: null
 		};
 	}
 
-	componentDidMount() {
-		this.makeRemoteRequest();
-	}
-
-	makeRemoteRequest = () => {
-		const { page, seed } = this.state;
-		const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
-		this.setState({ loading: true });
-		fetch(url)
-			.then(res => res.json())
-			.then(res => {
-				this.setState({
-					data: page === 1 ? res.results : [...this.state.data, ...res.results],
-					error: res.error || null,
-					loading: false,
-					refreshing: false
-				});
-			})
-			.catch(error => {
-				this.setState({ error, loading: false });
-			});
-	};
+	// componentDidMount() {
+	// 	this.makeRemoteRequest();
+	// }
+    //
+	// makeRemoteRequest = () => {
+	// 	const { page, seed } = this.state;
+	// 	const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
+	// 	this.setState({ loading: true });
+	// 	fetch(url)
+	// 		.then(res => res.json())
+	// 		.then(res => {
+	// 			this.setState({
+	// 				data: page === 1 ? res.results : [...this.state.data, ...res.results],
+	// 				error: res.error || null,
+	// 				loading: false,
+	// 				refreshing: false
+	// 			});
+	// 		})
+	// 		.catch(error => {
+	// 			this.setState({ error, loading: false });
+	// 		});
+	// };
 
 	render() {
 		return (
@@ -52,7 +52,7 @@ class CustomerList extends Component {
 					{/*renderItem={({item}) => <Text>{item.key}</Text>}*/}
 				{/*/>*/}
 				<FlatList
-					data={this.state.data}
+					data={this.props.customers}
 					ListHeaderComponent = {this.showHeader}
 					extraData={this.state.refresh}
 					renderItem={({item, index, separators}) => (
@@ -63,30 +63,30 @@ class CustomerList extends Component {
 							{this.getRow(item, index, separators)}
 						</TouchableHighlight>
 					)}
-					keyExtractor={item => item.email}
+					keyExtractor={item => item.id}
 				/>
 			</View>
 		);
 	}
 	getRow = (item, index, separators) =>{
 		let isSelected = false;
-		if( this.state.selectedCustomer && this.state.selectedCustomer.email === item.email){
-			console.log("Selected item is " + item.email);
+		if( this.state.selectedCustomer && this.state.selectedCustomer.id === item.id){
+			console.log("Selected item is " + item.id);
 			isSelected = true;
 		}
 		return (
 			<View style={ [this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row'}]}>
 				<View style={ {flex:2}}>
-					<Text style={[styles.baseItem,styles.leftMargin]}>{item.name.first + ' ' + item.name.last}</Text>
+					<Text style={[styles.baseItem,styles.leftMargin]}>{item.contact_name}</Text>
 				</View>
 				<View style={{flex:1.5}}>
-					<Text style={[styles.baseItem]}>{item.phone}</Text>
+					<Text style={[styles.baseItem]}>{item.phone_number}</Text>
 				</View>
 				<View style={{flex:2}}>
-					<Text style={[styles.baseItem]}>{item.name.first}</Text>
+					<Text style={[styles.baseItem]}>{item.address}</Text>
 				</View>
 				<View style={{flex:.75}}>
-					<Text style={[styles.baseItem]}>0</Text>
+					<Text style={[styles.baseItem]}>{item.due_amount}</Text>
 				</View>
 				<View style={{flex:1}}>
 					<Text style={[styles.baseItem]}>Walk-up</Text>
@@ -135,7 +135,9 @@ class CustomerList extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerReducer.SelectedCustomer
+		SelectedCustomer: state.customerReducer.SelectedCustomer,
+		customers: state.customerReducer.customers
+
 	};
 }
 

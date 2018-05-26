@@ -9,11 +9,11 @@ const customerReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case CUSTOMER_SELECTED:
 			newState = {...state};
-			state.SelectedCustomer = action.data ;
+			newState.SelectedCustomer = action.data ;
 			return newState;
 		case CUSTOMERS_LOADED:
 			newState = {...state};
-			state.customers = action.data ;
+			newState.customers = action.data ;
 			return newState;
 
 		default:
