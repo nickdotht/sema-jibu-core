@@ -6,6 +6,9 @@ import {
 	TextInput,
 	Button,
 } from 'react-native';
+import * as CustomerSelectedActions from "../actions/CustomerSelected";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -13,7 +16,7 @@ class SelectedCustomerDetails extends React.Component {
 			<View style = {styles.commandBarContainer}>
 				<View style={{ flexDirection:'row', height:40 }}>
 					<Text style={styles.selectedCustomerText}>Account Name</Text>
-					<Text style={styles.selectedCustomerText}>My Best Customer</Text>
+					<Text style={styles.selectedCustomerText}>{this.getName()}</Text>
 				</View>
 				<View style={{ flexDirection:'row', height:40 }}>
 					<Text style={styles.selectedCustomerText}>Telephone #</Text>
@@ -22,6 +25,13 @@ class SelectedCustomerDetails extends React.Component {
 			</View>
 		);
 	}
+	getName (){
+		if( this.props.selectedCustomer.hasOwnProperty("name")){
+			return this.props.selectedCustomer.name.first + ' ' + this.props.selectedCustomer.name.last;
+		}else{
+			return "";
+		}
+	};
 }
 class CustomerBarButton extends React.Component {
 	render() {
@@ -37,7 +47,7 @@ class CustomerBarButton extends React.Component {
 	}
 }
 
-export default class CustomerBar extends Component {
+class CustomerBar extends Component {
 	render() {
 		return (
 
@@ -65,7 +75,7 @@ export default class CustomerBar extends Component {
 					onChangeText = {this.onTextChange}
 					// Calling the custom TextInputStyleClass.
 					style={ [styles.SearchInput]}/>
-				<SelectedCustomerDetails/>
+				<SelectedCustomerDetails selectedCustomer = {this.props.SelectedCustomer}/>
 			</View>
 		);
 	}
@@ -83,6 +93,17 @@ export default class CustomerBar extends Component {
 	}
 
 }
+
+function mapStateToProps(state, props) {
+	return {
+		SelectedCustomer: state.customerSelectedReducer.SelectedCustomer
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return bindActionCreators(CustomerSelectedActions, dispatch);
+}
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerBar);
 
 const styles = StyleSheet.create({
 

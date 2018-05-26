@@ -2,13 +2,12 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { TabNavigator, createMaterialTopTabNavigator, createBottomTabNavigator } from 'react-navigation';
 import CustomerList from "./CustomerList";
-import {MultiColumnExample} from "./scratch";
 
 
 class AllScreen extends React.Component {
 	render() {
 		return (
-			<CustomerList filter='This is All'/>
+			<CustomerList filter='This is All' customerInfo={this.props.screenProps}/>
 		);
 	}
 }
@@ -16,7 +15,7 @@ class AllScreen extends React.Component {
 class WalkupScreen extends React.Component {
 	render() {
 		return (
-			<CustomerList filter='This is Walkup'/>
+			<CustomerList filter='This is Walkup' customerInfo={this.props.screenProps}/>
 		);
 	}
 }
@@ -24,14 +23,15 @@ class WalkupScreen extends React.Component {
 class ResellerScreen extends React.Component {
 	render() {
 		return (
-			<CustomerList filter='This is Reseller'/>
+			<CustomerList filter='This is Reseller' customerInfo={this.props.screenProps}/>
 		);
 	}
 }
 class CreditScreen extends React.Component {
 	render(){
+		console.log("__________________");
 		return (
-			<CustomerList filter='This is Credit'/>
+			<CustomerList filter='This is Credit' customerInfo={this.props.screenProps} />
 		);
 	}
 }

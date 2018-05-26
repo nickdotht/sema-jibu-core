@@ -1,7 +1,10 @@
 import React, {Component}  from "react";
 import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
+import {connect} from "react-redux";
+import {bindActionCreators} from 'redux';
+import * as CustomerSelectedActions from '../actions/CustomerSelected';
 
-export default class CustomerList extends Component {
+class CustomerList extends Component {
 	constructor(props) {
 		super(props);
 
@@ -12,6 +15,9 @@ export default class CustomerList extends Component {
 			seed: 1,
 			error: null,
 			refreshing: false,
+
+			refresh: false,
+			selectedCustomer: null
 		};
 	}
 
@@ -48,6 +54,7 @@ export default class CustomerList extends Component {
 				<FlatList
 					data={this.state.data}
 					ListHeaderComponent = {this.showHeader}
+					extraData={this.state.refresh}
 					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
 							onPress={() => this._onPressItem(item)}
@@ -62,22 +69,26 @@ export default class CustomerList extends Component {
 		);
 	}
 	getRow = (item, index, separators) =>{
-		console.log("Email " + item.email);
+		let isSelected = false;
+		if( this.state.selectedCustomer && this.state.selectedCustomer.email === item.email){
+			console.log("Selected item is " + item.email);
+			isSelected = true;
+		}
 		return (
 			<View style={{flex: 1, flexDirection: 'row'}}>
-				<View style={ [this.getRowBackground(index), {flex:2}]}>
+				<View style={ [this.getRowBackground(index, isSelected), {flex:2}]}>
 					<Text style={[styles.baseItem,styles.leftMargin]}>{item.name.first + ' ' + item.name.last}</Text>
 				</View>
-				<View style={ [this.getRowBackground(index), {flex:1.5}]}>
+				<View style={ [this.getRowBackground(index, isSelected), {flex:1.5}]}>
 					<Text style={[styles.baseItem]}>{item.phone}</Text>
 				</View>
-				<View style={ [this.getRowBackground(index), {flex:2}]}>
+				<View style={ [this.getRowBackground(index, isSelected), {flex:2}]}>
 					<Text style={[styles.baseItem]}>{item.name.first}</Text>
 				</View>
-				<View style={ [this.getRowBackground(index), {flex:.75}]}>
+				<View style={ [this.getRowBackground(index, isSelected), {flex:.75}]}>
 					<Text style={[styles.baseItem]}>0</Text>
 				</View>
-				<View style={ [this.getRowBackground(index), {flex:1}]}>
+				<View style={ [this.getRowBackground(index, isSelected), {flex:1}]}>
 					<Text style={[styles.baseItem]}>Walk-up</Text>
 				</View>
 			</View>
@@ -86,7 +97,10 @@ export default class CustomerList extends Component {
 
 	_onPressItem = (item) =>{
 		console.log("_onPressItem")
-	}
+		this.props.CustomerSelected(item);
+		this.setState({ selectedCustomer:item });
+		this.setState({refresh: !this.state.refresh});
+	};
 	showHeader = () =>{
 		console.log("Displaying header");
 		return (
@@ -109,11 +123,28 @@ export default class CustomerList extends Component {
 			</View>
 		);
 	};
-	getRowBackground = (index) =>{
-		return ((index % 2) == 0) ? styles.lightBackground: styles.darkBackground;
-	}
+	getRowBackground = (index, isSelected) =>{
+		if( isSelected ){
+			return styles.headerBackground;
+		}else {
+			return ((index % 2) == 0) ? styles.lightBackground : styles.darkBackground;
+		}
+	};
 
 }
+
+function mapStateToProps(state, props) {
+	return {
+		SelectedCustomer: state.customerSelectedReducer.SelectedCustomer
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return bindActionCreators(CustomerSelectedActions, dispatch);
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(CustomerList);
 
 const styles = StyleSheet.create({
 	baseItem:{

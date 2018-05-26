@@ -7,21 +7,56 @@ import {
 } from 'react-native';
 
 import Toolbar from './Toolbar';
-import {CustomerViews} from './Navigator'
+import {CustomerViews} from './CustomerViews'
 import CustomerBar from "./CustomerBar";
 
-export default class JibuApp extends Component {
+import {connect} from "react-redux";
+import {bindActionCreators} from 'redux';
+import * as CustomerSelectedActions from '../actions/CustomerSelected';
+import customerSelectedReducer from "../reducers/CustomerSelectedReducer";
+let that = null;
+
+class JibuApp extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {};
+	}
+	componentDidMount() {
+		console.log("Mounted");
+	}
     render() {
         return (
 
             <View style={{ flex: 1 }}>
                 <Toolbar/>
 				<CustomerBar/>
-				<CustomerViews/>
+				<CustomerViews screenProps={{customerSelectionChanged:this.customerSelectionChanged,
+											 foo: "foobar"}}/>
              </View>
         );
     }
+    customerSelectionChanged( customer ){
+    	console.log("customerSelectionChanged");
+		// that.props.CustomerSelected( customer)
+    }
+
 }
+
+function mapStateToProps(state, props) {
+	return {
+		SelectedCustomer: state.customerSelectedReducer.SelectedCustomer
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return bindActionCreators(CustomerSelectedActions, dispatch);
+}
+
+
+//Connect everything
+export default connect(mapStateToProps, mapDispatchToProps)(JibuApp);
+
 
 const styles = StyleSheet.create({
     container: {
