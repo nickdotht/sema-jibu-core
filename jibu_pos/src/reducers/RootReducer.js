@@ -1,11 +1,11 @@
 
 import { combineReducers } from 'redux';
-import customerSelectedReducer from "./CustomerSelectedReducer";
+import customerReducer from "./CustomerReducer";
 
 
 // Combine all the reducers
 const RootReducer = combineReducers({
-	customerSelectedReducer
+	customerReducer
 
 })
 

@@ -6,7 +6,7 @@ import {
 	TextInput,
 	Button,
 } from 'react-native';
-import * as CustomerSelectedActions from "../actions/CustomerSelected";
+import * as CustomerActions from "../actions/CustomerActions";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 
@@ -96,12 +96,12 @@ class CustomerBar extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerSelectedReducer.SelectedCustomer
+		SelectedCustomer: state.customerReducer.SelectedCustomer
 	};
 }
 
 function mapDispatchToProps(dispatch) {
-	return bindActionCreators(CustomerSelectedActions, dispatch);
+	return bindActionCreators(CustomerActions, dispatch);
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CustomerBar);
 

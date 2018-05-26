@@ -2,7 +2,7 @@ import React, {Component}  from "react";
 import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
-import * as CustomerSelectedActions from '../actions/CustomerSelected';
+import * as CustomerActions from '../actions/CustomerActions';
 
 class CustomerList extends Component {
 	constructor(props) {
@@ -75,20 +75,20 @@ class CustomerList extends Component {
 			isSelected = true;
 		}
 		return (
-			<View style={{flex: 1, flexDirection: 'row'}}>
-				<View style={ [this.getRowBackground(index, isSelected), {flex:2}]}>
+			<View style={ [this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row'}]}>
+				<View style={ {flex:2}}>
 					<Text style={[styles.baseItem,styles.leftMargin]}>{item.name.first + ' ' + item.name.last}</Text>
 				</View>
-				<View style={ [this.getRowBackground(index, isSelected), {flex:1.5}]}>
+				<View style={{flex:1.5}}>
 					<Text style={[styles.baseItem]}>{item.phone}</Text>
 				</View>
-				<View style={ [this.getRowBackground(index, isSelected), {flex:2}]}>
+				<View style={{flex:2}}>
 					<Text style={[styles.baseItem]}>{item.name.first}</Text>
 				</View>
-				<View style={ [this.getRowBackground(index, isSelected), {flex:.75}]}>
+				<View style={{flex:.75}}>
 					<Text style={[styles.baseItem]}>0</Text>
 				</View>
-				<View style={ [this.getRowBackground(index, isSelected), {flex:1}]}>
+				<View style={{flex:1}}>
 					<Text style={[styles.baseItem]}>Walk-up</Text>
 				</View>
 			</View>
@@ -104,20 +104,20 @@ class CustomerList extends Component {
 	showHeader = () =>{
 		console.log("Displaying header");
 		return (
-			<View style={{flex: 1, flexDirection: 'row'}}>
-				<View style={ [styles.headerBackground, {flex: 2}]}>
+			<View style={[{flex: 1, flexDirection: 'row'},styles.headerBackground]}>
+				<View style={ [{flex: 2}]}>
 					<Text style={[styles.headerItem,styles.leftMargin]}>Name</Text>
 				</View>
-				<View style={[styles.headerBackground, {flex: 1.5}]}>
+				<View style={[ {flex: 1.5}]}>
 					<Text style={[styles.headerItem]}>Telephone</Text>
 				</View>
-				<View style={ [styles.headerBackground, {flex: 2}]}>
+				<View style={ [ {flex: 2}]}>
 					<Text style={[styles.headerItem]}>Address</Text>
 				</View>
-				<View style={ [styles.headerBackground, {flex: .75}]}>
+				<View style={ [{flex: .75}]}>
 					<Text style={[styles.headerItem]}>Credit</Text>
 				</View>
-				<View style={ [styles.headerBackground, {flex: 1}]}>
+				<View style={ [{flex: 1}]}>
 					<Text style={[styles.headerItem, {flex: 1}, {flexDirection: 'row'}]}>Customer Type</Text>
 				</View>
 			</View>
@@ -125,7 +125,7 @@ class CustomerList extends Component {
 	};
 	getRowBackground = (index, isSelected) =>{
 		if( isSelected ){
-			return styles.headerBackground;
+			return styles.selectedBackground;
 		}else {
 			return ((index % 2) == 0) ? styles.lightBackground : styles.darkBackground;
 		}
@@ -135,12 +135,12 @@ class CustomerList extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerSelectedReducer.SelectedCustomer
+		SelectedCustomer: state.customerReducer.SelectedCustomer
 	};
 }
 
 function mapDispatchToProps(dispatch) {
-	return bindActionCreators(CustomerSelectedActions, dispatch);
+	return bindActionCreators(CustomerActions, dispatch);
 }
 
 
@@ -158,14 +158,17 @@ const styles = StyleSheet.create({
 		fontSize:18
 	},
 	headerBackground:{
-		backgroundColor:'#C0C0C0'
+		backgroundColor:'#ABC1DE'
 	},
 
 	lightBackground:{
 		backgroundColor:'white'
 	},
 	darkBackground:{
-		backgroundColor:'#F0F0F0'
+		backgroundColor:'#F0F8FF'
+	},
+	selectedBackground:{
+		backgroundColor:'#9AADC8'
 	}
 
 

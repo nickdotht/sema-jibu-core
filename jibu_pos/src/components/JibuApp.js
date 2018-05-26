@@ -12,8 +12,8 @@ import CustomerBar from "./CustomerBar";
 
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
-import * as CustomerSelectedActions from '../actions/CustomerSelected';
-import customerSelectedReducer from "../reducers/CustomerSelectedReducer";
+import * as CustomerActions from '../actions/CustomerActions';
+import customerReducer from "../reducers/CustomerReducer";
 let that = null;
 
 class JibuApp extends Component {
@@ -45,12 +45,12 @@ class JibuApp extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerSelectedReducer.SelectedCustomer
+		SelectedCustomer: state.customerReducer.SelectedCustomer
 	};
 }
 
 function mapDispatchToProps(dispatch) {
-	return bindActionCreators(CustomerSelectedActions, dispatch);
+	return bindActionCreators(CustomerActions, dispatch);
 }
 
 
