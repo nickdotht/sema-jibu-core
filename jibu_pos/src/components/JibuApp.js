@@ -13,37 +13,31 @@ import {bindActionCreators} from 'redux';
 import * as CustomerActions from '../actions/CustomerActions';
 
 import PosStorage from "../database/PosStorage";
+import Synchronization from "../services/Synchronization";
 
 
 class JibuApp extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {customersLoaded:false};
+		this.state = {synchronization: {customersLoaded:false,
+										productsLoaded:false}};
 		this.posStorage = new PosStorage();
 	}
 	componentDidMount() {
 		console.log("Mounted");
-		this.posStorage.Initialize().then( () =>{
-			this.state.customersLoaded = true;
-			this.props.SetCustomers(this.posStorage.GetCustomers() );
-			let that = this;
-			setTimeout(() => {
-				console.log("Loading customers");
-				that.state.customersLoaded = false;
-				that.props.LoadCustomers();
-			}, 10000);
-
-
+		this.posStorage.Initialize().then( (isInitialized) => {
+			let timeout = 200;
+			if (isInitialized) {
+				// Data already configured
+				this.state.synchronization.customersLoaded = true;
+				this.props.SetCustomers(this.posStorage.GetCustomers());
+				timeout = 20000;	// First sync after a bit
+			}
+			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.LoadCustomers );
 
 		});
 
-		// let database = new InitializeDB();
-		// database.InitializeDatabase().then(() => {
-		// 	console.log("succeeded");
-		// }).catch( (error) =>{
-		// 	console.log("failed");
-		// });
 		console.log("Mounted-Done");
 
 	}
@@ -66,7 +60,7 @@ class JibuApp extends Component {
 
     SynchronizeCustomers() {
 		console.log("SynchronizeCustomers");
-		this.state.customersLoaded = true;
+		this.state.synchronization.customersLoaded = true;
 		this.posStorage.AddCustomers( this.props.customers);
 	}
 }
@@ -78,7 +72,7 @@ class CustomerLoaderWatcher extends React.Component {
 	}
 	loaderEvent(){
 		console.log("CustomerLoaderWatcher" + this.props.parent.props.customers.length);
-		if( this.props.parent.props.customers.length > 0 && this.props.parent.state.customersLoaded  === false){
+		if( this.props.parent.props.customers.length > 0 && this.props.parent.state.synchronization.customersLoaded  === false){
 			// Must synchronize loaded customers with the ones we have
 			this.props.parent.SynchronizeCustomers();
 		}

@@ -21,14 +21,14 @@ export default class PosStorage {
 					this.version = '1';
 					this.setKey(versionKey, this.version);
 					this.setKey(customerKey, this.stringify(this.customers)).then( () =>{
-						resolve();
+						resolve( false );
 					});
 				} else {
 					console.log("Pos Storage: Version = " + version);
 					this.version = version;
 					this.getKey(customerKey).then(customers => {
 						this.customers = this.parseJson(customers);
-						resolve();
+						resolve(true);
 					});
 					console.log("PosStorage - Data retreived");
 				}
@@ -48,6 +48,7 @@ export default class PosStorage {
 		if( this.customers.length > 0 ){
 			console.log("AddCustomers - need to merge....");
 		}else{
+			console.log("No existing customers no need to merge....");
 			this.customers = customerArray;
 			this.setKey(customerKey, this.stringify( this.customers ) );
 		}
