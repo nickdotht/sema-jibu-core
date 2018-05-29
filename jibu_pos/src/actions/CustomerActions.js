@@ -1,5 +1,6 @@
 export const CUSTOMER_SELECTED = 'CUSTOMER_SELECTED';
 export const CUSTOMERS_LOADED = 'CUSTOMERS_LOADED';
+export const CUSTOMERS_SET = 'CUSTOMERS_SET';
 import mock_customers from '../mock_data/customers';
 
 export function CustomerSelected( customer){
@@ -14,8 +15,16 @@ export function LoadCustomers( ) {
 
 	return (dispatch) => {
 		setTimeout(() => {
+			console.log("LoadCustomers - loaded!!!");
 			dispatch({type: CUSTOMERS_LOADED, data:mock_customers});
-		}, 500);
+		}, 200);
 
 	};
+}
+
+export function SetCustomers( customers ) {
+	console.log("SetCustomers - action. No of customers " + customers.length);
+
+	return (dispatch) => {dispatch({type: CUSTOMERS_SET, data:customers})};
+
 }

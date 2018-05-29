@@ -1,5 +1,5 @@
 
-import { CUSTOMER_SELECTED, CUSTOMERS_LOADED } from "../actions/CustomerActions"
+import { CUSTOMER_SELECTED, CUSTOMERS_LOADED, CUSTOMERS_SET } from "../actions/CustomerActions"
 
 let initialState = {SelectedCustomer:{}, customers:[]};
 
@@ -12,6 +12,7 @@ const customerReducer = (state = initialState, action) => {
 			newState.SelectedCustomer = action.data ;
 			return newState;
 		case CUSTOMERS_LOADED:
+		case CUSTOMERS_SET:
 			newState = {...state};
 			newState.customers = action.data ;
 			return newState;

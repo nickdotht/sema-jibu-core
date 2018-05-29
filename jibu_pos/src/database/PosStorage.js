@@ -1,4 +1,4 @@
-var {React,AsyncStorage} = require('react-native');
+const {React,AsyncStorage} = require('react-native');
 // var SQLite = require('react-native-sqlite-storage');
 // SQLite.DEBUG(true);
 // SQLite.enablePromise(true);
@@ -14,21 +14,29 @@ export default class PosStorage {
 
 	Initialize() {
 		console.log("Pos Storage: Initialize");
-		this.getKey(versionKey).then( (version) =>{
-			if( version == null ){
-				console.log("Pos Storage: Not initialized" );
-				this.version = '1';
-				this.setKey(versionKey, this.version );
-				this.setKey(customerKey, this.stringify( this.customers ) );
-			}else{
-				console.log("Pos Storage: Version = " + version);
-				this.version = version;
-				this.getKey(customerKey ).then( customers => { this.customers = this.parseJson(customers)} );
-				console.log( "PosStorage - Data retreived");
-			}
+		return new Promise((resolve, reject) => {
+			this.getKey(versionKey).then((version) => {
+				if (version == null) {
+					console.log("Pos Storage: Not initialized");
+					this.version = '1';
+					this.setKey(versionKey, this.version);
+					this.setKey(customerKey, this.stringify(this.customers)).then( () =>{
+						resolve();
+					});
+				} else {
+					console.log("Pos Storage: Version = " + version);
+					this.version = version;
+					this.getKey(customerKey).then(customers => {
+						this.customers = this.parseJson(customers);
+						resolve();
+					});
+					console.log("PosStorage - Data retreived");
+				}
 
-		}).catch( err => {
-			console.log("Pos Storage: Exception " + err.message );
+			}).catch(err => {
+				console.log("Pos Storage: Exception " + err.message);
+				reject(err);
+			});
 		});
 	}
 	ClearAll(){
@@ -38,12 +46,17 @@ export default class PosStorage {
 
 	AddCustomers( customerArray ){
 		if( this.customers.length > 0 ){
-			//Merge in new customers
+			console.log("AddCustomers - need to merge....");
 		}else{
 			this.customers = customerArray;
 			this.setKey(customerKey, this.stringify( this.customers ) );
 		}
 	}
+	GetCustomers(){
+		console.log("PosStorage: GetCustomers. Count " + this.customers.length);
+		return this.customers;
+	}
+
 	stringify( jsObject){
 		return JSON.stringify(jsObject);
 	}
