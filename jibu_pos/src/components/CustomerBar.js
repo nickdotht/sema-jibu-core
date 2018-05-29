@@ -9,6 +9,7 @@ import {
 import * as CustomerActions from "../actions/CustomerActions";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import PosStorage from "../database/PosStorage";
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -92,12 +93,17 @@ class CustomerBar extends Component {
 	}
 	onDelete(){
 		console.log("delete!")
+		let posStorage = new PosStorage();
+		posStorage.ClearAll();
 	}
 	onEdit(){
 		console.log("edit!")
 	}
 	onOrder(){
 		console.log("order!")
+		let posStorage = new PosStorage();
+		posStorage.Initialize();
+
 	}
 
 }

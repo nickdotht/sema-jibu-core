@@ -14,17 +14,32 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import * as CustomerActions from '../actions/CustomerActions';
 import customerReducer from "../reducers/CustomerReducer";
+import {CUSTOMERS_LOADED} from "../actions/CustomerActions";
+import mock_customers from "../mock_data/customers";
+// import InitializeDB from "../database/InitializeDatabase";
+import PosStorage from "../database/PosStorage";
 let that = null;
 
 class JibuApp extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {};
+		this.state = {customersLoaded:false};
+		this.posStorage = new PosStorage();
 	}
 	componentDidMount() {
 		console.log("Mounted");
+		this.posStorage.Initialize();
 		this.props.LoadCustomers();
+		// let database = new InitializeDB();
+		// database.InitializeDatabase().then(() => {
+		// 	console.log("succeeded");
+		// }).catch( (error) =>{
+		// 	console.log("failed");
+		// });
+		console.log("Mounted-Done");
+		//this.props.LoadCustomers();
+
 	}
     render() {
         return (
@@ -34,6 +49,7 @@ class JibuApp extends Component {
 				<CustomerBar/>
 				<CustomerViews screenProps={{customerSelectionChanged:this.customerSelectionChanged,
 											 foo: "foobar"}}/>
+				<CustomerLoaderWatcher parent={ this}/>
              </View>
         );
     }
@@ -42,6 +58,25 @@ class JibuApp extends Component {
 		// that.props.CustomerSelected( customer)
     }
 
+    SynchronizeCustomers() {
+		console.log("SynchronizeCustomers");
+	}
+}
+
+class CustomerLoaderWatcher extends React.Component {
+	render() {
+		return this.loaderEvent();
+
+	}
+	loaderEvent(){
+		console.log("CustomerLoaderWatcher");
+		console.log("CustomerLoaderWatcher" + this.props.parent.props.customers.length);
+		if( this.props.parent.props.customers.length > 0 && this.props.parent.state.customersLoaded  === false){
+			// Must synchronize loaded customers with the ones we have
+			this.props.parent.SynchronizeCustomers();
+		}
+		return null;
+	}
 }
 
 function mapStateToProps(state, props) {
