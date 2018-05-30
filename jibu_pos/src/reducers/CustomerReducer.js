@@ -4,7 +4,7 @@ import { CUSTOMER_SELECTED, CUSTOMERS_LOADED, CUSTOMERS_SET, CUSTOMERS_SEARCH } 
 let initialState = {selectedCustomer:{}, customers:[], searchString:""};
 
 const customerReducer = (state = initialState, action) => {
-	console.log("customerReducer");
+	console.log("customerReducer: " +action.type);
 	let newState;
 	switch (action.type) {
 		case CUSTOMER_SELECTED:
@@ -27,7 +27,7 @@ const customerReducer = (state = initialState, action) => {
 					"sales_channel":"anonymous"};
 
 			newState.customers = action.data ;
-			newState.customers.unshift(anonymous);
+			// newState.customers.unshift(anonymous);
 			return newState;
 		case CUSTOMERS_SEARCH:
 			newState = {...state};

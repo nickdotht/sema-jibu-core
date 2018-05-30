@@ -10,6 +10,7 @@ import * as CustomerActions from "../actions/CustomerActions";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import PosStorage from "../database/PosStorage";
+import * as NetworkActions from "../actions/NetworkActions";
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -94,27 +95,28 @@ class CustomerBar extends Component {
 	}
 	onTextChange = (searchText) =>{
 		console.log( searchText );
-		this.props.SearchCustomers( searchText);
+		this.props.customerActions.SearchCustomers( searchText);
 		console.log( "onTextChange ---" + this.props.customers.length);
 
 	};
 
-	onDelete(){
+	onDelete = () =>{
 		console.log("delete!");
 		let posStorage = new PosStorage();
 		posStorage.ClearAll();
 	}
-	onEdit(){
+	onEdit = () =>{
 		console.log("edit!")
+		this.props.networkActions.NetworkConnection(false);
 	}
-	onOrder(){
+	onOrder = () =>{
 		console.log("order!");
-		let posStorage = new PosStorage();
-		posStorage.Initialize();
 
 	}
-	onAdd(){
+	onAdd = () =>{
 		console.log("Add!")
+		let posStorage = new PosStorage();
+		posStorage.Initialize();
 
 	}
 
@@ -130,7 +132,8 @@ function mapStateToProps(state, props) {
 }
 
 function mapDispatchToProps(dispatch) {
-	return bindActionCreators(CustomerActions, dispatch);
+	return {customerActions:bindActionCreators(CustomerActions, dispatch),
+		networkActions:bindActionCreators(NetworkActions, dispatch)};
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CustomerBar);
 

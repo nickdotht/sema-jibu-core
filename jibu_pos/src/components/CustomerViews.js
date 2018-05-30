@@ -17,7 +17,7 @@ class AllScreen extends React.Component {
 		if( this.props.navigation.isFocused() === true && this.isFocused === false){
 			this.isFocused = true;
 			console.log("AllScreen focus received")
-			this.props.screenProps.parent.props.SearchCustomers("");
+			this.props.screenProps.parent.props.customerActions.SearchCustomers("");
 		}else if( this.props.navigation.isFocused() === false){
 			this.isFocused = false;
 		}
@@ -36,13 +36,12 @@ class WalkupScreen extends React.Component {
 		super(props);
 		this.isFocused = false;
 	}
-
 	componentWillUpdate(){
 		console.log("WalkupScreen -componentWillUpdate: Focused : " + this.props.navigation.isFocused());
 		if( this.props.navigation.isFocused() === true && this.isFocused === false){
 			this.isFocused = true;
 			console.log("WalkupScreen focus received")
-			this.props.screenProps.parent.props.SearchCustomers("");
+			this.props.screenProps.parent.props.customerActions.SearchCustomers("");
 		}else if( this.props.navigation.isFocused() === false){
 			this.isFocused = false;
 		}
@@ -56,6 +55,21 @@ class WalkupScreen extends React.Component {
 }
 
 class ResellerScreen extends React.Component {
+	constructor(props) {
+		super(props);
+		this.isFocused = false;
+	}
+	componentWillUpdate(){
+		console.log("ResellerScreen -componentWillUpdate: Focused : " + this.props.navigation.isFocused());
+		if( this.props.navigation.isFocused() === true && this.isFocused === false){
+			this.isFocused = true;
+			console.log("ResellerScreen focus received")
+			this.props.screenProps.parent.props.customerActions.SearchCustomers("");
+		}else if( this.props.navigation.isFocused() === false){
+			this.isFocused = false;
+		}
+	}
+
 	render() {
 		return (
 			<CustomerList filter='reseller' customerInfo={this.props.screenProps}/>
@@ -63,6 +77,21 @@ class ResellerScreen extends React.Component {
 	}
 }
 class CreditScreen extends React.Component {
+	constructor(props) {
+		super(props);
+		this.isFocused = false;
+	}
+	componentWillUpdate(){
+		console.log("CreditScreen -componentWillUpdate: Focused : " + this.props.navigation.isFocused());
+		if( this.props.navigation.isFocused() === true && this.isFocused === false){
+			this.isFocused = true;
+			console.log("CreditScreen focus received")
+			this.props.screenProps.parent.props.customerActions.SearchCustomers("");
+		}else if( this.props.navigation.isFocused() === false){
+			this.isFocused = false;
+		}
+	}
+
 	render(){
 		return (
 			<CustomerList filter='credit' customerInfo={this.props.screenProps} />

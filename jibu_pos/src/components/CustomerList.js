@@ -26,7 +26,7 @@ class CustomerList extends Component {
 					{/*renderItem={({item}) => <Text>{item.key}</Text>}*/}
 				{/*/>*/}
 				<FlatList
-					data={this.props.customers}
+					data={this.prepareData()}
 					ListHeaderComponent = {this.showHeader}
 					extraData={this.state.refresh}
 					renderItem={({item, index, separators}) => (
@@ -42,6 +42,24 @@ class CustomerList extends Component {
 				<SearchWatcher parent = {this}>{this.props.searchString}</SearchWatcher>
 			</View>
 		);
+	}
+	prepareData = () =>{
+		if( this.props.customers.length > 0 && this.props.customers[0].id !== '9999999-9999-9999-9999-9999999' ) {
+			const anonymous = {
+				"id": "9999999-9999-9999-9999-9999999",
+				"version": 3,
+				"address": "----------------------------",
+				"contact_name": "Walkup Client",
+				"customer_type_id": 120,
+				"due_amount": "---------------",
+				"name": "",
+				"phone_number": "----------------------------",
+				"active": "1",
+				"sales_channel": "anonymous"
+			};
+			this.props.customers.unshift(anonymous);
+		}
+		return this.props.customers;
 	}
 	getRow = (item, index, separators) =>{
 		let isSelected = false;

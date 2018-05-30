@@ -2,15 +2,19 @@ import React, {Component} from "react";
 import {
     StyleSheet,
     View,
+	NetInfo,
 } from 'react-native';
 
 import Toolbar from './Toolbar';
 import {CustomerViews} from './CustomerViews'
 import CustomerBar from "./CustomerBar";
 
-import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
+
+import {connect} from "react-redux";
 import * as CustomerActions from '../actions/CustomerActions';
+import * as NetworkActions from '../actions/NetworkActions';
+
 
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
@@ -22,7 +26,8 @@ class JibuApp extends Component {
 		super(props);
 
 		this.state = {synchronization: {customersLoaded:false,
-										productsLoaded:false}};
+										productsLoaded:false},
+					  isConnected: false};
 		this.posStorage = new PosStorage();
 	}
 	componentDidMount() {
@@ -32,12 +37,13 @@ class JibuApp extends Component {
 			if (isInitialized) {
 				// Data already configured
 				this.state.synchronization.customersLoaded = true;
-				this.props.SetCustomers(this.posStorage.GetCustomers());
+				this.props.customerActions.SetCustomers(this.posStorage.GetCustomers());
 				timeout = 20000;	// First sync after a bit
 			}
-			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.LoadCustomers );
+			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});
+		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 
 		console.log("Mounted-Done");
 
@@ -63,7 +69,30 @@ class JibuApp extends Component {
 		this.state.synchronization.customersLoaded = true;
 		this.posStorage.AddCustomers( this.props.customers);
 	}
+
+	handleConnectivityChange = isConnected => {
+		console.log("handleConnectivityChange: " + isConnected);
+		this.props.networkActions.NetworkConnection(isConnected);
+	};
 }
+
+
+function mapStateToProps(state, props) {
+	return {
+		selectedCustomer: state.customerReducer.selectedCustomer,
+		customers: state.customerReducer.customers,
+		isNWConnected: state.networkReducer.isNWConnected
+
+	};
+}
+
+function mapDispatchToProps(dispatch) {
+	return {customerActions:bindActionCreators(CustomerActions, dispatch),
+		networkActions:bindActionCreators(NetworkActions, dispatch)};
+}
+
+//Connect everything
+export default connect(mapStateToProps, mapDispatchToProps)(JibuApp);
 
 class CustomerLoaderWatcher extends React.Component {
 	render() {
@@ -71,7 +100,7 @@ class CustomerLoaderWatcher extends React.Component {
 
 	}
 	loaderEvent(){
-		console.log("CustomerLoaderWatcher" + this.props.parent.props.customers.length);
+		console.log("CustomerLoaderWatcher. No of customers: " + this.props.parent.props.customers.length);
 		if( this.props.parent.props.customers.length > 0 && this.props.parent.state.synchronization.customersLoaded  === false){
 			// Must synchronize loaded customers with the ones we have
 			this.props.parent.SynchronizeCustomers();
@@ -79,22 +108,6 @@ class CustomerLoaderWatcher extends React.Component {
 		return null;
 	}
 }
-
-function mapStateToProps(state, props) {
-	return {
-		selectedCustomer: state.customerReducer.selectedCustomer,
-		customers: state.customerReducer.customers
-	};
-}
-
-function mapDispatchToProps(dispatch) {
-	return bindActionCreators(CustomerActions, dispatch);
-}
-
-
-//Connect everything
-export default connect(mapStateToProps, mapDispatchToProps)(JibuApp);
-
 
 const styles = StyleSheet.create({
     container: {
