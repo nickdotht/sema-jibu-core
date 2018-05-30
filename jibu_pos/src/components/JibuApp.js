@@ -48,8 +48,7 @@ class JibuApp extends Component {
             <View style={{ flex: 1 }}>
                 <Toolbar/>
 				<CustomerBar/>
-				<CustomerViews screenProps={{customerSelectionChanged:this.customerSelectionChanged,
-											 foo: "foobar"}}/>
+				<CustomerViews screenProps={{parent:this}}/>
 				<CustomerLoaderWatcher parent={ this}/>
              </View>
         );

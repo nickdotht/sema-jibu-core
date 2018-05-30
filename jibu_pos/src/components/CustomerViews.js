@@ -1,9 +1,27 @@
 import React from 'react';
 import { createBottomTabNavigator } from 'react-navigation';
 import CustomerList from "./CustomerList";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+import * as CustomerActions from "../actions/CustomerActions";
 
 
 class AllScreen extends React.Component {
+	constructor(props) {
+		super(props);
+		this.isFocused = false;
+	}
+
+	componentWillUpdate(){
+		console.log("AllScreen -componentWillUpdate: Focused : " + this.props.navigation.isFocused());
+		if( this.props.navigation.isFocused() === true && this.isFocused === false){
+			this.isFocused = true;
+			console.log("AllScreen focus received")
+			this.props.screenProps.parent.props.SearchCustomers("");
+		}else if( this.props.navigation.isFocused() === false){
+			this.isFocused = false;
+		}
+	}
 	render() {
 		return (
 			<CustomerList filter='all' customerInfo={this.props.screenProps}/>
@@ -11,7 +29,25 @@ class AllScreen extends React.Component {
 	}
 }
 
+
+
 class WalkupScreen extends React.Component {
+	constructor(props) {
+		super(props);
+		this.isFocused = false;
+	}
+
+	componentWillUpdate(){
+		console.log("WalkupScreen -componentWillUpdate: Focused : " + this.props.navigation.isFocused());
+		if( this.props.navigation.isFocused() === true && this.isFocused === false){
+			this.isFocused = true;
+			console.log("WalkupScreen focus received")
+			this.props.screenProps.parent.props.SearchCustomers("");
+		}else if( this.props.navigation.isFocused() === false){
+			this.isFocused = false;
+		}
+	}
+
 	render() {
 		return (
 			<CustomerList filter='walkup' customerInfo={this.props.screenProps}/>
@@ -50,6 +86,7 @@ export const CustomerViews = createBottomTabNavigator({
 		navigationOptions: {
 			tabBarLabel: 'Walkup',
 			tabBarOnPress: (scene, jumpToIndex) => {
+				let parent = scene.navigation.dangerouslyGetParent();
 				let output = "Walkup-Tab " + scene.navigation.state.routeName;
 				console.log(output);
 			},
