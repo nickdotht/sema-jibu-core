@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -25,12 +27,6 @@ app.use(
 		cookie: { maxAge: 45000, secure: false, rolling: true }
 	})
 );
-
-// app.use(function (req, res, next) {
-// //    console.log("dbService");
-//     dbService( req, res, next);
-//
-// });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
