@@ -9,40 +9,14 @@ class CustomerList extends Component {
 		super(props);
 
 		this.state = {
-			// loading: false,
-			// data: [],
-			// page: 1,
-			// seed: 1,
-			// error: null,
-			// refreshing: false,
-
 			refresh: false,
-			selectedCustomer: null
+			selectedCustomer: null,
+			searchString:""
 		};
 	}
-
-	// componentDidMount() {
-	// 	this.makeRemoteRequest();
-	// }
-    //
-	// makeRemoteRequest = () => {
-	// 	const { page, seed } = this.state;
-	// 	const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
-	// 	this.setState({ loading: true });
-	// 	fetch(url)
-	// 		.then(res => res.json())
-	// 		.then(res => {
-	// 			this.setState({
-	// 				data: page === 1 ? res.results : [...this.state.data, ...res.results],
-	// 				error: res.error || null,
-	// 				loading: false,
-	// 				refreshing: false
-	// 			});
-	// 		})
-	// 		.catch(error => {
-	// 			this.setState({ error, loading: false });
-	// 		});
-	// };
+	componentDidMount() {
+		console.log("CustomerList = Mounted");
+	}
 
 	render() {
 		return (
@@ -57,7 +31,7 @@ class CustomerList extends Component {
 					extraData={this.state.refresh}
 					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
-							onPress={() => this._onPressItem(item)}
+							onPress={() => this.onPressItem(item)}
 							onShowUnderlay={separators.highlight}
 							onHideUnderlay={separators.unhighlight}>
 							{this.getRow(item, index, separators)}
@@ -65,6 +39,7 @@ class CustomerList extends Component {
 					)}
 					keyExtractor={item => item.id}
 				/>
+				<SearchWatcher parent = {this}>{this.props.searchString}</SearchWatcher>
 			</View>
 		);
 	}
@@ -74,29 +49,52 @@ class CustomerList extends Component {
 			console.log("Selected item is " + item.id);
 			isSelected = true;
 		}
-		return (
-			<View style={ [this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row'}]}>
-				<View style={ {flex:2}}>
-					<Text style={[styles.baseItem,styles.leftMargin]}>{item.contact_name}</Text>
+		if( this.filterItem(item) ) {
+			return (
+				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row'}]}>
+					<View style={{flex: 2}}>
+						<Text style={[styles.baseItem, styles.leftMargin]}>{item.contact_name}</Text>
+					</View>
+					<View style={{flex: 1.5}}>
+						<Text style={[styles.baseItem]}>{item.phone_number}</Text>
+					</View>
+					<View style={{flex: 2}}>
+						<Text style={[styles.baseItem]}>{item.address}</Text>
+					</View>
+					<View style={{flex: .75}}>
+						<Text style={[styles.baseItem]}>{item.due_amount}</Text>
+					</View>
+					<View style={{flex: 1}}>
+						<Text style={[styles.baseItem]}>Walk-up</Text>
+					</View>
 				</View>
-				<View style={{flex:1.5}}>
-					<Text style={[styles.baseItem]}>{item.phone_number}</Text>
-				</View>
-				<View style={{flex:2}}>
-					<Text style={[styles.baseItem]}>{item.address}</Text>
-				</View>
-				<View style={{flex:.75}}>
-					<Text style={[styles.baseItem]}>{item.due_amount}</Text>
-				</View>
-				<View style={{flex:1}}>
-					<Text style={[styles.baseItem]}>Walk-up</Text>
-				</View>
-			</View>
-		);
+			);
+		}else{
+			return (<View/>);
+		}
 	};
 
-	_onPressItem = (item) =>{
-		console.log("_onPressItem")
+	filterItem = (item )=> {
+		if( item.sales_channel === "anonymous"){
+			return true;
+		}
+		if (this.props.filter === "all" || this.props.filter === item.sales_channel){
+			if (this.state.searchString.length >= 2) {
+				const filterString = this.state.searchString.toLowerCase();
+				if (item.contact_name.toLowerCase().startsWith(filterString) ||
+					item.phone_number.startsWith(filterString)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	};
+
+	onPressItem = (item) =>{
+		console.log("_onPressItem");
 		this.props.CustomerSelected(item);
 		this.setState({ selectedCustomer:item });
 		this.setState({refresh: !this.state.refresh});
@@ -127,16 +125,35 @@ class CustomerList extends Component {
 		if( isSelected ){
 			return styles.selectedBackground;
 		}else {
-			return ((index % 2) == 0) ? styles.lightBackground : styles.darkBackground;
+			return ((index % 2) === 0) ? styles.lightBackground : styles.darkBackground;
 		}
 	};
 
 }
 
+class SearchWatcher extends React.Component {
+	render() {
+		return this.searchEvent();
+
+	}
+	searchEvent(){
+		console.log("SearchWatcher");
+		let that = this;
+		setTimeout( ()=> {
+			if( that.props.parent.props.searchString !== that.props.parent.state.searchString ) {
+				that.props.parent.state.searchString = that.props.parent.props.searchString;
+				that.props.parent.setState({refresh: !that.props.parent.state.refresh});
+			}
+		}, 50);
+		return null;
+	}
+}
+
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerReducer.SelectedCustomer,
-		customers: state.customerReducer.customers
+		selectedCustomer: state.customerReducer.selectedCustomer,
+		customers: state.customerReducer.customers,
+		searchString: state.customerReducer.searchString
 
 	};
 }

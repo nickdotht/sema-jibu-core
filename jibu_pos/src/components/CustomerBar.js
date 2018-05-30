@@ -62,6 +62,10 @@ class CustomerBar extends Component {
 
 			<View style={{ flexDirection:'row', height:100, backgroundColor:'white',  }}>
 				<CustomerBarButton
+					title = "Add"
+					handler = {this.onAdd}
+				/>
+				<CustomerBarButton
 					title = "Order"
 					handler = {this.onOrder}
 				/>
@@ -82,17 +86,21 @@ class CustomerBar extends Component {
 					// Making the Under line Transparent.
 					underlineColorAndroid='transparent'
 					onChangeText = {this.onTextChange}
-					// Calling the custom TextInputStyleClass.
+					value={this.props.searchString}
 					style={ [styles.SearchInput]}/>
-				<SelectedCustomerDetails selectedCustomer = {this.props.SelectedCustomer}/>
+				<SelectedCustomerDetails selectedCustomer = {this.props.selectedCustomer}/>
 			</View>
 		);
 	}
-	onTextChange(){
+	onTextChange = (searchText) =>{
+		console.log( searchText );
+		this.props.SearchCustomers( searchText);
+		console.log( "onTextChange ---" + this.props.customers.length);
 
-	}
+	};
+
 	onDelete(){
-		console.log("delete!")
+		console.log("delete!");
 		let posStorage = new PosStorage();
 		posStorage.ClearAll();
 	}
@@ -100,17 +108,24 @@ class CustomerBar extends Component {
 		console.log("edit!")
 	}
 	onOrder(){
-		console.log("order!")
+		console.log("order!");
 		let posStorage = new PosStorage();
 		posStorage.Initialize();
 
 	}
+	onAdd(){
+		console.log("Add!")
+
+	}
+
 
 }
 
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerReducer.SelectedCustomer
+		selectedCustomer: state.customerReducer.selectedCustomer,
+		customers: state.customerReducer.customers,
+		searchString: state.customerReducer.searchString,
 	};
 }
 

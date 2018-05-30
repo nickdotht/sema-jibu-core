@@ -15,6 +15,7 @@ import * as CustomerActions from '../actions/CustomerActions';
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
 
+console.ignoredYellowBox = ['Warning: isMounted'];
 
 class JibuApp extends Component {
 	constructor(props) {
@@ -82,7 +83,7 @@ class CustomerLoaderWatcher extends React.Component {
 
 function mapStateToProps(state, props) {
 	return {
-		SelectedCustomer: state.customerReducer.SelectedCustomer,
+		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers
 	};
 }

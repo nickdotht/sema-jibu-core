@@ -38,7 +38,8 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"credit"
 	},
 	{
 		"id" : "051d650d-e3a1-4945-9623-396b0ba0a196",
@@ -58,7 +59,8 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"credit"
 	},
 	{
 		"id" : "053488e1-7af4-4408-8d78-f1ea9658e658",
@@ -78,7 +80,8 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"credit"
 	},
 	{
 		"id" : "0588da3b-0407-4482-a869-cdd5d2d260b8",
@@ -98,7 +101,9 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"credit"
+
 	},
 	{
 		"id" : "065b85d7-568c-47a7-b521-677998483174",
@@ -118,7 +123,9 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"walkup"
+
 	},
 	{
 		"id" : "069ca279-dae8-41bd-83ac-424c0c207742",
@@ -138,7 +145,8 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"walkup"
 	},
 	{
 		"id" : "06bb9c9a-9755-496d-8af8-dca08ec1c98a",
@@ -158,7 +166,8 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"reseller"
 	},
 	{
 		"id" : "08b854d4-9846-49c9-ae3a-130ef8814e75",
@@ -178,7 +187,8 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"reseller"
 	},
 	{
 		"id" : "09ede826-eb40-401f-83fc-b7a7ae9421fc",
@@ -198,7 +208,8 @@ export default mock_customers = [
 		"multimedia1" : null,
 		"multimedia2" : null,
 		"multimedia3" : null,
-		"gender" : null
+		"gender" : null,
+		"sales_channel":"reseller"
 	},
 	{
 		"id" : "0a7809b5-2b21-4b62-b612-cacb121634af",

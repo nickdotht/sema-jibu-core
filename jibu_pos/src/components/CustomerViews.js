@@ -1,13 +1,12 @@
 import React from 'react';
-import { Text, View } from 'react-native';
-import { TabNavigator, createMaterialTopTabNavigator, createBottomTabNavigator } from 'react-navigation';
+import { createBottomTabNavigator } from 'react-navigation';
 import CustomerList from "./CustomerList";
 
 
 class AllScreen extends React.Component {
 	render() {
 		return (
-			<CustomerList filter='This is All' customerInfo={this.props.screenProps}/>
+			<CustomerList filter='all' customerInfo={this.props.screenProps}/>
 		);
 	}
 }
@@ -15,7 +14,7 @@ class AllScreen extends React.Component {
 class WalkupScreen extends React.Component {
 	render() {
 		return (
-			<CustomerList filter='This is Walkup' customerInfo={this.props.screenProps}/>
+			<CustomerList filter='walkup' customerInfo={this.props.screenProps}/>
 		);
 	}
 }
@@ -23,15 +22,14 @@ class WalkupScreen extends React.Component {
 class ResellerScreen extends React.Component {
 	render() {
 		return (
-			<CustomerList filter='This is Reseller' customerInfo={this.props.screenProps}/>
+			<CustomerList filter='reseller' customerInfo={this.props.screenProps}/>
 		);
 	}
 }
 class CreditScreen extends React.Component {
 	render(){
-		console.log("__________________");
 		return (
-			<CustomerList filter='This is Credit' customerInfo={this.props.screenProps} />
+			<CustomerList filter='credit' customerInfo={this.props.screenProps} />
 		);
 	}
 }
@@ -110,74 +108,5 @@ export const CustomerViews = createBottomTabNavigator({
 });
 
 
-// class HomeScreen extends React.Component {
-// 	render() {
-// 		return (
-// 			<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-// 				<Text>Home!</Text>
-// 			</View>
-// 		);
-// 	}
-// }
-//
-// class SettingsScreen extends React.Component {
-// 	render() {
-// 		return (
-// 			<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-// 				<Text>SettingsScreen!</Text>
-// 			</View>
-//
-// 		);
-// 	}
-// }
-//
-// class ResellerScreen extends React.Component {
-// 	render() {
-// 		return (
-// 			<View style={{width: 300, height: 500, backgroundColor: 'steelblue'}}>
-// 				<Text>cccc!</Text>
-// 			</View>
-// 		);
-// 	}
-// }
-//
-//
-// export const Tab = createBottomTabNavigator ({
-// 	Home: {
-// 		screen: HomeScreen,
-// 		navigationOptions: {
-// 			tabBarLabel: 'All',
-// 		},
-// 	},
-// 	Settings: {
-// 		screen: SettingsScreen,
-// 		navigationOptions: {
-// 			tabBarLabel: 'Walk Up',
-// 		},
-// 	},
-// 	Reseller: {
-// 		screen: ResellerScreen,
-// 		navigationOptions: {
-// 			tabBarLabel: 'Reseller',
-// 			tabBarOnPress: (scene, jumpToIndex) => {
-// 				let foo = "foobar " + scene.navigation.state.routeName;
-// 				console.log(foo);
-// 			},
-// 		},
-// 	}
-//
-// }, {
-// 	swipeEnabled: true,
-// 	tabBarOptions: {
-// 		activeTintColor: '#f2f2f2',
-// 		activeBackgroundColor: "#3EC426",
-// 		inactiveTintColor: '#666',
-// 		inactiveBackgroundColor: 'pink',
-// 		labelStyle: {
-// 			fontSize: 18,
-// 			padding: 12
-// 		}
-// 	}
-// });
 
 
