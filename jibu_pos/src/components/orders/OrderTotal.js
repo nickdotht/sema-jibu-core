@@ -1,17 +1,33 @@
 import React, {Component}  from "react"
 import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
+import {bindActionCreators} from "redux";
+import {connect} from "react-redux";
+import * as OrderActions from "../../actions/OrderActions";
 
-export default class OrderTotal extends Component {
+class OrderTotal extends Component {
 	render() {
 		return (
 			<View style = {styles.container}>
 				<Text style={[{flex: 2}, styles.totalText]}>Order Total</Text>
-				<Text style={[{flex: 3}, styles.totalText]}>$1500</Text>
+				<Text style={[{flex: 3}, styles.totalText]}>{this.getAmount()}</Text>
 
 			</View>
 		);
 	}
+	getAmount = () =>{
+		return this.props.products.reduce( (total, item) => { return(total + item.quantity * item.product.price_amount) }, 0);
+	};
+
 }
+
+function mapStateToProps(state, props) {
+	return {products: state.orderReducer.products};
+}
+function mapDispatchToProps(dispatch) {
+	return {orderActions: bindActionCreators(OrderActions,dispatch)};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrderTotal);
 
 const styles = StyleSheet.create({
 	container: {

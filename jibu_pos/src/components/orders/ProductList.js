@@ -20,7 +20,7 @@ class ProductList extends Component {
 			<View onLayout={(event) => { this.find_dimesions(event.nativeEvent.layout) }} style={styles.container} >
 				<FlatList
 					data={this.prepareData()}
-					// extraData={this.state.refresh}
+					extraData={this.state.refresh}
 					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
 							onPress={() => this.onPressItem(item)}
@@ -40,8 +40,11 @@ class ProductList extends Component {
 
 	find_dimesions = (layout) =>{
 		const {x, y, width, height} = layout;
-		this.setState({columnWidth: width/3});
-		console.log( "find_dimesions -Product cell width" + this.state.columnWidth)
+		setTimeout( () => {
+			this.setState({columnWidth: width/3});
+			this.setState({refresh: !this.state.refresh});
+			console.log( "find_dimesions -state.columnWidth " + this.state.columnWidth + " width: " + width);
+		}, 5);
 
 	};
 
