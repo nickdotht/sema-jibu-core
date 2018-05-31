@@ -2,8 +2,8 @@ import React, {Component}  from "react";
 import { View, Text, FlatList, TouchableHighlight, StyleSheet, Image } from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
-import * as ProductActions from '../actions/ProductActions';
-import * as NetworkActions from "../actions/NetworkActions";
+import * as ProductActions from '../../actions/ProductActions';
+import * as OrderActions from "../../actions/OrderActions";
 
 class ProductList extends Component {
 	constructor(props) {
@@ -41,11 +41,12 @@ class ProductList extends Component {
 	find_dimesions = (layout) =>{
 		const {x, y, width, height} = layout;
 		this.setState({columnWidth: width/3});
+		console.log( "find_dimesions -Product cell width" + this.state.columnWidth)
 
 	};
 
 	getItem = (item, index, separators) =>{
-		console.log( "----------------------------" + this.prevColumnWidth)
+		console.log( "getItem -Product cell width" + this.state.columnWidth)
 		return (
 			<View style={[this.getItemBackground(index ), {flex:1, height:this.state.columnWidth, width:this.state.columnWidth}]}>
 				<Image
@@ -69,6 +70,7 @@ class ProductList extends Component {
 
 	onPressItem = (item) =>{
 		console.log("onPressItem");
+		this.props.orderActions.AddProductToOrder(item, 1);
 	};
 	getItemBackground = (index ) =>{
 		return ((index % 2) === 0) ? styles.lightBackground : styles.darkBackground;
@@ -84,7 +86,8 @@ function mapStateToProps(state, props) {
 }
 
 function mapDispatchToProps(dispatch) {
-	return { productActions: bindActionCreators(ProductActions, dispatch) };
+	return { productActions: bindActionCreators(ProductActions, dispatch),
+			orderActions: bindActionCreators(OrderActions,dispatch)};
 }
 
 

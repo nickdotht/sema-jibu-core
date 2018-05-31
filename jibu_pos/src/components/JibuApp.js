@@ -8,7 +8,7 @@ import {
 import Toolbar from './Toolbar';
 import {CustomerViews} from './CustomerViews'
 import CustomerBar from "./CustomerBar";
-import OrderView from "./OrderView"
+import OrderView from "./orders/OrderView"
 import {bindActionCreators} from 'redux';
 
 import {connect} from "react-redux";

@@ -5,7 +5,7 @@ import ProductList from "./ProductList";
 export default class OrderProductScreen extends Component {
 	render() {
 		return (
-			<View style = {{flex:3, backgroundColor:"green"}}>
+			<View style = {{flex:3, backgroundColor:'#ABC1DE'}}>
 				<ProductList/>
 			</View>
 		);

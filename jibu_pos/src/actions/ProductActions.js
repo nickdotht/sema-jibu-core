@@ -8,7 +8,8 @@ export function LoadProducts( ) {
 	return (dispatch) => {
 		setTimeout(() => {
 			console.log("LoadProducts - loaded!!!");
-			dispatch({type: PRODUCTS_LOADED, data:mock_products});
+			let mock_copy = mock_products.slice();
+			dispatch({type: PRODUCTS_LOADED, data:mock_copy});
 		}, 10);
 
 	};
