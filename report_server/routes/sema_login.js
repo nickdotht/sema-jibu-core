@@ -1,15 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const semaLog = require('../seama_services/sema_logger');
+const User = require('../models').user;
+const validator = require('validator');
 
 /* Process login. */
-router.get('/', function(req, res) {
+router.get('/', async (req, res) => {
 	semaLog.info('sema_login - Enter');
-	let auth = req.header('authorization');
+	const { usernameOrEmail, password } = req.body;
+	let whereClause = validator.isEmail(usernameOrEmail) ?
+		{ email: usernameOrEmail } :
+		{ username: usernameOrEmail };
+
+	const [err, user] = await User.findOne({ where: whereClause });
+
 	try {
-		auth = auth.substr('Basic '.length);
-		auth = Buffer.from(auth, 'base64').toString();
-		const credentials = auth.split(':');
 		if (
 			credentials[0] === 'administrator'.toLowerCase() &&
 			credentials[1] === 'dloHaiti'
