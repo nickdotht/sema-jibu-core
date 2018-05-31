@@ -1,5 +1,5 @@
 import React from 'react';
-import { createBottomTabNavigator } from 'react-navigation';
+import { createBottomTabNavigator,createStackNavigator } from 'react-navigation';
 import CustomerList from "./CustomerList";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";

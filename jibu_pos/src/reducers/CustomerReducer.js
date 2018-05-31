@@ -14,20 +14,7 @@ const customerReducer = (state = initialState, action) => {
 		case CUSTOMERS_LOADED:
 		case CUSTOMERS_SET:
 			newState = {...state};
-			// Insert the dummy 'walkup customer
-			const anonymous = { "id" : "9999999-9999-9999-9999-9999999",
-					"version" : 3,
-					"address" : "----------------------------",
-					"contact_name" : "Walkup Client",
-					"customer_type_id" : 120,
-					"due_amount" : "---------------",
-					"name" : "",
-					"phone_number" : "----------------------------",
-					"active" : "1",
-					"sales_channel":"anonymous"};
-
 			newState.customers = action.data ;
-			// newState.customers.unshift(anonymous);
 			return newState;
 		case CUSTOMERS_SEARCH:
 			newState = {...state};

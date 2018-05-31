@@ -6,11 +6,15 @@ import {
 	TextInput,
 	Button,
 } from 'react-native';
-import * as CustomerActions from "../actions/CustomerActions";
+
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import PosStorage from "../database/PosStorage";
 import * as NetworkActions from "../actions/NetworkActions";
+import * as CustomerActions from "../actions/CustomerActions";
+import * as CustomerBarActions from "../actions/CustomerBarActions";
+
+import CustomerBarButton from './CustomerBarButton';
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -43,21 +47,19 @@ class SelectedCustomerDetails extends React.Component {
 	};
 
 }
-class CustomerBarButton extends React.Component {
-	render() {
-		return (
-			<View style={styles.Button}>
-				<Button
-					onPress={this.props.handler}
-					title={this.props.title}
-					color='#2858a7'
-				/>
-			</View>
-		);
-	}
-}
 
 class CustomerBar extends Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			addFunction: true,
+			orderFunction: true,
+			editFunction: true,
+			deleteFunction: true
+		}
+	}
+
 	render() {
 		return (
 
@@ -65,19 +67,23 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = "Add"
 					handler = {this.onAdd}
+					enabled = {this.state.addFunction}
 				/>
 				<CustomerBarButton
 					title = "Order"
 					handler = {this.onOrder}
+					enabled = {this.state.orderFunction}
 				/>
 				<CustomerBarButton
 					title = "Edit"
 					handler = {this.onEdit}
+					enabled = {this.state.editFunction}
 				/>
 
 				<CustomerBarButton
 					title = "Delete"
 					handler = {this.onDelete}
+					enabled = {this.state.deleteFunction}
 				/>
 
 				<TextInput
@@ -107,10 +113,17 @@ class CustomerBar extends Component {
 	}
 	onEdit = () =>{
 		console.log("edit!")
-		this.props.networkActions.NetworkConnection(false);
+		this.props.customerBarActions.ShowHideCustomers(1);
+		this.setState({'addFunction' : true } )
+		this.setState({'deleteFunction' : true } )
+		this.setState({'orderFunction' : true } )
 	}
 	onOrder = () =>{
 		console.log("order!");
+		this.props.customerBarActions.ShowHideCustomers(0);
+		this.setState({'addFunction' : false } )
+		this.setState({'deleteFunction' : false } )
+		this.setState({'orderFunction' : false } )
 
 	}
 	onAdd = () =>{
@@ -133,7 +146,8 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
 	return {customerActions:bindActionCreators(CustomerActions, dispatch),
-		networkActions:bindActionCreators(NetworkActions, dispatch)};
+		networkActions:bindActionCreators(NetworkActions, dispatch),
+		customerBarActions:bindActionCreators(CustomerBarActions, dispatch)};
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CustomerBar);
 

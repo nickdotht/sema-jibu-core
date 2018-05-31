@@ -8,7 +8,7 @@ import {
 import Toolbar from './Toolbar';
 import {CustomerViews} from './CustomerViews'
 import CustomerBar from "./CustomerBar";
-
+import OrderView from "./OrderView"
 import {bindActionCreators} from 'redux';
 
 import {connect} from "react-redux";
@@ -54,15 +54,21 @@ class JibuApp extends Component {
             <View style={{ flex: 1 }}>
                 <Toolbar/>
 				<CustomerBar/>
-				<CustomerViews screenProps={{parent:this}}/>
+				<ViewSwitcher Jibu={this}/>
+				{/*<View style={{flex: this.props.showView.showCustomers}}>*/}
+					{/*<CustomerViews screenProps={{parent:this}}/>*/}
+				{/*</View>*/}
+				{/*<View style={{flex: this.props.showView.showNewOrder}}>*/}
+					{/*<OrderView/>*/}
+				{/*</View>*/}
 				<CustomerLoaderWatcher parent={ this}/>
              </View>
         );
     }
-    customerSelectionChanged( customer ){
-    	console.log("customerSelectionChanged");
-		// that.props.CustomerSelected( customer)
-    }
+    // customerSelectionChanged( customer ){
+    // 	console.log("customerSelectionChanged");
+		// // that.props.CustomerSelected( customer)
+    // }
 
     SynchronizeCustomers() {
 		console.log("SynchronizeCustomers");
@@ -75,13 +81,23 @@ class JibuApp extends Component {
 		this.props.networkActions.NetworkConnection(isConnected);
 	};
 }
+class ViewSwitcher extends Component {
 
+	render() {
+		if (this.props.Jibu.props.showView.showNewOrder ) {
+			return (<OrderView/>)
+		} else {
+			return (<CustomerViews screenProps={{parent: this.props.Jibu}}/>)
+		}
+	}
+}
 
 function mapStateToProps(state, props) {
 	return {
 		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers,
-		isNWConnected: state.networkReducer.isNWConnected
+		isNWConnected: state.networkReducer.isNWConnected,
+		showView: state.customerBarReducer.showView
 
 	};
 }
