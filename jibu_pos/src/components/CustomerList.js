@@ -38,6 +38,7 @@ class CustomerList extends Component {
 						</TouchableHighlight>
 					)}
 					keyExtractor={item => item.id}
+					initialNumToRender={50}
 				/>
 				<SearchWatcher parent = {this}>{this.props.searchString}</SearchWatcher>
 			</View>
