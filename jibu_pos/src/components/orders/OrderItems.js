@@ -45,7 +45,7 @@ class OrderItems extends Component {
 							{this.getRow(item, index, separators)}
 						</TouchableHighlight>
 					)}
-					keyExtractor={item => item.product.id}
+					keyExtractor={item => item.product.id.toString()}
 				/>
 				<Modal visible = {this.state.isQuantityVisible}
 					   backdropColor={'red'}
@@ -71,17 +71,14 @@ class OrderItems extends Component {
 	getRow = (item) =>{
 		return (
 			<View style={{flex: 1, flexDirection: 'row', backgroundColor:'white'} }>
-				<View style={ [{flex: .5}]}>
-					<Text style={[styles.baseItem,styles.leftMargin]}>X</Text>
-				</View>
-				<View style={ [{flex: 2.5}]}>
-					<Text style={[styles.baseItem]}>{item.product.description}</Text>
+				<View style={ [{flex: 3}]}>
+					<Text style={[styles.baseItem,styles.leftMargin]}>{item.product.description}</Text>
 				</View>
 				<View style={[ {flex: 1}]}>
 					<Text style={[styles.baseItem]}>{item.quantity}</Text>
 				</View>
 				<View style={ [ {flex: 1}]}>
-					<Text style={[styles.baseItem]}>{item.quantity * item.product.price_amount}</Text>
+					<Text style={[styles.baseItem]}>{(item.quantity * item.product.price_amount)}</Text>
 				</View>
 			</View>
 		);
@@ -190,7 +187,7 @@ const styles = StyleSheet.create({
 		left:10
 	},
 	headerLeftMargin:{
-		left:50
+		left:10
 	},
 	headerItem:{
 		fontWeight:'bold',

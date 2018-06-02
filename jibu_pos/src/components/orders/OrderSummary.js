@@ -19,7 +19,7 @@ class OrderSummary extends Component {
 		);
 	}
 	getTotalOrders = () =>{
-		console.log("foo");
+		console.log("getTotalOrders");
 		return this.props.products.reduce( (total, item) => { return(total + item.quantity) }, 0);
 	};
 }
