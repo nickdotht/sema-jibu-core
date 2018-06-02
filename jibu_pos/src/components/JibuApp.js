@@ -6,8 +6,8 @@ import {
 } from 'react-native';
 
 import Toolbar from './Toolbar';
-import {CustomerViews} from './CustomerViews'
-import CustomerBar from "./CustomerBar";
+import {CustomerViews} from './customers/CustomerViews'
+import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
 import {bindActionCreators} from 'redux';
 

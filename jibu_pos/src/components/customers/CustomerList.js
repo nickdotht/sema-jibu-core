@@ -2,7 +2,7 @@ import React, {Component}  from "react";
 import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
-import * as CustomerActions from '../actions/CustomerActions';
+import * as CustomerActions from '../../actions/CustomerActions';
 
 class CustomerList extends Component {
 	constructor(props) {

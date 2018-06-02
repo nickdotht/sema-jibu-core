@@ -22,9 +22,9 @@ const styles = StyleSheet.create({
 
 	Button: {
 		flex: .1,
-		alignSelf:'center',
-		height:50,
-		marginLeft:30
+		// alignSelf:'center',
+		// height:70,
+		marginLeft:15
 	},
 });
 
