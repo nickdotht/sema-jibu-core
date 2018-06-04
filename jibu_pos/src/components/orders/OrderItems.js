@@ -78,7 +78,7 @@ class OrderItems extends Component {
 					<Text style={[styles.baseItem]}>{item.quantity}</Text>
 				</View>
 				<View style={ [ {flex: 1}]}>
-					<Text style={[styles.baseItem]}>{(item.quantity * item.product.price_amount)}</Text>
+					<Text style={[styles.baseItem]}>{(item.quantity * this.getItemPrice( item.product.price_amount))}</Text>
 				</View>
 			</View>
 		);
@@ -161,10 +161,21 @@ class OrderItems extends Component {
 			this.props.orderActions.SetProductQuantity( this.state.selectedItem.product, this.state.accumulator );
 		}
 	};
+	getItemPrice = (amount) =>{
+		if( this.props.channel === "walkup") {
+			return amount;
+		}else{
+			// DODO - Each channels its own price. 10% discount is a place holder
+			return 0.9 * amount;
+		}
+	};
+
 }
 
 function mapStateToProps(state, props) {
-	return {products: state.orderReducer.products};
+	return {
+		products: state.orderReducer.products,
+		channel: state.orderReducer.channel};
 }
 function mapDispatchToProps(dispatch) {
 	return {orderActions: bindActionCreators(OrderActions,dispatch)};

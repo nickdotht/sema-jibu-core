@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Button, StyleSheet} from 'react-native';
-import OrderProductScreen from "./OrderProductScreen";
+import {OrderProductScreen} from "./OrderProductScreen";
 import OrderSummaryScreen from "./OrderSummaryScreen";
 
 export default class OrderView extends React.Component {
@@ -14,7 +14,7 @@ export default class OrderView extends React.Component {
 	displayView (){
 		return (
 			<View style = {{flex:1, backgroundColor:"pink", flexDirection:'row'}}>
-				<OrderProductScreen/>
+				<OrderProductScreen parent = {this}/>
 				<OrderSummaryScreen/>
 			</View>
 		);
