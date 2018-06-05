@@ -19,6 +19,7 @@ class OrderCheckout extends Component {
 	}
 	onPay = ()=>{
 		console.log("onPay");
+		this.props.orderActions.SetOrderFlow('payment');
 	}
 	getOpacity = ()=>{
 		if( this.props.products.length == 0 ){

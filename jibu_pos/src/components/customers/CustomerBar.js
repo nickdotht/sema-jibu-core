@@ -15,6 +15,7 @@ import * as CustomerActions from "../../actions/CustomerActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
 
 import CustomerBarButton from './CustomerBarButton';
+import * as OrderActions from "../../actions/OrderActions";
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -128,6 +129,7 @@ class CustomerBar extends Component {
 			this.setState({'deleteFunction': false});
 			this.setState({'orderFunction': true});
 			this.setState({'isOrder': true});
+			this.props.orderActions.SetOrderFlow('products');
 		}else{
 			this.props.customerBarActions.ShowHideCustomers(1);
 			this.setState({'isOrder': false});
@@ -156,7 +158,8 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
 	return {customerActions:bindActionCreators(CustomerActions, dispatch),
 		networkActions:bindActionCreators(NetworkActions, dispatch),
-		customerBarActions:bindActionCreators(CustomerBarActions, dispatch)};
+		customerBarActions:bindActionCreators(CustomerBarActions, dispatch),
+		orderActions: bindActionCreators(OrderActions,dispatch)};
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CustomerBar);
 
