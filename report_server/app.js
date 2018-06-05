@@ -19,7 +19,13 @@ var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
 const winston = require('winston');
 
+const passport = require('passport');
+const configurePassport = require('./config/passport');
+
 var app = express();
+
+app.use(passport.initialize());
+configurePassport();
 
 app.use(
 	session({
