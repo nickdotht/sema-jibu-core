@@ -15,13 +15,20 @@ class OrderTotal extends Component {
 		);
 	}
 	getAmount = () =>{
-		return this.props.products.reduce( (total, item) => { return(total + item.quantity * item.product.price_amount) }, 0);
+		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.price_amount)) }, 0);
 	};
-
+	getItemPrice = (amount) =>{
+		if( this.props.channel.salesChannel === "walkup"){
+			return amount;
+		}else{
+			return .9* amount;
+		}
+	}
 }
 
 function mapStateToProps(state, props) {
-	return {products: state.orderReducer.products};
+	return {products: state.orderReducer.products,
+		channel: state.orderReducer.channel};
 }
 function mapDispatchToProps(dispatch) {
 	return {orderActions: bindActionCreators(OrderActions,dispatch)};

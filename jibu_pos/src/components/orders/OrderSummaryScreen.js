@@ -8,7 +8,7 @@ import OrderCheckout from "./OrderCheckout";
 export default class OrderSummaryScreen extends Component {
 	render() {
 		return (
-			<View style = {{flex:2, backgroundColor:"blue", borderColor: '#2858a7', borderLeftWidth:5}}>
+			<View style = {{flex:.6, backgroundColor:"blue", borderColor: '#2858a7', borderLeftWidth:5}}>
 				<OrderSummary/>
 				<OrderTotal/>
 				<OrderItems/>

@@ -58,7 +58,7 @@ class ProductList extends Component {
 					resizeMethod ='scale'
 					style={{flex:1}}>
 				</Image>
-				<Text style={styles.imageLabel}>{item.description}{'\n'}${item.price_amount}</Text>
+				<Text style={[styles.imageLabel,this.getLabelBackground()]}>{item.description}{'\n'}${this.getItemPrice(item.price_amount)}</Text>
 			</View>
 		);
 	};
@@ -69,7 +69,7 @@ class ProductList extends Component {
 	};
 	getImage = (item)=>{
 		return 'data:image/png;base64,' + item.base64encoded_image
-	}
+	};
 
 	onPressItem = (item) =>{
 		console.log("onPressItem");
@@ -77,6 +77,22 @@ class ProductList extends Component {
 	};
 	getItemBackground = (index ) =>{
 		return ((index % 2) === 0) ? styles.lightBackground : styles.darkBackground;
+	};
+
+	getLabelBackground = () =>{
+		if( this.props.filter === "walkup") {
+			return styles.imageLabelBackgroundWalkup;
+		}else{
+			return styles.imageLabelBackgroundReseller;
+		}
+	};
+	getItemPrice = (amount) =>{
+		if( this.props.filter === "walkup") {
+			return amount;
+		}else{
+			// DODO - Each channels its own price. 10% discount is a place holder
+			return 0.9 * amount;
+		}
 	};
 
 }
@@ -110,9 +126,16 @@ const styles = StyleSheet.create({
 		paddingBottom:5,
 		textAlign: 'center',
 		color:'white',
-		backgroundColor: '#2858a7'
+		// backgroundColor: '#2858a7'
 
 	},
+	imageLabelBackgroundWalkup: {
+		backgroundColor: '#2858a7'
+	},
+	imageLabelBackgroundReseller: {
+		backgroundColor: '#812629'
+	},
+
 	lightBackground:{
 		backgroundColor:'#ABC1DE'
 	},

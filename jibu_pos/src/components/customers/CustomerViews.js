@@ -3,7 +3,7 @@ import { createBottomTabNavigator,createStackNavigator } from 'react-navigation'
 import CustomerList from "./CustomerList";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import * as CustomerActions from "../actions/CustomerActions";
+import * as CustomerActions from "../../actions/CustomerActions";
 
 
 class AllScreen extends React.Component {

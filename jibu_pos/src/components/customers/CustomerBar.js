@@ -9,10 +9,10 @@ import {
 
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import PosStorage from "../database/PosStorage";
-import * as NetworkActions from "../actions/NetworkActions";
-import * as CustomerActions from "../actions/CustomerActions";
-import * as CustomerBarActions from "../actions/CustomerBarActions";
+import PosStorage from "../../database/PosStorage";
+import * as NetworkActions from "../../actions/NetworkActions";
+import * as CustomerActions from "../../actions/CustomerActions";
+import * as CustomerBarActions from "../../actions/CustomerBarActions";
 
 import CustomerBarButton from './CustomerBarButton';
 
@@ -53,24 +53,25 @@ class CustomerBar extends Component {
 		super(props);
 
 		this.state = {
-			addFunction: true,
+			addFunction: false,
 			orderFunction: true,
-			editFunction: true,
-			deleteFunction: true
+			editFunction: false,
+			deleteFunction: false,
+			isOrder :false
 		}
 	}
 
 	render() {
 		return (
 
-			<View style={{ flexDirection:'row', height:100, backgroundColor:'white',  }}>
+			<View style={{ flexDirection:'row', height:100, backgroundColor:'white',  alignItems:'center'}}>
 				<CustomerBarButton
 					title = "Add"
 					handler = {this.onAdd}
 					enabled = {this.state.addFunction}
 				/>
 				<CustomerBarButton
-					title = "Order"
+					title = {this.state.isOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder}
 					enabled = {this.state.orderFunction}
 				/>
@@ -108,28 +109,36 @@ class CustomerBar extends Component {
 
 	onDelete = () =>{
 		console.log("delete!");
-		let posStorage = new PosStorage();
-		posStorage.ClearAll();
+		// let posStorage = new PosStorage();
+		// posStorage.ClearAll();
 	}
 	onEdit = () =>{
 		console.log("edit!")
 		this.props.customerBarActions.ShowHideCustomers(1);
-		this.setState({'addFunction' : true } )
-		this.setState({'deleteFunction' : true } )
-		this.setState({'orderFunction' : true } )
+		this.setState({'addFunction' : true } );
+		this.setState({'deleteFunction' : true } );
+		this.setState({'orderFunction' : true } );
 	}
 	onOrder = () =>{
 		console.log("order!");
-		this.props.customerBarActions.ShowHideCustomers(0);
-		this.setState({'addFunction' : false } )
-		this.setState({'deleteFunction' : false } )
-		this.setState({'orderFunction' : false } )
+		if( !this.state.isOrder) {
+			this.props.customerBarActions.ShowHideCustomers(0);
+			this.setState({'addFunction': false});
+			this.setState({'editFunction': false})
+			this.setState({'deleteFunction': false});
+			this.setState({'orderFunction': true});
+			this.setState({'isOrder': true});
+		}else{
+			this.props.customerBarActions.ShowHideCustomers(1);
+			this.setState({'isOrder': false});
+
+		}
 
 	}
 	onAdd = () =>{
 		console.log("Add!")
-		let posStorage = new PosStorage();
-		posStorage.Initialize();
+		// let posStorage = new PosStorage();
+		// posStorage.Initialize();
 
 	}
 
