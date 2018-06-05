@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const semaLog = require('../seama_services/sema_logger');
 const User = require('../models').user;
+const Role = require('../models').role;
 const validator = require('validator');
+const jwt = require('jsonwebtoken');
 
 /* Process login. */
 router.get('/', async (req, res) => {
@@ -12,22 +14,44 @@ router.get('/', async (req, res) => {
 		{ email: usernameOrEmail } :
 		{ username: usernameOrEmail };
 
-	const [err, user] = await User.findOne({ where: whereClause });
 
 	try {
-		if (
-			credentials[0] === 'administrator'.toLowerCase() &&
-			credentials[1] === 'dloHaiti'
-		){
-			semaLog.info('sema_login - succeeded');
-			res.json({ LogState: 'LoggedIn', version: req.app.get('sema_version')});
-		} else {
+		// Get the user without the password attribute
+		const user = await User.findOne({
+			where: whereClause,
+			include: [Role],
+			attributes: {
+				exclude: ['password']
+			}
+		});
+
+		if (!user) {
 			semaLog.warn('sema_login - Invalid Credentials');
-			res.status(401).send("Invalid Credentials");
+			return res.status(401).send("Invalid Credentials");
 		}
-	} catch (ex) {
-		semaLog.error('sema_login - Missing/bad headers');
-		res.status(400).send("Missing/bad headers");
+
+		const isValidPassword = await user.comparePassword(password);
+
+		if (!isValidPassword) {
+			semaLog.warn('sema_login - Invalid Credentials');
+			return res.status(401).send("Invalid Credentials");
+		}
+
+		// Everything went well
+		const token = jwt.sign(user, process.env.JWT_SECRET, {
+			expiresIn: '1 day'
+		});
+
+		semaLog.info('sema_login - succeeded');
+
+		res.json({
+			LogState: 'LoggedIn',
+			version: req.app.get('sema_version'),
+			token
+		});
+	} catch(err) {
+		semaLog.warn(`sema_login - Error: ${err}`);
+		return res.status(401).send("Something wrong happened");
 	}
 });
 
