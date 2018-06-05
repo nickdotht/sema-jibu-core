@@ -14,7 +14,7 @@ export default class OrderView extends React.Component {
 	displayView (){
 		return (
 			<View style = {{flex:1, backgroundColor:"pink", flexDirection:'row'}}>
-				<OrderProductScreen parent = {this}/>
+				<OrderProductScreen screenProps={{orderView: this}}/>
 				<OrderSummaryScreen/>
 			</View>
 		);

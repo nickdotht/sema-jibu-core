@@ -2,32 +2,14 @@ import React, {Component}  from "react";
 import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
 import ProductList from "./ProductList";
 import {createBottomTabNavigator} from "react-navigation";
+import {bindActionCreators} from "redux";
+import * as OrderActions from "../../actions/OrderActions";
+import {connect} from "react-redux";
+import OrderResellerScreen from './OrderResellerScreen';
+import OrderWalkupScreen from './OrderWalkupScreen';
 
-class OrderWalkupScreen extends Component {
-	componentWillUpdate(nextProps, nextState){
-		console.log( "componentWillUpdate- OrderWalkupScreen. Focused: " + nextProps.navigation.isFocused());
-	}
-	render() {
-		return (
-			<View style = {{flex:1, backgroundColor:'#ABC1DE'}}>
-				<ProductList filter='walkup' />
-			</View>
-		);
-	}
-}
 
-class OrderResellerScreen extends Component {
-	componentWillUpdate(nextProps, nextState){
-		console.log( "componentWillUpdate- OrderResellerScreen. Focused: " + nextProps.navigation.isFocused());
-	}
-	render() {
-		return (
-			<View style = {{flex:1, backgroundColor:'#ABC1DE'}}>
-				<ProductList filter='reseller' />
-			</View>
-		);
-	}
-}
+
 
 
 export const OrderProductScreen = createBottomTabNavigator({
@@ -38,7 +20,7 @@ export const OrderProductScreen = createBottomTabNavigator({
 			tabBarOnPress: (scene, jumpToIndex) => {
 				let parent = scene.navigation.dangerouslyGetParent();
 				let output = "Walkup-Tab " + scene.navigation.state.routeName;
-				console.log(output);
+				console.log(this);
 			},
 		},
 
@@ -72,3 +54,4 @@ export const OrderProductScreen = createBottomTabNavigator({
 		tabStyle: {justifyContent: 'center', alignItems: 'center'},
 	}
 });
+

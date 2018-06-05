@@ -36,7 +36,7 @@ class OrderItems extends Component {
 				<FlatList
 					data={this.props.products}
 					ListHeaderComponent = {this.showHeader}
-					// extraData={this.state.refresh}
+					extraData={this.state.refresh}
 					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
 							onPress={() => this.onPressItem(item)}
@@ -47,6 +47,7 @@ class OrderItems extends Component {
 					)}
 					keyExtractor={item => item.product.id.toString()}
 				/>
+				<ChannelWatcher parent = {this}/>
 				<Modal visible = {this.state.isQuantityVisible}
 					   backdropColor={'red'}
 					   transparent ={true}
@@ -54,6 +55,7 @@ class OrderItems extends Component {
 					{this.ShowQuantityContent()}
 				</Modal>
 			</View>
+
 		);
 	}
 	closeHandler = () =>{
@@ -162,15 +164,24 @@ class OrderItems extends Component {
 		}
 	};
 	getItemPrice = (amount) =>{
-		if( this.props.channel === "walkup") {
+		if( this.props.channel.salesChannel === "walkup") {
 			return amount;
 		}else{
 			// DODO - Each channels its own price. 10% discount is a place holder
 			return 0.9 * amount;
 		}
 	};
-
 }
+class ChannelWatcher extends React.Component {
+	render() {
+		console.log("ChannelWatcher");
+		setTimeout( ()=> {
+			this.props.parent.setState({refresh: !this.props.parent.state.refresh});
+		}, 50);
+		return null;
+	}
+}
+
 
 function mapStateToProps(state, props) {
 	return {

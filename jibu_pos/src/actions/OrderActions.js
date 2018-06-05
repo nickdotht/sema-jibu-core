@@ -21,5 +21,5 @@ export function SetProductQuantity( product, quantity ) {
 
 export function SetOrderChannel( channel) {
 	console.log("SetOrderChannel - action");
-	return (dispatch) => { dispatch({type: SET_ORDER_CHANNEL, data:{channel:channel}})};
+	return (dispatch) => { dispatch({type: SET_ORDER_CHANNEL, data:{channel:{salesChannel:channel}}})};
 }

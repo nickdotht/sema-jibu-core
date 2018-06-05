@@ -1,7 +1,7 @@
 
 import { ADD_PRODUCT_TO_ORDER, CLEAR_ORDER, REMOVE_PRODUCT, SET_PRODUCT_QUANTITY, SET_ORDER_CHANNEL } from "../actions/OrderActions";
 
-let initialState = {products:[], channel:'walkup'};
+let initialState = {products:[], channel:{salesChannel:'walkup'}};
 
 const orderReducer = (state = initialState, action) => {
 	console.log("orderReducer: " +action.type);
@@ -48,6 +48,7 @@ const orderReducer = (state = initialState, action) => {
 		case SET_ORDER_CHANNEL:
 			newState = {...state};
 			newState.channel  = action.data.channel;
+			console.log("SET_ORDER_CHANNEL - " + JSON.stringify(newState.channel));
 			return newState;
 
 		default:
