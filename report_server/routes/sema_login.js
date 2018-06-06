@@ -7,22 +7,22 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 
 /* Process login. */
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
 	semaLog.info('sema_login - Enter');
 	const { usernameOrEmail, password } = req.body;
 	let whereClause = validator.isEmail(usernameOrEmail) ?
-		{ email: usernameOrEmail } :
-		{ username: usernameOrEmail };
+		{ email: usernameOrEmail.toLowerCase() } :
+		{ username: usernameOrEmail.toLowerCase() };
 
 
 	try {
-		// Get the user without the password attribute
+		// Get the user with the assigned role code
 		const user = await User.findOne({
 			where: whereClause,
-			include: [Role],
-			attributes: {
-				exclude: ['password']
-			}
+			include: [{
+				model: Role,
+				attributes: ['code']
+			}]
 		});
 
 		if (!user) {
@@ -38,7 +38,7 @@ router.get('/', async (req, res) => {
 		}
 
 		// Everything went well
-		const token = jwt.sign(user, process.env.JWT_SECRET, {
+		const token = jwt.sign(user.toJSON(), process.env.JWT_SECRET, {
 			expiresIn: '1 day'
 		});
 
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 		});
 	} catch(err) {
 		semaLog.warn(`sema_login - Error: ${err}`);
-		return res.status(401).send("Something wrong happened");
+		return res.status(500).send("Internal Server Error");
 	}
 });
 
