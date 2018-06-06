@@ -1,5 +1,6 @@
 import React, {Component}  from "react";
-import { View, CheckBox, Text, Image, TouchableHighlight, StyleSheet } from "react-native";
+import { View, CheckBox, Text, Image, TouchableHighlight, TextInput, StyleSheet } from "react-native";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -8,7 +9,7 @@ import * as OrderActions from "../../actions/OrderActions";
 class PaymentDescription extends Component {
 	render() {
 		return (
-			<View style={[{flex: 1, flexDirection: 'row'}]}>
+			<View style={[{flex: 1, flexDirection: 'row', marginTop:20} ]}>
 				<View style={ [{flex: 3}]}>
 					<Text style={[styles.totalTitle]}>{this.props.title}</Text>
 				</View>
@@ -17,7 +18,53 @@ class PaymentDescription extends Component {
 				</View>
 			</View>
 		);
+	}
+}
+class PaymentMethod extends Component{
+	render(){
+		return (
+			<View style = {styles.checkBoxRow}>
+				<View style={ [{flex: 1}]}>
+					<CheckBox
+						style = {styles.checkBox}
+						value={this.props.checkBox}
+						onValueChange={this.props.checkBoxChange}/>
+				</View>
+				<View style={ [{flex: 3}]}>
+					<Text style = {styles.checkLabel} >{this.props.checkBoxLabel}</Text>
+				</View>
+				<View style={[{flex: 3}]}>
+					{this.showTextInput()}
+				</View>
+			</View>
+		);
+	}
+	showTextInput (){
+		if( this.props.parent.state.isCredit) {
+			if (this.props.type === 'cash' && this.props.parent.state.isCash) {
+				return (
+					<TextInput
+						underlineColorAndroid='transparent'
+						onChangeText={this.props.valueChange}
+						value = {this.props.value}
+						style={[styles.cashInput]}/>
+				);
+			} else if (this.props.type === 'credit') {
+				return (
+					<Text style = {styles.checkLabel}>{this.props.value}</Text>
+				);
 
+			}if (this.props.type === 'mobile' && this.props.parent.state.isMobile) {
+				return (
+					<TextInput
+					underlineColorAndroid='transparent'
+					onChangeText={this.props.valueChange}
+					value = {this.props.value}
+					style={[styles.cashInput]}/>
+				);
+			}
+		}
+		return null;
 	}
 }
 
@@ -31,10 +78,18 @@ class OrderPaymentScreen extends Component {
 			isMobile:false
 		};
 	}
+	componentDidMount() {
+		console.log("OrderPaymentScreen = Mounted");
+		this.updatePayment(0);
+	}
 
 	render() {
 		return (
-			<View style = {styles.orderPayment}>
+			<KeyboardAwareScrollView
+				style={styles.orderPayment}
+				resetScrollToCoords={{ x: 0, y: 0 }}
+				contentContainerStyle={styles.container}
+				scrollEnabled={false}>
 				<View style ={{justifyContent:'flex-end', flexDirection:"row", right:100, top:20}}>
 					<TouchableHighlight
 						onPress={() => this.onCancelOrder()}>
@@ -42,28 +97,30 @@ class OrderPaymentScreen extends Component {
 					</TouchableHighlight>
 					{/*<Image source={require('../../images/icons8-cancel-50.png')} />;*/}
 				</View>
-				<View style={{flex:1, marginTop:20, marginBottom:50, marginLeft:200, marginRight:200}}>
-					<View style = {styles.checkBoxRow}>
-						<CheckBox
-							style = {styles.checkBox}
-							value={this.state.isCash}
-							onValueChange={() => this.setState({ isCash: !this.state.isCash })}/>
-						<Text style = {styles.checkLabel} >Cash</Text>
-					</View>
-					<View style = {styles.checkBoxRow}>
-						<CheckBox
-							style = {styles.checkBox}
-							value={this.state.isCredit}
-							onValueChange={() => this.setState({ isCredit: !this.state.isCredit })}/>
-						<Text style = {styles.checkLabel} >Credit</Text>
-					</View>
-					<View style = {styles.checkBoxRow}>
-						<CheckBox
-							style = {styles.checkBox}
-							value={this.state.isMobile}
-							onValueChange={() => this.setState({ isMobile: !this.state.isMobile })}/>
-						<Text style = {styles.checkLabel} >Mobile</Text>
-					</View>
+				<View style={{flex:1, marginTop:0, marginBottom:50, marginLeft:200, marginRight:200}}>
+					<PaymentMethod
+						parent = {this}
+						type = {"cash"}
+						checkBox = {this.state.isCash}
+						checkBoxChange = {this.checkBoxChangeCash.bind(this)}
+						checkBoxLabel = {'Cash'}
+						value = {this.props.payment.cash.toString()}
+						valueChange = {this.valuePaymentChange} />
+					<PaymentMethod
+						parent = {this}
+						type = {"credit"}
+						checkBox = {this.state.isCredit}
+						checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
+						checkBoxLabel = {'credit'}
+						value = {this.props.payment.credit} />
+					<PaymentMethod
+						parent = {this}
+						type = {"mobile"}
+						checkBox = {this.state.isMobile}
+						checkBoxChange = {this.checkBoxChangeMobile.bind(this)}
+						checkBoxLabel = {'mobile'}
+						value = {this.props.payment.mobile.toString()}
+						valueChange = {this.valuePaymentChange}/>
 					<PaymentDescription title = "Sale Amount Due:" total={this.calculateOrderDue()}/>
 					<PaymentDescription title = "Previous Amount Due:" total={this.calculateAmountDue()}/>
 					<PaymentDescription title = "Total Amount Due:" total={this.calculateTotalDue()}/>
@@ -76,7 +133,7 @@ class OrderPaymentScreen extends Component {
 						</View>
 					</View>
 				</View>
-			</View>
+			</KeyboardAwareScrollView>
 		);
 	}
 	calculateOrderDue(){
@@ -89,26 +146,75 @@ class OrderPaymentScreen extends Component {
 	calculateTotalDue(){
 		return this.calculateOrderDue() + this.calculateAmountDue();
 	}
+
 	onCompleteOrder = ()=>{
 
-	}
+	};
 	onCancelOrder =() =>{
 		this.props.orderActions.SetOrderFlow('products');
-	}
+	};
 	getItemPrice = (amount) =>{
 		if( this.props.channel.salesChannel === "walkup"){
 			return amount;
 		}else{
 			return .9* amount;
 		}
-	}
+	};
 
+	checkBoxChangeCash=()=>{
+		this.setState({isCash:!this.state.isCash} );
+		this.setState({isMobile:!this.state.isMobile},function(){this.updatePayment(0)});
+
+	};
+	valuePaymentChange=(textValue)=>{
+		let cashValue = parseInt( textValue);
+		if( isNaN(cashValue)){
+			cashValue = 0;
+		}
+		if( cashValue > this.calculateOrderDue()){
+			cashValue = this.calculateOrderDue();
+		}
+		this.updatePayment( this.calculateOrderDue() - cashValue);
+	};
+
+
+	checkBoxChangeCredit=()=>{
+		this.setState({isCredit:!this.state.isCredit},function(){this.updatePayment(0)} );
+	};
+
+	checkBoxChangeMobile=()=> {
+		this.setState({isMobile:!this.state.isMobile} , function(){this.updatePayment(0)});
+		this.setState({isCash:!this.state.isCash} );
+	};
+
+
+
+	updatePayment=( credit)=> {
+		let payment = {
+			cash: this.calculateOrderDue()-credit,
+			credit: credit,
+			mobile: 0
+		};
+		if (this.state.isMobile) {
+			payment = {
+				mobile: this.calculateOrderDue()-credit,
+				credit: credit,
+				cash: 0
+			};
+		}
+		console.log("Payment - " + JSON.stringify(payment));
+		this.props.orderActions.SetPayment( payment );
+	};
 }
+
+
 
 function mapStateToProps(state, props) {
 	return {
 		products: state.orderReducer.products,
 		channel: state.orderReducer.channel,
+		payment: state.orderReducer.payment,
+
 		selectedCustomer: state.customerReducer.selectedCustomer};
 }
 function mapDispatchToProps(dispatch) {
@@ -126,12 +232,13 @@ const styles = StyleSheet.create({
 	},
 	checkBoxRow: {
 		flex: 1,
-		flexDirection:"row"
+		flexDirection:"row",
+		marginTop:20
 	},
 	checkBox: {
 	},
 	checkLabel: {
-		left: 50,
+		left: 20,
 		fontSize:18,
 	},
 	totalSubTotal: {
@@ -146,8 +253,8 @@ const styles = StyleSheet.create({
 	},
 	completeOrder: {
 		backgroundColor:"#2858a7",
-		borderRadius:30
-		// height:100
+		borderRadius:30,
+		marginTop:20
 
 	},
 	buttonText:{
@@ -155,7 +262,14 @@ const styles = StyleSheet.create({
 		fontSize:20,
 		alignSelf:'center',
 		color:'white'
+	},
+	cashInput : {
+		textAlign: 'left',
+		height: 40,
+		width:100,
+		borderWidth: 2,
+
+		borderColor: '#404040',
+		// alignSelf: 'center',
 	}
-
-
 });

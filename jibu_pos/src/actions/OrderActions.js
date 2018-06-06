@@ -4,6 +4,7 @@ export const REMOVE_PRODUCT = 'REMOVE_PRODUCT';
 export const SET_PRODUCT_QUANTITY = 'SET_PRODUCT_QUANTITY';
 export const SET_ORDER_CHANNEL = 'SET_CHANNEL';
 export const SET_ORDER_FLOW = 'SET_ORDER_FLOW';
+export const SET_PAYMENT = 'SET_PAYMENT';
 
 
 export function AddProductToOrder( product, quantity ) {
@@ -26,6 +27,10 @@ export function SetOrderChannel( channel) {
 	return (dispatch) => { dispatch({type: SET_ORDER_CHANNEL, data:{channel:{salesChannel:channel}}})};
 }
 export function SetOrderFlow( page) {
-	console.log("SetOrderChannel - action");
+	console.log("SetOrderFlow - action");
 	return (dispatch) => { dispatch({type: SET_ORDER_FLOW, data:{flow:{page:page}}})};
+}
+export function SetPayment( payment) {
+	console.log("SetPayment - action");
+	return (dispatch) => { dispatch({type: SET_PAYMENT, data:{payment:payment}})};
 }
