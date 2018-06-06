@@ -11,16 +11,17 @@ module.exports = () => {
 	opts.secretOrKey = process.env.JWT_SECRET;
 
 	passport.use(new JwtStrategy(opts, (jwt_payload, done) => {
-		User.findOne({
-			where: {
-				id: jwt_payload.id
-			},
-			include: [Role],
-			attributes: {
-				exclude: ['password']
-			}
-		})
-		.then(user => user ? done(null, user) : done(null, false));
-		.catch(err => done(err, false));
+		User
+			.findOne({
+				where: {
+					id: jwt_payload.id
+				},
+				include: [Role],
+				attributes: {
+					exclude: ['password']
+				}
+			})
+			.then(user => done(null, user))
+			.catch(err => done(err, false));
 	}));
 };
