@@ -2,11 +2,11 @@ const mysql = require('mysql');
 const connectionTable = {};
 
 const sqlConfig = {
-	host: '167.99.229.86',
+	host: process.env.DB_HOST,
 	port: '3306',
-	database: 'sema',
-	user: 'dashboard',
-	password: 'Dashboard2018'
+	database: process.env.DB_SCHEMA,
+	user: process.env.DB_USER,
+	password: process.env.DB_PASSWORD
 };
 
 const schema ={
