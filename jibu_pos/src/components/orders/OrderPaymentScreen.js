@@ -1,10 +1,11 @@
 import React, {Component}  from "react";
-import { View, CheckBox, Text, Image, TouchableHighlight, TextInput, StyleSheet } from "react-native";
+import { View, CheckBox, Text, Image, TouchableHighlight, TextInput, StyleSheet, Modal } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as OrderActions from "../../actions/OrderActions";
+import * as CustomerBarActions from "../../actions/CustomerBarActions";
 
 class PaymentDescription extends Component {
 	render() {
@@ -75,7 +76,8 @@ class OrderPaymentScreen extends Component {
 		this.state = {
 			isCash: true,
 			isCredit: false,
-			isMobile:false
+			isMobile:false,
+			isCompleteOrderVisible :false
 		};
 	}
 	componentDidMount() {
@@ -133,8 +135,16 @@ class OrderPaymentScreen extends Component {
 						</View>
 					</View>
 				</View>
+				<Modal visible = {this.state.isCompleteOrderVisible}
+					   backdropColor={'red'}
+					   transparent ={true}
+					   onRequestClose ={this.closeHandler}>
+					{this.ShowCompleteOrder()}
+				</Modal>
+
 			</KeyboardAwareScrollView>
-		);
+
+	);
 	}
 	calculateOrderDue(){
 		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.price_amount)) }, 0);
@@ -148,6 +158,7 @@ class OrderPaymentScreen extends Component {
 	}
 
 	onCompleteOrder = ()=>{
+		this.setState({isCompleteOrderVisible:true});
 
 	};
 	onCancelOrder =() =>{
@@ -187,8 +198,6 @@ class OrderPaymentScreen extends Component {
 		this.setState({isCash:!this.state.isCash} );
 	};
 
-
-
 	updatePayment=( credit)=> {
 		let payment = {
 			cash: this.calculateOrderDue()-credit,
@@ -202,8 +211,34 @@ class OrderPaymentScreen extends Component {
 				cash: 0
 			};
 		}
-		console.log("Payment - " + JSON.stringify(payment));
 		this.props.orderActions.SetPayment( payment );
+	};
+
+	closeHandler= ()=>{
+		this.setState( {isCompleteOrderVisible:false} );
+		this.props.customerBarActions.ShowHideCustomers(1);
+	};
+
+	ShowCompleteOrder = () =>{
+		let that = this;
+		if( this.state.isCompleteOrderVisible ) {
+			setTimeout(() => {
+				that.closeHandler()
+			}, 1500);
+		}
+		return (
+			<View style={{
+				flex: 1,
+				flexDirection: 'column',
+				justifyContent: 'center',
+				alignItems: 'center'
+			}}>
+
+				<View style={styles.orderProcessing}>
+					<Text style={{fontSize:18, fontWeight:'bold'}}>Processing order....</Text>
+				</View>
+			</View>
+		);
 	};
 }
 
@@ -218,7 +253,10 @@ function mapStateToProps(state, props) {
 		selectedCustomer: state.customerReducer.selectedCustomer};
 }
 function mapDispatchToProps(dispatch) {
-	return {orderActions: bindActionCreators(OrderActions,dispatch)};
+	return {
+		orderActions: bindActionCreators(OrderActions,dispatch),
+		customerBarActions:bindActionCreators(CustomerBarActions, dispatch)
+	};
 }
 
 export default  connect(mapStateToProps, mapDispatchToProps)(OrderPaymentScreen);
@@ -271,5 +309,17 @@ const styles = StyleSheet.create({
 
 		borderColor: '#404040',
 		// alignSelf: 'center',
+	},
+	orderProcessing: {
+		height:100,
+		width:500,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor:'#ABC1DE',
+		borderColor:"#2858a7",
+		borderWidth:5,
+		borderRadius:10
 	}
+
 });
+

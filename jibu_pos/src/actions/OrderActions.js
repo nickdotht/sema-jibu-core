@@ -34,3 +34,7 @@ export function SetPayment( payment) {
 	console.log("SetPayment - action");
 	return (dispatch) => { dispatch({type: SET_PAYMENT, data:{payment:payment}})};
 }
+export function ClearOrder( payment) {
+	console.log("ClearOrder - action");
+	return (dispatch) => { dispatch({type: CLEAR_ORDER, data:{}})};
+}

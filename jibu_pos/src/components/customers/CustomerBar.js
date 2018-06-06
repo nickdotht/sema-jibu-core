@@ -57,8 +57,7 @@ class CustomerBar extends Component {
 			addFunction: false,
 			orderFunction: true,
 			editFunction: false,
-			deleteFunction: false,
-			isOrder :false
+			deleteFunction: false
 		}
 	}
 
@@ -72,7 +71,7 @@ class CustomerBar extends Component {
 					enabled = {this.state.addFunction}
 				/>
 				<CustomerBarButton
-					title = {this.state.isOrder ? 'Cancel' : 'Order'}
+					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder}
 					enabled = {this.state.orderFunction}
 				/>
@@ -122,17 +121,16 @@ class CustomerBar extends Component {
 	}
 	onOrder = () =>{
 		console.log("order!");
-		if( !this.state.isOrder) {
+		if( !this.props.showView.showNewOrder) {
 			this.props.customerBarActions.ShowHideCustomers(0);
 			this.setState({'addFunction': false});
 			this.setState({'editFunction': false})
 			this.setState({'deleteFunction': false});
 			this.setState({'orderFunction': true});
-			this.setState({'isOrder': true});
+			this.props.orderActions.ClearOrder();
 			this.props.orderActions.SetOrderFlow('products');
 		}else{
 			this.props.customerBarActions.ShowHideCustomers(1);
-			this.setState({'isOrder': false});
 
 		}
 
@@ -152,6 +150,7 @@ function mapStateToProps(state, props) {
 		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers,
 		searchString: state.customerReducer.searchString,
+		showView: state.customerBarReducer.showView
 	};
 }
 
