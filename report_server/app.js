@@ -15,24 +15,17 @@ var seama_kiosks = require('./routes/sema_kiosks');
 var seama_water_operations = require('./routes/sema_water_operations');
 var sema_sales = require('./routes/sema_sales');
 var sema_sales_by_channel = require('./routes/sema_sales_by_channel');
-var session = require('express-session');
 var dbService = require('./seama_services/db_service').dbService;
 const winston = require('winston');
 
 const passport = require('passport');
 const configurePassport = require('./config/passport');
+const { isAuthenticated, isAuthorized } = require('./seama_services/auth_services');
 
 var app = express();
 
 app.use(passport.initialize());
 configurePassport();
-
-app.use(
-	session({
-		secret: 'seama-secret-token',
-		cookie: { maxAge: 45000, secure: false, rolling: true }
-	})
-);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -59,6 +52,10 @@ app.use('/untapped/kiosks', dbService, seama_kiosks);
 app.use('/untapped/water-operations', dbService, seama_water_operations);
 app.use('/untapped/sales', dbService, sema_sales);
 app.use('/untapped/sales-by-channel', dbService, sema_sales_by_channel);
+
+app.get('/test', isAuthenticated, isAuthorized('admin'), (req, res) => {
+	res.json({msg: 'You made it to a secured endpoint with the right roles'});
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
