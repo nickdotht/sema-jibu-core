@@ -13,6 +13,16 @@ module.exports = models => {
 	});
 
 	// Instance level method: to use when comparing passwords on user login
-	models.user.prototype.comparePassword = (pw) =>
-		bcrypt.compareSync(pw, this.password);
+	models.user.prototype.comparePassword = function (pw) {
+		return bcrypt.compareSync(pw, this.password);
+	};
+
+	// We override the default toJSON so we NEVER send the password
+	// to the client
+	models.user.prototype.toJSON =  function () {
+	  var values = Object.assign({}, this.get());
+
+	  delete values.password;
+	  return values;
+	};
 };
