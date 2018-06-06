@@ -36,7 +36,7 @@ class OrderItems extends Component {
 				<FlatList
 					data={this.props.products}
 					ListHeaderComponent = {this.showHeader}
-					extraData={this.state.refresh}
+					extraData={this.props.channel.salesChannel}
 					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
 							onPress={() => this.onPressItem(item)}
@@ -47,7 +47,6 @@ class OrderItems extends Component {
 					)}
 					keyExtractor={item => item.product.id.toString()}
 				/>
-				<ChannelWatcher parent = {this}/>
 				<Modal visible = {this.state.isQuantityVisible}
 					   backdropColor={'red'}
 					   transparent ={true}
@@ -60,7 +59,7 @@ class OrderItems extends Component {
 	}
 	closeHandler = () =>{
 		this.setState( {isQuantityVisible:false} );
-	}
+	};
 	onPressItem = (item) =>{
 		this.setState( {isQuantityVisible:true} );
 		this.setState( {selectedItem:item});
@@ -101,7 +100,7 @@ class OrderItems extends Component {
 		);
 	};
 
-	ShowQuantityContent = (item) => (
+	ShowQuantityContent = () => (
 		<View style={styles.quantityModal}>
 			<View style={styles.modalTotal }>
 				<Text style={styles.accumulator}>{this.state.accumulator}</Text>
@@ -171,15 +170,6 @@ class OrderItems extends Component {
 			return 0.9 * amount;
 		}
 	};
-}
-class ChannelWatcher extends React.Component {
-	render() {
-		console.log("ChannelWatcher");
-		setTimeout( ()=> {
-			this.props.parent.setState({refresh: !this.props.parent.state.refresh});
-		}, 50);
-		return null;
-	}
 }
 
 
