@@ -5,7 +5,7 @@ const isAuthenticated = (req, res, next) =>
 	passport.authenticate('jwt', { session: false })(req, res, next);
 
 // Higher order function to take care of authorizations
-// It uses the 'code' column of the role table
+// It uses the 'code' column of the role table of the logged in user
 const isAuthorized = (...authorizedRoles) =>
 	(req, res, next) => {
 		const currentUserRoles = req.user.roles.map(roles => roles.code);
