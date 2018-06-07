@@ -10,12 +10,11 @@ const jwt = require('jsonwebtoken');
 router.post('/', async (req, res) => {
 	semaLog.info('sema_login - Enter');
 	const { usernameOrEmail, password } = req.body;
-	let whereClause = validator.isEmail(usernameOrEmail) ?
-		{ email: usernameOrEmail.toLowerCase() } :
-		{ username: usernameOrEmail.toLowerCase() };
-
-
 	try {
+		let whereClause = validator.isEmail(usernameOrEmail) ?
+			{ email: usernameOrEmail.toLowerCase() } :
+			{ username: usernameOrEmail.toLowerCase() };
+
 		// Get the user with the assigned role code
 		const user = await User.findOne({
 			where: whereClause,
@@ -39,7 +38,7 @@ router.post('/', async (req, res) => {
 
 		// Everything went well
 		const token = jwt.sign(user.toJSON(), process.env.JWT_SECRET, {
-			expiresIn: '1 day'
+			expiresIn: process.env.JWT_EXPIRATION_LENGTH
 		});
 
 		semaLog.info('sema_login - succeeded');
