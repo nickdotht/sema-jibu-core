@@ -99,7 +99,7 @@ class OrderPaymentScreen extends Component {
 					</TouchableHighlight>
 					{/*<Image source={require('../../images/icons8-cancel-50.png')} />;*/}
 				</View>
-				<View style={{flex:1, marginTop:0, marginBottom:50, marginLeft:200, marginRight:200}}>
+				<View style={{flex:1, marginTop:0, marginBottom:50, marginLeft:100, marginRight:100}}>
 					<PaymentMethod
 						parent = {this}
 						type = {"cash"}
@@ -235,7 +235,7 @@ class OrderPaymentScreen extends Component {
 			}}>
 
 				<View style={styles.orderProcessing}>
-					<Text style={{fontSize:18, fontWeight:'bold'}}>Processing order....</Text>
+					<Text style={{fontSize:24, fontWeight:'bold'}}>Processing order....</Text>
 				</View>
 			</View>
 		);
@@ -271,23 +271,24 @@ const styles = StyleSheet.create({
 	checkBoxRow: {
 		flex: 1,
 		flexDirection:"row",
-		marginTop:20
+		marginTop:20,
+		alignItems:'center'
 	},
 	checkBox: {
 	},
 	checkLabel: {
 		left: 20,
-		fontSize:18,
+		fontSize:24,
 	},
 	totalSubTotal: {
 		flex: 1,
 		flexDirection:"row"
 	},
 	totalTitle: {
-		fontSize:18,
+		fontSize:24,
 	},
 	totalValue: {
-		fontSize:18,
+		fontSize:24,
 	},
 	completeOrder: {
 		backgroundColor:"#2858a7",
@@ -297,16 +298,16 @@ const styles = StyleSheet.create({
 	},
 	buttonText:{
 		fontWeight:'bold',
-		fontSize:20,
+		fontSize:24,
 		alignSelf:'center',
 		color:'white'
 	},
 	cashInput : {
 		textAlign: 'left',
-		height: 40,
+		height: 50,
 		width:100,
 		borderWidth: 2,
-
+		fontSize:20,
 		borderColor: '#404040',
 		// alignSelf: 'center',
 	},

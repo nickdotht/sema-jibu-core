@@ -73,7 +73,7 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder}
-					enabled = {this.state.orderFunction}
+					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
 				/>
 				<CustomerBarButton
 					title = "Edit"

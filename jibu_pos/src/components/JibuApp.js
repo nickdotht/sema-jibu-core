@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {
     StyleSheet,
     View,
+	Text,
 	NetInfo,
 } from 'react-native';
 
@@ -9,6 +10,8 @@ import Toolbar from './Toolbar';
 import {CustomerViews} from './customers/CustomerViews'
 import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
+import DashboardReport from './reports/DashboardReport';
+
 import {bindActionCreators} from 'redux';
 
 import {connect} from "react-redux";
@@ -50,25 +53,12 @@ class JibuApp extends Component {
 	}
     render() {
         return (
-
-            <View style={{ flex: 1 }}>
-                <Toolbar/>
-				<CustomerBar/>
-				<ViewSwitcher Jibu={this}/>
-				{/*<View style={{flex: this.props.showView.showCustomers}}>*/}
-					{/*<CustomerViews screenProps={{parent:this}}/>*/}
-				{/*</View>*/}
-				{/*<View style={{flex: this.props.showView.showNewOrder}}>*/}
-					{/*<OrderView/>*/}
-				{/*</View>*/}
-				<CustomerLoaderWatcher parent={ this}/>
-             </View>
-        );
+			<View style={{ flex: 1 }}>
+				<Toolbar/>
+				<ScreenSwitcher currentScreen = {this.props.showScreen} Jibu = {this}/>
+			</View>
+		);
     }
-    // customerSelectionChanged( customer ){
-    // 	console.log("customerSelectionChanged");
-		// // that.props.CustomerSelected( customer)
-    // }
 
     SynchronizeCustomers() {
 		console.log("SynchronizeCustomers");
@@ -81,6 +71,26 @@ class JibuApp extends Component {
 		this.props.networkActions.NetworkConnection(isConnected);
 	};
 }
+class ScreenSwitcher extends Component {
+
+	render() {
+		if (this.props.currentScreen.showMain ) {
+			return (
+				<View style={{ flex: 1 }}>
+					<CustomerBar/>
+					<ViewSwitcher Jibu={this.props.Jibu}/>
+					<CustomerLoaderWatcher parent={ this.props.Jibu}/>
+				</View>
+
+			);
+		} else {
+			return (<View style={{flex:1}}>
+				<DashboardReport/>
+			</View>);
+		}
+	}
+}
+
 class ViewSwitcher extends Component {
 
 	render() {
@@ -97,7 +107,8 @@ function mapStateToProps(state, props) {
 		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers,
 		isNWConnected: state.networkReducer.isNWConnected,
-		showView: state.customerBarReducer.showView
+		showView: state.customerBarReducer.showView,
+		showScreen: state.toolBarReducer.showScreen
 
 	};
 }
