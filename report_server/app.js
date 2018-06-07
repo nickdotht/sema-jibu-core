@@ -19,6 +19,7 @@ var dbService = require('./seama_services/db_service').dbService;
 const winston = require('winston');
 
 const passport = require('passport');
+const session = require('express-session');
 const configurePassport = require('./config/passport');
 const { isAuthenticated, isAuthorized } = require('./seama_services/auth_services');
 
@@ -26,6 +27,11 @@ var app = express();
 
 app.use(passport.initialize());
 configurePassport();
+
+app.use(session({
+	secret: 'sema-secret-token',
+	cookie: { maxAge: 4500, secure: false, rolling: true }
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -39,9 +45,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(validator());
 app.use(cookieParser());
 
-// Use for static html
-//app.use(express.static(path.join(__dirname, 'public')));
-
 // Use for react
 app.use(express.static(path.join(__dirname, 'public_react/build/')));
 
@@ -52,10 +55,6 @@ app.use('/untapped/kiosks', dbService, seama_kiosks);
 app.use('/untapped/water-operations', dbService, seama_water_operations);
 app.use('/untapped/sales', dbService, sema_sales);
 app.use('/untapped/sales-by-channel', dbService, sema_sales_by_channel);
-
-app.get('/test', isAuthenticated, isAuthorized('admin'), (req, res) => {
-	res.json({msg: 'You made it to a secured endpoint with the right roles'});
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -75,12 +74,7 @@ app.use(function(err, req, res) {
 	res.render('error');
 });
 
-// ------------Seam development ---------------
-// For development, return mock data rather than DB access
-app.set('mockIt', false);
-
 // Version
 app.set('sema_version', '0.0.0.7');
-
 
 module.exports = app;
