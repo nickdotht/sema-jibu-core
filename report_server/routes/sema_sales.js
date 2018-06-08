@@ -1,16 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const connectionTable = require('../seama_services/db_service').connectionTable;
 const sprintf = require('sprintf-js').sprintf;
-const customerAccountHasCreatedDate = require('../seama_services/db_service').customerAccountHasCreatedDate;
-require('datejs');
-const semaLog = require('../seama_services/sema_logger');
-
-const PeriodData = require('../seama_services/datetime_services').PeriodData;
-
-
-
 // Note: inporting datejs will extend the native Date class
+require('datejs');
+const semaLog = require(`${__basedir}/seama_services/sema_logger`);
+const { PeriodData } = require(`${__basedir}/seama_services/datetime_services`);
+const {	connectionPool } = require(`${__basedir}/seama_services/db_service`);
 
 /* GET data for sales view. */
 const sqlTotalCustomers =
@@ -69,8 +64,6 @@ const sqlLMostRecentCustomer =
 
 router.get('/', function(request, response) {
 	semaLog.info('sales - Enter, kiosk_id:',request.query.kioskID );
-	let sessData = request.session;
-	let connection = connectionTable[sessData.id];
 	let results = initResults();
 
 	request.check("kioskID", "Parameter kioskID is missing").exists();
@@ -90,15 +83,19 @@ router.get('/', function(request, response) {
 			}
 			// Use the most recent receipt as the end date if now is specified (Because there may
 			// be many receipts, we don't want the SQL query to span too much tine}
-			getMostRecentReceipt(connection, request.query, endDate).then((receiptEndDate) => {
-				getMostRecentCustomer(connection, request.query, endDate).then((customerEndDate) => {
-					getTotalCustomers(connection, request.query, results).then(() => {
-						getTotalRevenue(connection, request.query, results).then(() => {
-							getRevenueByPeriod(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
-								getGallonsPerCustomer(connection, request.query, results).then(() => {
-									getCustomersByPeriod(connection, request.query, (endDate) ? endDate : customerEndDate, results).then(() => {
-										getRetailerRevenue(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
-											yieldResults(response, results);
+			connectionPool.getConnection((err, connection) => {
+				getMostRecentReceipt(connection, request.query, endDate).then((receiptEndDate) => {
+					getMostRecentCustomer(connection, request.query, endDate).then((customerEndDate) => {
+						getTotalCustomers(connection, request.query, results).then(() => {
+							getTotalRevenue(connection, request.query, results).then(() => {
+								getRevenueByPeriod(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
+									getGallonsPerCustomer(connection, request.query, results).then(() => {
+										getCustomersByPeriod(connection, request.query, (endDate) ? endDate : customerEndDate, results).then(() => {
+											getRetailerRevenue(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
+												yieldResults(response, results);
+											}).catch(err => {
+												yieldError(err, response, 500, results);
+											})
 										}).catch(err => {
 											yieldError(err, response, 500, results);
 										})
@@ -113,12 +110,12 @@ router.get('/', function(request, response) {
 							})
 						}).catch(err => {
 							yieldError(err, response, 500, results);
-						})
+						});
 					}).catch(err => {
 						yieldError(err, response, 500, results);
 					});
-				}).catch(err => {
-					yieldError(err, response, 500, results);
+				}).then(() => {
+					connection.release();
 				});
 			});
 		}
@@ -196,7 +193,10 @@ const getRevenueByPeriod = (connection, requestParams, endDate, results ) => {
 
 const getCustomersByPeriod = (connection, requestParams, endDate, results ) => {
 	return new Promise((resolve, reject) => {
-		if (customerAccountHasCreatedDate()) {
+		// We already know the customer_account table doesn't have the
+		// created_date field yet
+		// TODO: Remove those logical statements once it does
+		if (false) {
 			results.newCustomers.period = requestParams.groupby;
 			PeriodData.UpdatePeriodDates( results.newCustomers.periods, endDate, requestParams.groupby );
 			const sql = sprintf(sqlCustomersByPeriod, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
@@ -308,7 +308,10 @@ const getMostRecentReceipt = ( connection, requestParams, endDate ) => {
 
 const getMostRecentCustomer = ( connection, requestParams, endDate ) => {
 	return new Promise((resolve ) => {
-		if (customerAccountHasCreatedDate()) {
+		// We already know the customer_account table doesn't have the
+		// created_date field yet
+		// TODO: Remove those logical statements once it does
+		if (false) {
 			if (endDate != null) {
 				resolve(endDate);
 			} else {

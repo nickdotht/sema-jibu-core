@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const connectionTable = require('../seama_services/db_service').connectionTable;
+const { connectionPool } = require(`${__basedir}/seama_services/db_service`);
 require('datejs');
 const semaLog = require('../seama_services/sema_logger');
 
@@ -26,8 +26,6 @@ const sqlLMostRecentReceipt =
 
 router.get('/', function( request, response ) {
 	semaLog.info( 'sales-by-channel Entry - kiosk: - ', request.query.kioskID );
-	let sessData = request.session;
-	let connection = connectionTable[sessData.id];
 	let results = initResults();
 
 	request.check("kioskID", "Parameter kioskID is missing").exists();
@@ -48,16 +46,20 @@ router.get('/', function( request, response ) {
 				endDate = new Date(Date.parse(request.query.enddate));
 			}
 
-			getMostRecentReceipt(connection, request.query, endDate).then((newEndDate) => {
-				endDate = newEndDate;
-				beginDate = new Date(newEndDate.getFullYear(), 0);	// 	Default to start of the year
+			connectionPool.getConnection((err, connection) => {
+				getMostRecentReceipt(connection, request.query, endDate).then((newEndDate) => {
+					endDate = newEndDate;
+					beginDate = new Date(newEndDate.getFullYear(), 0);	// 	Default to start of the year
 
-				results.salesByChannel.beginDate = beginDate;
-				results.salesByChannel.endDate = endDate;
-				getSalesChannels(connection).then((salesChannel) => {
-					execSalesByChannel(salesChannel, 0, connection, request.query.kioskID, beginDate, endDate, response, results);
-				}).catch((err) => {
-					yieldError(err, response, 500, results);
+					results.salesByChannel.beginDate = beginDate;
+					results.salesByChannel.endDate = endDate;
+					getSalesChannels(connection).then((salesChannel) => {
+						execSalesByChannel(salesChannel, 0, connection, request.query.kioskID, beginDate, endDate, response, results);
+					}).catch((err) => {
+						yieldError(err, response, 500, results);
+					});
+				}).then(() => {
+					connection.release();
 				});
 			});
 		}

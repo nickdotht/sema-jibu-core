@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const semaLog = require('../seama_services/sema_logger');
-const User = require('../models').user;
-const Role = require('../models').role;
+const semaLog = require(`${__basedir}/seama_services/sema_logger`);
+const User = require(`${__basedir}/models`).user;
+const Role = require(`${__basedir}/models`).role;
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const connectionTable = require('../seama_services/db_service').connectionTable;
+const { connectionPool } = require(`${__basedir}/seama_services/db_service`);
 require('datejs');
 const semaLog = require('../seama_services/sema_logger');
 
@@ -80,8 +80,6 @@ const sqlSamplingSite=
 router.get('/', function(request, response) {
 	semaLog.info( 'water-operations Entry - kiosk: - ', request.query.kioskID );
 
-	let sessData = request.session;
-	let connection = connectionTable[sessData.id];
 	let results = initResults();
 
 	request.check("kioskID", "Parameter kioskID is missing").exists();
@@ -101,36 +99,40 @@ router.get('/', function(request, response) {
 				endDate = new Date(Date.parse(request.query.enddate));
 			}
 
-			getParametersAndSiteIds(connection ).then( () => {
-				getMostRecentReading(connection, request.query, endDate).then((newEndDate) => {
-					endDate = newEndDate;
-					results.latestDate = endDate;
-					beginDate = new Date(newEndDate.getFullYear(), newEndDate.getMonth(), 1);	// 	Default to start of previous month
-					beginDate.addMonths(-1);
+			connectionPool.getConnection((err, connection) => {
+				getParametersAndSiteIds(connection ).then( () => {
+					getMostRecentReading(connection, request.query, endDate).then((newEndDate) => {
+						endDate = newEndDate;
+						results.latestDate = endDate;
+						beginDate = new Date(newEndDate.getFullYear(), newEndDate.getMonth(), 1);	// 	Default to start of previous month
+						beginDate.addMonths(-1);
 
-					getTotalOrFillProduction(connection, request.query, results.totalProduction, "AM: Product Line", "PM: Product Line", results).then(() => {
-						getTotalOrFillProduction(connection, request.query, results.fillStation, "Fill Station", "PM: Fill Station", results).then(() => {
-						getSitePressure(connection, request.query, "PRE-FILTER PRESSURE IN", results.sitePressureIn,  results).then(() => {
-							getSitePressure(connection, request.query, "PRE-FILTER PRESSURE OUT", results.sitePressureOut,  results).then(() => {
-								getSitePressure(connection, request.query, "MEMBRANE FEED PRESSURE", results.sitePressureMembrane,  results).then(() => {
-									getFlowRate(connection, request.query, "Feed Flow Rate", results.flowRateFeed, results).then(() => {
-									getFlowRate(connection, request.query, "Product Flow Rate", results.flowRateProduct, results).then(() => {
-									getProduction(connection, request.query, beginDate, endDate, results).then(() => {
-									getTotalChlorine(connection, request.query, beginDate, endDate, results).then(() => {
-									getTDS(connection, request.query, beginDate, endDate, results).then(() => {
-										yieldResults(response, results);
-									}).catch(err => {
-										yieldError(err, response, 500, results);
-									});
-									}).catch(err => {
-										yieldError(err, response, 500, results);
-									});
-									}).catch(err => {
-										yieldError(err, response, 500, results);
-									});
-									}).catch(err => {
-										yieldError(err, response, 500, results);
-									});
+						getTotalOrFillProduction(connection, request.query, results.totalProduction, "AM: Product Line", "PM: Product Line", results).then(() => {
+							getTotalOrFillProduction(connection, request.query, results.fillStation, "Fill Station", "PM: Fill Station", results).then(() => {
+							getSitePressure(connection, request.query, "PRE-FILTER PRESSURE IN", results.sitePressureIn,  results).then(() => {
+								getSitePressure(connection, request.query, "PRE-FILTER PRESSURE OUT", results.sitePressureOut,  results).then(() => {
+									getSitePressure(connection, request.query, "MEMBRANE FEED PRESSURE", results.sitePressureMembrane,  results).then(() => {
+										getFlowRate(connection, request.query, "Feed Flow Rate", results.flowRateFeed, results).then(() => {
+										getFlowRate(connection, request.query, "Product Flow Rate", results.flowRateProduct, results).then(() => {
+										getProduction(connection, request.query, beginDate, endDate, results).then(() => {
+										getTotalChlorine(connection, request.query, beginDate, endDate, results).then(() => {
+										getTDS(connection, request.query, beginDate, endDate, results).then(() => {
+											yieldResults(response, results);
+										}).catch(err => {
+											yieldError(err, response, 500, results);
+										});
+										}).catch(err => {
+											yieldError(err, response, 500, results);
+										});
+										}).catch(err => {
+											yieldError(err, response, 500, results);
+										});
+										}).catch(err => {
+											yieldError(err, response, 500, results);
+										});
+										}).catch(err => {
+											yieldError(err, response, 500, results);
+										});
 									}).catch(err => {
 										yieldError(err, response, 500, results);
 									});
@@ -140,15 +142,15 @@ router.get('/', function(request, response) {
 							}).catch(err => {
 								yieldError(err, response, 500, results);
 							});
+							}).catch(err => {
+								yieldError(err, response, 500, results);
+							});
 						}).catch(err => {
 							yieldError(err, response, 500, results);
 						});
-						}).catch(err => {
-							yieldError(err, response, 500, results);
-						});
-					}).catch(err => {
-						yieldError(err, response, 500, results);
 					});
+				}).then(() => {
+					connection.release();
 				});
 			});
 		}
