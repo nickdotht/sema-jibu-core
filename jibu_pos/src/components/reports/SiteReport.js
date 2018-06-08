@@ -17,10 +17,10 @@ class Sidebar extends Component {
 		return (
 			<View style ={{flex:1,backgroundColor:colors.COLOR_REPORT_SIDEBAR_BACKGROUND}}>
 				<TouchableHighlight onPress={() => this.onSales()}>
-					<Text style ={styles.menuText}>Sales</Text>
+					<Text style ={[styles.menuText, {color:'#3C93FC'}]}>Sales</Text>
 				</TouchableHighlight>
 				<TouchableHighlight onPress={() => this.onInventory()}>
-					<Text style ={[styles.menuText, {color:'#3C93FC'}]}>Inventory</Text>
+					<Text style ={[styles.menuText, ]}>Inventory</Text>
 				</TouchableHighlight>
 			</View>
 		);
@@ -55,12 +55,9 @@ class SalesReport extends Component {
 						ListHeaderComponent = {this.showHeader}
 						// extraData={this.state.refresh}
 						renderItem={({item, index, separators}) => (
-							<TouchableHighlight
-								onPress={() => this.onPressItem(item)}
-								onShowUnderlay={separators.highlight}
-								onHideUnderlay={separators.unhighlight}>
+							<View >
 								{this.getRow(item, index, separators)}
-							</TouchableHighlight>
+							</View>
 						)}
 						keyExtractor={item => item.sku}
 						initialNumToRender={50}
@@ -104,7 +101,7 @@ class SalesReport extends Component {
 		return (
 			<View style={[{flex: 1, flexDirection: 'row', height:50, alignItems:'center'},styles.headerBackground]}>
 				<View style={ [{flex: 1}]}>
-					<Text style={[styles.headerItem,styles.leftMargin]}>SKUX</Text>
+					<Text style={[styles.headerItem,styles.leftMargin]}>SKU</Text>
 				</View>
 				<View style={[ {flex: .7}]}>
 					<Text style={[styles.headerItem]}>Quantity</Text>
