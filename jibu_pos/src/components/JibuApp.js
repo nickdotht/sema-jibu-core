@@ -21,6 +21,7 @@ import * as NetworkActions from '../actions/NetworkActions';
 
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
+import SiteReport from "./reports/SiteReport";
 
 console.ignoredYellowBox = ['Warning: isMounted'];
 
@@ -74,7 +75,7 @@ class JibuApp extends Component {
 class ScreenSwitcher extends Component {
 
 	render() {
-		if (this.props.currentScreen.showMain ) {
+		if (this.props.currentScreen.showMain === false) {
 			return (
 				<View style={{ flex: 1 }}>
 					<CustomerBar/>
@@ -85,7 +86,7 @@ class ScreenSwitcher extends Component {
 			);
 		} else {
 			return (<View style={{flex:1}}>
-				<DashboardReport/>
+				<SiteReport/>
 			</View>);
 		}
 	}
