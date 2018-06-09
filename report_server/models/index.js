@@ -10,7 +10,8 @@ const db			= {};
 
 const sequelize = new Sequelize(__dbConfig.database, __dbConfig.username, __dbConfig.password, {
 	host: __dbConfig.host,
-	dialect: __dbConfig.dialect
+	dialect: __dbConfig.dialect,
+	logging: false // No need to see all those boring SQL queries
 });
 
 fs
