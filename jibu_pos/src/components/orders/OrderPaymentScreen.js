@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as OrderActions from "../../actions/OrderActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
+import PosStorage from '../../database/PosStorage'
 
 class PaymentDescription extends Component {
 	render() {
@@ -222,6 +223,7 @@ class OrderPaymentScreen extends Component {
 	ShowCompleteOrder = () =>{
 		let that = this;
 		if( this.state.isCompleteOrderVisible ) {
+			this.formatAndSaveSale()
 			setTimeout(() => {
 				that.closeHandler()
 			}, 1500);
@@ -240,6 +242,22 @@ class OrderPaymentScreen extends Component {
 			</View>
 		);
 	};
+
+	formatAndSaveSale = () =>{
+		let sale = {cash:this.props.payment.cash, credit:this.props.payment.credit, mobile:this.props.payment.mobile, products:[] };
+		sale.products = this.props.products.map( product => {
+			let productSale = {};
+			productSale.id = product.product.id;
+			productSale.description = product.product.description;
+			productSale.gallons =  product.product.gallons;
+			productSale.sku = product.product.sku;
+			productSale.price_amount = product.product.price_amount;
+			productSale.price_currency  = product.product.price_currency;
+			productSale.quantity = product.quantity;
+			return productSale;
+		});
+		PosStorage.AddSale(sale);
+	}
 }
 
 

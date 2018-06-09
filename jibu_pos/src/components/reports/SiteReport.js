@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Text, View, StyleSheet, TouchableHighlight, FlatList } from 'react-native';
 import * as colors from '../../styles/sema_colors'
+import PosStorage from '../../database/PosStorage'
+
 export default class SiteReport extends Component {
 	render() {
 		return (
@@ -46,12 +48,21 @@ class Report extends Component {
 }
 
 class SalesReport extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			salesData: []
+		}
+	}
+	componentDidMount() {
+		this.getSalesData();
+	}
 	render() {
 		return (
 			<View style ={{flex:1}}>
 				<View style = {{flex:1, backgroundColor:'white', marginLeft:30, marginRight:30, marginTop:80, }}>
 					<FlatList
-						data={this.getSalesData()}
+						data={this.state.salesData}
 						ListHeaderComponent = {this.showHeader}
 						// extraData={this.state.refresh}
 						renderItem={({item, index, separators}) => (
@@ -68,10 +79,44 @@ class SalesReport extends Component {
 		);
 	}
 	getSalesData = () =>{
-		return [ {sku:'18.75L refill', quantity:21, litersPerSku:18.75, totalLiters:383.75, pricePerSku:'$1.00', totalSales:'$21'},
-			{sku:'20L jug', quantity:2, litersPerSku:20, totalLiters:40, pricePerSku:'$4.00', totalSales:'$8'}
-		];
+		let results = new Map();
+		let sales = PosStorage.GetSales();
+		sales.every( saleKey =>{
+			PosStorage.LoadSale( saleKey ).then( sale => {
+				sale.products.every( product =>{
+					let mapProduct = results.get(product.sku);
+					if( mapProduct ){
+						mapProduct.quantity += product.quantity;
+						mapProduct.totalSales += product.quantity * product.price_amount;
+					}else{
+						mapProduct = {
+							sku: product.description,
+							quantity: product.quantity,
+							pricePerSku: product.price_amount,
+							totalSales: product.quantity * product.price_amount,
+							litersPerSku: 'N/A',
+							totalLiters: 'N/A',
+						}
+						results.set(product.sku, mapProduct );
+					}
+				});
+				let displayItems = [];
+				results.forEach( value =>{
+					displayItems.push( value );
+				});
+				var dummy = this;
+				if( this.state.salesData.length ===0 && displayItems.length > 0  ) {
+					setTimeout(() => {
+						dummy.setState({salesData: displayItems})
+					}, 20);
+				}
+			});
+		});
 	};
+
+	// productSale.id = product.product.id;
+	// productSale.gallons =  product.product.gallons;
+
 	getRow = (item)=>{
 		console.log("SalesReport - getRow");
 		return (

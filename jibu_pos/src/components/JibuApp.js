@@ -32,7 +32,7 @@ class JibuApp extends Component {
 		this.state = {synchronization: {customersLoaded:false,
 										productsLoaded:false},
 					  isConnected: false};
-		this.posStorage = new PosStorage();
+		this.posStorage = PosStorage;
 	}
 	componentDidMount() {
 		console.log("Mounted");
@@ -75,7 +75,7 @@ class JibuApp extends Component {
 class ScreenSwitcher extends Component {
 
 	render() {
-		if (this.props.currentScreen.showMain === false) {
+		if (this.props.currentScreen.showMain === true) {
 			return (
 				<View style={{ flex: 1 }}>
 					<CustomerBar/>

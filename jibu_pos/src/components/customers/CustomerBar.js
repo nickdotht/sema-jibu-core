@@ -9,7 +9,7 @@ import {
 
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import PosStorage from "../../database/PosStorage";
+// import PosStorage from "../../database/PosStorage";
 import * as NetworkActions from "../../actions/NetworkActions";
 import * as CustomerActions from "../../actions/CustomerActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
