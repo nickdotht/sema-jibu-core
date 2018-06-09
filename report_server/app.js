@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var validator = require('express-validator');
 
-var index = require('./routes/index');
+var index = require('./routes');
 var seama_health_check = require('./routes/sema_health_check');
 var seama_login = require('./routes/sema_login');
 var seama_kiosks = require('./routes/sema_kiosks');
