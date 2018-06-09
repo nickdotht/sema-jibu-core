@@ -5,7 +5,6 @@ const sprintf = require('sprintf-js').sprintf;
 require('datejs');
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const { PeriodData } = require(`${__basedir}/seama_services/datetime_services`);
-const {	connectionPool } = require(`${__basedir}/seama_services/db_service`);
 
 /* GET data for sales view. */
 const sqlTotalCustomers =
@@ -83,7 +82,7 @@ router.get('/', function(request, response) {
 			}
 			// Use the most recent receipt as the end date if now is specified (Because there may
 			// be many receipts, we don't want the SQL query to span too much tine}
-			connectionPool.getConnection((err, connection) => {
+			__pool.getConnection((err, connection) => {
 				getMostRecentReceipt(connection, request.query, endDate).then((receiptEndDate) => {
 					getMostRecentCustomer(connection, request.query, endDate).then((customerEndDate) => {
 						getTotalCustomers(connection, request.query, results).then(() => {

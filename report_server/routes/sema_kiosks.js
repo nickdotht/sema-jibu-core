@@ -1,12 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { connectionPool } = require(`${__basedir}/seama_services/db_service`);
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 
 /* GET kiosks in the database. */
 router.get('/', function(req, res) {
 	semaLog.info('kiosks - Enter');
-	connectionPool.getConnection((err, connection) => {
+	__pool.getConnection((err, connection) => {
+		if (err) {
+			console.log("WTF: "+ err);
+			return ;
+		}
 		connection.query('SELECT * FROM kiosk', (err, result ) => {
 			connection.release();
 

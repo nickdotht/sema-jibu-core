@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { connectionPool } = require(`${__basedir}/seama_services/db_service`);
 require('datejs');
 const semaLog = require('../seama_services/sema_logger');
 
@@ -99,7 +98,7 @@ router.get('/', function(request, response) {
 				endDate = new Date(Date.parse(request.query.enddate));
 			}
 
-			connectionPool.getConnection((err, connection) => {
+			__pool.getConnection((err, connection) => {
 				getParametersAndSiteIds(connection ).then( () => {
 					getMostRecentReading(connection, request.query, endDate).then((newEndDate) => {
 						endDate = newEndDate;
