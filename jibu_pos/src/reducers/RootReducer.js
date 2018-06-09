@@ -6,6 +6,7 @@ import customerBarReducer from "./CustomerBarReducer";
 import productReducer from "./ProductReducer";
 import orderReducer from "./OrderReducer";
 import toolBarReducer from "./ToolbarReducer";
+import reportReducer from "./ReportReducer";
 
 // Combine all the reducers
 const RootReducer = combineReducers({
@@ -14,8 +15,9 @@ const RootReducer = combineReducers({
 	customerBarReducer,
 	productReducer,
 	orderReducer,
-	toolBarReducer
+	toolBarReducer,
+	reportReducer
 
-})
+});
 
 export default RootReducer;
