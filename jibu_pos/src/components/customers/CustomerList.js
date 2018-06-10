@@ -52,7 +52,7 @@ class CustomerList extends Component {
 				"address": "----------------------------",
 				"contact_name": "Walkup Client",
 				"customer_type_id": 120,
-				"due_amount": "---------------",
+				"due_amount": "",
 				"name": "",
 				"phone_number": "----------------------------",
 				"active": "1",
