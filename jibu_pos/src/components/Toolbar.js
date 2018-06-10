@@ -12,6 +12,7 @@ import {connect} from "react-redux";
 import * as CustomerActions from "../actions/CustomerActions";
 import networkReducer from "../reducers/NetworkReducer";
 import * as ToolBarActions from "../actions/ToolBarActions";
+import PosStorage from "../database/PosStorage";
 
 class Toolbar extends Component {
     render() {
@@ -19,9 +20,11 @@ class Toolbar extends Component {
         	<View style ={styles.toolbar}>
 				<View style = {[styles.leftToolbar]}>
 					<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
-					<Text style = {[styles.text_style, {left:50}]}>Version: 0.0.8</Text>
-					<Text style = {[styles.text_style, {left:100}]}>Site:</Text>
-					<View style = {[styles.site_container, {left:130}]}>
+					<TouchableHighlight onPress={() => this.onClearOrders()}>
+						<Text style = {[styles.text_style, {marginLeft:50}]}>Version: 0.0.8</Text>
+					</TouchableHighlight>
+					<Text style = {[styles.text_style, {marginLeft:20}]}>Site:</Text>
+					<View style = {[styles.site_container, {marginLeft:20}]}>
 						<Text style = {styles.site_text}>Kampala</Text>
 					</View>
 				</View>
@@ -49,6 +52,10 @@ class Toolbar extends Component {
 
 		}
     };
+	onClearOrders= () =>{
+		console.log("onClearOrders");
+		PosStorage.ClearAll();
+	};
 
 	onLogout= () =>{
 		console.log("onLogout");
