@@ -1,99 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const connectionTable = require('../seama_services/db_service').connectionTable;
-const semaLog = require('../seama_services/sema_logger');
+const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 
 /* GET kiosks in the database. */
-
 router.get('/', function(req, res) {
 	semaLog.info('kiosks - Enter');
-	let mockit = req.app.get('mockIt');
-	if (mockit) {
-		res.json({
-			kiosks: [
-				{
-					id: 98,
-					version: 0,
-					api_key: 'S21nt2rd',
-					name: 'Mock - Saintard',
-					region_id: 40
-				},
-				{
-					id: 99,
-					version: 0,
-					api_key: 'C0r21l',
-					name: 'Corail',
-					region_id: 40
-				},
-				{
-					id: 100,
-					version: 0,
-					api_key: 'Courjo113',
-					name: 'Mock - Courjolles',
-					region_id: 40
-				},
-				{
-					id: 101,
-					version: 0,
-					api_key: 'C2b2r3t',
-					name: 'Cabaret',
-					region_id: 40
-				},
-				{
-					id: 102,
-					version: 0,
-					api_key: 'S2nt019',
-					name: 'Santo19',
-					region_id: 42
-				},
-				{
-					id: 103,
-					version: 0,
-					api_key: 'B01sn3uf',
-					name: 'Bois9',
-					region_id: 42
-				},
-				{
-					id: 104,
-					version: 0,
-					api_key: '2u2rt13r',
-					name: 'Quartier Morin',
-					region_id: 41
-				},
-				{
-					id: 105,
-					version: 0,
-					api_key: '11m0n2d3',
-					name: 'Limonade',
-					region_id: 41
-				},
-				{
-					id: 112,
-					version: 0,
-					api_key: 'r40ulspl4c3',
-					name: 'Raouls Place',
-					region_id: 43
-				},
-				{
-					id: 113,
-					version: 0,
-					api_key: 'k10sk90ua',
-					name: 'Ouanaminthe',
-					region_id: 41
-				},
-				{
-					id: 114,
-					version: 0,
-					api_key: 'HQ177',
-					name: 'HQ',
-					region_id: 42
-				}
-			]
-		});
-	} else {
-		const sessData = req.session;
-		const connection = connectionTable[sessData.id];
-		connection.query('SELECT * FROM kiosk', function(err, result ) {
+	__pool.getConnection((err, connection) => {
+		if (err) {
+			console.log("WTF: "+ err);
+			return ;
+		}
+		connection.query('SELECT * FROM kiosk', (err, result ) => {
+			connection.release();
+
 			if (err) {
 				semaLog.error( 'kiosks - failed', {err});
 				res.status(500).send(err.message);
@@ -102,7 +21,7 @@ router.get('/', function(req, res) {
 				res.json({ kiosks: result });
 			}
 		});
-	}
+	});
 });
 
 module.exports = router;
