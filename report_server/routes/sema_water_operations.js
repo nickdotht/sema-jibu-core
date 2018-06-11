@@ -203,7 +203,7 @@ const getSitePressure = (connection, params, pressureName, pressureResult,  resu
 			} else {
 				try{
 					if (Array.isArray(result) && result.length >= 1) {
-						pressureResult.value = result[0].value;
+						pressureResult.value = parseFloat(result[0].value);
 						pressureResult.date = new Date(result[0].created_date);
 					}
 					resolve();
@@ -227,7 +227,7 @@ const getFlowRate = (connection, params, flowRateName, flowRateResult, results) 
 			} else {
 				try{
 					if (Array.isArray(result) && result.length >= 1) {
-						flowRateResult.value = result[0].value;
+						flowRateResult.value = parseFloat(result[0].value);
 						flowRateResult.date = new Date(result[0].created_date);
 					}
 					resolve();
@@ -298,7 +298,7 @@ function getTotalChlorine(connection, params, beginDate, endDate, results) {
 				try {
 					if (Array.isArray(result) && result.length >= 1) {
 						const timeTicks = result.map(item =>{return item.created_date});
-						const values = result.map(item =>{return item.value});
+						const values = result.map(item =>{return parseFloat(item.value)});
 						results.chlorine = {
 							x_axis: timeTicks,
 							datasets: [{label: 'Total Chlorine', data: values}]
