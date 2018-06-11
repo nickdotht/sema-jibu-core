@@ -16,21 +16,23 @@ describe('Testing Login', function () {
 		delete require.cache[require.resolve('../bin/www')];
 		done();
 	});
-	describe('GET /untapped/login - missing auth', function() {
+	describe('POST /untapped/login - missing auth', function() {
 		it('should get /untapped/login', function testLoginNoAuth(done) {
 			chai.request(server)
-				.get('/untapped/login')
+				.post('/untapped/login')
 				.end(function(err, res) {
 					res.should.have.status(400);	// No Auth headers!
 					done(err);
 				});
 		});
 	});
-	describe('GET /untapped/login - correct auth', function() {
+
+
+	describe('POST /untapped/login - correct auth', function() {
 		it('should get /untapped/login', function testLoginNoAuth(done) {
 			chai.request(server)
-				.get('/untapped/login')
-				.auth('administrator', 'dloHaiti')
+				.post('/untapped/login')
+				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
 				.end(function(err, res) {
 					res.should.have.status(200);	// Correct Auth!
 					res.body.should.have.property('version').eql('0.0.0.2');
@@ -38,10 +40,10 @@ describe('Testing Login', function () {
 				});
 		});
 	});
-	describe('GET /untapped/login - incorrect auth', function() {
+	describe('POST /untapped/login - incorrect auth', function() {
 		it('should get /untapped/login', function testLoginNoAuth(done) {
 			chai.request(server)
-				.get('/untapped/login')
+				.post('/untapped/login')
 				.auth('administrator', 'xxxx')
 				.end(function(err, res) {
 					res.should.have.status(401);	// Invalid Auth!
