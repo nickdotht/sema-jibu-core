@@ -15,9 +15,9 @@ class SalesReport extends Component {
 	render() {
 		return (
 			<View style ={{flex:1}}>
-				<View style = {{flex:1, backgroundColor:'white', marginLeft:30, marginRight:30, marginTop:80, }}>
+				<View style = {{flex:.7, backgroundColor:'white', marginLeft:30, marginRight:30, marginTop:80, }}>
 					<FlatList
-						data={this.props.salesData}
+						data={this.props.salesData.salesItems}
 						ListHeaderComponent = {this.showHeader}
 						// extraData={this.state.refresh}
 						renderItem={({item, index, separators}) => (
@@ -28,8 +28,17 @@ class SalesReport extends Component {
 						keyExtractor={item => item.sku}
 						initialNumToRender={50}
 					/>
-
 				</View>
+				<View style = {{flex:.3, backgroundColor:'white', marginLeft:30, marginRight:30, marginBottom:100, }}>
+					<View style = {{flex: 1, flexDirection: 'row'}}>
+						<Text style={[styles.totalItem, {flex:1.7}]}> </Text>
+						<Text style={[styles.totalItem, {flex:.9}]}>Total Liters </Text>
+						<Text style={[styles.totalItem, {flex:.6}]}>{this.props.salesData.totalLiters}</Text>
+						<Text style={[styles.totalItem, {flex:.7}]}>Total Sales </Text>
+						<Text style={[styles.totalItem, {flex:.5}]}>{this.props.salesData.totalSales}</Text>
+					</View>
+				</View>
+
 			</View>
 		);
 	}
@@ -119,6 +128,11 @@ const styles = StyleSheet.create({
 
 	headerBackground:{
 		backgroundColor:'white'
+	},
+	totalItem:{
+		fontWeight:"bold",
+		fontSize:18,
+		paddingLeft:10,
 	},
 
 

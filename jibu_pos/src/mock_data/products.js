@@ -11,7 +11,8 @@ export default mock_products = [
 		"minimum_quantity" : 5,
 		"price_amount" : 2000,
 		"price_currency" : "HTG",
-		"sku" : "MP"
+		"sku" : "MP",
+		"liters_per_sku":5
 	},
 	{
 		"id" : 491,
@@ -25,7 +26,8 @@ export default mock_products = [
 		"minimum_quantity" : 4,
 		"price_amount" : 14000,
 		"price_currency" : "HTG",
-		"sku" : "PPP"
+		"sku" : "PPP",
+		"liters_per_sku":18.75
 	},
 	{
 		"id" : 492,
@@ -39,7 +41,8 @@ export default mock_products = [
 		"minimum_quantity" : 0,
 		"price_amount" : 12500,
 		"price_currency" : "HTG",
-		"sku" : "GP"
+		"sku" : "GP",
+		"liters_per_sku":20
 	},
 	{
 		"id" : 493,
@@ -53,7 +56,8 @@ export default mock_products = [
 		"minimum_quantity" : 4,
 		"price_amount" : 5000,
 		"price_currency" : "HTG",
-		"sku" : "RGP"
+		"sku" : "RGP",
+		"liters_per_sku":20
 	},
 	{
 		"id" : 494,

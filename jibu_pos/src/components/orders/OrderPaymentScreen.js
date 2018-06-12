@@ -250,6 +250,7 @@ class OrderPaymentScreen extends Component {
 			productSale.id = product.product.id;
 			productSale.description = product.product.description;
 			productSale.gallons =  product.product.gallons;
+			productSale.liters_per_sku = product.product.liters_per_sku;
 			productSale.sku = product.product.sku;
 			productSale.price_amount = product.product.price_amount;
 			productSale.price_currency  = product.product.price_currency;
