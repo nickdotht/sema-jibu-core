@@ -9,14 +9,16 @@ require('datejs');
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 
-describe('Testing Water Production API', () => {
+describe('Testing Water Production API', function () {
 	let server;
+	this.timeout(6000);
 	beforeEach( () => {
 		server = require('../bin/www' );
 	});
 	afterEach( (done) => {
-		delete require.cache[require.resolve('../bin/www')];
-		done();
+		var iAmDone = done;
+		server.close();
+		setTimeout( function(){iAmDone()}, 2000);
 	});
 	describe('GET /untapped/water-operations - missing kioskID', () => {
 		it('Should fail with 400 error code', (done) => {
