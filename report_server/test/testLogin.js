@@ -9,12 +9,14 @@ process.env.NODE_ENV = 'test';  // Set environment to test
 
 describe('Testing Login', function () {
 	let server;
-	beforeEach(function () {
+	this.timeout(6000);
+	beforeEach( () => {
 		server = require('../bin/www' );
 	});
-	afterEach(function (done) {
-		delete require.cache[require.resolve('../bin/www')];
-		done();
+	afterEach( (done) => {
+		var iAmDone = done;
+		server.close();
+		setTimeout( function(){iAmDone()}, 2000);
 	});
 	describe('POST /untapped/login - missing auth', function() {
 		it('should get /untapped/login', function testLoginNoAuth(done) {

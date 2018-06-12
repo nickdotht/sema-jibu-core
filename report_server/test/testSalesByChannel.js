@@ -10,12 +10,14 @@ process.env.NODE_ENV = 'test';  // Set environment to test
 
 describe('Testing Sales ByChannel API', function () {
 	let server;
-	beforeEach(function () {
+	this.timeout(6000);
+	beforeEach( () => {
 		server = require('../bin/www' );
 	});
-	afterEach(function (done) {
-		delete require.cache[require.resolve('../bin/www')];
-		done();
+	afterEach( (done) => {
+		var iAmDone = done;
+		server.close();
+		setTimeout( function(){iAmDone()}, 2000);
 	});
 	describe('GET /untapped/sales-by-channel - missing kioskID', function() {
 		it('Should fail with 400 error code', (done) => {

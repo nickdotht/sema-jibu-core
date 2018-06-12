@@ -1,5 +1,4 @@
 const request = require('supertest');
-var enableDestroy = require('server-destroy');
 const expect = require('chai').expect;
 const chai = require('chai');
 chaiHttp = require('chai-http');
@@ -10,17 +9,16 @@ require('datejs');
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 
-describe('Testing Water Production API', () => {
-	var server;
+describe('Testing Water Production API', function () {
+	let server;
+	this.timeout(6000);
 	beforeEach( () => {
 		server = require('../bin/www' );
-		enableDestroy(server);
 	});
 	afterEach( (done) => {
 		var iAmDone = done;
-		server.destroy();
-
-		setTimeout( function(){iAmDone()}, 1000);
+		server.close();
+		setTimeout( function(){iAmDone()}, 2000);
 	});
 	describe('GET /untapped/water-operations - missing kioskID', () => {
 		it('Should fail with 400 error code', (done) => {
