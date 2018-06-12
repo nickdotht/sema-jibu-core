@@ -85,9 +85,7 @@ class SeamaToolbar extends Component {
     }
     logOut (){
         console.log("logOut");
-		this.props.loginActions.setLogin("NotLoggedIn" );
-
-
+		this.props.loginActions.logOut();
     }
 
     render() {
