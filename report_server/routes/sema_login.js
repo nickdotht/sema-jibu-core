@@ -44,7 +44,7 @@ router.post('/', async (req, res) => {
 		semaLog.info('sema_login - succeeded');
 
 		res.json({
-			LogState: 'LoggedIn',
+			logState: 'loggedIn',
 			version: req.app.get('sema_version'),
 			token
 		});
