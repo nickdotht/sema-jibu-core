@@ -10,6 +10,9 @@ const jwt = require('jsonwebtoken');
 router.post('/', async (req, res) => {
 	semaLog.info('sema_login - Enter');
 	const { usernameOrEmail, password } = req.body;
+	if( ! usernameOrEmail || ! password){
+		return res.status(400).send("Bad request, missing username or password");
+	}
 	try {
 		let whereClause = validator.isEmail(usernameOrEmail) ?
 			{ email: usernameOrEmail.toLowerCase() } :

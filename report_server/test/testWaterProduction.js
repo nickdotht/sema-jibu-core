@@ -9,14 +9,16 @@ require('datejs');
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 
-describe('Testing Water Production API', () => {
+describe('Testing Water Production API', function () {
 	let server;
+	this.timeout(6000);
 	beforeEach( () => {
 		server = require('../bin/www' );
 	});
 	afterEach( (done) => {
-		delete require.cache[require.resolve('../bin/www')];
-		done();
+		var iAmDone = done;
+		server.close();
+		setTimeout( function(){iAmDone()}, 2000);
 	});
 	describe('GET /untapped/water-operations - missing kioskID', () => {
 		it('Should fail with 400 error code', (done) => {
@@ -79,7 +81,7 @@ describe('Testing Water Production API', () => {
 							expect(sampleDate.getMonth()).to.equal(4);
 							expect(sampleDate.getDate()).to.equal(1);
 							expect(res.body.chlorine.datasets.length).to.equal(1);
-							expect(res.body.chlorine.datasets[0].data[0]).to.equal(0.5);
+							expect(res.body.chlorine.datasets[0].data[0]).to.equal(0.50);
 
 							// Test total TDS - should be empty
 							expect(res.body.tds.x_axis).to.be.an('array');
@@ -94,7 +96,7 @@ describe('Testing Water Production API', () => {
 							expect(sampleDate.getMonth()).to.equal(4);
 							expect(sampleDate.getDate()).to.equal(15);
 							expect(res.body.production.datasets.length).to.equal(1);
-							expect(res.body.production.datasets[0].data[0]).to.equal(100);
+							expect(res.body.production.datasets[0].data[0]).to.equal(40);
 
 							// Flow rate:
 							expect(res.body.flowRateProduct.value).to.equal(123);

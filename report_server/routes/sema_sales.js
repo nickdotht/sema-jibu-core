@@ -146,6 +146,8 @@ const getTotalRevenue = (connection, requestParams, results ) => {
 					results.totalRevenue.total = sqlResult[0]["SUM(customer_amount)"];
 					if( results.totalRevenue.total === null ){
 						results.totalRevenue.total = "N/A";
+					}else{
+						results.totalRevenue.total = parseFloat(results.totalRevenue.total);
 					}
 				}
 				resolve();
@@ -165,18 +167,18 @@ const getRevenueByPeriod = (connection, requestParams, endDate, results ) => {
 			} else {
 				try{
 					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-						results.totalRevenue.periods[0].setValue(sqlResult[0]["SUM(customer_amount)"]);
+						results.totalRevenue.periods[0].setValue( parseFloat(sqlResult[0]["SUM(customer_amount)"]));
 					}
 					if (Array.isArray(sqlResult) && sqlResult.length > 1) {
 						if( PeriodData.IsExpected( results.totalRevenue.periods[1], new Date( sqlResult[1]["YEAR(created_date)"], sqlResult[1]["MONTH(created_date)"] -1 ))){
-							results.totalRevenue.periods[1].setValue( sqlResult[1]["SUM(customer_amount)"]);
+							results.totalRevenue.periods[1].setValue( parseFloat(sqlResult[1]["SUM(customer_amount)"]));
 						}else{
 							results.totalRevenue.periods[1].setValue(0);
 						}
 					}
 					if (Array.isArray(sqlResult) && sqlResult.length > 2) {
 						if( PeriodData.IsExpected( results.totalRevenue.periods[2], new Date( sqlResult[2]["YEAR(created_date)"], sqlResult[2]["MONTH(created_date)"] -1 ))) {
-							results.totalRevenue.periods[2].setValue(sqlResult[2]["SUM(customer_amount)"]);
+							results.totalRevenue.periods[2].setValue(parseFloat(sqlResult[2]["SUM(customer_amount)"]));
 						}else{
 							results.totalRevenue.periods[2].setValue(0);
 						}
@@ -344,7 +346,7 @@ const updateSales = ( results, sqlResult, index, month, period, endDate ) => {
 
 	PeriodData.UpdatePeriodDates( retailer.periods, endDate, period );
 
-	retailer.periods[0].setValue( sqlResult[index]["SUM(receipt.customer_amount)"]);
+	retailer.periods[0].setValue( parseFloat(sqlResult[index]["SUM(receipt.customer_amount)"]));
 
 	index = getPrevPeriodSales( retailer, sqlResult, index+1, retailer.periods[1] );
 	if( index !== -1 ){
@@ -358,7 +360,7 @@ const getPrevPeriodSales = ( retailer, sqlResult, index, nextPeriod ) => {
 		if( sqlResult[index]["customer_account_id"] === retailer.id &&
 			sqlResult[index]["YEAR(receipt.created_date)"] === nextPeriod.beginDate.getFullYear() &&
 			sqlResult[index]["MONTH(receipt.created_date)"] === (nextPeriod.beginDate.getMonth() +1) ){
-			nextPeriod.setValue( sqlResult[index]["SUM(receipt.customer_amount)"] );
+			nextPeriod.setValue( parseFloat(sqlResult[index]["SUM(receipt.customer_amount)"]) );
 			return index;
 		}
 		index +=1;
