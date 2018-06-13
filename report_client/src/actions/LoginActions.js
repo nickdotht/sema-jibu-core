@@ -3,29 +3,33 @@ import { loginService } from '../services';
 
 export const receiveLogin = data => {
 	console.log(`receiveLogin - ${JSON.stringify(data)}`);
-	return {type: allActions.RECEIVE_LOGIN, logState: data};
+	return {type: allActions.RECEIVE_LOGIN, data};
 }
 
-export const fetchLogin = () => {
-	console.log('fetchLogin - loading');
-	return {type: allActions.FETCH_LOGIN, logState: 'loading'};
+export const fetchLogin = data => {
+	console.log(`fetchLogin - ${JSON.stringify(data)}`);
+	return {type: allActions.FETCH_LOGIN, data};
 };
 
 export function login(usernameOrEmail, password) {
 	return dispatch => {
-		dispatch(fetchLogin());
+		dispatch(fetchLogin({ logState: 'loading' }));
 
 		loginService.login(usernameOrEmail, password)
 			.then(response => {
 				if (response.status === 200) {
-					dispatch(receiveLogin(response.data))
+					const data = {...response.data, logState: 'success' };
+					dispatch(receiveLogin(data))
+				} else if (response.status === 401) {
+					const data = { logState: "badCredentials" };
+					dispatch(receiveLogin(data))
 				} else {
-					const data = { logState: "NoService" };
+					const data = { logState: "noService" };
 					dispatch(receiveLogin(data))
 				}
 			})
 			.catch(function(error){
-				const data = { logState: "NoService" };
+				const data = { logState: "noService" };
 				dispatch(receiveLogin(data))
 			});
 	};
