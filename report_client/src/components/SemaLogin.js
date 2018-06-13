@@ -15,14 +15,6 @@ class SemaLogin extends Component {
 		console.log("SemaLogin-constructor");
 
 		this.handleClick = this.handleClick.bind(this);
-		this.handler = this.handler.bind(this);
-		this.state ={
-			show:"normal"
-		};
-	}
-
-	handler(newState) {
-		this.setState({show:newState});
 	}
 
 	handleClick(event) {
@@ -35,10 +27,10 @@ class SemaLogin extends Component {
 	render() {
 		return (
 			<div className="LogIn">
-				<Form horizontal className={this.state.show}>
+				<Form horizontal className="normal">
 					<FormGroup controlId="formUser">
 						<Col sm={10}>
-							<FormControl type="text" placeholder="User" inputRef={ref => { this.inputUser = ref; }}/>
+							<FormControl type="text" placeholder="Username or Email" inputRef={ref => { this.inputUser = ref; }}/>
 						</Col>
 					</FormGroup>
 
@@ -54,16 +46,14 @@ class SemaLogin extends Component {
 						</Col>
 					</FormGroup>
 					<div>
-						<BounceLoader color={'red'} loading={this.props.logState ==="loading"} />
+						<BounceLoader color={'red'} loading={this.props.logState === "loading"} />
 					</div>
 				</Form>
 
-				{ this.props.logState === "NoService" ? <NoService
-					parent={this.handler}
+				{ this.props.logState === "noService" ? <NoService
 					header="Service Not Currently Available"
 					message="The Service is not currently available. Please try again later."/> : null }
-				{ this.props.logState === "BadCredentials" ? <NoService
-					parent={this.handler}
+				{ this.props.logState === "badCredentials" ? <NoService
 					header="Invalid Credentials"
 					message="User name and/or password are not valid"/> : null }
 			</div>
@@ -77,23 +67,23 @@ class NoService extends Component {
 		super(props, context);
 		console.log("NoService-constructor");
 		this.handleClick = this.handleClick.bind(this);
-	}
 
-	componentDidMount() {
-		this.props.parent("dimmed", false);
+		this.state ={
+			show: ""
+		};
 	}
 
 	handleClick(event) {
 		console.log("SemaLogin - handleClick");
 
-		this.props.parent("normal", true);
+		this.setState({ show: 'hidden' });
 
 		event.preventDefault();
 	};
 
 	render() {
 		return (
-			<Alert bsStyle="info" className="SeamaServiceError" style={{textAlign:"center", height:"130px"}}>
+			<Alert bsStyle="info" className={`${this.state.show} SeamaServiceError`} style={{textAlign:"center", height:"130px"}}>
 				<h4>{this.props.header}</h4>
 				<p>{this.props.message}</p>
 				<Button bsStyle="info" onClick={this.handleClick} style={{marginTop:"15px"}}>Ok</Button>
@@ -110,7 +100,7 @@ SemaLogin.propTypes = {
 
 function mapStateToProps(state) {
 	return {
-		logState: state.logIn.LogState
+		logState: state.logIn.logState
 	};
 }
 
