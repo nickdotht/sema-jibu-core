@@ -37,7 +37,7 @@ describe('Testing Login', function () {
 				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
 				.end(function(err, res) {
 					res.should.have.status(200);	// Correct Auth!
-					res.body.should.have.property('version').eql('0.0.0.2');
+					res.body.should.have.property('version').eql('0.0.0.7');
 					done(err);
 				});
 		});
@@ -46,7 +46,7 @@ describe('Testing Login', function () {
 		it('should get /untapped/login', function testLoginNoAuth(done) {
 			chai.request(server)
 				.post('/untapped/login')
-				.auth('administrator', 'xxxx')
+				.send({ usernameOrEmail:'administrator' , password:'xxxx' })
 				.end(function(err, res) {
 					res.should.have.status(401);	// Invalid Auth!
 					done(err);
