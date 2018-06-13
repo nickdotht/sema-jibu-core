@@ -4,8 +4,7 @@ import {
     View,
 	Text,
 	Image,
-	TouchableHighlight,
-	TouchableOpacity
+	TouchableHighlight
 } from 'react-native';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -30,7 +29,7 @@ class Toolbar extends Component {
 				</View>
 				<View style = {[styles.rightToolbar]}>
 					<TouchableHighlight onPress={() => this.onSettings()}>
-						<Image source={require('../images/gear-icon.png')} resizeMode ='stretch'style={[styles.iconSize, {marginRight:20} ]}/>
+						<Image source={require('../images/gear-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
 					</TouchableHighlight>
 					<TouchableHighlight onPress={() => this.onLogout()}>
 						<Text style = {[styles.text_style,{marginRight:20}]}>Logout</Text>
@@ -59,6 +58,7 @@ class Toolbar extends Component {
 
 	onLogout= () =>{
 		console.log("onLogout");
+		this.props.toolbarActions.SetLoggedIn(false);
 	};
 
 	onSettings= () =>{

@@ -2,7 +2,6 @@ import React, {Component} from "react";
 import {
     StyleSheet,
     View,
-	Text,
 	NetInfo,
 } from 'react-native';
 
@@ -11,6 +10,7 @@ import {CustomerViews} from './customers/CustomerViews'
 import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
 import DashboardReport from './reports/DashboardReport';
+import Login from './Login';
 
 import {bindActionCreators} from 'redux';
 
@@ -53,12 +53,7 @@ class JibuApp extends Component {
 
 	}
     render() {
-        return (
-			<View style={{ flex: 1 }}>
-				<Toolbar/>
-				<ScreenSwitcher currentScreen = {this.props.showScreen} Jibu = {this}/>
-			</View>
-		);
+        return (this.getLoginOrHomeScreen());
     }
 
     SynchronizeCustomers() {
@@ -71,6 +66,22 @@ class JibuApp extends Component {
 		console.log("handleConnectivityChange: " + isConnected);
 		this.props.networkActions.NetworkConnection(isConnected);
 	};
+
+	getLoginOrHomeScreen(){
+		if( this.props.showScreen.isLoggedIn ) {
+			return (
+				<View style={{flex: 1}}>
+					<Toolbar/>
+					<ScreenSwitcher currentScreen={this.props.showScreen} Jibu={this}/>
+				</View>
+
+			);
+		}else{
+			return(
+				<Login/>
+			);
+		}
+	}
 }
 class ScreenSwitcher extends Component {
 
