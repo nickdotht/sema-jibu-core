@@ -21,6 +21,8 @@ const passport = require('passport');
 const configurePassport = require('./config/passport');
 const { isAuthenticated, isAuthorized } = require('./seama_services/auth_services');
 
+const { version } = require('./package.json');
+
 var app = express();
 
 app.use(passport.initialize());
@@ -68,6 +70,6 @@ app.use(function(err, req, res) {
 });
 
 // Version
-app.set('sema_version', '0.0.0.7');
+app.set('sema_version', version);
 
 module.exports = app;
