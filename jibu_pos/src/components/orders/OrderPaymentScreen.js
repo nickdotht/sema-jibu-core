@@ -129,9 +129,9 @@ class OrderPaymentScreen extends Component {
 					<PaymentDescription title = "Total Amount Due:" total={this.calculateTotalDue()}/>
 					<View style={styles.completeOrder}>
 						<View style={{justifyContent:'center', height:100}}>
-							<TouchableHighlight
+							<TouchableHighlight underlayColor = '#c0c0c0'
 								onPress={() => this.onCompleteOrder()}>
-								<Text style={styles.buttonText}>Complete Sale</Text>
+								<Text style={ [ {paddingTop:20, paddingBottom:20}, styles.buttonText]}>Complete Sale</Text>
 							</TouchableHighlight>
 						</View>
 					</View>

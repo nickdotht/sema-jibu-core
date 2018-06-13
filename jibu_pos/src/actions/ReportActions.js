@@ -24,6 +24,9 @@ const getSalesData = () =>{
 		let results = new Map();
 		let sales = PosStorage.GetSales();
 		let resolvedCount = 0;
+		if( sales.length === 0 ){
+			resolve({totalLiters: 0, totalSales: 0, salesItems:[]});
+		}
 		for( let index = 0; index < sales.length; index++ ){
 			PosStorage.LoadSale(sales[index] ).then( (sale) => {
 				resolvedCount++;

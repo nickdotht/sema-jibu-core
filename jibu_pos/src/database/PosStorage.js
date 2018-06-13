@@ -58,6 +58,7 @@ class PosStorage {
 		this.removeKey(salesKey );
 		this.removeKey(customersKey );
 		this.removeKey(versionKey );
+		this.sales = [];
 	}
 
 	AddCustomers( customerArray ){

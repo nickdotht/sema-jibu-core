@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, FlatList, TouchableHighlight, StyleSheet, Image } from "react-native";
+import { View, Text, FlatList, TouchableHighlight, StyleSheet, Image, TouchableOpacity } from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import * as ProductActions from '../../actions/ProductActions';
@@ -22,13 +22,13 @@ class ProductList extends Component {
 					data={this.prepareData()}
 					// extraData={this.state.refresh}
 					renderItem={({item, index, separators}) => (
-						<TouchableHighlight
+						<TouchableOpacity
 							onPress={() => this.onPressItem(item)}
 							onShowUnderlay={separators.highlight}
 							onHideUnderlay={separators.unhighlight}>
 							{this.getItem(item, index, separators)}
 
-						</TouchableHighlight>
+						</TouchableOpacity>
 					)}
 					keyExtractor={item => item.id}
 					numColumns={3}

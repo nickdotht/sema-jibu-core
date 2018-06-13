@@ -1,5 +1,5 @@
 import React, {Component}  from "react"
-import { View, Text, Button, TouchableHighlight, StyleSheet } from "react-native";
+import { View, Text, Button, TouchableHighlight, StyleSheet, TouchableNativeFeedback } from "react-native";
 import * as OrderActions from "../../actions/OrderActions";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -9,9 +9,9 @@ class OrderCheckout extends Component {
 		return (
 			<View style={styles.container}>
 				<View style={[{flex: 1, justifyContent:'center'}, this.getOpacity()]}>
-					<TouchableHighlight
+					<TouchableHighlight underlayColor = '#c0c0c0'
 						onPress={() => this.onPay()}>
-						<Text style={[{ color:'white'}, styles.buttonText]}>Pay</Text>
+						<Text style={[{paddingTop:20, paddingBottom:20}, styles.buttonText]}>Pay</Text>
 					</TouchableHighlight>
 				</View>
 			</View>
@@ -20,7 +20,7 @@ class OrderCheckout extends Component {
 	onPay = ()=>{
 		console.log("onPay");
 		this.props.orderActions.SetOrderFlow('payment');
-	}
+	};
 	getOpacity = ()=>{
 		if( this.props.products.length == 0 ){
 			return {opacity:.3};
@@ -42,7 +42,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(OrderCheckout);
 const styles = StyleSheet.create({
 
 	container: {
-		flex: 2,
+		flex: 1,
 		backgroundColor:"#2858a7",
 
 	},
@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
 		fontWeight:'bold',
 		fontSize:30,
 		alignSelf:'center',
+		color:'white'
 	}
 
 });
