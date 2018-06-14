@@ -1,14 +1,14 @@
 
 import {combineReducers} from 'redux';
 import healthCheck from './HealthcheckReducer';
-import logIn from './LoginReducer';
+import auth from './AuthReducer';
 import kiosk from './KioskReducer';
 import waterOperations from './WaterOperationsReducer';
 import sales from './SalesReducer';
 
 const rootReducer = combineReducers({
     healthCheck,
-	logIn,
+	auth,
 	kiosk,
 	waterOperations,
 	sales
