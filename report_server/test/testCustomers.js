@@ -5,6 +5,7 @@ chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const should = chai.should();
 const sprintf = require('sprintf-js').sprintf;
+var findKioskIndex = require('./Utilities/findKioskIndex');
 
 
 describe('Testing Customers API', function () {
@@ -49,15 +50,10 @@ describe('Testing Customers API', function () {
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					let url = "/sema/site/customers?site-id=%d";
-					let site_index = -1;	// Not a real index
-					for (let i=0; i<res.body.kiosks.length; i++) {
-						if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-							site_index = i;
-							break;
-						}
-					}
 
-					res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
+
+					res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 					url = sprintf(url, res.body.kiosks[site_index].id)
 
@@ -87,15 +83,9 @@ describe('Testing Customers API', function () {
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					let url = "/sema/site/customers?site-id=%d&begin-date=%s";
-					let site_index = -1;	// Not a real index
-					for (let i=0; i<res.body.kiosks.length; i++) {
-						if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-							site_index = i;
-							break;
-						}
-					}
+					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-					res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+					res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 					url = sprintf(url, res.body.kiosks[site_index].id, new Date("2018-2-1"));
 
@@ -118,15 +108,9 @@ describe('Testing Customers API', function () {
 					.end(function(err, res) {
 						expect(res.body.kiosks).to.be.an('array');
 						let url = "/sema/site/customers?site-id=%d&begin-date=%s";
-						let site_index = -1;	// Not a real index
-						for (let i = 0; i < res.body.kiosks.length; i++) {
-							if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-								site_index = i;
-								break;
-							}
-						}
+						let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-						res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+						res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 						url = sprintf(url, res.body.kiosks[site_index].id, new Date("2018-6-1"));
 
@@ -155,15 +139,9 @@ describe('Testing Customers API', function () {
 					.end(function(err, res) {
 						expect(res.body.kiosks).to.be.an('array');
 						let url = "/sema/site/customers?site-id=%d&end-date=%s";
-						let site_index = -1;	// Not a real index
-						for (let i = 0; i < res.body.kiosks.length; i++) {
-							if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-								site_index = i;
-								break;
-							}
-						}
+						let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-						res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+						res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 						url = sprintf(url, res.body.kiosks[site_index].id, new Date("2018-2-1"));
 
@@ -185,15 +163,9 @@ describe('Testing Customers API', function () {
 						.end(function(err, res) {
 							expect(res.body.kiosks).to.be.an('array');
 							let url = "/sema/site/customers?site-id=%d&end-date=%s";
-							let site_index = -1;	// Not a real index
-							for (let i = 0; i < res.body.kiosks.length; i++) {
-								if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-									site_index = i;
-									break;
-								}
-							}
+							let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-							res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+							res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 							url = sprintf(url, res.body.kiosks[site_index].id, new Date("2017-1-1"));
 
@@ -223,15 +195,9 @@ describe('Testing Customers API', function () {
 					.end(function(err, res) {
 						expect(res.body.kiosks).to.be.an('array');
 						let url = "/sema/site/customers?site-id=%d&updated-date=%s";
-						let site_index = -1;	// Not a real index
-						for (let i = 0; i < res.body.kiosks.length; i++) {
-							if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-								site_index = i;
-								break;
-							}
-						}
+						let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-						res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+						res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 						url = sprintf(url, res.body.kiosks[site_index].id, new Date("2018-3-1"));
 
@@ -262,15 +228,9 @@ describe('Testing Customers API', function () {
 						.end(function(err, res) {
 							expect(res.body.kiosks).to.be.an('array');
 							let url = "/sema/site/customers?site-id=%d&updated-date=%s";
-							let site_index = -1;	// Not a real index
-							for (let i = 0; i < res.body.kiosks.length; i++) {
-								if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-									site_index = i;
-									break;
-								}
-							}
+							let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-							res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+							res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 							url = sprintf(url, res.body.kiosks[site_index].id, new Date("2018-5-1"));
 
@@ -300,15 +260,9 @@ describe('Testing Customers API', function () {
 					.end(function(err, res) {
 						expect(res.body.kiosks).to.be.an('array');
 						let url = "/sema/site/customers?site-id=%d&begin-date=%s&end-date=%s";
-						let site_index = -1;	// Not a real index
-						for (let i = 0; i < res.body.kiosks.length; i++) {
-							if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-								site_index = i;
-								break;
-							}
-						}
+						let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-						res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+						res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 						url = sprintf(url, res.body.kiosks[site_index].id, new Date("2018-2-1"), new Date("2018-4-1"));
 
@@ -331,15 +285,9 @@ describe('Testing Customers API', function () {
 						.end(function(err, res) {
 							expect(res.body.kiosks).to.be.an('array');
 							let url = "/sema/site/customers?site-id=%d&begin-date=%s&end-date=%s";
-							let site_index = -1;	// Not a real index
-							for (let i = 0; i < res.body.kiosks.length; i++) {
-								if (res.body.kiosks[i].name === 'UnitTestCustomers') {
-									site_index = i;
-									break;
-								}
-							}
+							let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 
-							res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+							res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 
 							url = sprintf(url, res.body.kiosks[site_index].id, new Date("2018-6-1"), new Date("2018-8-1"));
 

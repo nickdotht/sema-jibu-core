@@ -4,7 +4,7 @@ const chai = require('chai');
 chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const should = chai.should();
-
+var findKioskIndex = require('./Utilities/findKioskIndex');
 process.env.NODE_ENV = 'test';  // Set environment to test
 
 describe('Testing Kiosks', function () {
@@ -25,10 +25,11 @@ describe('Testing Kiosks', function () {
 				.end(function(err, res) {
 					// console.log(JSON.stringify(res))
 					res.should.have.status(200);
+					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
 					res.body.should.be.a('object');
 					res.body.should.have.property('kiosks');
 					expect(res.body.kiosks).to.be.an('array');
-					res.body.kiosks[0].should.have.property('name').eql('UnitTest');
+					res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 					done(err);
 				});
 		});

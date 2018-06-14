@@ -5,6 +5,7 @@ chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const should = chai.should();
 const sprintf = require('sprintf-js').sprintf;
+var findKioskIndex = require('./Utilities/findKioskIndex');
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 
@@ -49,9 +50,11 @@ describe('Testing Sales ByChannel API', function () {
 				.get('/untapped/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
-					res.body.kiosks[0].should.have.property('name').eql('UnitTest');
+					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
+
+					res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 					let url = "/untapped/sales-by-channel?kioskID=%d&groupby=month";
-					url = sprintf( url, res.body.kiosks[0].id)
+					url = sprintf( url, res.body.kiosks[site_index].id)
 					chai.request(server)
 						.get(url)
 						.end(function (err, res) {
@@ -64,7 +67,5 @@ describe('Testing Sales ByChannel API', function () {
 				});
 		});
 	});
-
-
 });
 
