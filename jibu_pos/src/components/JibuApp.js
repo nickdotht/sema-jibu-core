@@ -90,7 +90,7 @@ class JibuApp extends Component {
 class ScreenSwitcher extends Component {
 
 	render() {
-		if (this.props.currentScreen.showMain === true) {
+		if (this.props.currentScreen.screenToShow === "main") {
 			return (
 				<View style={{ flex: 1 }}>
 					<CustomerBar/>
@@ -99,10 +99,14 @@ class ScreenSwitcher extends Component {
 				</View>
 
 			);
-		} else {
+		} else if (this.props.currentScreen.screenToShow === "report") {
 			return (<View style={{flex:1}}>
 				<SiteReport/>
 			</View>);
+		} else{
+			return (<View style={{flex:1,backgroundColor:'yellow'}}>
+			</View>);
+
 		}
 	}
 }

@@ -52,10 +52,10 @@ class Toolbar extends Component {
 
 	onShowRemoteReport = () =>{
         console.log("onShowRemoteReport");
-        if( this.props.showScreen.showMain) {
-			this.props.toolbarActions.ShowReport();
+        if( this.props.showScreen.screenToShow === "main") {
+			this.props.toolbarActions.ShowScreen("report");
 		}else{
-			this.props.toolbarActions.ShowMain();
+			this.props.toolbarActions.ShowScreen("main");
 
 		}
     };
