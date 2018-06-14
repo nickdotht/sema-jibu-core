@@ -16,10 +16,10 @@ import SalesByChannelChart from "./Sales/SalesByChannelChart";
 let dateFormat = require('dateformat');
 
 class SemaSales extends Component {
-    constructor(props, context) {
-        super(props, context);
-        console.log("SeamaSales - Constructor");
-    }
+	constructor(props, context) {
+		super(props, context);
+		console.log("SeamaSales - Constructor");
+	}
 
 	render() {
 		return this.showContent();
@@ -34,26 +34,26 @@ class SemaSales extends Component {
 
 	}
 
-    showSales(){
-        return (
+	showSales(){
+		return (
 			<div className="SalesContainer">
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="New Customers" date={this.props.sales.newCustomers.periods[1].beginDate}
-										  	value={this.props.sales.newCustomers.periods[0].periodValue}
-										  	delta = {calcChange(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)}
-						                  	valueColor = {calcColor(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)} />
+											value={this.props.sales.newCustomers.periods[0].periodValue}
+											delta = {calcChange(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)}
+											valueColor = {calcColor(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)} />
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Revenue" date={this.props.sales.totalRevenue.periods[1].beginDate}
-										  	value={formatDollar(this.props.sales.totalRevenue.total)}
-										  	delta = {calcChange(this.props.sales.totalRevenue.periods[1].periodValue, this.props.sales.totalRevenue.periods[2].periodValue)}
+											value={formatDollar(this.props.sales.totalRevenue.total)}
+											delta = {calcChange(this.props.sales.totalRevenue.periods[1].periodValue, this.props.sales.totalRevenue.periods[2].periodValue)}
 											valueColor = {calcColor(this.props.sales.totalRevenue.periods[1].periodValue, this.props.sales.totalRevenue.periods[2].periodValue)} />
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Net Income" date={this.props.sales.netIncome.periods[1].beginDate}
-										  	value={this.props.sales.netIncome.total}
-										  	delta = {calcChange(this.props.sales.netIncome.periods[1].periodValue, this.props.sales.netIncome.periods[2].periodValue)}
+											value={this.props.sales.netIncome.total}
+											delta = {calcChange(this.props.sales.netIncome.periods[1].periodValue, this.props.sales.netIncome.periods[2].periodValue)}
 											valueColor = {calcColor(this.props.sales.netIncome.periods[1].periodValue, this.props.sales.netIncome.periods[2].periodValue)} />
 					</div>
 				</div>
@@ -95,11 +95,11 @@ class SemaSales extends Component {
 				</div>
 
 			</div>
-        );
-    }
+		);
+	}
 }
 // const foobar = (p)=>{
-// 	return p.sales.salesByChannel;
+//	return p.sales.salesByChannel;
 // }
 
 const formatRetailSalesHeader = (retailSales) =>{
