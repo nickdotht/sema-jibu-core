@@ -52,7 +52,7 @@ class CustomerList extends Component {
 				"address": "----------------------------",
 				"contact_name": "Walkup Client",
 				"customer_type_id": 120,
-				"due_amount": "---------------",
+				"due_amount": "",
 				"name": "",
 				"phone_number": "----------------------------",
 				"active": "1",
@@ -70,7 +70,7 @@ class CustomerList extends Component {
 		}
 		if( this.filterItem(item) ) {
 			return (
-				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row'}]}>
+				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row', height:50, alignItems:'center'}]}>
 					<View style={{flex: 2}}>
 						<Text style={[styles.baseItem, styles.leftMargin]}>{item.contact_name}</Text>
 					</View>
@@ -84,7 +84,7 @@ class CustomerList extends Component {
 						<Text style={[styles.baseItem]}>{item.due_amount}</Text>
 					</View>
 					<View style={{flex: 1}}>
-						<Text style={[styles.baseItem]}>Walk-up</Text>
+						<Text style={[styles.baseItem]}>{this.getCustomerType(item)}</Text>
 					</View>
 				</View>
 			);
@@ -93,11 +93,22 @@ class CustomerList extends Component {
 		}
 	};
 
+	getCustomerType(item) {
+		if( item.hasOwnProperty("sales_channel")){
+			return item.sales_channel;
+		}else{
+			return "Walk-up";
+		}
+	}
+
 	filterItem = (item )=> {
 		if( item.sales_channel === "anonymous"){
 			return true;
 		}
-		if (this.props.filter === "all" || this.props.filter === item.sales_channel){
+		if (this.props.filter === "all" ||
+			(this.props.filter === "reseller" && item.sales_channel === "reseller") ||
+			(this.props.filter === "walkup" && item.sales_channel !== "reseller") ||
+			(this.props.filter === "credit" && item.due_amount >0 )){
 			if (this.state.searchString.length >= 2) {
 				const filterString = this.state.searchString.toLowerCase();
 				if (item.contact_name.toLowerCase().startsWith(filterString) ||
@@ -121,7 +132,7 @@ class CustomerList extends Component {
 	showHeader = () =>{
 		console.log("Displaying header");
 		return (
-			<View style={[{flex: 1, flexDirection: 'row'},styles.headerBackground]}>
+			<View style={[{flex: 1, flexDirection: 'row', height:50, alignItems:'center'},styles.headerBackground]}>
 				<View style={ [{flex: 2}]}>
 					<Text style={[styles.headerItem,styles.leftMargin]}>Name</Text>
 				</View>
@@ -135,7 +146,7 @@ class CustomerList extends Component {
 					<Text style={[styles.headerItem]}>Credit</Text>
 				</View>
 				<View style={ [{flex: 1}]}>
-					<Text style={[styles.headerItem, {flex: 1}, {flexDirection: 'row'}]}>Customer Type</Text>
+					<Text style={[styles.headerItem]}>Customer Type</Text>
 				</View>
 			</View>
 		);
