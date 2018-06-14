@@ -1,31 +1,32 @@
 const express = require('express');
-const mysql = require('mysql2');
 const router = express.Router();
 
 const semaLog = require('../seama_services/sema_logger');
 
-router.get('/', function(req, res ) {
+router.get('/', (req, res) => {
 	semaLog.log('info', 'health-check - Enter');
 
-	const con = mysql.createConnection(__dbConfig);
+	__pool.getConnection((err, connection) => {
+		connection.release();
 
-	con.connect(function(err) {
 		if (err) {
 			semaLog.log('error', 'health-check - Failed; database failure');
-			res.json({
+			semaLog.log('error', err.toString());
+
+			return res.json({
 				server: 'Ok',
 				database: 'Failed',
-				version: req.app.get('sema_version'),
-				err: err.toString()
-			});
-		} else {
-			semaLog.log('info', 'health-check - succeeded');
-			res.json({
-				server: 'Ok',
-				database: 'Ok',
 				version: req.app.get('sema_version')
 			});
 		}
+
+		semaLog.log('info', 'health-check - succeeded');
+
+		res.json({
+			server: 'Ok',
+			database: 'Ok',
+			version: req.app.get('sema_version')
+		});
 	});
 });
 
