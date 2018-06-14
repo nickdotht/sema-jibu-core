@@ -107,14 +107,14 @@ const getCustomers = (query, params, res ) => {
 		__pool.getConnection((err, connection) => {
 
 			connection.query(query, params, function(err, result) {
+				connection.release();
+
 				if (err) {
 					semaLog.error('customers - failed', { err });
 					res.status(500).send(err.message);
-					connection.release();
 					reject(err);
 				}
 				else {
-					connection.release();
 					semaLog.info('customers - succeeded');
 
 					try {
