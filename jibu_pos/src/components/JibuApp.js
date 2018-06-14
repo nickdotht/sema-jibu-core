@@ -47,6 +47,10 @@ class JibuApp extends Component {
 			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});
+		NetInfo.isConnected.fetch().then(isConnected => {
+			console.log('Network is ' + (isConnected ? 'online' : 'offline'));
+			this.props.networkActions.NetworkConnection(isConnected);
+		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 
 		console.log("Mounted-Done");
@@ -118,7 +122,7 @@ function mapStateToProps(state, props) {
 	return {
 		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers,
-		isNWConnected: state.networkReducer.isNWConnected,
+		network: state.networkReducer.network,
 		showView: state.customerBarReducer.showView,
 		showScreen: state.toolBarReducer.showScreen
 

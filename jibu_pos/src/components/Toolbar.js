@@ -22,7 +22,8 @@ class Toolbar extends Component {
 					<TouchableHighlight onPress={() => this.onClearOrders()}>
 						<Text style = {[styles.text_style, {marginLeft:50}]}>Version: 0.0.8</Text>
 					</TouchableHighlight>
-					<Text style = {[styles.text_style, {marginLeft:20}]}>Site:</Text>
+					<Text style = {[styles.text_style, {marginLeft:20}, this.getNetworkStyle()]}>{this.getNetworkState()}</Text>
+					<Text style = {[styles.text_style, {marginLeft:30}]}>Site:</Text>
 					<View style = {[styles.site_container, {marginLeft:20}]}>
 						<Text style = {styles.site_text}>Kampala</Text>
 					</View>
@@ -42,6 +43,13 @@ class Toolbar extends Component {
 			</View>
         );
     }
+    getNetworkState  = () =>{
+    	return this.props.network.isNWConnected ? "ONLINE" : "OFFLINE";
+	};
+	getNetworkStyle  = () =>{
+		return this.props.network.isNWConnected ? {} : {color:'red'};
+	};
+
 	onShowRemoteReport = () =>{
         console.log("onShowRemoteReport");
         if( this.props.showScreen.showMain) {
@@ -68,7 +76,7 @@ class Toolbar extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		isNWConnected: state.networkReducer.isNWConnected,
+		network: state.networkReducer.network,
 		showScreen: state.toolBarReducer.showScreen
 	};
 }
