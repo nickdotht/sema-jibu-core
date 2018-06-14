@@ -5,7 +5,7 @@ import 'css/SemaLogin.css';
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import PropTypes from 'prop-types';
-import * as loginActions from 'actions/LoginActions';
+import { authActions } from 'actions';
 import { withRouter } from 'react-router';
 
 class SemaLogin extends Component {
@@ -19,10 +19,10 @@ class SemaLogin extends Component {
 
 	handleClick(event) {
 		console.log("SemaLogin - handleClick");
-		this.props.loginActions.login(this.inputUser.value, this.inputPassword.value);
+		this.props.authActions.login(this.inputUser.value, this.inputPassword.value);
 
 		event.preventDefault();
-	};
+	}
 
 	render() {
 		return (
@@ -94,19 +94,19 @@ class NoService extends Component {
 }
 
 SemaLogin.propTypes = {
-	loginActions: PropTypes.object,
+	authActions: PropTypes.object,
 	logState: PropTypes.string
 };
 
 function mapStateToProps(state) {
 	return {
-		logState: state.logIn.logState
+		logState: state.auth.logState
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		loginActions: bindActionCreators(loginActions, dispatch)
+		authActions: bindActionCreators(authActions, dispatch)
 	};
 }
 
