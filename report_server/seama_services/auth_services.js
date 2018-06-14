@@ -19,7 +19,7 @@ const isAuthorized = (...authorizedRoles) =>
 
 		if (!found) {
 			// TODO: Improve this error message
-			return res.status(403).json('Forbidden');
+			return res.status(403).json({ msg: 'Forbidden' });
 		}
 
 		next();
