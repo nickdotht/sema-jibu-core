@@ -6,6 +6,7 @@ chai.use(chaiHttp);
 const should = chai.should();
 const sprintf = require('sprintf-js').sprintf;
 require('datejs');
+var findKioskIndex = require('./Utilities/findKioskIndex');
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 
@@ -64,10 +65,11 @@ describe('Testing Water Production API', function () {
 				.get('/untapped/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
-					res.body.kiosks[0].should.have.property('name').eql('UnitTest');
+					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
+					res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 					let endDate = new Date(2018,5, 1);	// Need truncate at June 1, 2018 to capture May, 2018 readings
 					let url = "/untapped/water-operations?kioskID=%d&groupby=month&enddate=%s";
-					url = sprintf( url, res.body.kiosks[0].id, endDate.toISOString())
+					url = sprintf( url, res.body.kiosks[site_index].id, endDate.toISOString())
 					chai.request(server)
 						.get(url)
 						.end(function (err, res) {
@@ -118,10 +120,11 @@ describe('Testing Water Production API', function () {
 				.get('/untapped/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
-					res.body.kiosks[0].should.have.property('name').eql('UnitTest');
+					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
+					res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
 					let endDate = new Date(2018,5, 15);	//
 					let url = "/untapped/water-operations?kioskID=%d&groupby=month&enddate=%s";
-					url = sprintf( url, res.body.kiosks[0].id, endDate.toISOString())
+					url = sprintf( url, res.body.kiosks[site_index].id, endDate.toISOString())
 					chai.request(server)
 						.get(url)
 						.end(function (err, res) {
