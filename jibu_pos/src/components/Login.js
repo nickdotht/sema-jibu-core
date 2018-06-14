@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Modal, ImageBackground } from "react-native";
+import { View, Text, TouchableHighlight, TextInput, StyleSheet, Modal, ImageBackground, Image } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {connect} from "react-redux";
@@ -31,7 +31,10 @@ class Login extends Component {
 						resetScrollToCoords={{ x: 0, y: 0 }}
 						scrollEnabled={false}>
 						<View style ={{flex:1, alignItems:'center' }}>
-								<View style ={[{marginTop:'20%'}, styles.inputContainer]}>
+								<View style ={{marginTop:'5%'}}>
+									<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
+								</View>
+								<View style ={[{marginTop:40}, styles.inputContainer]}>
 									<TextInput
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
@@ -154,7 +157,12 @@ const styles = StyleSheet.create({
 		borderColor:"#2858a7",
 		borderWidth:5,
 		borderRadius:10
-	}
+	},
+	logoSize: {
+		width: 200,
+		height: 200,
+	},
+
 
 
 });
