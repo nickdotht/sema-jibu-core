@@ -3,7 +3,7 @@ import './App.css';
 import './css/SeamaNav.css'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as loginActions from 'actions/LoginActions';
+import { authActions } from 'actions';
 import * as kioskActions from 'actions/KioskActions';
 import * as waterOperationsActions from 'actions/WaterOperationsActions';
 import * as salesActions from 'actions/SalesActions';
@@ -14,7 +14,6 @@ import {
 } from 'react-router-dom';
 import {
 	SemaContainer,
-	PrivateRoute,
 	SemaLogin
 } from './components';
 
@@ -31,7 +30,7 @@ class App extends Component {
 			console.log("on route change", self);
 			switch( location.pathname ){
 				case "/":
-					if( ! this.props.waterOperations.loaded && this.props.kiosk.selectedKiosk.kioskID  ){
+					if( ! this.props.waterOperations.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID  ){
 						this.props.waterOperationsActions.fetchWaterOperations(this.props.kiosk.selectedKiosk);
 					}
 					break;
@@ -58,11 +57,11 @@ class App extends Component {
 
 	render() {
 		return (
-			<Router history={history}>
-				<div>
-					<PrivateRoute exact path="/" component={SemaContainer} />
-					<Route path="/login" component={SemaLogin} />
-				</div>
+			<Router history={ history }>
+				{this.props.auth.currentUser ?
+					<SemaContainer /> :
+					<SemaLogin />
+				}
 			</Router>
 		);
 	}
@@ -70,7 +69,7 @@ class App extends Component {
 
 function mapDispatchToProps(dispatch) {
 	return {
-		loginActions: bindActionCreators(loginActions, dispatch),
+		authActions: bindActionCreators(authActions, dispatch),
 		kioskActions: bindActionCreators(kioskActions, dispatch),
 		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch),
 		salesActions: bindActionCreators(salesActions, dispatch)
@@ -81,7 +80,8 @@ function mapStateToProps(state) {
 	return {
 		kiosk: state.kiosk,
 		waterOperations: state.waterOperations,
-		sales: state.sales
+		sales: state.sales,
+		auth: state.auth
 	};
 }
 
