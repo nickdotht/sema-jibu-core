@@ -1,6 +1,9 @@
-import { RECEIVE_SALES, RECEIVE_SALES_BY_CHANNEL} from 'actions/ActionTypes';
-import {initializeSales} from 'actions/SalesActions'
-import {FORCE_SALES_UPDATE} from "actions/ActionTypes";
+import {
+	RECEIVE_SALES,
+	RECEIVE_SALES_BY_CHANNEL,
+	FORCE_SALES_UPDATE,
+	salesActions
+} from 'actions';
 
 export default function sales(state =init(), action) {
 	let newState;
@@ -25,5 +28,5 @@ export default function sales(state =init(), action) {
 
 
 function init() {
-	return initializeSales()
+	return salesActions.initializeSales()
 }
