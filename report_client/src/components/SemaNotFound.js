@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { connect } from "react-redux";
 
 // TODO: Make this 404 page prettier
 export class SemaNotFound extends Component {
