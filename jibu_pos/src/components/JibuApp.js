@@ -11,6 +11,7 @@ import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
 import DashboardReport from './reports/DashboardReport';
 import Login from './Login';
+import CustomerEdit from './customers/CustomerEdit';
 
 import {bindActionCreators} from 'redux';
 
@@ -104,9 +105,7 @@ class ScreenSwitcher extends Component {
 				<SiteReport/>
 			</View>);
 		} else{
-			return (<View style={{flex:1,backgroundColor:'yellow'}}>
-			</View>);
-
+			return (<CustomerEdit isEdit = {false}/>);
 		}
 	}
 }
