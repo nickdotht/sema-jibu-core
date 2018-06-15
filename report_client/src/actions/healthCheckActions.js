@@ -1,23 +1,19 @@
 import { RECEIVE_HEALTHCHECK } from 'actions';
+import { axiosService } from 'services';
 
 const receiveHealthCheck = data => {
 	console.log("receiveHealthCheck - ", data.toString())
 	return {type: RECEIVE_HEALTHCHECK, healthCheck: data};
 }
 
-export const fetchHealthCheck = () => {
+const fetchHealthCheck = () => {
 	return (dispatch) => {
-		fetch('/untapped/health-check')
-			.then(response =>
-				response.json().then(data => ({
-					data:data,
-					status: response.status
-				}))
-			)
+		axiosService
+			.get('/untapped/health-check')
 			.then(response => {
-				if(response.status === 200){
+				if (response.status === 200){
 					dispatch(receiveHealthCheck(response.data))
-				}else{
+				} else{
 					var data = {server: "failed", database: "n/a"};
 					dispatch(receiveHealthCheck(data))
 				}
@@ -31,3 +27,6 @@ export const fetchHealthCheck = () => {
 	};
 }
 
+export const healthCheckActions = {
+	fetchHealthCheck
+};
