@@ -1,24 +1,19 @@
 import * as allActions from './ActionTypes';
+import { axiosService } from 'services';
 
-export function receiveKiosks(data) {
+function receiveKiosks(data) {
 	console.log("receiveSeamaKiosks - ", data.toString())
 	return {type: allActions.RECEIVE_KIOSKS, kiosks: data};
 }
 
-export function selectKiosk(kiosk) {
+function selectKiosk(kiosk) {
 	console.log("selectKiosk - ", kiosk)
 	return {type: allActions.SELECT_KIOSK, selectedKiosk: kiosk};
 }
 
-export function fetchKiosks() {
+function fetchKiosks() {
 	return (dispatch) => {
-		return fetch('/untapped/kiosks', {credentials: 'include'})
-			.then(response =>
-				response.json().then(data => ({
-					data:data,
-					status: response.status
-				}))
-			)
+		return axiosService('/untapped/kiosks')
 			.then(response => {
 				if(response.status === 200){
 					dispatch(receiveKiosks(response.data))
@@ -34,3 +29,8 @@ export function fetchKiosks() {
 	};
 }
 
+export const kioskActions = {
+	receiveKiosks,
+	selectKiosk,
+	fetchKiosks
+}

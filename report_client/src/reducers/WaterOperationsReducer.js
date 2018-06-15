@@ -1,5 +1,7 @@
-import { RECEIVE_WATER_OPERATIONS} from 'actions/ActionTypes';
-import {initializeWaterOperations} from 'actions/WaterOperationsActions'
+import {
+	RECEIVE_WATER_OPERATIONS,
+	waterOperationsActions
+} from 'actions'
 
 export default function waterOperations(state =init(), action) {
 	let newState;
@@ -15,5 +17,5 @@ export default function waterOperations(state =init(), action) {
 
 
 function init() {
-	return initializeWaterOperations()
+	return waterOperationsActions.initializeWaterOperations()
 }

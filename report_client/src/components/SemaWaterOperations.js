@@ -4,7 +4,7 @@ import SemaSummaryPanel1 from "./WaterQuality/SemaSummaryPanel1";
 import SeamaWaterProductionChart from "./WaterQuality/SeamaWaterProductionChart";
 import SeamaWaterChlorineChart from "./WaterQuality/SeamaWaterChlorineChart";
 import SeamaWaterTdsChart from "./WaterQuality/SeamaWaterTdsChart";
-import 'css/SeamaWaterOperations.css';
+import 'css/SemaWaterOperations.css';
 import SeamaWaterQualityNavigation from "./WaterQuality/SeamaWaterQualityNavigation";
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";

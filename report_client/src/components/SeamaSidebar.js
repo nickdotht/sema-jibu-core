@@ -26,6 +26,8 @@ const ImageStyle = {
     resize:"both",
     width:"240px",
     height:"80px",
+	maxWidth: '100%',
+	marginBottom: '5px'
 };
 
 

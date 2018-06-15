@@ -1,13 +1,14 @@
 import * as allActions from './ActionTypes';
 import moment from "moment/moment";
+import { axiosService } from 'services';
 
-export function receiveWaterOperations(data) {
+function receiveWaterOperations(data) {
 	console.log("receiveWaterOperations - ", data.toString());
 	data = updateWaterQualityState(data);
 	return {type: allActions.RECEIVE_WATER_OPERATIONS, data};
 }
 
-export function initializeWaterOperations() {
+function initializeWaterOperations() {
 	return {
 		loaded:false,
 		totalProduction: {value:"N/A", date:"N/A"},
@@ -23,18 +24,10 @@ export function initializeWaterOperations() {
 	}
 }
 
-export function fetchWaterOperations( params ) {
-	const urlParms = queryParams(params);
-	const url = '/untapped/water-operations?' + urlParms;
-
+function fetchWaterOperations( params ) {
 	return (dispatch) => {
-		return fetch(url, {credentials: 'include'})
-			.then(response =>
-				response.json().then(data => ({
-					data:data,
-					status: response.status
-				}))
-			)
+		return axiosService
+			.get('/untapped/water-operations', { params })
 			.then(response => {
 				if(response.status === 200){
 					dispatch(receiveWaterOperations(response.data))
@@ -49,11 +42,6 @@ export function fetchWaterOperations( params ) {
 			});
 	};
 }
-const queryParams =(params) => {
-	return Object.keys(params)
-		.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-		.join('&');
-};
 
 
 const updateWaterQualityState = waterQuality => {
@@ -70,7 +58,7 @@ const updateWaterQualityState = waterQuality => {
 	newWaterQuality.flowRateFeed = waterQuality.flowRateFeed;
 	newWaterQuality.flowRateProduct = waterQuality.flowRateProduct;
 
-	if( waterQuality.production.datasets.length == 0 ){
+	if( waterQuality.production.datasets.length === 0 ){
 		newWaterQuality.production = createBlankChart();
 	}else{
 		newWaterQuality.production = {
@@ -96,7 +84,7 @@ const updateWaterQualityState = waterQuality => {
 		};
 		newWaterQuality.production.datasets.unshift(lineSet )
 	}
-	if( waterQuality.chlorine.datasets.length == 0){
+	if( waterQuality.chlorine.datasets.length === 0){
 		newWaterQuality.chlorine = createBlankChart();
 	}else{
 		newWaterQuality.chlorine = {
@@ -113,7 +101,7 @@ const updateWaterQualityState = waterQuality => {
 		createGuide(newWaterQuality.chlorine.datasets, 0.4, "yellow", "Low");
 		createGuide(newWaterQuality.chlorine.datasets, 0.6, "green", "ideal");
 	}
-	if( waterQuality.tds.datasets.length == 0){
+	if( waterQuality.tds.datasets.length === 0){
 		newWaterQuality.tds = createBlankChart();
 	}else{
 		newWaterQuality.tds = {
@@ -154,4 +142,10 @@ const createGuide = ( datasets, yValue, color, label) =>{
 };
 const createBlankChart = () => {
 	return { x_axis: [], datasets: []}
+};
+
+export const waterOperationsActions = {
+	receiveWaterOperations,
+	initializeWaterOperations,
+	fetchWaterOperations
 };
