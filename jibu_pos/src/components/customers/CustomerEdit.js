@@ -1,10 +1,11 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Modal, Image, Picker } from "react-native";
+import { View, Text, TouchableHighlight, TextInput, StyleSheet, Modal, Image} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as ToolbarActions from "../../actions/ToolBarActions";
+import ModalDropdown from 'react-native-modal-dropdown';
 
 class CustomerEdit extends Component {
 	constructor(props) {
@@ -44,27 +45,27 @@ class CustomerEdit extends Component {
 									placeholder = 'Telephone Number'/>
 
 							</View>
-							<View style ={[{marginTop:40}, styles.inputContainer]}>
+							<View style ={[{marginTop:20}, styles.inputContainer]}>
 								<TextInput
 									style = {[styles.inputText, ]}
 									underlineColorAndroid='transparent'
 									placeholder = 'Name'/>
 							</View>
-							<View style ={[{marginTop:40}, styles.inputContainer]}>
+							<View style ={[{marginTop:20}, styles.inputContainer]}>
 								<TextInput
 									style = {[styles.inputText, ]}
 									underlineColorAndroid='transparent'
 									placeholder = 'Address'/>
 							</View>
-							<Picker
-								selectedValue={"js"}
-								style={{ height: 50, width: 100, fontSize:20 }}
-								mode={'dropdown'}
-								onValueChange={(itemValue, itemIndex) => this.setState({language: itemValue})}>
-								<Picker.Item label="Java" value="java" />
-								<Picker.Item label="JavaScript" value="js" />
-							</Picker>
-
+							<View style ={[{marginTop:20, flexDirection:'row',alignItems:'center'}]}>
+								<ModalDropdown
+									style ={{width:250}}
+									textStyle={styles.dropdownText}
+									dropdownTextStyle = {[styles.dropdownText, {width:250}]}
+									defaultValue = {"Customer Channel"}
+									options={['Reseller', 'Walkup']}/>
+								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+							</View>
 							<View style={styles.submit}>
 								<View style={{justifyContent:'center', height:100, width:'30%', alignItems:'center'}}>
 									<TouchableHighlight underlayColor = '#c0c0c0'
@@ -173,6 +174,9 @@ const styles = StyleSheet.create({
 		width:400,
 		margin:5
 
+	},
+	dropdownText:{
+		fontSize:24,
 	},
 
 	updating: {

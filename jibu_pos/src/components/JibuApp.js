@@ -73,7 +73,7 @@ class JibuApp extends Component {
 	};
 
 	getLoginOrHomeScreen(){
-		if( this.props.showScreen.isLoggedIn ) {
+		if( this.props.showScreen.isLoggedIn || true) {
 			return (
 				<View style={{flex: 1}}>
 					<Toolbar/>
