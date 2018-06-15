@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Panel } from 'react-bootstrap';
 import 'App.css';
-import 'css/SeamaWaterOperations.css';
+import 'css/SemaWaterOperations.css';
 import {Table } from 'react-bootstrap';
 
 let dateFormat = require('dateformat');
@@ -15,16 +15,16 @@ class SemaSummaryPanel2 extends Component {
 						<Table >
 							<tbody>
 								<tr>
-									<td class="WaterOpTableRow1Col1">{this.populateRow1Col1()}</td>
-									<td class="WaterOpTableRow1Col2to4">{this.populateRow1Col2()}</td>
-									<td class="WaterOpTableRow1Col2to4">{this.populateRow1Col3()}</td>
-									<td class="WaterOpTableRow1Col2to4">{this.populateRow1Col4()}</td>
+									<td className="WaterOpTableRow1Col1">{this.populateRow1Col1()}</td>
+									<td className="WaterOpTableRow1Col2to4">{this.populateRow1Col2()}</td>
+									<td className="WaterOpTableRow1Col2to4">{this.populateRow1Col3()}</td>
+									<td className="WaterOpTableRow1Col2to4">{this.populateRow1Col4()}</td>
 								</tr>
 								<tr>
 									<td style={{border:"none", paddingBottom:0, paddingTop:3}}>{this.populateRow2Col1()}</td>
-									<td class="WaterOpTableRow2Col2to4">{this.populateRow2Col2()}</td>
-									<td class="WaterOpTableRow2Col2to4">{this.populateRow2Col3()}</td>
-									<td class="WaterOpTableRow2Col2to4">{this.populateRow2Col4()}</td>
+									<td className="WaterOpTableRow2Col2to4">{this.populateRow2Col2()}</td>
+									<td className="WaterOpTableRow2Col2to4">{this.populateRow2Col3()}</td>
+									<td className="WaterOpTableRow2Col2to4">{this.populateRow2Col4()}</td>
 								</tr>
 							</tbody>
 						</Table>
@@ -34,7 +34,7 @@ class SemaSummaryPanel2 extends Component {
         );
     }
 	populateRow1Col1(){
-        if( this.props.type == "pressure"){
+        if( this.props.type === "pressure"){
         	return "Pressure";
 		}else{
 			return "Flowrate";
@@ -42,7 +42,7 @@ class SemaSummaryPanel2 extends Component {
     }
 
 	populateRow1Col2(){
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			return "Membrane Feed";
 		}else{
 			return "Feed Flow Rate";
@@ -50,7 +50,7 @@ class SemaSummaryPanel2 extends Component {
 	}
 
 	populateRow1Col3(){
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			return "Pre-Filter In";
 		}else{
 			return "Product Flow Rate";
@@ -58,7 +58,7 @@ class SemaSummaryPanel2 extends Component {
 	}
 
 	populateRow1Col4(){
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			return "Pre-Filter Out";
 		}else{
 			return "";
@@ -66,7 +66,7 @@ class SemaSummaryPanel2 extends Component {
 	}
 
 	populateRow2Col1(){
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			return "Units: PSI";
 		}else{
 			return "Units: GPM";
@@ -74,7 +74,7 @@ class SemaSummaryPanel2 extends Component {
 	}
 
 	populateRow2Col2(){
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			return this.props.data.sitePressureMembrane.value;
 		}else{
 			return this.props.data.flowRateFeed.value;
@@ -82,7 +82,7 @@ class SemaSummaryPanel2 extends Component {
 	}
 
 	populateRow2Col3(){
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			return this.props.data.sitePressureIn.value;
 		}else{
 			return this.props.data.flowRateProduct.value;
@@ -90,7 +90,7 @@ class SemaSummaryPanel2 extends Component {
 	}
 
 	populateRow2Col4(){
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			return this.props.data.sitePressureOut.value;
 		}else{
 			return "";
@@ -99,12 +99,12 @@ class SemaSummaryPanel2 extends Component {
 
 	populateDate(){
     	let dateVal = null;
-		if( this.props.type == "pressure"){
+		if( this.props.type === "pressure"){
 			dateVal = this.props.data.sitePressureMembrane.date;
 		}else{
 			dateVal = this.props.data.flowRateProduct.date;
 		}
-		if( dateVal == "N/A"){
+		if( dateVal === "N/A"){
 			return "";
 		}
 		return this.formatDate(dateVal);
@@ -118,11 +118,11 @@ class SemaSummaryPanel2 extends Component {
 export default SemaSummaryPanel2;
 
 
-{/*<Panel className="WaterQualitySummaryPanel">*/}
-	{/*<Panel.Body  style={{padding:"7px"}}>*/}
-		{/*<Panel.Title componentClass="h3" style={{margin:"0"}}>{this.props.title}</Panel.Title>*/}
-		{/*<p style={{fontSize:"large",margin:"0", color:this.props.valueColor }}>{this.format()}   <span style={{fontSize:"medium",margin:"0", color:"black" }}>{this.props.units}</span></p>*/}
-		{/*<p style={{margin:"0"}}>{this.formatDate()}</p>*/}
-	{/*</Panel.Body>*/}
-{/*</Panel>*/}
-{/*</div>*/}
+// {/*<Panel className="WaterQualitySummaryPanel">*/}
+// 	{/*<Panel.Body  style={{padding:"7px"}}>*/}
+// 		{/*<Panel.Title componentClass="h3" style={{margin:"0"}}>{this.props.title}</Panel.Title>*/}
+// 		{/*<p style={{fontSize:"large",margin:"0", color:this.props.valueColor }}>{this.format()}   <span style={{fontSize:"medium",margin:"0", color:"black" }}>{this.props.units}</span></p>*/}
+// 		{/*<p style={{margin:"0"}}>{this.formatDate()}</p>*/}
+// 	{/*</Panel.Body>*/}
+// {/*</Panel>*/}
+// {/*</div>*/}

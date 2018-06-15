@@ -25,7 +25,7 @@ export default class SalesRetailerList extends Component {
 		this.props.retailers.forEach( (retailer, index) => {
 			// rows.push(<tr {this.calcColor(retailer.thisPeriod, retailer.lastPeriod)}>
 			// rows.push(<tr style={{color:"red"}}>
-			rows.push(<tr style={this.calcColor(retailer.periods[1].periodValue, retailer.periods[2].periodValue)}>
+			rows.push(<tr key={index} style={this.calcColor(retailer.periods[1].periodValue, retailer.periods[2].periodValue)}>
 						<td>{index+1}.</td>
 						<td>{retailer.name}</td>
 						<td>{retailer.periods[0].periodValue}</td>

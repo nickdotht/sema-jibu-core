@@ -1,35 +1,32 @@
-import * as allActions from './ActionTypes';
+import { RECEIVE_HEALTHCHECK } from 'actions';
+import { axiosService } from 'services';
 
-export function receiveHealthCheck(data) {
-    console.log("receiveHealthCheck - ", data.toString())
-    return {type: allActions.RECEIVE_HEALTHCHECK, healthCheck: data};
+const receiveHealthCheck = data => {
+	console.log("receiveHealthCheck - ", data.toString())
+	return {type: RECEIVE_HEALTHCHECK, healthCheck: data};
 }
 
-
-export function fetchHealthCheck() {
-    return (dispatch) => {
-        fetch('/untapped/health-check', {credentials: 'include'})
-            .then(response =>
-                response.json().then(data => ({
-                    data:data,
-                    status: response.status
-                }))
-            )
-            .then(response => {
-                if(response.status === 200){
-                    dispatch(receiveHealthCheck(response.data))
-                }else{
-                    var data = {server: "failed", database: "n/a"};
-                    dispatch(receiveHealthCheck(data))
-
-                }
-            })
-            .catch(function(error){
-                // This means the service isn't running.
-                var data = {server: "failed", database: "n/a"};
-                dispatch(receiveHealthCheck(data))
-            });
-        ;
-    };
+const fetchHealthCheck = () => {
+	return (dispatch) => {
+		axiosService
+			.get('/untapped/health-check')
+			.then(response => {
+				if (response.status === 200){
+					dispatch(receiveHealthCheck(response.data))
+				} else{
+					var data = {server: "failed", database: "n/a"};
+					dispatch(receiveHealthCheck(data))
+				}
+			})
+			.catch(function(error){
+				// This means the service isn't running.
+				var data = {server: "failed", database: "n/a"};
+				dispatch(receiveHealthCheck(data))
+			});
+		;
+	};
 }
 
+export const healthCheckActions = {
+	fetchHealthCheck
+};

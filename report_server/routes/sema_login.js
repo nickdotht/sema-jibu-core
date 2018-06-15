@@ -11,8 +11,9 @@ router.post('/', async (req, res) => {
 	semaLog.info('sema_login - Enter');
 	const { usernameOrEmail, password } = req.body;
 	if( ! usernameOrEmail || ! password){
-		return res.status(400).send("Bad request, missing username or password");
+		return res.status(400).send({ msg: "Bad request, missing username or password" });
 	}
+
 	try {
 		let whereClause = validator.isEmail(usernameOrEmail) ?
 			{ email: usernameOrEmail.toLowerCase() } :
@@ -29,14 +30,14 @@ router.post('/', async (req, res) => {
 
 		if (!user) {
 			semaLog.warn('sema_login - Invalid Credentials');
-			return res.status(401).send("Invalid Credentials");
+			return res.status(401).send({ msg: "Invalid Credentials" });
 		}
 
 		const isValidPassword = await user.comparePassword(password);
 
 		if (!isValidPassword) {
 			semaLog.warn('sema_login - Invalid Credentials');
-			return res.status(401).send("Invalid Credentials");
+			return res.status(401).send({ msg: "Invalid Credentials" });
 		}
 
 		// Everything went well
@@ -47,13 +48,12 @@ router.post('/', async (req, res) => {
 		semaLog.info('sema_login - succeeded');
 
 		res.json({
-			LogState: 'LoggedIn',
 			version: req.app.get('sema_version'),
 			token
 		});
 	} catch(err) {
 		semaLog.warn(`sema_login - Error: ${err}`);
-		return res.status(500).send("Internal Server Error");
+		return res.status(500).send({ msg: "Internal Server Error" });
 	}
 });
 

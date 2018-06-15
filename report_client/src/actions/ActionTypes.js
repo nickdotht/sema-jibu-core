@@ -3,7 +3,7 @@ export const RECEIVE_HEALTHCHECK = 'RECEIVE_HEALTHCHECK';
 
 export const FETCH_LOGIN = 'FETCH_LOGIN';
 export const RECEIVE_LOGIN = 'RECEIVE_LOGIN';
-export const SET_LOGIN = 'SET_LOGIN';
+export const LOGOUT = 'LOGOUT';
 
 export const RECEIVE_KIOSKS= 'RECEIVE_KIOSKS';
 export const SELECT_KIOSK= 'SELECT_KIOSK';

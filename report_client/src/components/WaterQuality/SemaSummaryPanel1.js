@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Panel } from 'react-bootstrap';
 import 'App.css';
-import 'css/SeamaWaterOperations.css';
+import 'css/SemaWaterOperations.css';
 let dateFormat = require('dateformat');
 
 class SemaSummaryPanel1 extends Component {

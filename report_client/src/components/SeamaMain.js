@@ -1,21 +1,26 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 import SeamaWaterQuality from "./SemaWaterOperations";
 import SemaSales from "./SemaSales";
 import SeamaDistributionMap from "./SeamaDistributionMap";
 import SeamaDeliverySchedule from "./SeamaDeliverySchedule";
 import SeamaInventoryManagement from "./SeamaInventoryManagement";
 import SeamaFinancials from "./SeamaFinancials";
+import {
+	PrivateRoute,
+	SemaNotFound
+} from './';
 
 const Main = (props) => (
     <main>
         <Switch>
-            <Route exact path='/' component={SeamaWaterQuality}/>
-            <Route path='/Sales' component={SemaSales}/>
-            <Route path='/DistributionMap' render={(routeProps) =>(<SeamaDistributionMap {...routeProps } {...props} /> )}/>
-            <Route path='/DeliverySchedule' render={(routeProps) =>(<SeamaDeliverySchedule {...routeProps } {...props} /> )}/>
-            <Route path='/InventoryManagement' render={(routeProps) =>(<SeamaInventoryManagement {...routeProps } {...props} /> )}/>
-            <Route path='/Financials' render={(routeProps) =>(<SeamaFinancials {...routeProps } {...props} /> )}/>
+            <PrivateRoute exact path='/' component={SeamaWaterQuality}/>
+            <PrivateRoute path='/Sales' component={SemaSales}/>
+            <PrivateRoute path='/DistributionMap' component={SeamaDistributionMap}/>
+            <PrivateRoute path='/DeliverySchedule' component={SeamaDeliverySchedule}/>
+            <PrivateRoute path='/InventoryManagement' component={SeamaInventoryManagement}/>
+            <PrivateRoute path='/Financials' component={SeamaFinancials}/>
+            <PrivateRoute component={SemaNotFound}/>
         </Switch>
     </main>
 );
