@@ -133,14 +133,14 @@ const formatTotalCustomers = total =>{
 	if( typeof total === "string"){
 		return total;
 	}else{
-		return parseFloat(total.toFixed(0));
+		return String(parseFloat(total.toFixed(0)));
 	}
 };
 const formatLitersPerCustomer = litersPerCustomer =>{
 	if( typeof litersPerCustomer.value === "string"){
 		return litersPerCustomer.value;
 	}else{
-		return parseFloat(litersPerCustomer.value.toFixed(0));
+		return String(parseFloat(litersPerCustomer.value.toFixed(0)));
 	}
 };
 const formatLitersPerPeriod = litersPerCustomer =>{
