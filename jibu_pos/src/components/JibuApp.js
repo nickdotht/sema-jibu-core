@@ -9,6 +9,10 @@ import Toolbar from './Toolbar';
 import {CustomerViews} from './customers/CustomerViews'
 import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
+import DashboardReport from './reports/DashboardReport';
+import Login from './Login';
+import CustomerEdit from './customers/CustomerEdit';
+
 import {bindActionCreators} from 'redux';
 
 import {connect} from "react-redux";
@@ -18,6 +22,7 @@ import * as NetworkActions from '../actions/NetworkActions';
 
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
+import SiteReport from "./reports/SiteReport";
 
 console.ignoredYellowBox = ['Warning: isMounted'];
 
@@ -28,7 +33,7 @@ class JibuApp extends Component {
 		this.state = {synchronization: {customersLoaded:false,
 										productsLoaded:false},
 					  isConnected: false};
-		this.posStorage = new PosStorage();
+		this.posStorage = PosStorage;
 	}
 	componentDidMount() {
 		console.log("Mounted");
@@ -43,32 +48,18 @@ class JibuApp extends Component {
 			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});
+		NetInfo.isConnected.fetch().then(isConnected => {
+			console.log('Network is ' + (isConnected ? 'online' : 'offline'));
+			this.props.networkActions.NetworkConnection(isConnected);
+		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 
 		console.log("Mounted-Done");
 
 	}
     render() {
-        return (
-
-            <View style={{ flex: 1 }}>
-                <Toolbar/>
-				<CustomerBar/>
-				<ViewSwitcher Jibu={this}/>
-				{/*<View style={{flex: this.props.showView.showCustomers}}>*/}
-					{/*<CustomerViews screenProps={{parent:this}}/>*/}
-				{/*</View>*/}
-				{/*<View style={{flex: this.props.showView.showNewOrder}}>*/}
-					{/*<OrderView/>*/}
-				{/*</View>*/}
-				<CustomerLoaderWatcher parent={ this}/>
-             </View>
-        );
+        return (this.getLoginOrHomeScreen());
     }
-    // customerSelectionChanged( customer ){
-    // 	console.log("customerSelectionChanged");
-		// // that.props.CustomerSelected( customer)
-    // }
 
     SynchronizeCustomers() {
 		console.log("SynchronizeCustomers");
@@ -80,7 +71,45 @@ class JibuApp extends Component {
 		console.log("handleConnectivityChange: " + isConnected);
 		this.props.networkActions.NetworkConnection(isConnected);
 	};
+
+	getLoginOrHomeScreen(){
+		if( this.props.showScreen.isLoggedIn || true) {
+			return (
+				<View style={{flex: 1}}>
+					<Toolbar/>
+					<ScreenSwitcher currentScreen={this.props.showScreen} Jibu={this}/>
+				</View>
+
+			);
+		}else{
+			return(
+				<Login/>
+			);
+		}
+	}
 }
+class ScreenSwitcher extends Component {
+
+	render() {
+		if (this.props.currentScreen.screenToShow === "main") {
+			return (
+				<View style={{ flex: 1 }}>
+					<CustomerBar/>
+					<ViewSwitcher Jibu={this.props.Jibu}/>
+					<CustomerLoaderWatcher parent={ this.props.Jibu}/>
+				</View>
+
+			);
+		} else if (this.props.currentScreen.screenToShow === "report") {
+			return (<View style={{flex:1}}>
+				<SiteReport/>
+			</View>);
+		} else{
+			return (<CustomerEdit isEdit = {false}/>);
+		}
+	}
+}
+
 class ViewSwitcher extends Component {
 
 	render() {
@@ -96,8 +125,9 @@ function mapStateToProps(state, props) {
 	return {
 		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers,
-		isNWConnected: state.networkReducer.isNWConnected,
-		showView: state.customerBarReducer.showView
+		network: state.networkReducer.network,
+		showView: state.customerBarReducer.showView,
+		showScreen: state.toolBarReducer.showScreen
 
 	};
 }

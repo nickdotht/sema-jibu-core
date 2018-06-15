@@ -1,7 +1,9 @@
 
-import { ADD_PRODUCT_TO_ORDER, CLEAR_ORDER, REMOVE_PRODUCT, SET_PRODUCT_QUANTITY, SET_ORDER_CHANNEL } from "../actions/OrderActions";
+import { ADD_PRODUCT_TO_ORDER, CLEAR_ORDER, REMOVE_PRODUCT,
+	SET_PRODUCT_QUANTITY, SET_ORDER_CHANNEL, SET_ORDER_FLOW,
+	SET_PAYMENT} from "../actions/OrderActions";
 
-let initialState = {products:[], channel:{salesChannel:'walkup'}};
+let initialState = {products:[], channel:{salesChannel:'walkup'}, flow:{page:'products'}, payment:{ cash: 0, credit: 0, mobile: 0}};
 
 const orderReducer = (state = initialState, action) => {
 	console.log("orderReducer: " +action.type);
@@ -48,7 +50,16 @@ const orderReducer = (state = initialState, action) => {
 		case SET_ORDER_CHANNEL:
 			newState = {...state};
 			newState.channel  = action.data.channel;
-			console.log("SET_ORDER_CHANNEL - " + JSON.stringify(newState.channel));
+			return newState;
+
+		case SET_ORDER_FLOW:
+			newState = {...state};
+			newState.flow  = action.data.flow;
+			return newState;
+
+		case SET_PAYMENT:
+			newState = {...state};
+			newState.payment  = action.data.payment;
 			return newState;
 
 		default:
@@ -57,4 +68,5 @@ const orderReducer = (state = initialState, action) => {
 };
 
 export default orderReducer;
+
 

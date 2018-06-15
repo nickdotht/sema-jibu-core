@@ -15,6 +15,8 @@ var seama_kiosks = require('./routes/sema_kiosks');
 var seama_water_operations = require('./routes/sema_water_operations');
 var sema_sales = require('./routes/sema_sales');
 var sema_sales_by_channel = require('./routes/sema_sales_by_channel');
+var sema_customers = require('./routes/sema_customers');
+
 const winston = require('winston');
 
 const passport = require('passport');
@@ -53,6 +55,7 @@ app.use('/untapped/kiosks', isAuthenticated, seama_kiosks);
 app.use('/untapped/water-operations', isAuthenticated, seama_water_operations);
 app.use('/untapped/sales', isAuthenticated, sema_sales);
 app.use('/untapped/sales-by-channel', isAuthenticated, sema_sales_by_channel);
+app.use('/sema/site/customers', isAuthenticated, sema_customers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -9,12 +9,14 @@ import {
 
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import PosStorage from "../../database/PosStorage";
+// import PosStorage from "../../database/PosStorage";
 import * as NetworkActions from "../../actions/NetworkActions";
 import * as CustomerActions from "../../actions/CustomerActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
+import * as ToolbarActions from "../../actions/ToolBarActions";
 
 import CustomerBarButton from './CustomerBarButton';
+import * as OrderActions from "../../actions/OrderActions";
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -53,11 +55,10 @@ class CustomerBar extends Component {
 		super(props);
 
 		this.state = {
-			addFunction: false,
+			addFunction: true,
 			orderFunction: true,
 			editFunction: false,
-			deleteFunction: false,
-			isOrder :false
+			deleteFunction: false
 		}
 	}
 
@@ -71,9 +72,9 @@ class CustomerBar extends Component {
 					enabled = {this.state.addFunction}
 				/>
 				<CustomerBarButton
-					title = {this.state.isOrder ? 'Cancel' : 'Order'}
+					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder}
-					enabled = {this.state.orderFunction}
+					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
 				/>
 				<CustomerBarButton
 					title = "Edit"
@@ -121,24 +122,23 @@ class CustomerBar extends Component {
 	}
 	onOrder = () =>{
 		console.log("order!");
-		if( !this.state.isOrder) {
+		if( !this.props.showView.showNewOrder) {
 			this.props.customerBarActions.ShowHideCustomers(0);
 			this.setState({'addFunction': false});
 			this.setState({'editFunction': false})
 			this.setState({'deleteFunction': false});
 			this.setState({'orderFunction': true});
-			this.setState({'isOrder': true});
+			this.props.orderActions.ClearOrder();
+			this.props.orderActions.SetOrderFlow('products');
 		}else{
 			this.props.customerBarActions.ShowHideCustomers(1);
-			this.setState({'isOrder': false});
 
 		}
 
 	}
 	onAdd = () =>{
 		console.log("Add!")
-		// let posStorage = new PosStorage();
-		// posStorage.Initialize();
+		this.props.toolbarActions.ShowScreen("newCustomer");
 
 	}
 
@@ -150,13 +150,16 @@ function mapStateToProps(state, props) {
 		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers,
 		searchString: state.customerReducer.searchString,
+		showView: state.customerBarReducer.showView
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {customerActions:bindActionCreators(CustomerActions, dispatch),
 		networkActions:bindActionCreators(NetworkActions, dispatch),
-		customerBarActions:bindActionCreators(CustomerBarActions, dispatch)};
+		customerBarActions:bindActionCreators(CustomerBarActions, dispatch),
+		toolbarActions:bindActionCreators(ToolbarActions, dispatch),
+		orderActions: bindActionCreators(OrderActions,dispatch)};
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CustomerBar);
 
