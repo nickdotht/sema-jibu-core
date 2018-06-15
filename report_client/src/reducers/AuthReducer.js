@@ -1,7 +1,6 @@
 import {
 	FETCH_LOGIN,
 	RECEIVE_LOGIN,
-	SET_LOGIN,
 	LOGOUT
 } from 'actions';
 import jwt from 'jsonwebtoken';
@@ -37,7 +36,6 @@ export default (state = initialState, action) => {
 		case RECEIVE_LOGIN:
 			console.log('RECEIVE_LOGIN Action');
 			const currentUser = jwt.decode(action.data.token);
-			console.log(`got this user: ${JSON.stringify(currentUser)}`);
 			newState = {
 				logState: action.data.logState,
 				currentUser
