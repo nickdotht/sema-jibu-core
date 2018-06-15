@@ -11,6 +11,7 @@ import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
 import DashboardReport from './reports/DashboardReport';
 import Login from './Login';
+import CustomerEdit from './customers/CustomerEdit';
 
 import {bindActionCreators} from 'redux';
 
@@ -72,7 +73,7 @@ class JibuApp extends Component {
 	};
 
 	getLoginOrHomeScreen(){
-		if( this.props.showScreen.isLoggedIn ) {
+		if( this.props.showScreen.isLoggedIn || true) {
 			return (
 				<View style={{flex: 1}}>
 					<Toolbar/>
@@ -90,7 +91,7 @@ class JibuApp extends Component {
 class ScreenSwitcher extends Component {
 
 	render() {
-		if (this.props.currentScreen.showMain === true) {
+		if (this.props.currentScreen.screenToShow === "main") {
 			return (
 				<View style={{ flex: 1 }}>
 					<CustomerBar/>
@@ -99,10 +100,12 @@ class ScreenSwitcher extends Component {
 				</View>
 
 			);
-		} else {
+		} else if (this.props.currentScreen.screenToShow === "report") {
 			return (<View style={{flex:1}}>
 				<SiteReport/>
 			</View>);
+		} else{
+			return (<CustomerEdit isEdit = {false}/>);
 		}
 	}
 }

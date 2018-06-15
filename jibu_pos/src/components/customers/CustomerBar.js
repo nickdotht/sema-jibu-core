@@ -13,6 +13,7 @@ import {connect} from "react-redux";
 import * as NetworkActions from "../../actions/NetworkActions";
 import * as CustomerActions from "../../actions/CustomerActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
+import * as ToolbarActions from "../../actions/ToolBarActions";
 
 import CustomerBarButton from './CustomerBarButton';
 import * as OrderActions from "../../actions/OrderActions";
@@ -54,7 +55,7 @@ class CustomerBar extends Component {
 		super(props);
 
 		this.state = {
-			addFunction: false,
+			addFunction: true,
 			orderFunction: true,
 			editFunction: false,
 			deleteFunction: false
@@ -137,8 +138,7 @@ class CustomerBar extends Component {
 	}
 	onAdd = () =>{
 		console.log("Add!")
-		// let posStorage = new PosStorage();
-		// posStorage.Initialize();
+		this.props.toolbarActions.ShowScreen("newCustomer");
 
 	}
 
@@ -158,6 +158,7 @@ function mapDispatchToProps(dispatch) {
 	return {customerActions:bindActionCreators(CustomerActions, dispatch),
 		networkActions:bindActionCreators(NetworkActions, dispatch),
 		customerBarActions:bindActionCreators(CustomerBarActions, dispatch),
+		toolbarActions:bindActionCreators(ToolbarActions, dispatch),
 		orderActions: bindActionCreators(OrderActions,dispatch)};
 }
 export default connect(mapStateToProps, mapDispatchToProps)(CustomerBar);
