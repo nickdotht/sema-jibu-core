@@ -3,26 +3,22 @@ import './App.css';
 import './css/SeamaNav.css'
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import { authActions } from 'actions';
-import * as kioskActions from 'actions/KioskActions';
-import * as waterOperationsActions from 'actions/WaterOperationsActions';
-import * as salesActions from 'actions/SalesActions';
+import {
+	authActions,
+	kioskActions,
+	waterOperationsActions,
+	salesActions
+} from 'actions';
 import { history } from './utils';
 import {
-	Router,
-	Route
+	Router
 } from 'react-router-dom';
 import {
 	SemaContainer,
 	SemaLogin
-} from './components';
+} from 'components';
 
 class App extends Component {
-
-	constructor(props, context) {
-		super(props, context);
-	}
-
 	componentWillMount() {
 		let self = this;
 
@@ -46,6 +42,8 @@ class App extends Component {
 						this.props.kiosk.selectedKiosk.groupby = "month";	// // TODO - Should be derived from toolbar time/date filter UI
 						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
 					}
+					break;
+				default:
 					break;
 			}
 		});
