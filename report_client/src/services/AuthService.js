@@ -1,35 +1,27 @@
 import jwt from 'jsonwebtoken';
-import { handleResponse } from './';
+import { axiosService } from 'services';
 
 const login = (usernameOrEmail, password) =>
-	fetch('/untapped/login', {
-		headers: {
-		  'Accept': 'application/json',
-		  'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ usernameOrEmail , password }),
-		method: 'post'
-	})
-	.then(response =>
-		response.json().then(data => {
-			return {
-				data,
-				status: response.status
-			};
-		})
+	axiosService.post('/untapped/login',
+		{
+			usernameOrEmail,
+			password
+		}
 	)
 	.then(response => {
-		if (response.data.token) {
-			const user = jwt.decode(response.data.token);
+		const user = jwt.decode(response.data.token);
 
-			localStorage.setItem('currentUser', JSON.stringify(user));
-		}
+		localStorage.setItem('currentUser', JSON.stringify(user));
+		localStorage.setItem('token', response.data.token);
+		// localStorage.setItem('refreshToken', response.data.refreshToken);
 
 		return response;
 	});
 
 const logout = () => {
 	localStorage.removeItem('currentUser');
+	localStorage.removeItem('token');
+	// localStorage.removeItem('refreshToken');
 };
 
 export const authService = {
