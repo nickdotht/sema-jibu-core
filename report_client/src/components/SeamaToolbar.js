@@ -3,11 +3,13 @@ import { Navbar, Label, Nav,NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import { authActions } from 'actions';
-import * as healthCheckActions from 'actions/healthCheckActions';
-import * as kioskActions from 'actions/KioskActions';
-import * as waterOperationsActions from 'actions/WaterOperationsActions';
-import * as salesActions from 'actions/SalesActions';
+import {
+	kioskActions,
+	waterOperationsActions,
+	salesActions,
+	authActions,
+	healthCheckActions
+} from 'actions';
 import { withRouter } from 'react-router'
 
 const menuStyle = {};
@@ -41,19 +43,22 @@ class SeamaToolbar extends Component {
 		this.buildMenuItems = this.buildMenuItems.bind(this);
 		this.logOut = this.logOut.bind(this);
 
-		this.state = {title: "--Kiosks--"};
-	}
-
-	componentDidMount() {
-		this.props.healthCheckActions.fetchHealthCheck();
-		this.props.kioskActions.fetchKiosks();
+		this.state = {
+			title: "--Kiosks--"
+		};
 	}
 
 	handleSelect(eventKey){
 		console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
+
 		this.setState({title: this.props.kiosk.kiosks[eventKey].name});
+
 		let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
-		if( kioskParams.kioskID !== this.props.kiosk.selectedKiosk.kioskID) {
+		const previousKioskID = this.props.kiosk.selectedKiosk ?
+			this.props.kiosk.selectedKiosk.kioskID :
+			null;
+
+		if(kioskParams.kioskID !== previousKioskID) {
 			kioskParams.groupby = "month";	// TODO - Should be derived from toolbar time/date filter UI
 			this.props.kioskActions.selectKiosk(kioskParams);
 			this.props.waterOperations.loaded = false;
@@ -68,7 +73,6 @@ class SeamaToolbar extends Component {
 				default:
 					console.log("Not implemented:", this.props.location.pathname);
 			}
-
 		}
 	};
 
@@ -78,7 +82,7 @@ class SeamaToolbar extends Component {
 			let keys = Object.keys(this.props.kiosk.kiosks);
 			for( let i = 0; i < keys.length; i++ ){
 				let kiosk = this.props.kiosk.kiosks[keys[i]];
-				 menuItems.push(<MenuItem eventKey={keys[i]} style={menuStyle}>{kiosk.name}</MenuItem>);
+				 menuItems.push(<MenuItem eventKey={keys[i]} key={keys[i]} style={menuStyle}>{kiosk.name}</MenuItem>);
 			}
 		}
 		return menuItems;
@@ -86,7 +90,6 @@ class SeamaToolbar extends Component {
 	logOut (){
 		console.log("logout");
 		this.props.authActions.logout();
-		window.location.reload(true);
 	}
 
 	render() {
@@ -106,12 +109,12 @@ class SeamaToolbar extends Component {
 						Kiosk
 					</Label>
 					<Nav >
-						<NavDropdown eventKey={3} title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >
+						<NavDropdown title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >
 							{this.buildMenuItems()}
 						</NavDropdown>
 					</Nav>
 					<Label style={LabelStyleRight}> Server: {this.showServer()}</Label>
-					<Label	eventKey={1} onClick={this.logOut} href="#" style={LabelStyleRight}>
+					<Label onClick={this.logOut} href="#" style={LabelStyleRight}>
 						<a href="/">Logout</a>
 					</Label>
 					<Label style={LabelStyleRight}>
