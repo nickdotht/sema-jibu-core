@@ -1,17 +1,18 @@
 import * as allActions from './ActionTypes';
+import { axiosService } from 'services';
 
-export function receiveSales(data) {
+function receiveSales(data) {
 	console.log("receiveSales - ", data.toString());
 	data.loaded = true;
 	return {type: allActions.RECEIVE_SALES, data};
 }
 
-export function receiveSalesByChannel(data) {
+function receiveSalesByChannel(data) {
 	console.log("receiveSales - ", data.toString());
 	return {type: allActions.RECEIVE_SALES_BY_CHANNEL, data};
 }
 
-export function initializeSales() {
+function initializeSales() {
 	return {
 		loaded:false,
 		newCustomers: {period: "N/A", periods:PeriodData.init3Periods()},
@@ -24,37 +25,18 @@ export function initializeSales() {
 	}
 }
 
-export function fetchSales( params ) {
+function fetchSales( params ) {
 	let startEndDate = getStartEndDates( params );
 	if( startEndDate ){
 		params.firstdate=startEndDate[0];
 		params.lastdate=startEndDate[1];
 	}
-
-	const urlParms = queryParams(params);
-	const url = '/untapped/sales?' + urlParms;
-	// return (dispatch) => {
-	// 	dispatch(receiveSales(createDummySales()))
-	// };
 	return (dispatch) => {
-		return fetch(url, {credentials: 'include'})
-			.then(response =>
-				response.json().then(data => ({
-					data:data,
-					status: response.status
-				}))
-			)
+		return axiosService.get('/untapped/sales', { params })
 			.then(response => {
 				if(response.status === 200){
 					dispatch(receiveSales(response.data));
-					let salesByChannelUrl = '/untapped/sales-by-channel?' + urlParms;
-					return fetch(salesByChannelUrl, {credentials: 'include'})
-						.then(response =>
-							response.json().then(data => ({
-								data:data,
-								status: response.status
-							}))
-						)
+					return axiosService.get('/untapped/sales-by-channel', { params })
 						.then(response => {
 							if(response.status === 200){
 								formatChartData(response.data);
@@ -65,7 +47,6 @@ export function fetchSales( params ) {
 						})
 				}else{
 					dispatch(receiveSales(initializeSales()))
-
 				}
 			})
 			.catch(function(){
@@ -113,24 +94,18 @@ const formatChartData = (chartData) =>{
 	});
 };
 
-export function forceUpdate() {
+function forceUpdate() {
 	console.log("forceUpdate - ");
 	return {type: allActions.FORCE_SALES_UPDATE};
 }
-
-const queryParams =(params) => {
-	return Object.keys(params)
-		.map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
-		.join('&');
-};
 
 const createBlankChart = () => {
 	return { labels: [], datasets: [ { label: "", data: [],},]}
 };
 
-const periodData = ()=> {
-	return {beginDate : "N/A", endDate :"N/A", periodValue: "N/A"};
-};
+// const periodData = ()=> {
+// 	return {beginDate : "N/A", endDate :"N/A", periodValue: "N/A"};
+// };
 
 
 class PeriodData {
@@ -153,4 +128,12 @@ class PeriodData {
 	static init3Periods() {
 		return [new PeriodData(), new PeriodData(), new PeriodData()];
 	}
+};
+
+export const salesActions = {
+	receiveSales,
+	receiveSalesByChannel,
+	initializeSales,
+	fetchSales,
+	forceUpdate
 };
