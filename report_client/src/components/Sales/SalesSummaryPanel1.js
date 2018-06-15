@@ -27,7 +27,7 @@ class SalesSummaryPanel1 extends Component {
 	}
 
 	calcDeltaDate( ){
-    	if( this.props.delta === "N/A" || this.props.date == "N/A" ){
+    	if( this.props.delta === "N/A" || this.props.date === "N/A" ){
     		return "";
 		}else{
 			return  dateFormat((Date.parse(this.props.date)), "mmm d, yyyy");
