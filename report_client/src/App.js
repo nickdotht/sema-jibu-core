@@ -42,7 +42,7 @@ class App extends Component {
 						self.props.salesActions.forceUpdate();
 					}, 100);
 
-					if( ! this.props.sales.loaded && this.props.kiosk.selectedKiosk.kioskID ) {
+					if( ! this.props.sales.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
 						this.props.kiosk.selectedKiosk.groupby = "month";	// // TODO - Should be derived from toolbar time/date filter UI
 						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
 					}
