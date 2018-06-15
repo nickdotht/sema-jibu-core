@@ -1,22 +1,15 @@
 import { createStore, applyMiddleware } from 'redux';
-import rootReducer from 'reducers/RootReducer';
+import persistedReducer from 'reducers/RootReducer';
 import thunk from 'redux-thunk';
-import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-
-const persistConfig = {
-	key: 'root',
-	storage
-};
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+import { persistStore } from 'redux-persist';
+import { axiosMiddleware } from 'services';
 
 export default function configureStore() {
-    const store = createStore(
-        persistedReducer,
-        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
-        applyMiddleware(thunk)
-    );
+	const store = createStore(
+		persistedReducer,
+		window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+		applyMiddleware(thunk, axiosMiddleware)
+	);
 
 	const persistor = persistStore(store);
 
