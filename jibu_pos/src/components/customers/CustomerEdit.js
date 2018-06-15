@@ -1,6 +1,7 @@
 import React, {Component}  from "react";
 import { View, Text, TouchableHighlight, TextInput, StyleSheet, Modal, Image} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import PropTypes from 'prop-types';
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -129,6 +130,10 @@ class CustomerEdit extends Component {
 
 }
 
+CustomerEdit.propTypes = {
+	isEdit: PropTypes.bool.isRequired,
+	toolbarActions: PropTypes.object.isRequired
+};
 
 
 function mapStateToProps(state, props) {

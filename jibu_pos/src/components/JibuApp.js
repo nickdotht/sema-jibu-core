@@ -104,8 +104,10 @@ class ScreenSwitcher extends Component {
 			return (<View style={{flex:1}}>
 				<SiteReport/>
 			</View>);
-		} else{
+		} else if (this.props.currentScreen.screenToShow === "newCustomer") {
 			return (<CustomerEdit isEdit = {false}/>);
+		} else if (this.props.currentScreen.screenToShow === "editCustomer") {
+			return (<CustomerEdit isEdit = {true}/>);
 		}
 	}
 }

@@ -57,8 +57,8 @@ class CustomerBar extends Component {
 		this.state = {
 			addFunction: true,
 			orderFunction: true,
-			editFunction: false,
-			deleteFunction: false
+			editFunction: true,
+			deleteFunction: true
 		}
 	}
 
@@ -79,13 +79,13 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = "Edit"
 					handler = {this.onEdit}
-					enabled = {this.state.editFunction}
+					enabled = {this.state.editFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
 				/>
 
 				<CustomerBarButton
 					title = "Delete"
 					handler = {this.onDelete}
-					enabled = {this.state.deleteFunction}
+					enabled = {this.state.deleteFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
 				/>
 
 				<TextInput
@@ -114,11 +114,8 @@ class CustomerBar extends Component {
 		// posStorage.ClearAll();
 	}
 	onEdit = () =>{
-		console.log("edit!")
-		this.props.customerBarActions.ShowHideCustomers(1);
-		this.setState({'addFunction' : true } );
-		this.setState({'deleteFunction' : true } );
-		this.setState({'orderFunction' : true } );
+		console.log("Edit Customer")
+		this.props.toolbarActions.ShowScreen("editCustomer");
 	}
 	onOrder = () =>{
 		console.log("order!");
@@ -137,7 +134,7 @@ class CustomerBar extends Component {
 
 	}
 	onAdd = () =>{
-		console.log("Add!")
+		console.log("Add Customer")
 		this.props.toolbarActions.ShowScreen("newCustomer");
 
 	}
