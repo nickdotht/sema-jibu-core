@@ -20,6 +20,17 @@ describe('Testing Customers API', function () {
 		setTimeout( function(){iAmDone()}, 2000);
 	});
 
+	describe('Post /sema/site/customers - missing siteId, customerName, customerType', function() {
+		it('Should fail with 400 error code', (done) => {
+			chai.request(server)
+				.post('/sema/site/customers')
+				.end(function(err, res) {
+					res.should.have.status(400);
+					done(err);
+				});
+		});
+	});
+
 	describe('GET /sema/site/customers - missing site-id', function() {
 		it('Should fail with 400 error code', (done) => {
 			chai.request(server)
