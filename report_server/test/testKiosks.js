@@ -19,18 +19,27 @@ describe('Testing Kiosks', function () {
 		setTimeout( function(){iAmDone()}, 2000);
 	});
 	describe('GET /untapped/kiosks', function() {
-		it('should get /untapped/kiosks', function testHealthCheck(done) {
+		it('should get /untapped/kiosks', function testKiosks(done) {
 			chai.request(server)
-				.get('/untapped/kiosks')
+				.post('/untapped/login')
+				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
 				.end(function(err, res) {
-					// console.log(JSON.stringify(res))
 					res.should.have.status(200);
-					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
-					res.body.should.be.a('object');
-					res.body.should.have.property('kiosks');
-					expect(res.body.kiosks).to.be.an('array');
-					res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
-					done(err);
+					res.body.should.have.property('token');
+					let token = "Bearer " + res.body.token;
+					chai.request(server)
+						.get('/untapped/kiosks')
+						.set('Authorization', token)
+						.end(function(err, res) {
+							// console.log(JSON.stringify(res))
+							res.should.have.status(200);
+							let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
+							res.body.should.be.a('object');
+							res.body.should.have.property('kiosks');
+							expect(res.body.kiosks).to.be.an('array');
+							res.body.kiosks[site_index].should.have.property('name').eql('UnitTest');
+							done(err);
+						});
 				});
 		});
 	});
