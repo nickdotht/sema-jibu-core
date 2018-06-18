@@ -51,7 +51,7 @@ const onListening = (server, debug) =>
 		const addr = server.address();
 		const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
 		debug('Listening on ' + bind);
-		console.log('Listening on ' + bind);
+		console.log(`Listening on ${bind}, DB schema: ${process.env.DB_SCHEMA}`);
 	}
 
 module.exports = {
