@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { proxy as baseURL } from '../../package.json';
 
-export const axiosService = axios.create({ baseURL });
+const axiosOptions = {
+	baseURL: process.env.NODE_ENV === 'production' ? '/' : baseURL
+};
+
+export const axiosService = axios.create(axiosOptions);
 
 /*
  * This handles the response from the server before passing it to the next
