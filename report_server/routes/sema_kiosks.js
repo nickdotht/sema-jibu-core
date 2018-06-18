@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
+const Kiosk = require('../model_layer/Kiosk');
 
 /* GET kiosks in the database. */
 router.get('/', function(req, res) {
@@ -18,7 +19,7 @@ router.get('/', function(req, res) {
 				res.status(500).send(err.message);
 			} else {
 				semaLog.info( 'kiosks - succeeded');
-				res.json({ kiosks: result });
+				res.json({ kiosks: result.map( (kiosk) => { return (new Kiosk(kiosk)).classToPlain()}) });
 			}
 		});
 	});
