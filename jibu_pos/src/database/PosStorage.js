@@ -103,14 +103,17 @@ class PosStorage {
 	makeCustomerKey( customer ){
 		return (customerItemKey + '_' + customer.id);
 	}
-	createCustomer(){
+	createCustomer(phone, name, address ){
+		const newCustomer = { id:"999", contact_name:name, phone_number:phone, address:address, due_amount:0 };
 
+		this.customers.push( newCustomer );
 	}
 	updateCustomer( customer, phone, name, address){
 		let key = this.makeCustomerKey(customer);
 		customer.contact_name = name; 	// FIXUP - Won't be contact_name forever
 		customer.phone_number = phone; 	// FIXUP - Won't be phone_number forever
 		customer.address = address; 	// FIXUP - Won't be phone_number forever
+		this.pendingCustomers.push( customer );
 		// persist the changes
 		AsyncStorage.setItem( key, this.stringify(customer));
 

@@ -81,6 +81,7 @@ class CustomerEdit extends Component {
 								ref={this.name}/>
 							<CustomerProperty
 								marginTop = {20}
+								placeHolder = 'Address'
 								parent ={this}
 								valueFn = {this.getAddress}
 								ref={this.address}/>

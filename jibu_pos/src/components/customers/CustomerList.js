@@ -63,7 +63,7 @@ class CustomerList extends Component {
 		return this.props.customers;
 	}
 	getRow = (item, index, separators) =>{
-		console.log("getRow -index: " + index)
+		// console.log("getRow -index: " + index)
 		let isSelected = false;
 		if( this.props.selectedCustomer && this.props.selectedCustomer.id === item.id){
 			console.log("Selected item is " + item.id);
