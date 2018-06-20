@@ -36,7 +36,7 @@ class JibuApp extends Component {
 		this.posStorage = PosStorage;
 	}
 	componentDidMount() {
-		console.log("Mounted");
+		console.log("JibuApp - Mounted");
 		this.posStorage.Initialize().then( (isInitialized) => {
 			let timeout = 200;
 			if (isInitialized) {
@@ -45,6 +45,7 @@ class JibuApp extends Component {
 				this.props.customerActions.SetCustomers(this.posStorage.GetCustomers());
 				timeout = 20000;	// First sync after a bit
 			}
+			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
 			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});
@@ -64,7 +65,7 @@ class JibuApp extends Component {
     SynchronizeCustomers() {
 		console.log("SynchronizeCustomers");
 		this.state.synchronization.customersLoaded = true;
-		this.posStorage.AddCustomers( this.props.customers);
+		this.posStorage.addCustomers( this.props.customers);
 	}
 
 	handleConnectivityChange = isConnected => {

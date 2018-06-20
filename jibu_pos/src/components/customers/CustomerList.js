@@ -10,7 +10,7 @@ class CustomerList extends Component {
 
 		this.state = {
 			refresh: false,
-			selectedCustomer: null,
+			// selectedCustomer: null,
 			searchString:""
 		};
 	}
@@ -63,8 +63,9 @@ class CustomerList extends Component {
 		return this.props.customers;
 	}
 	getRow = (item, index, separators) =>{
+		console.log("getRow -index: " + index)
 		let isSelected = false;
-		if( this.state.selectedCustomer && this.state.selectedCustomer.id === item.id){
+		if( this.props.selectedCustomer && this.props.selectedCustomer.id === item.id){
 			console.log("Selected item is " + item.id);
 			isSelected = true;
 		}
@@ -126,7 +127,7 @@ class CustomerList extends Component {
 	onPressItem = (item) =>{
 		console.log("_onPressItem");
 		this.props.CustomerSelected(item);
-		this.setState({ selectedCustomer:item });
+		// this.setState({ selectedCustomer:item });
 		this.setState({refresh: !this.state.refresh});
 	};
 	showHeader = () =>{

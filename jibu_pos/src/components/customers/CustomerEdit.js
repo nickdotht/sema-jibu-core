@@ -7,6 +7,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as ToolbarActions from "../../actions/ToolBarActions";
 import ModalDropdown from 'react-native-modal-dropdown';
+import PosStorage from "../../database/PosStorage";
 
 class CustomerProperty extends Component {
 	constructor(props) {
@@ -151,9 +152,19 @@ class CustomerEdit extends Component {
 	};
 
 	onEdit(){
-		console.log( this.phone.current.state.propertyText);
-		console.log( this.name.current.state.propertyText);
-		console.log( this.address.current.state.propertyText);
+		// TODO - Validate fields and set focus to invalid field
+		if( this.props.isEdit ){
+			PosStorage.updateCustomer(
+				this.props.selectedCustomer,
+				this.phone.current.state.propertyText,
+				this.name.current.state.propertyText,
+				this.address.current.state.propertyText );
+		}else{
+			PosStorage.createCustomer(
+				this.phone.current.state.propertyText,
+			 	this.name.current.state.propertyText,
+				this.address.current.state.propertyText);
+		}
 
 		this.setState( {isEditInProgress:true} );
 	};

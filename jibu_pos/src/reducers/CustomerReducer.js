@@ -11,7 +11,6 @@ const customerReducer = (state = initialState, action) => {
 			newState = {...state};
 			newState.selectedCustomer = action.data ;
 			return newState;
-		case CUSTOMERS_LOADED:
 		case CUSTOMERS_SET:
 			newState = {...state};
 			newState.customers = action.data ;
@@ -20,7 +19,8 @@ const customerReducer = (state = initialState, action) => {
 			newState = {...state};
 			newState.searchString = action.data ;
 			return newState;
-
+		case CUSTOMERS_LOADED:
+			return state;		// Customers need to be merged,,
 		default:
 			return state;
 	}
