@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-nati
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import * as CustomerActions from '../../actions/CustomerActions';
+import Events from 'react-native-simple-events';
 
 class CustomerList extends Component {
 	constructor(props) {
@@ -16,7 +17,19 @@ class CustomerList extends Component {
 	}
 	componentDidMount() {
 		console.log("CustomerList = Mounted");
+//		this.flatListRef.scrollToItem({animated: true, item: this.props.selectedCustomer, viewPosition:0.5});
+		Events.on('ScrollCustomerTo', 'customerId1', this.onScrollCustomerTo.bind(this) );
 	}
+	componentWillUnmount(){
+		Events.rm('ScrollCustomerTo', 'customerId1') ;
+	}
+	onScrollCustomerTo( data ){
+		console.log("On scroll to");
+		this.flatListRef.scrollToItem({animated: false, item: data.customer, viewPosition:0.5});
+	}
+	getItemLayout = (data, index) => (
+		{ length: 50, offset: 50 * index, index }
+	)
 
 	render() {
 		return (
@@ -26,6 +39,8 @@ class CustomerList extends Component {
 					{/*renderItem={({item}) => <Text>{item.key}</Text>}*/}
 				{/*/>*/}
 				<FlatList
+					ref={(ref) => { this.flatListRef = ref; }}
+					getItemLayout={this.getItemLayout}
 					data={this.prepareData()}
 					ListHeaderComponent = {this.showHeader}
 					extraData={this.state.refresh}

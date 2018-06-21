@@ -5,9 +5,12 @@ import PropTypes from 'prop-types';
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import Events from 'react-native-simple-events';
+
 import * as ToolbarActions from "../../actions/ToolBarActions";
 import ModalDropdown from 'react-native-modal-dropdown';
 import PosStorage from "../../database/PosStorage";
+import * as CustomerActions from "../../actions/CustomerActions";
 
 class CustomerProperty extends Component {
 	constructor(props) {
@@ -146,6 +149,8 @@ class CustomerEdit extends Component {
 	}
 	onCancelEdit (){
 		this.props.toolbarActions.ShowScreen("main");
+		setTimeout( ()=>{
+			Events.trigger('ScrollCustomerTo', {customer: this.props.selectedCustomer})}, 50 );
 	}
 	closeHandler(){
 		this.setState( {isEditInProgress:false} );
@@ -161,10 +166,11 @@ class CustomerEdit extends Component {
 				this.name.current.state.propertyText,
 				this.address.current.state.propertyText );
 		}else{
-			PosStorage.createCustomer(
+			let newCustomer = PosStorage.createCustomer(
 				this.phone.current.state.propertyText,
 			 	this.name.current.state.propertyText,
 				this.address.current.state.propertyText);
+			this.props.customerActions.CustomerSelected(newCustomer);
 		}
 
 		this.setState( {isEditInProgress:true} );
@@ -195,7 +201,8 @@ class CustomerEdit extends Component {
 
 CustomerEdit.propTypes = {
 	isEdit: PropTypes.bool.isRequired,
-	toolbarActions: PropTypes.object.isRequired
+	toolbarActions: PropTypes.object.isRequired,
+	customerActions: PropTypes.object.isRequired
 };
 
 
@@ -204,7 +211,8 @@ function mapStateToProps(state, props) {
 }
 function mapDispatchToProps(dispatch) {
 	return {
-		toolbarActions:bindActionCreators(ToolbarActions, dispatch)
+		toolbarActions:bindActionCreators(ToolbarActions, dispatch),
+		customerActions:bindActionCreators(CustomerActions, dispatch)
 	};
 }
 

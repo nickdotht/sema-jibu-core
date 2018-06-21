@@ -4,6 +4,8 @@ This class contains the persistence implementation of the tablet business object
  */
 const {React,AsyncStorage} = require('react-native');
 
+const uuidv1 = require('uuid/v1');
+
 const versionKey = '@Sema:VersionKey';
 const customersKey = '@Sema:CustomersKey';
 const customerItemKey = '@Sema:CustomerItemKey';
@@ -98,22 +100,33 @@ class PosStorage {
 		this.removeKey(salesKey );
 		this.removeKey(customersKey );
 		this.removeKey(versionKey );
-		this.sales = [];
+		this.salesKeys = [];
 	}
 	makeCustomerKey( customer ){
 		return (customerItemKey + '_' + customer.id);
 	}
 	createCustomer(phone, name, address ){
-		const newCustomer = { id:"999", contact_name:name, phone_number:phone, address:address, due_amount:0 };
-
+		const newCustomer = { id:uuidv1(), contact_name:name, phone_number:phone, address:address, due_amount:0 };
+		let key = this.makeCustomerKey(newCustomer);
 		this.customers.push( newCustomer );
+
+		// Write the new customer
+		AsyncStorage.setItem( key, this.stringify(newCustomer));
+
+		this.customersKeys.push( key );
+
+		AsyncStorage.setItem( customersKey, this.stringify(this.customersKeys));
+
+		this.pendingCustomers.push( key );
+		return newCustomer;
 	}
 	updateCustomer( customer, phone, name, address){
 		let key = this.makeCustomerKey(customer);
 		customer.contact_name = name; 	// FIXUP - Won't be contact_name forever
 		customer.phone_number = phone; 	// FIXUP - Won't be phone_number forever
-		customer.address = address; 	// FIXUP - Won't be phone_number forever
-		this.pendingCustomers.push( customer );
+		customer.address = address; 	// FIXUP - Won't be address forever
+
+		this.pendingCustomers.push( key );
 		// persist the changes
 		AsyncStorage.setItem( key, this.stringify(customer));
 
@@ -161,12 +174,12 @@ class PosStorage {
 	}
 
 	GetSales(){
-		console.log("PosStorage: GetSales. Count " + this.sales.length);
-		return this.sales;
+		console.log("PosStorage: GetSales. Count " + this.salesKeys.length);
+		return this.salesKeys;
 	}
 
-	AddSale( sale){
-		console.log("AddSale" );
+	addSale( sale){
+		console.log("PosStorage: addSale" );
 		return new Promise((resolve, reject) => {
 			let saleDateTime = new Date(Date.now());
 			let saleDateKey = saleDateTime.toISOString();
@@ -174,8 +187,8 @@ class PosStorage {
 			this.setKey(saleItemKey + saleDateKey, this.stringify(sale))
 				.then(() => {
 					// Add the key to sales and serialize it
-					this.sales.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
-					this.setKey(salesKey, this.stringify(this.sales))
+					this.salesKeys.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
+					this.setKey(salesKey, this.stringify(this.salesKeys))
 						.then(() => resolve(true))
 						.catch(error => reject(error));
 				})
