@@ -42,7 +42,7 @@ class JibuApp extends Component {
 			if (isInitialized) {
 				// Data already configured
 				this.state.synchronization.customersLoaded = true;
-				this.props.customerActions.SetCustomers(this.posStorage.GetCustomers());
+				this.props.customerActions.SetCustomers(this.posStorage.getCustomers());
 				timeout = 20000;	// First sync after a bit
 			}
 			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");

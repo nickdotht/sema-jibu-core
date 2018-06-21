@@ -12,25 +12,30 @@ class CustomerList extends Component {
 		this.state = {
 			refresh: false,
 			// selectedCustomer: null,
-			searchString:""
+			searchString:"",
+			hasScrolled:false
 		};
 	}
 	componentDidMount() {
-		console.log("CustomerList = Mounted");
-//		this.flatListRef.scrollToItem({animated: true, item: this.props.selectedCustomer, viewPosition:0.5});
+		console.log("CustomerList:componentDidMount");
 		Events.on('ScrollCustomerTo', 'customerId1', this.onScrollCustomerTo.bind(this) );
 	}
 	componentWillUnmount(){
 		Events.rm('ScrollCustomerTo', 'customerId1') ;
 	}
+
 	onScrollCustomerTo( data ){
-		console.log("On scroll to");
+		console.log("onScrollCustomerTo");
 		this.flatListRef.scrollToItem({animated: false, item: data.customer, viewPosition:0.5});
 	}
 	getItemLayout = (data, index) => (
 		{ length: 50, offset: 50 * index, index }
-	)
+	);
 
+	shouldComponentUpdate(nextProps, nextState){
+		console.log("onScrollCustomerTo");
+		return true;
+	}
 	render() {
 		return (
 			<View >

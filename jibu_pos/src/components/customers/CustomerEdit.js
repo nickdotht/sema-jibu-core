@@ -149,8 +149,9 @@ class CustomerEdit extends Component {
 	}
 	onCancelEdit (){
 		this.props.toolbarActions.ShowScreen("main");
+		var that = this;
 		setTimeout( ()=>{
-			Events.trigger('ScrollCustomerTo', {customer: this.props.selectedCustomer})}, 50 );
+			Events.trigger('ScrollCustomerTo', {customer: that.props.selectedCustomer})}, 10 );
 	}
 	closeHandler(){
 		this.setState( {isEditInProgress:false} );

@@ -17,6 +17,9 @@ const lastCustomerSyncKey = '@Sema:LastCustomerSyncKey';
 const lastSalesSyncKey = '@Sema:LastSalesSyncKey';
 const lastProductsSyncKey = '@Sema:LastProductsSyncKey';
 
+const pendingCustomersKey = '@Sema:PendingCustomersKey';
+const pendingSalesKey = '@Sema:PendingSalesKey';
+
 class PosStorage {
 	constructor() {
 		// Version, major versions require the storage to be re-written
@@ -67,18 +70,22 @@ class PosStorage {
 							[productsKey, this.stringify(this.productsKeys)],
 							[lastCustomerSyncKey,currentDateTime],
 							[lastSalesSyncKey,currentDateTime],
-							[lastProductsSyncKey,currentDateTime] ];
+							[lastProductsSyncKey,currentDateTime],
+							[pendingCustomersKey, this.stringify(this.pendingCustomers)],
+							[pendingSalesKey, this.stringify(this.pendingSales)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
-							console.log( "Pos Storage Multi-Key set, Error: " + error );
+							console.log( "PosStorage:Initialize: Error: " + error );
 							resolve(false)})
 
 					} else {
 						console.log("Pos Storage: Version = " + version);
 						this.version = version;
-						let keyArray = [customersKey,salesKey,productsKey,lastCustomerSyncKey,lastSalesSyncKey,lastProductsSyncKey];
+						let keyArray = [customersKey,salesKey,productsKey,lastCustomerSyncKey,
+							lastSalesSyncKey,lastProductsSyncKey,
+							pendingCustomersKey, pendingSalesKey];
 						var that = this;
 						AsyncStorage.multiGet(keyArray ).then( results =>{
-							console.log( "Pos Storage Multi-Key" + results.length );
+							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
 								console.log(" key : " + results[i][0] + " Value : " +  results[i][1]);
 							}
@@ -110,14 +117,20 @@ class PosStorage {
 		let key = this.makeCustomerKey(newCustomer);
 		this.customers.push( newCustomer );
 
-		// Write the new customer
-		AsyncStorage.setItem( key, this.stringify(newCustomer));
 
 		this.customersKeys.push( key );
-
-		AsyncStorage.setItem( customersKey, this.stringify(this.customersKeys));
-
 		this.pendingCustomers.push( key );
+		let keyArray = [
+			[customersKey,  this.stringify(this.customersKeys)],				// Array of customer keys
+			[key, this.stringify(newCustomer) ],								// The new customer
+			[pendingCustomersKey, this.stringify(this.pendingCustomers)]	// Array pending customer
+		];
+		AsyncStorage.multiSet( keyArray).then( error => {
+			console.log("PosStorage:createCustomer: Error: " + error);
+			if( error ) {
+				console.log("PosStorage:createCustomer: Error: " + error);
+			}
+		});
 		return newCustomer;
 	}
 	updateCustomer( customer, phone, name, address){
@@ -127,13 +140,23 @@ class PosStorage {
 		customer.address = address; 	// FIXUP - Won't be address forever
 
 		this.pendingCustomers.push( key );
-		// persist the changes
-		AsyncStorage.setItem( key, this.stringify(customer));
+
+		let keyArray = [
+			[key, this.stringify(customer) ],								// Array of customer keys
+			[pendingCustomersKey, this.stringify(this.pendingCustomers)]	// Array pending customer
+		];
+		AsyncStorage.multiSet( keyArray).then( error => {
+			if( error ) {
+				console.log("PosStorage:updateCustomer: Error: " + error);
+			}
+		});
 
 	}
 	addCustomers( customerArray ){
 		if( this.customers.length > 0 ){
 			console.log("AddCustomers - need to merge....");
+			// Return the updated array of customers so the the UI will get updated
+			return null;
 		}else{
 			console.log("No existing customers no need to merge....");
 			this.customers = customerArray;
@@ -145,9 +168,11 @@ class PosStorage {
 			});
 			keyValueArray.push([ customersKey, this.stringify(keyArray) ] );
 			AsyncStorage.multiSet(keyValueArray ).then( error => {
-				console.log("Pos Storage writing customers and keys: Error: " + error);
+				if( error ) {
+					console.log("PosStorage:addCustomers: Error: " + error);
+				}
 			});
-
+			return this.customers;
 		}
 	}
 
@@ -168,13 +193,13 @@ class PosStorage {
 		});
 	}
 
-	GetCustomers(){
-		console.log("PosStorage: GetCustomers. Count " + this.customers.length);
+	getCustomers(){
+		console.log("PosStorage: getCustomers. Count " + this.customers.length);
 		return this.customers;
 	}
 
-	GetSales(){
-		console.log("PosStorage: GetSales. Count " + this.salesKeys.length);
+	getSales(){
+		console.log("PosStorage: getSales. Count " + this.salesKeys.length);
 		return this.salesKeys;
 	}
 
@@ -183,19 +208,23 @@ class PosStorage {
 		return new Promise((resolve, reject) => {
 			let saleDateTime = new Date(Date.now());
 			let saleDateKey = saleDateTime.toISOString();
-			// Save the serialized sale
-			this.setKey(saleItemKey + saleDateKey, this.stringify(sale))
-				.then(() => {
-					// Add the key to sales and serialize it
-					this.salesKeys.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
-					this.setKey(salesKey, this.stringify(this.salesKeys))
-						.then(() => resolve(true))
-						.catch(error => reject(error));
-				})
+			this.salesKeys.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
+			this.pendingSales.push(saleItemKey + saleDateKey);
+			let keyArray = [
+				[ saleItemKey + saleDateKey, this.stringify(sale)],		// The sale
+				[ salesKey, this.stringify(this.salesKeys)],			// Array of date/time sales keys
+				[ pendingSalesKey, this.stringify(this.pendingSales)]];	// Pending sales keys
+			AsyncStorage.multiSet(keyArray ).then( error =>{
+				if( error ){
+					reject(error);
+				}else{
+					resolve(true);
+				}
+			});
 		});
 	}
-	LoadSale( saleKey){
-		console.log("LoadSale" );
+	loadSale( saleKey){
+		console.log("PosStorage:loadSale" );
 		return new Promise((resolve, reject) => {
 			this.getKey(saleKey.saleKey )
 				.then( sale => {
