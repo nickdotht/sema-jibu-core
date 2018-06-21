@@ -26,7 +26,9 @@ class CustomerList extends Component {
 
 	onScrollCustomerTo( data ){
 		console.log("onScrollCustomerTo");
-		this.flatListRef.scrollToItem({animated: false, item: data.customer, viewPosition:0.5});
+		// Commented oto scrollToItem requires getItemLayout and getItemLayout fails with
+		// searches. Expect since not all items are rendered on sea
+		// this.flatListRef.scrollToItem({animated: false, item: data.customer, viewPosition:0.5});
 	}
 	getItemLayout = (data, index) => (
 		{ length: 50, offset: 50 * index, index }
@@ -45,7 +47,7 @@ class CustomerList extends Component {
 				{/*/>*/}
 				<FlatList
 					ref={(ref) => { this.flatListRef = ref; }}
-					getItemLayout={this.getItemLayout}
+					// getItemLayout={this.getItemLayout}
 					data={this.prepareData()}
 					ListHeaderComponent = {this.showHeader}
 					extraData={this.state.refresh}

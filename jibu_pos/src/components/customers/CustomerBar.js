@@ -9,7 +9,7 @@ import {
 
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-// import PosStorage from "../../database/PosStorage";
+import PosStorage from "../../database/PosStorage";
 import * as NetworkActions from "../../actions/NetworkActions";
 import * as CustomerActions from "../../actions/CustomerActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
@@ -109,16 +109,17 @@ class CustomerBar extends Component {
 	};
 
 	onDelete = () =>{
-		console.log("delete!");
-		// let posStorage = new PosStorage();
-		// posStorage.ClearAll();
-	}
+		console.log("CustomerBar:onDelete");
+		PosStorage.deleteCustomer(this.props.selectedCustomer);
+		this.props.customerActions.CustomerSelected({});	// Clear selected customer
+		this.props.customerActions.SetCustomers( PosStorage.getCustomers());
+	};
 	onEdit = () =>{
-		console.log("Edit Customer")
+		console.log("CustomerBar:onEdit");
 		this.props.toolbarActions.ShowScreen("editCustomer");
-	}
+	};
 	onOrder = () =>{
-		console.log("order!");
+		console.log("CustomerBar:onOrder");
 		if( !this.props.showView.showNewOrder) {
 			this.props.customerBarActions.ShowHideCustomers(0);
 			this.setState({'addFunction': false});
@@ -132,12 +133,12 @@ class CustomerBar extends Component {
 
 		}
 
-	}
+	};
 	onAdd = () =>{
-		console.log("Add Customer")
+		console.log("CustomerBar:onAdd");
 		this.props.toolbarActions.ShowScreen("newCustomer");
 
-	}
+	};
 
 
 }

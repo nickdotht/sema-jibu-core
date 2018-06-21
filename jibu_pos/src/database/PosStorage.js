@@ -116,8 +116,7 @@ class PosStorage {
 		const newCustomer = { id:uuidv1(), contact_name:name, phone_number:phone, address:address, due_amount:0 };
 		let key = this.makeCustomerKey(newCustomer);
 		this.customers.push( newCustomer );
-
-
+		newCustomer.syncAction = "create";
 		this.customersKeys.push( key );
 		this.pendingCustomers.push( key );
 		let keyArray = [
@@ -133,11 +132,36 @@ class PosStorage {
 		});
 		return newCustomer;
 	}
+	deleteCustomer( customer ){
+		let key = this.makeCustomerKey(customer);
+		let index = this.customers.indexOf(customer);
+		if (index > -1) {
+			let customer = this.customers[index];
+			customer.syncAction = "delete";
+			this.customers.splice(index, 1);
+			index = this.customersKeys.indexOf(key);
+			if (index > -1) {
+				this.customersKeys.splice(index, 1);
+			}
+			this.pendingCustomers.push( key );
+			let keyArray = [
+				[customersKey,  this.stringify(this.customersKeys)],			// Array of customer keys
+				[key, this.stringify(customer) ],								// The customer being deleted
+				[pendingCustomersKey, this.stringify(this.pendingCustomers)]	// Array pending customer
+			];
+			AsyncStorage.multiSet( keyArray).then( error => {
+				if( error ) {
+					console.log("PosStorage:deleteCustomer: Error: " + error);
+				}
+			});
+		}
+	}
 	updateCustomer( customer, phone, name, address){
 		let key = this.makeCustomerKey(customer);
 		customer.contact_name = name; 	// FIXUP - Won't be contact_name forever
 		customer.phone_number = phone; 	// FIXUP - Won't be phone_number forever
 		customer.address = address; 	// FIXUP - Won't be address forever
+		customer.syncAction = "update";
 
 		this.pendingCustomers.push( key );
 
