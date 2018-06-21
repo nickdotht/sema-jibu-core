@@ -37,7 +37,7 @@ class JibuApp extends Component {
 	}
 	componentDidMount() {
 		console.log("JibuApp - Mounted");
-		this.posStorage.Initialize().then( (isInitialized) => {
+		this.posStorage.initialize().then( (isInitialized) => {
 			let timeout = 200;
 			if (isInitialized) {
 				// Data already configured
