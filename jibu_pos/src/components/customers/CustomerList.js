@@ -66,8 +66,8 @@ class CustomerList extends Component {
 			</View>
 		);
 	}
-	prepareData = () =>{
-		if( this.props.customers.length > 0 && this.props.customers[0].id !== '9999999-9999-9999-9999-9999999' ) {
+	prepareData = () => {
+		if (this.props.customers.length > 0 && this.props.customers[0].id !== '9999999-9999-9999-9999-9999999') {
 			const anonymous = {
 				"id": "9999999-9999-9999-9999-9999999",
 				"version": 3,
@@ -82,7 +82,19 @@ class CustomerList extends Component {
 			};
 			this.props.customers.unshift(anonymous);
 		}
-		return this.props.customers;
+		let data = [];
+		if (this.props.customers.length > 0) {
+			data.push(this.props.customers[0]);
+			if (this.props.customers.length > 1) {
+				data = this.props.customers.slice(1);
+
+				data.sort((a, b) => {
+					return (a.contact_name < b.contact_name ? -1 : 1)
+				});
+				data.unshift(this.props.customers[0]);
+			}
+		}
+		return data;
 	}
 	getRow = (item, index, separators) =>{
 		// console.log("getRow -index: " + index)

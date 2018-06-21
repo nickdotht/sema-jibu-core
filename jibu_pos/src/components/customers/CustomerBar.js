@@ -143,6 +143,10 @@ class CustomerBar extends Component {
 			this.props.orderActions.SetOrderFlow('products');
 		}else{
 			this.props.customerBarActions.ShowHideCustomers(1);
+			this.setState({'addFunction': true});
+			this.setState({'editFunction': true})
+			this.setState({'deleteFunction': true});
+			this.setState({'orderFunction': true});
 
 		}
 
