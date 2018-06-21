@@ -90,8 +90,17 @@ class PosStorage {
 								console.log(" key : " + results[i][0] + " Value : " +  results[i][1]);
 							}
 							that.customersKeys = that.parseJson(results[0][1]);	// Array of customer keys
-							that.loadCustomersFromKeys().then(()=>{
-								resolve(true);});
+							that.salesKeys = that.parseJson(results[1][1]);	// Array of sales keys
+							that.productsKey = that.parseJson(results[2][1]);	// Array of products keys
+							that.lastCustomerSync = new Date(results[3][1]);	// Last customer sync time
+							that.lastSalesSync = new Date(results[4][1]);	// Last sales sync time
+							that.lastProductsSync = new Date(results[5][1]);	// Last products sync time
+							that.pendingCustomers = that.parseJson(results[6][1]);	// Array of pending customers
+							that.pendingSales = that.parseJson(results[7][1]);	// Array of pending sales
+
+							that.loadCustomersFromKeys()
+								.then(()=>{ resolve(true);})
+								.catch((err) =>reject(err));
 
 						});
 					}})
@@ -216,6 +225,7 @@ class PosStorage {
 			}
 		});
 	}
+
 
 	getCustomers(){
 		console.log("PosStorage: getCustomers. Count " + this.customers.length);

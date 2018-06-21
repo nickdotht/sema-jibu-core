@@ -4,7 +4,7 @@ import {
 	Text,
 	View,
 	TextInput,
-	Button,
+	Alert,
 } from 'react-native';
 
 import {bindActionCreators} from "redux";
@@ -110,9 +110,22 @@ class CustomerBar extends Component {
 
 	onDelete = () =>{
 		console.log("CustomerBar:onDelete");
-		PosStorage.deleteCustomer(this.props.selectedCustomer);
-		this.props.customerActions.CustomerSelected({});	// Clear selected customer
-		this.props.customerActions.SetCustomers( PosStorage.getCustomers());
+		let alertMessage = "Delete  customer " + this.props.selectedCustomer.contact_name;
+		Alert.alert(
+			alertMessage,
+			'Are you sure you want to delete this customer?',
+			[
+				{text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+				{text: 'OK', onPress: () => {
+						PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
+						this.props.customerActions.CustomerSelected({});		// Clear selected customer
+						this.props.customerActions.SetCustomers( PosStorage.getCustomers());
+
+					}},
+			],
+			{ cancelable: false }
+		);
+
 	};
 	onEdit = () =>{
 		console.log("CustomerBar:onEdit");
