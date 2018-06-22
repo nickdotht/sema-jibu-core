@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image} from "react-native";
+import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import PropTypes from 'prop-types';
 
@@ -180,9 +180,33 @@ class Settings extends Component {
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText);
 		try {
-			communications.login2()
-				.then(result => console.log("Passed - status" + result.status + " " + JSON.stringify(result.response)))
-				.catch(result => console.log( "Failed- status "+ result.status + " " +  result.response))
+			let message = "Successfully connected to the SEMA service";
+			communications.login()
+				.then(result => {
+					console.log("Passed - status" + result.status + " " + JSON.stringify(result.response));
+					if( result.status != 200 ) {
+						message = result.response.msg + "(Error code: " + result.status + ")";
+					}
+
+					Alert.alert(
+						"Network Connection",
+						message,
+						[
+							{text: 'OK', style: 'cancel'},
+						],
+						{ cancelable: true }
+					);
+				})
+				.catch(result => {console.log( "Failed- status "+ result.status + " " +  result.response);
+					Alert.alert(
+						"Network Connection",
+						result.response.message,
+						[
+							{text: 'OK', style: 'cancel'},
+						],
+						{ cancelable: true }
+					);
+				})
 		}catch( error ){
 			console.log( JSON.stringify(error));
 		}

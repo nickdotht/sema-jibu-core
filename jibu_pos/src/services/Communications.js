@@ -8,51 +8,22 @@ export default class Communications {
 		this._password= password;
 
 	}
-	// login() {
-	// 	console.log("logging into " + this._url + '/untapped/login');
-	// 	return new Promise( (resolve, reject) =>{
-	// 		try {
-	// 			fetch(this._url + 'untapped/login', {
-	// 				method: 'POST',
-	// 				headers: {
-	// 					Accept: 'application/json',
-	// 					'Content-Type': 'application/json',
-	// 				},
-	// 				body: JSON.stringify({
-	// 					usernameOrEmail: this._user,
-	// 					password: this._password,
-	// 				}),
-	// 			})
-	// 				.then((response) => response.json())
-	// 				.then((responseJson) => {
-	// 					resolve(responseJson);
-	// 				})
-	// 				.catch((error) => {
-	// 					console.log(error);
-	// 					reject(error);
-	// 				});
-	// 		}catch( error ){
-	// 			reject(error);
-	// 		}
-	// 	})console.log(  JSON.stringify(response));
-	// }
-	login(){
-		var foo = null;
-		return fetch('http://facebook.github.io/react-native/movies.json')
-			.then((response) => response.json())
-			.then((responseJson) => {
-				console.log(">>>>>>" + JSON.stringify(responseJson));
-				return [response, responseJson];
-			})
 
-			.catch((error) => {
-				console.log("=======================================================" + JSON.stringify(error));
-				return error;
-			});
-	}
-	login2(){
+	login(){
+		let options = {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				usernameOrEmail: this._user,
+				password: this._password,
+			}),
+		}
+
 		return new Promise( (resolve, reject ) => {
-			fetch(this._url + 'untapped/login')
+			fetch(this._url + 'untapped/login', options)
 				.then((response) => {
 					console.log( response.status);
 					response.json()
@@ -66,7 +37,7 @@ export default class Communications {
 				})
 				.catch((error) => {
 					console.log(error + " OUTER " + JSON.stringify(error));
-					reject({status:418, response:error});	// This is the I'm a teapot error
+					reject({status:418, response:error});	// This is the "I'm a teapot error"
 				});
 		})
 	}
