@@ -12,12 +12,14 @@ import OrderView from "./orders/OrderView"
 import DashboardReport from './reports/DashboardReport';
 import Login from './Login';
 import CustomerEdit from './customers/CustomerEdit';
+import Settings from './Settings';
 
 import {bindActionCreators} from 'redux';
 
 import {connect} from "react-redux";
 import * as CustomerActions from '../actions/CustomerActions';
 import * as NetworkActions from '../actions/NetworkActions';
+import * as SettingsActions from '../actions/SettingsActions';
 
 
 import PosStorage from "../database/PosStorage";
@@ -38,6 +40,7 @@ class JibuApp extends Component {
 	componentDidMount() {
 		console.log("JibuApp - Mounted");
 		this.posStorage.initialize().then( (isInitialized) => {
+			this.props.settingsActions.setSettings(this.posStorage.getSettings());
 			let timeout = 200;
 			if (isInitialized) {
 				// Data already configured
@@ -109,6 +112,8 @@ class ScreenSwitcher extends Component {
 			return (<CustomerEdit isEdit = {false}/>);
 		} else if (this.props.currentScreen.screenToShow === "editCustomer") {
 			return (<CustomerEdit isEdit = {true}/>);
+		} else if (this.props.currentScreen.screenToShow === "settings") {
+			return (<Settings/>);
 		}
 	}
 }
@@ -130,14 +135,17 @@ function mapStateToProps(state, props) {
 		customers: state.customerReducer.customers,
 		network: state.networkReducer.network,
 		showView: state.customerBarReducer.showView,
-		showScreen: state.toolBarReducer.showScreen
+		showScreen: state.toolBarReducer.showScreen,
+		settings:state.settingsReducer.settings
 
 	};
 }
 
 function mapDispatchToProps(dispatch) {
-	return {customerActions:bindActionCreators(CustomerActions, dispatch),
-		networkActions:bindActionCreators(NetworkActions, dispatch)};
+	return {
+		customerActions:bindActionCreators(CustomerActions, dispatch),
+		networkActions:bindActionCreators(NetworkActions, dispatch),
+		settingsActions:bindActionCreators(SettingsActions, dispatch)};
 }
 
 //Connect everything

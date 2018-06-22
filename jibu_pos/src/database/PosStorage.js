@@ -20,6 +20,8 @@ const lastProductsSyncKey = '@Sema:LastProductsSyncKey';
 const pendingCustomersKey = '@Sema:PendingCustomersKey';
 const pendingSalesKey = '@Sema:PendingSalesKey';
 
+const settingsKey = '@Sema:SettingsKey';
+
 class PosStorage {
 	constructor() {
 		// Version, major versions require the storage to be re-written
@@ -51,7 +53,7 @@ class PosStorage {
 		this.lastCustomerSync = null;
 		this.lastSalesSync = null;
 		this.lastProductsSync = null;
-
+		this.settings = {settings:{semaUrl:"ABC", site:"", user:"", password:""}};
 	}
 
 	initialize() {
@@ -72,7 +74,8 @@ class PosStorage {
 							[lastSalesSyncKey,currentDateTime],
 							[lastProductsSyncKey,currentDateTime],
 							[pendingCustomersKey, this.stringify(this.pendingCustomers)],
-							[pendingSalesKey, this.stringify(this.pendingSales)]];
+							[pendingSalesKey, this.stringify(this.pendingSales)],
+							[settingsKey, this.stringify(this.settings)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
 							console.log( "PosStorage:initialize: Error: " + error );
 							resolve(false)})
@@ -82,7 +85,8 @@ class PosStorage {
 						this.version = version;
 						let keyArray = [customersKey,salesKey,productsKey,lastCustomerSyncKey,
 							lastSalesSyncKey,lastProductsSyncKey,
-							pendingCustomersKey, pendingSalesKey];
+							pendingCustomersKey, pendingSalesKey,
+							settingsKey];
 						AsyncStorage.multiGet(keyArray ).then( function(results){
 							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
@@ -96,6 +100,7 @@ class PosStorage {
 							this.lastProductsSync = new Date(results[5][1]);	// Last products sync time
 							this.pendingCustomers = this.parseJson(results[6][1]);	// Array of pending customers
 							this.pendingSales = this.parseJson(results[7][1]);	// Array of pending sales
+							this.settings = this.parseJson(results[8][1]);		// Settings
 
 							this.loadCustomersFromKeys()
 								.then(()=>{ resolve(true);})
@@ -230,6 +235,10 @@ class PosStorage {
 		console.log("PosStorage: getCustomers. Count " + this.customers.length);
 		return this.customers;
 	}
+	getSettings(){
+		console.log("PosStorage: getSettings.");
+		return this.settings;
+	}
 
 	getSales(){
 		console.log("PosStorage: getSales. Count " + this.salesKeys.length);
@@ -268,6 +277,12 @@ class PosStorage {
 		});
 	}
 
+	saveSettings( url, site, user, password ){
+		let settings = {settings:{semaUrl:url, site:site, user:user, password:password}};
+		this.settings = settings;
+		this.setKey( settingsKey, this.stringify( settings));
+
+	}
 	stringify( jsObject){
 		return JSON.stringify(jsObject);
 	}
