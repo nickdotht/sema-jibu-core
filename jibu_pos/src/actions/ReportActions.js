@@ -22,13 +22,13 @@ export function GetSalesReportData( ) {
 const getSalesData = () =>{
 	return new Promise((resolve, reject) => {
 		let results = new Map();
-		let sales = PosStorage.GetSales();
+		let sales = PosStorage.getSales();
 		let resolvedCount = 0;
 		if( sales.length === 0 ){
 			resolve({totalLiters: 0, totalSales: 0, salesItems:[]});
 		}
 		for( let index = 0; index < sales.length; index++ ){
-			PosStorage.LoadSale(sales[index] ).then( (sale) => {
+			PosStorage.loadSale(sales[index] ).then( (sale) => {
 				resolvedCount++;
 				sale.products.every(product => {
 					let mapProduct = results.get(product.sku);

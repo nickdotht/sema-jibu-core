@@ -257,7 +257,7 @@ class OrderPaymentScreen extends Component {
 			productSale.quantity = product.quantity;
 			return productSale;
 		});
-		PosStorage.AddSale(sale);
+		PosStorage.addSale(sale);
 	}
 }
 
