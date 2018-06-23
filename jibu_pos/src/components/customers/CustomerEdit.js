@@ -128,7 +128,7 @@ class CustomerEdit extends Component {
 	}
 	getName(me){
 		if( me.props.isEdit ){
-			return me.props.selectedCustomer.contact_name;
+			return me.props.selectedCustomer.contactName;
 		}else{
 			return ""
 		}

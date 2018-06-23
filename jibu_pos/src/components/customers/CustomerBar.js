@@ -34,8 +34,8 @@ class SelectedCustomerDetails extends React.Component {
 		);
 	}
 	getName (){
-		if( this.props.selectedCustomer.hasOwnProperty("contact_name")){
-			return this.props.selectedCustomer.contact_name;
+		if( this.props.selectedCustomer.hasOwnProperty("contactName")){
+			return this.props.selectedCustomer.contactName;
 		}else{
 			return "";
 		}
@@ -74,18 +74,18 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder}
-					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
+					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contactName')}
 				/>
 				<CustomerBarButton
 					title = "Edit"
 					handler = {this.onEdit}
-					enabled = {this.state.editFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
+					enabled = {this.state.editFunction && this.props.selectedCustomer.hasOwnProperty('contactName')}
 				/>
 
 				<CustomerBarButton
 					title = "Delete"
 					handler = {this.onDelete}
-					enabled = {this.state.deleteFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
+					enabled = {this.state.deleteFunction && this.props.selectedCustomer.hasOwnProperty('contactNname')}
 				/>
 
 				<TextInput
@@ -110,7 +110,7 @@ class CustomerBar extends Component {
 
 	onDelete = () =>{
 		console.log("CustomerBar:onDelete");
-		let alertMessage = "Delete  customer " + this.props.selectedCustomer.contact_name;
+		let alertMessage = "Delete  customer " + this.props.selectedCustomer.contactName;
 		Alert.alert(
 			alertMessage,
 			'Are you sure you want to delete this customer?',

@@ -72,7 +72,7 @@ class CustomerList extends Component {
 				"id": "9999999-9999-9999-9999-9999999",
 				"version": 3,
 				"address": "----------------------------",
-				"contact_name": "Walkup Client",
+				"contactName": "Walkup Client",
 				"customer_type_id": 120,
 				"due_amount": "",
 				"name": "",
@@ -89,7 +89,7 @@ class CustomerList extends Component {
 				data = this.props.customers.slice(1);
 
 				data.sort((a, b) => {
-					return (a.contact_name < b.contact_name ? -1 : 1)
+					return (a.contactName < b.contactName ? -1 : 1)
 				});
 				data.unshift(this.props.customers[0]);
 			}
@@ -107,7 +107,7 @@ class CustomerList extends Component {
 			return (
 				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row', height:50, alignItems:'center'}]}>
 					<View style={{flex: 2}}>
-						<Text style={[styles.baseItem, styles.leftMargin]}>{item.contact_name}</Text>
+						<Text style={[styles.baseItem, styles.leftMargin]}>{item.contactName}</Text>
 					</View>
 					<View style={{flex: 1.5}}>
 						<Text style={[styles.baseItem]}>{item.phone_number}</Text>
@@ -146,7 +146,7 @@ class CustomerList extends Component {
 			(this.props.filter === "credit" && item.due_amount >0 )){
 			if (this.state.searchString.length >= 2) {
 				const filterString = this.state.searchString.toLowerCase();
-				if (item.contact_name.toLowerCase().startsWith(filterString) ||
+				if (item.contactName.toLowerCase().startsWith(filterString) ||
 					item.phone_number.startsWith(filterString)) {
 					return true;
 				} else {

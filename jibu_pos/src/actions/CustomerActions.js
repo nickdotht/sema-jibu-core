@@ -17,8 +17,22 @@ export function LoadCustomers( ) {
 
 	return (dispatch) => {
 		setTimeout(() => {
-			console.log("LoadCustomers - loaded!!!");
-			dispatch({type: CUSTOMERS_LOADED, data:mock_customers});
+			console.log("LoadCustomers - loaded");
+			let customers = mock_customers;
+			if( Array.isArray(mock_customers)){
+				customers = mock_customers.map( customer => {return {
+					id:customer.id,
+					address:customer.address,
+					contactName: customer.contact_name,
+					customer_type_id: customer.customer_type_id,
+					due_amount: customer.due_amount,
+					name: customer.name,
+					phone_number: customer.phone_number,
+					active: customer.active,
+					sales_channel: customer.sales_channel,
+				}});
+			}
+			dispatch({type: CUSTOMERS_LOADED, data:customers});
 		}, 200);
 
 	};
