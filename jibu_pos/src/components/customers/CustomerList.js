@@ -87,7 +87,7 @@ class CustomerList extends Component {
 			data.push(this.props.customers[0]);
 			if (this.props.customers.length > 1) {
 				data = this.props.customers.slice(1);
-
+				data = this.filterItems( data );
 				data.sort((a, b) => {
 					return (a.contactName < b.contactName ? -1 : 1)
 				});
@@ -96,6 +96,16 @@ class CustomerList extends Component {
 		}
 		return data;
 	};
+	filterItems = (data) => {
+		let filteredItems = [];
+		for( let i = 0; i < data.length; i++ ){
+			if( this.filterItem( data[i])){
+				filteredItems.push(data[i]);
+			}
+		}
+		return filteredItems;
+	};
+
 	getRow = (item, index, separators) =>{
 		// console.log("getRow -index: " + index)
 		let isSelected = false;
@@ -103,7 +113,7 @@ class CustomerList extends Component {
 			console.log("Selected item is " + item.id);
 			isSelected = true;
 		}
-		if( this.filterItem(item) ) {
+		if( true ) {
 			return (
 				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row', height:50, alignItems:'center'}]}>
 					<View style={{flex: 2}}>
