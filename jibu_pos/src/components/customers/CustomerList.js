@@ -17,7 +17,7 @@ class CustomerList extends Component {
 		};
 	}
 	componentDidMount() {
-		console.log("CustomerList:componentDidMount");
+		console.log("CustomerList:componentDidMount - filter: " + this.props.filter);
 		Events.on('ScrollCustomerTo', 'customerId1', this.onScrollCustomerTo.bind(this) );
 	}
 	componentWillUnmount(){
@@ -95,7 +95,7 @@ class CustomerList extends Component {
 			}
 		}
 		return data;
-	}
+	};
 	getRow = (item, index, separators) =>{
 		// console.log("getRow -index: " + index)
 		let isSelected = false;
