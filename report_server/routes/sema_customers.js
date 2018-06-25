@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const semaLog = require('../seama_services/sema_logger');
-const uuidv1 = require('uuid/v1');
+const Customer = require('../model_layer/Customer');
+const bodyParser = require('body-parser');
+
+router.use(bodyParser.urlencoded({ extended: false }));
 
 /* GET customers in the database. */
 
@@ -29,6 +32,8 @@ const sqlUpdatedDate = "SELECT * " +
 	"WHERE kiosk_id = ? " +
 	"AND updated_date > ?";
 
+const sqlDeleteCustomers = "DELETE FROM customer_account WHERE id = ?";
+const sqlGetCustomerById = "SELECT * FROM customer_account WHERE id = ?";
 
 const sqlInsertCustomer = "INSERT INTO customer_account " +
 	"(id, address, contact_name, customer_type_id, gps_coordinates, " +
@@ -36,13 +41,218 @@ const sqlInsertCustomer = "INSERT INTO customer_account " +
 	"gender, version, due_amount) " +
 	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, 0)";
 
+const sqlUpdateCustomers = 	"UPDATE customer_account " +
+	"SET address = ?, contact_name = ?, customer_type_id = ?, " +
+		"gps_coordinates = ?, name = ?, phone_number = ?, " +
+		"updated_date = ?, gender = ?, due_amount = ? " +
+	"WHERE id = ?";
+
+
+
+router.put('/:id', async (req, res) => {
+	semaLog.info('sema_customer - Enter');
+
+	console.log(req.params.id);
+
+	req.getValidationResult().then(function(result) {
+		if (!result.isEmpty()) {
+			const errors = result.array().map((elem) => {
+				return elem.msg;
+			});
+			console.log("validation error");
+			res.status(400).send(errors.toString());
+		}
+		else {
+			findCustomers(sqlGetCustomerById, req.params.id).then(function(result) {
+					updateCustomers(sqlUpdateCustomers, putLogic(result[0], req.body), res);
+			}, function(reason) {
+				res.status(404).send("Could not find customer with that id")
+			});
+		}
+	});
+});
+
+
+function putLogic(originalAtts, newAtts) {
+	let arr = [];
+
+	if (newAtts.hasOwnProperty("address"))
+		arr.push(newAtts["address"]);
+	else
+		arr.push(originalAtts["address"]);
+
+	if (newAtts.hasOwnProperty("contactName"))
+		arr.push(newAtts["contactName"]);
+	else
+		arr.push(originalAtts["contact_name"]);
+
+	if (newAtts.hasOwnProperty("customerType"))
+		arr.push(newAtts["customerType"]);
+	else
+		arr.push(originalAtts["customer_type_id"]);
+
+	if (newAtts.hasOwnProperty("gpsCoordinates"))
+		arr.push(newAtts["gpsCoordinates"]);
+	else
+		arr.push(originalAtts["gps_coordinates"]);
+
+	if (newAtts.hasOwnProperty("Name"))
+		arr.push(newAtts["Name"]);
+	else
+		arr.push(originalAtts["name"]);
+
+	if (newAtts.hasOwnProperty("phoneNumber"))
+		arr.push(newAtts["phoneNumber"]);
+	else
+		arr.push(originalAtts["phone_number"]);
+
+	if (newAtts.hasOwnProperty("updatedDate"))
+		arr.push(newAtts["updatedDate"]);
+	else {
+		var today = new Date();
+		var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+		arr.push(date);
+	}
+
+	if (newAtts.hasOwnProperty("gender"))
+		arr.push(newAtts["gender"]);
+	else
+		arr.push(originalAtts["gender"]);
+
+	if (newAtts.hasOwnProperty("dueAmount"))
+		arr.push(newAtts["dueAmount"]);
+	else
+		arr.push(originalAtts["due_amount"]);
+
+	arr.push(originalAtts["id"]);
+	return arr;
+
+
+}
+
+
+
+const updateCustomers = (query, params, res ) => {
+	return new Promise((resolve, reject) => {
+		__pool.getConnection((err, connection) => {
+			connection.query(query, params, function(err, result) {
+				connection.release();
+				if (err) {
+					semaLog.error('customers - failed', { err });
+					res.status(500).send(err.message);
+					reject(err);
+				}
+				else {
+					semaLog.info('customers - succeeded');
+
+					try {
+						resolve(res.json({Updated: result}));
+					} catch (err) {
+						semaLog.error('customers - failed', { err });
+						res.status(500).send(err.message);
+						reject(err);
+					}
+				}
+			});
+
+		})
+	});
+};
+
+
+router.delete('/:id', async (req, res) => {
+	semaLog.info('sema_customer - Enter');
+
+	console.log(req.params.id);
+
+	req.getValidationResult().then(function(result) {
+		if (!result.isEmpty()) {
+			const errors = result.array().map((elem) => {
+				return elem.msg;
+			});
+			console.log("validation error");
+			res.status(400).send(errors.toString());
+		}
+		else {
+			findCustomers(sqlGetCustomerById, req.params.id).then(function(result) {
+				deleteCustomers(sqlDeleteCustomers, req.params.id, res);
+			}, function(reason) {
+				res.status(404).send("Could not find customer with that id")
+			});
+		}
+	});
+});
+
+
+
+const findCustomers = (query, params, ) => {
+	return new Promise((resolve, reject) => {
+		__pool.getConnection((err, connection) => {
+			connection.query(query, params, function(err, result) {
+				connection.release();
+				if (err) {
+					semaLog.error('customers - failed', { err });
+					res.status(500).send(err.message);
+					reject(err);
+				}
+				else {
+					semaLog.info('customers - succeeded');
+
+					try {
+						if (Array.isArray(result) && result.length>0) {
+							resolve(result);
+						}
+						else {
+							reject(null);
+						}
+					} catch (err) {
+						semaLog.error('customers - failed', { err });
+						res.status(500).send(err.message);
+						reject(err);
+					}
+				}
+			});
+		})
+	});
+};
+
+const deleteCustomers = (query, params, res ) => {
+	return new Promise((resolve, reject) => {
+		__pool.getConnection((err, connection) => {
+			connection.query(query, params, function(err, result) {
+				connection.release();
+				if (err) {
+					semaLog.error('customers - failed', { err });
+					res.status(500).send(err.message);
+					reject(err);
+				}
+				else {
+					semaLog.info('customers - succeeded');
+
+					try {
+						let msg = "Deleted customer with Id " + params.toString();
+						resolve(res.status(200).send(msg));
+					} catch (err) {
+						semaLog.error('customers - failed', { err });
+						res.status(500).send(err.message);
+						reject(err);
+					}
+
+				}
+			});
+
+		})
+	});
+};
+
 
 
 router.post('/', async (req, res) => {
 	semaLog.info('sema_customer - Enter');
 
-	var postSqlParams = [];
+	//var postSqlParams = [];
 
+	console.log(req.body);
 	req.check("customerType", "Parameter customer-type is missing").exists();
 	req.check("contactName", "Parameter contact-name is missing").exists();
 	req.check("siteId", "Parameter site-id is missing").exists();
@@ -56,78 +266,28 @@ router.post('/', async (req, res) => {
 			res.status(400).send(errors.toString());
 		}
 		else {
-			console.log("customerType: ", req.query["customerType"]);
-			console.log("contactName: ", req.query["contactName"]);
-			console.log("siteId: ", req.query["siteId"]);
+
+			console.log("customerType: ", req.body["customerType"]);
+			console.log("contactName: ", req.body["contactName"]);
+			console.log("siteId: ", req.body["siteId"]);
 
 
+			let customer = new Customer(req);
+			let postSqlParams = [customer.customerId, customer.address, customer.contactName, customer.customerType,
+				customer.gpsCoordinates, customer.siteId, customer.Name, customer.phoneNumber,
+				customer.createdDate, customer.updatedDate, customer.gender];
 
-			if (req.query.hasOwnProperty("customerId"))
-				{ postSqlParams.push(req.query["customerId"]); }
-			else { postSqlParams.push(uuidv1()); }
-
-			// Required Fields have already been checked
-
-
-			if (req.query.hasOwnProperty("address"))
-				{ postSqlParams.push(req.query["address"]); }
-			else { postSqlParams.push(null); }
-
-			postSqlParams.push(req.query["contactName"]);
-
-			postSqlParams.push(req.query["customerType"]);
-
-			if (req.query.hasOwnProperty("gpsCoordinates"))
-				{ postSqlParams.push(req.query["gpsCoordinates"]); }
-			else { postSqlParams.push(null); }
-
-			postSqlParams.push(req.query["siteId"]);
-
-			if (req.query.hasOwnProperty("Name"))
-				{ postSqlParams.push(req.query["Name"]); }
-			else { postSqlParams.push(null); }
-
-			if (req.query.hasOwnProperty("phoneNumber"))
-				{ postSqlParams.push(req.query["phoneNumber"]); }
-			else { postSqlParams.push(null); }
-
-			if (req.query.hasOwnProperty("createdDate"))
-				{ postSqlParams.push(new Date(req.query["createdDate"])); }
-			else {
-				var today = new Date();
-				var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-				postSqlParams.push(date);
-			}
-
-			if (req.query.hasOwnProperty("updatedDate"))
-			{ postSqlParams.push(new Date(req.query["updatedDate"])); }
-			else {
-				var today = new Date();
-				var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-				postSqlParams.push(date);
-			}
-
-			if (req.query.hasOwnProperty("gender"))
-				{ postSqlParams.push(req.query["gender"]); }
-			else { postSqlParams.push(null); }
-
-
-			console.log(postSqlParams);
-			insertCustomers(sqlInsertCustomer, postSqlParams, res).then(function(result) {
-				getCustomers();
-			});
+			insertCustomers(customer, sqlInsertCustomer, postSqlParams, res);
 		}
 	});
 
 });
 
-const insertCustomers = (query, params, res ) => {
+const insertCustomers = (customer, query, params, res ) => {
 	return new Promise((resolve, reject) => {
 		__pool.getConnection((err, connection) => {
-
 			connection.query(query, params, function(err, result) {
 				connection.release();
-
 				if (err) {
 					semaLog.error('customers - failed', { err });
 					res.status(500).send(err.message);
@@ -137,32 +297,19 @@ const insertCustomers = (query, params, res ) => {
 					semaLog.info('customers - succeeded');
 
 					try {
-						if (Array.isArray(result) && result.length >= 1) {
-							const values = result.map(item => {
-								const toKeep = {};
-
-								for (let i = 0; i < attsToGrab.length; i++) {
-									toKeep[attsToGrab[i]] = item[attsToGrab[i]];
-								}
-								return toKeep;
-							});
-							resolve(res.json({ customers: values }));
-						} else {
-							resolve(res.json({ customers: [] }));
-						}
-
-
+						resolve(res.json(customer.classToPlain()));
 					} catch (err) {
 						semaLog.error('customers - failed', { err });
 						res.status(500).send(err.message);
 						reject(err);
 					}
+
 				}
 			});
 
 		})
 	});
-}
+};
 
 
 router.get('/', function(req, res) {

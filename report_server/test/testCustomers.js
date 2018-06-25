@@ -20,12 +20,46 @@ describe('Testing Customers API', function () {
 		setTimeout( function(){iAmDone()}, 2000);
 	});
 
-	describe('Post /sema/site/customers - missing siteId, customerName, customerType', function() {
+	describe('PUT /sema/site/customers - missing customerId', function() {
+		it('Should fail with 400 error code', (done) => {
+			chai.request(server)
+				.put('/sema/site/customers/99999')
+				.end(function(err, res) {
+					res.should.have.status(404);
+					done(err);
+				});
+		});
+	});
+
+	describe('DELETE /sema/site/customers - missing customerId', function() {
+		it('Should fail with 400 error code', (done) => {
+			chai.request(server)
+				.delete('/sema/site/customers/99999')
+				.end(function(err, res) {
+					res.should.have.status(404);
+					done(err);
+				});
+		});
+	});
+
+	describe('POST /sema/site/customers - missing siteId, customerName, customerType', function() {
 		it('Should fail with 400 error code', (done) => {
 			chai.request(server)
 				.post('/sema/site/customers')
 				.end(function(err, res) {
 					res.should.have.status(400);
+					done(err);
+				});
+		});
+	});
+
+	describe('POST /sema/site/customer - unknown site-id', function() {
+		it('Should fail with foreign key constraint error 500', (done) => {
+			chai.request(server)
+				.post('/sema/site/customers?contactName=Brian&customerType=128&siteId=9999')
+				.end(function(err, res) {
+					res.should.have.status(500);
+
 					done(err);
 				});
 		});
