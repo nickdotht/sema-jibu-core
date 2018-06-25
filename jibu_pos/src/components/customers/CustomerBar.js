@@ -41,8 +41,8 @@ class SelectedCustomerDetails extends React.Component {
 		}
 	};
 	getPhone (){
-		if( this.props.selectedCustomer.hasOwnProperty("phone_number")){
-			return this.props.selectedCustomer.phone_number;
+		if( this.props.selectedCustomer.hasOwnProperty("phoneNumber")){
+			return this.props.selectedCustomer.phoneNumber;
 		}else{
 			return "";
 		}

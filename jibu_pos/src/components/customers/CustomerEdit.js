@@ -121,7 +121,7 @@ class CustomerEdit extends Component {
 	}
 	getTelephoneNumber(me){
 		if( me.props.isEdit ){
-			return me.props.selectedCustomer.phone_number;
+			return me.props.selectedCustomer.phoneNumber;
 		}else{
 			return ""
 		}

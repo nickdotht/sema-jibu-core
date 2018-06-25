@@ -151,7 +151,7 @@ class OrderPaymentScreen extends Component {
 		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.price_amount)) }, 0);
 	}
 	calculateAmountDue(){
-		return this.props.selectedCustomer.due_amount;
+		return this.props.selectedCustomer.dueAmount;
 	}
 
 	calculateTotalDue(){

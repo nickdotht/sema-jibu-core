@@ -15,6 +15,9 @@ const customerReducer = (state = initialState, action) => {
 		case CUSTOMERS_SET:
 			newState = {...state};
 			newState.customers = action.data ;
+			console.log( "**********" + newState.customers[0].contactName);
+			console.log( "**********" + newState.customers [1].contactName);
+
 			return newState;
 		case CUSTOMERS_SEARCH:
 			newState = {...state};

@@ -21,13 +21,13 @@ export function LoadCustomers( ) {
 			let customers = mock_customers;
 			if( Array.isArray(mock_customers)){
 				customers = mock_customers.map( customer => {return {
-					id:customer.id,
+					customerId:customer.id,
 					address:customer.address,
 					contactName: customer.contact_name,
 					customer_type_id: customer.customer_type_id,
-					due_amount: customer.due_amount,
+					dueAmount: customer.due_amount,
 					name: customer.name,
-					phone_number: customer.phone_number,
+					phoneNumber: customer.phone_number,
 					active: customer.active,
 					sales_channel: customer.sales_channel,
 				}});

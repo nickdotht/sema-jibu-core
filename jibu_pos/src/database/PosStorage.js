@@ -123,10 +123,10 @@ class PosStorage {
 		this.salesKeys = [];
 	}
 	makeCustomerKey( customer ){
-		return (customerItemKey + '_' + customer.id);
+		return (customerItemKey + '_' + customer.customerId);
 	}
 	createCustomer(phone, name, address ){
-		const newCustomer = { id:uuidv1(), contactName:name, phone_number:phone, address:address, due_amount:0 };
+		const newCustomer = { customerId:uuidv1(), contactName:name, phoneNumber:phone, address:address, due_amount:0 };
 		let key = this.makeCustomerKey(newCustomer);
 		this.customers.push( newCustomer );
 		newCustomer.syncAction = "create";
@@ -172,7 +172,7 @@ class PosStorage {
 	updateCustomer( customer, phone, name, address){
 		let key = this.makeCustomerKey(customer);
 		customer.contactName = name; 	// FIXUP - Won't be contactName forever
-		customer.phone_number = phone; 	// FIXUP - Won't be phone_number forever
+		customer.phoneNumber = phone; 	// FIXUP - Won't be phone_number forever
 		customer.address = address; 	// FIXUP - Won't be address forever
 		customer.syncAction = "update";
 
