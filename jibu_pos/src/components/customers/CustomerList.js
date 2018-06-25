@@ -87,8 +87,6 @@ class CustomerList extends Component {
 			data.push(this.props.customers[0]);
 			if (this.props.customers.length > 1) {
 				data = this.props.customers.slice(1);
-				console.log( "++++++++++" + data[0].contactName);
-				console.log( "++++++++++" + data[1].contactName);
 				data = this.filterItems( data );
 				data.sort((a, b) => {
 					return (a.contactName < b.contactName ? -1 : 1)
