@@ -7,6 +7,7 @@ import productReducer from "./ProductReducer";
 import orderReducer from "./OrderReducer";
 import toolBarReducer from "./ToolbarReducer";
 import reportReducer from "./ReportReducer";
+import settingsReducer from "./SettingsReducer";
 
 // Combine all the reducers
 const RootReducer = combineReducers({
@@ -16,7 +17,8 @@ const RootReducer = combineReducers({
 	productReducer,
 	orderReducer,
 	toolBarReducer,
-	reportReducer
+	reportReducer,
+	settingsReducer
 
 });
 

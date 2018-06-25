@@ -6,6 +6,8 @@ import {
 	Image,
 	TouchableHighlight
 } from 'react-native';
+import packageJson from '../../package.json';
+
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as CustomerActions from "../actions/CustomerActions";
@@ -20,7 +22,7 @@ class Toolbar extends Component {
 				<View style = {[styles.leftToolbar]}>
 					<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
 					<TouchableHighlight onPress={() => this.onClearOrders()}>
-						<Text style = {[styles.text_style, {marginLeft:50}]}>Version: 0.0.8</Text>
+						<Text style = {[styles.text_style, {marginLeft:50}]}>Version {packageJson.version}</Text>
 					</TouchableHighlight>
 					<Text style = {[styles.text_style, {marginLeft:20}, this.getNetworkStyle()]}>{this.getNetworkState()}</Text>
 					<Text style = {[styles.text_style, {marginLeft:30}]}>Site:</Text>
@@ -71,6 +73,9 @@ class Toolbar extends Component {
 
 	onSettings= () =>{
 		console.log("onSettings");
+		if( this.props.showScreen.screenToShow !== "settings") {
+			this.props.toolbarActions.ShowScreen("settings");
+		}
 	};
 }
 

@@ -1,16 +1,48 @@
 import React, {Component}  from "react";
 import { View, Text, TouchableHighlight, TextInput, StyleSheet, Modal, Image} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import PropTypes from 'prop-types';
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import Events from 'react-native-simple-events';
+
 import * as ToolbarActions from "../../actions/ToolBarActions";
 import ModalDropdown from 'react-native-modal-dropdown';
+import PosStorage from "../../database/PosStorage";
+import * as CustomerActions from "../../actions/CustomerActions";
+
+class CustomerProperty extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {propertyText : this.props.valueFn(this.props.parent)};
+	}
+
+
+	render() {
+		return (
+			<View style ={[{ marginTop: this.props.marginTop }, styles.inputContainer]}>
+				<TextInput
+					style = {[styles.inputText,]}
+					underlineColorAndroid='transparent'
+					placeholder = {this.props.placeHolder}
+					value = {this.state.propertyText}
+					onChangeText = {this.onChangeText}/>
+			</View>
+		);
+	}
+	onChangeText = (text )=>{
+		this.setState({propertyText :text});
+	}
+}
 
 class CustomerEdit extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {isEditInProgress : false};
+		this.phone = React.createRef();
+		this.name = React.createRef();
+		this.address = React.createRef();
 	}
 	componentDidMount() {
 		console.log("CustomerEdit = Mounted");
@@ -38,25 +70,24 @@ class CustomerEdit extends Component {
 						resetScrollToCoords={{ x: 0, y: 0 }}
 						scrollEnabled={false}>
 						<View style ={{flex:1, alignItems:'center' }}>
-							<View style ={[{marginTop:10}, styles.inputContainer]}>
-								<TextInput
-									style = {[styles.inputText, ]}
-									underlineColorAndroid='transparent'
-									placeholder = 'Telephone Number'/>
-
-							</View>
-							<View style ={[{marginTop:20}, styles.inputContainer]}>
-								<TextInput
-									style = {[styles.inputText, ]}
-									underlineColorAndroid='transparent'
-									placeholder = 'Name'/>
-							</View>
-							<View style ={[{marginTop:20}, styles.inputContainer]}>
-								<TextInput
-									style = {[styles.inputText, ]}
-									underlineColorAndroid='transparent'
-									placeholder = 'Address'/>
-							</View>
+							<CustomerProperty
+								marginTop = {10}
+								placeHolder = 'Telephone Number'
+								parent ={this}
+								valueFn = {this.getTelephoneNumber}
+								ref={this.phone}/>
+							<CustomerProperty
+								marginTop = {20}
+								placeHolder = 'Name'
+								parent ={this}
+								valueFn = {this.getName}
+								ref={this.name}/>
+							<CustomerProperty
+								marginTop = {20}
+								placeHolder = 'Address'
+								parent ={this}
+								valueFn = {this.getAddress}
+								ref={this.address}/>
 							<View style ={[{marginTop:20, flexDirection:'row',alignItems:'center'}]}>
 								<ModalDropdown
 									style ={{width:250}}
@@ -88,6 +119,28 @@ class CustomerEdit extends Component {
 
 		);
 	}
+	getTelephoneNumber(me){
+		if( me.props.isEdit ){
+			return me.props.selectedCustomer.phone_number;
+		}else{
+			return ""
+		}
+	}
+	getName(me){
+		if( me.props.isEdit ){
+			return me.props.selectedCustomer.contact_name;
+		}else{
+			return ""
+		}
+	}
+	getAddress(me){
+		if( me.props.isEdit ){
+			return me.props.selectedCustomer.address;
+		}else{
+			return ""
+		}
+
+	}
 	getHeaderText(){
 		return this.props.isEdit ? "Edit Customer" : "New Customer";
 	}
@@ -96,16 +149,34 @@ class CustomerEdit extends Component {
 	}
 	onCancelEdit (){
 		this.props.toolbarActions.ShowScreen("main");
+		var that = this;
+		setTimeout( ()=>{
+			Events.trigger('ScrollCustomerTo', {customer: that.props.selectedCustomer})}, 10 );
 	}
-	closeHandler= ()=>{
+	closeHandler(){
 		this.setState( {isEditInProgress:false} );
 		this.onCancelEdit();
 	};
 
-	onEdit= ()=>{
+	onEdit(){
+		// TODO - Validate fields and set focus to invalid field
+		if( this.props.isEdit ){
+			PosStorage.updateCustomer(
+				this.props.selectedCustomer,
+				this.phone.current.state.propertyText,
+				this.name.current.state.propertyText,
+				this.address.current.state.propertyText );
+		}else{
+			let newCustomer = PosStorage.createCustomer(
+				this.phone.current.state.propertyText,
+			 	this.name.current.state.propertyText,
+				this.address.current.state.propertyText);
+			this.props.customerActions.CustomerSelected(newCustomer);
+		}
+
 		this.setState( {isEditInProgress:true} );
 	};
-	showEditInProgress = () =>{
+	showEditInProgress(){
 		let that = this;
 		if( this.state.isEditInProgress ) {
 			setTimeout(() => {
@@ -129,14 +200,20 @@ class CustomerEdit extends Component {
 
 }
 
+CustomerEdit.propTypes = {
+	isEdit: PropTypes.bool.isRequired,
+	toolbarActions: PropTypes.object.isRequired,
+	customerActions: PropTypes.object.isRequired
+};
 
 
 function mapStateToProps(state, props) {
-	return {};
+	return {selectedCustomer: state.customerReducer.selectedCustomer};
 }
 function mapDispatchToProps(dispatch) {
 	return {
-		toolbarActions:bindActionCreators(ToolbarActions, dispatch)
+		toolbarActions:bindActionCreators(ToolbarActions, dispatch),
+		customerActions:bindActionCreators(CustomerActions, dispatch)
 	};
 }
 
