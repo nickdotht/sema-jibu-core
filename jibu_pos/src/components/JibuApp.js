@@ -12,12 +12,14 @@ import OrderView from "./orders/OrderView"
 import DashboardReport from './reports/DashboardReport';
 import Login from './Login';
 import CustomerEdit from './customers/CustomerEdit';
+import Settings from './Settings';
 
 import {bindActionCreators} from 'redux';
 
 import {connect} from "react-redux";
 import * as CustomerActions from '../actions/CustomerActions';
 import * as NetworkActions from '../actions/NetworkActions';
+import * as SettingsActions from '../actions/SettingsActions';
 
 
 import PosStorage from "../database/PosStorage";
@@ -36,15 +38,17 @@ class JibuApp extends Component {
 		this.posStorage = PosStorage;
 	}
 	componentDidMount() {
-		console.log("Mounted");
-		this.posStorage.Initialize().then( (isInitialized) => {
+		console.log("JibuApp - Mounted");
+		this.posStorage.initialize().then( (isInitialized) => {
+			this.props.settingsActions.setSettings(this.posStorage.getSettings());
 			let timeout = 200;
 			if (isInitialized) {
 				// Data already configured
 				this.state.synchronization.customersLoaded = true;
-				this.props.customerActions.SetCustomers(this.posStorage.GetCustomers());
+				this.props.customerActions.SetCustomers(this.posStorage.getCustomers());
 				timeout = 20000;	// First sync after a bit
 			}
+			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
 			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});
@@ -64,7 +68,7 @@ class JibuApp extends Component {
     SynchronizeCustomers() {
 		console.log("SynchronizeCustomers");
 		this.state.synchronization.customersLoaded = true;
-		this.posStorage.AddCustomers( this.props.customers);
+		this.posStorage.addCustomers( this.props.customers);
 	}
 
 	handleConnectivityChange = isConnected => {
@@ -104,8 +108,12 @@ class ScreenSwitcher extends Component {
 			return (<View style={{flex:1}}>
 				<SiteReport/>
 			</View>);
-		} else{
+		} else if (this.props.currentScreen.screenToShow === "newCustomer") {
 			return (<CustomerEdit isEdit = {false}/>);
+		} else if (this.props.currentScreen.screenToShow === "editCustomer") {
+			return (<CustomerEdit isEdit = {true}/>);
+		} else if (this.props.currentScreen.screenToShow === "settings") {
+			return (<Settings/>);
 		}
 	}
 }
@@ -127,14 +135,17 @@ function mapStateToProps(state, props) {
 		customers: state.customerReducer.customers,
 		network: state.networkReducer.network,
 		showView: state.customerBarReducer.showView,
-		showScreen: state.toolBarReducer.showScreen
+		showScreen: state.toolBarReducer.showScreen,
+		settings:state.settingsReducer.settings
 
 	};
 }
 
 function mapDispatchToProps(dispatch) {
-	return {customerActions:bindActionCreators(CustomerActions, dispatch),
-		networkActions:bindActionCreators(NetworkActions, dispatch)};
+	return {
+		customerActions:bindActionCreators(CustomerActions, dispatch),
+		networkActions:bindActionCreators(NetworkActions, dispatch),
+		settingsActions:bindActionCreators(SettingsActions, dispatch)};
 }
 
 //Connect everything

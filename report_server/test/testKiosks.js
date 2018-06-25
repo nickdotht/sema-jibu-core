@@ -10,8 +10,10 @@ process.env.NODE_ENV = 'test';  // Set environment to test
 describe('Testing Kiosks', function () {
 	let server;
 	this.timeout(6000);
-	beforeEach( () => {
+	beforeEach( (done) => {
+		var iAmDone = done;
 		server = require('../bin/www' );
+		setTimeout( function(){iAmDone()}, 1500);
 	});
 	afterEach( (done) => {
 		var iAmDone = done;

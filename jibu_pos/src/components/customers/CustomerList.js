@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-nati
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import * as CustomerActions from '../../actions/CustomerActions';
+import Events from 'react-native-simple-events';
 
 class CustomerList extends Component {
 	constructor(props) {
@@ -10,14 +11,33 @@ class CustomerList extends Component {
 
 		this.state = {
 			refresh: false,
-			selectedCustomer: null,
-			searchString:""
+			// selectedCustomer: null,
+			searchString:"",
+			hasScrolled:false
 		};
 	}
 	componentDidMount() {
-		console.log("CustomerList = Mounted");
+		console.log("CustomerList:componentDidMount");
+		Events.on('ScrollCustomerTo', 'customerId1', this.onScrollCustomerTo.bind(this) );
+	}
+	componentWillUnmount(){
+		Events.rm('ScrollCustomerTo', 'customerId1') ;
 	}
 
+	onScrollCustomerTo( data ){
+		console.log("onScrollCustomerTo");
+		// Commented oto scrollToItem requires getItemLayout and getItemLayout fails with
+		// searches. Expect since not all items are rendered on sea
+		// this.flatListRef.scrollToItem({animated: false, item: data.customer, viewPosition:0.5});
+	}
+	getItemLayout = (data, index) => (
+		{ length: 50, offset: 50 * index, index }
+	);
+
+	shouldComponentUpdate(nextProps, nextState){
+		console.log("onScrollCustomerTo");
+		return true;
+	}
 	render() {
 		return (
 			<View >
@@ -26,6 +46,8 @@ class CustomerList extends Component {
 					{/*renderItem={({item}) => <Text>{item.key}</Text>}*/}
 				{/*/>*/}
 				<FlatList
+					ref={(ref) => { this.flatListRef = ref; }}
+					// getItemLayout={this.getItemLayout}
 					data={this.prepareData()}
 					ListHeaderComponent = {this.showHeader}
 					extraData={this.state.refresh}
@@ -44,8 +66,8 @@ class CustomerList extends Component {
 			</View>
 		);
 	}
-	prepareData = () =>{
-		if( this.props.customers.length > 0 && this.props.customers[0].id !== '9999999-9999-9999-9999-9999999' ) {
+	prepareData = () => {
+		if (this.props.customers.length > 0 && this.props.customers[0].id !== '9999999-9999-9999-9999-9999999') {
 			const anonymous = {
 				"id": "9999999-9999-9999-9999-9999999",
 				"version": 3,
@@ -60,11 +82,24 @@ class CustomerList extends Component {
 			};
 			this.props.customers.unshift(anonymous);
 		}
-		return this.props.customers;
+		let data = [];
+		if (this.props.customers.length > 0) {
+			data.push(this.props.customers[0]);
+			if (this.props.customers.length > 1) {
+				data = this.props.customers.slice(1);
+
+				data.sort((a, b) => {
+					return (a.contact_name < b.contact_name ? -1 : 1)
+				});
+				data.unshift(this.props.customers[0]);
+			}
+		}
+		return data;
 	}
 	getRow = (item, index, separators) =>{
+		// console.log("getRow -index: " + index)
 		let isSelected = false;
-		if( this.state.selectedCustomer && this.state.selectedCustomer.id === item.id){
+		if( this.props.selectedCustomer && this.props.selectedCustomer.id === item.id){
 			console.log("Selected item is " + item.id);
 			isSelected = true;
 		}
@@ -126,7 +161,7 @@ class CustomerList extends Component {
 	onPressItem = (item) =>{
 		console.log("_onPressItem");
 		this.props.CustomerSelected(item);
-		this.setState({ selectedCustomer:item });
+		// this.setState({ selectedCustomer:item });
 		this.setState({refresh: !this.state.refresh});
 	};
 	showHeader = () =>{
