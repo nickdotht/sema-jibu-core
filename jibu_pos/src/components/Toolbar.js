@@ -21,13 +21,13 @@ class Toolbar extends Component {
         	<View style ={styles.toolbar}>
 				<View style = {[styles.leftToolbar]}>
 					<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
-					<TouchableHighlight onPress={() => this.onClearOrders()}>
+					<TouchableHighlight onPress={() => this.onVersion()}>
 						<Text style = {[styles.text_style, {marginLeft:50}]}>Version {packageJson.version}</Text>
 					</TouchableHighlight>
 					<Text style = {[styles.text_style, {marginLeft:20}, this.getNetworkStyle()]}>{this.getNetworkState()}</Text>
 					<Text style = {[styles.text_style, {marginLeft:30}]}>Site:</Text>
 					<View style = {[styles.site_container, {marginLeft:20}]}>
-						<Text style = {styles.site_text}>Kampala</Text>
+						<Text style = {styles.site_text}>{this.props.settings.settings.site}</Text>
 					</View>
 				</View>
 				<View style = {[styles.rightToolbar]}>
@@ -61,9 +61,8 @@ class Toolbar extends Component {
 
 		}
     };
-	onClearOrders= () =>{
-		console.log("onClearOrders");
-		PosStorage.ClearAll();
+	onVersion= () =>{
+		console.log("onVersion");
 	};
 
 	onLogout= () =>{
@@ -82,7 +81,8 @@ class Toolbar extends Component {
 function mapStateToProps(state, props) {
 	return {
 		network: state.networkReducer.network,
-		showScreen: state.toolBarReducer.showScreen
+		showScreen: state.toolBarReducer.showScreen,
+		settings:state.settingsReducer
 	};
 }
 

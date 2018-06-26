@@ -41,4 +41,37 @@ export default class Communications {
 				});
 		})
 	}
+	getSiteId( token, siteName){
+		let options = {
+			method: 'GET',
+			headers: {
+				Authorization : 'Bearer ' + token
+			},
+		}
+
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'untapped/kiosks', options)
+				.then((response) => {
+					console.log( response.status);
+					response.json()
+						.then((responseJson) => {
+							let result = -1;
+							for( let i = 0; i < responseJson.kiosks.length; i++){
+								if( responseJson.kiosks[i].name === siteName ){
+									result = responseJson.kiosks[i].id;
+									break;
+								}
+							}
+							resolve(result);
+						})
+						.catch( (error )=>{
+							resolve(-1);
+						})
+				})
+				.catch((error) => {
+					resolve(-1);
+				});
+		})
+
+	}
 };

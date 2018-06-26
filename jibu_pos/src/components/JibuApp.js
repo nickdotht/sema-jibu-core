@@ -41,6 +41,7 @@ class JibuApp extends Component {
 		console.log("JibuApp - Mounted");
 		this.posStorage.initialize().then( (isInitialized) => {
 			this.props.settingsActions.setSettings(this.posStorage.getSettings());
+			this.props.settingsActions.setConfiguration(this.posStorage.getConfiguration());
 			let timeout = 200;
 			if (isInitialized) {
 				// Data already configured
@@ -136,7 +137,7 @@ function mapStateToProps(state, props) {
 		network: state.networkReducer.network,
 		showView: state.customerBarReducer.showView,
 		showScreen: state.toolBarReducer.showScreen,
-		settings:state.settingsReducer.settings
+		settings:state.settingsReducer
 
 	};
 }
