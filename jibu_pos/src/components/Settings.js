@@ -165,6 +165,7 @@ class Settings extends Component {
 	}
 
 	onCancelSettings (){
+		console.log("foooo " + JSON.stringify(Communications) + " url " + Communications._url);
 		this.props.toolbarActions.ShowScreen("main");
 	}
 	closeHandler(){
@@ -200,23 +201,24 @@ class Settings extends Component {
 
 	}
 	onConnection() {
-		let communications = new Communications(
+		Communications.initialize(
 			this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText);
 		try {
 			let message = "Successfully connected to the SEMA service";
-			communications.login()
+			Communications.login()
 				.then(result => {
 					console.log("Passed - status" + result.status + " " + JSON.stringify(result.response));
 					if( result.status === 200){
-						communications.getSiteId( result.response.token, this.site.current.state.propertyText )
+						Communications.getSiteId( result.response.token, this.site.current.state.propertyText )
 							.then( siteId => {
 								if( siteId == -1 ){
 									message ="Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' does not exist";
 								}else{
 									this.saveSettings();
+									Communications.setToken( result.response.token);
 									PosStorage.saveConfiguration( result.response.token, siteId );
 									this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 								}

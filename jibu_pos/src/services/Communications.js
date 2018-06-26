@@ -1,14 +1,27 @@
 import React from 'react';
 
-export default class Communications {
-	constructor( url, site, user, password ){
+class Communications {
+	constructor(  ){
+		this._url = "";
+		this._site = "";
+		this._user = "";
+		this._password= "";
+		this._token = "";
+		this._siteId ="";
+	}
+	initialize( url, site, user, password){
 		this._url = url;
 		this._site = site;
 		this._user = user;
 		this._password= password;
-
+		this._token = "not set";
 	}
-
+	setToken( token ){
+		this._token = token;
+	}
+	setSiteId( siteId ){
+		this._siteId = siteId;
+	}
 	login(){
 		let options = {
 			method: 'POST',
@@ -74,4 +87,37 @@ export default class Communications {
 		})
 
 	}
+	getCustomers(){
+		let options = {
+			method: 'GET',
+			headers: { Authorization : 'Bearer ' + this._token }
+		}
+
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'untapped/kiosks', options)
+				.then((response) => {
+					console.log( response.status);
+					response.json()
+						.then((responseJson) => {
+							let result = -1;
+							for( let i = 0; i < responseJson.kiosks.length; i++){
+								if( responseJson.kiosks[i].name === siteName ){
+									result = responseJson.kiosks[i].id;
+									break;
+								}
+							}
+							resolve(result);
+						})
+						.catch( (error )=>{
+							resolve(-1);
+						})
+				})
+				.catch((error) => {
+					resolve(-1);
+				});
+		})
+
+	}
+
 };
+export default new Communications();

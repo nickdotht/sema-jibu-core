@@ -25,6 +25,7 @@ import * as SettingsActions from '../actions/SettingsActions';
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
 import SiteReport from "./reports/SiteReport";
+import Communications from "../services/Communications";
 
 console.ignoredYellowBox = ['Warning: isMounted'];
 
@@ -40,8 +41,17 @@ class JibuApp extends Component {
 	componentDidMount() {
 		console.log("JibuApp - Mounted");
 		this.posStorage.initialize().then( (isInitialized) => {
-			this.props.settingsActions.setSettings(this.posStorage.getSettings());
-			this.props.settingsActions.setConfiguration(this.posStorage.getConfiguration());
+
+			let settings = this.posStorage.getSettings();
+			let configuration = this.posStorage.getConfiguration();
+			this.props.settingsActions.setSettings( settings );
+			this.props.settingsActions.setConfiguration(configuration);
+			Communications.initialize( settings.semaUrl, settings.site, settings.user, settings.password);
+			Communications.setToken( configuration.token );
+			Communications.setSiteId(configuration.siteId);
+
+			console.log( "Communications - " + JSON.stringify(Communications));
+
 			let timeout = 200;
 			if (isInitialized) {
 				// Data already configured
