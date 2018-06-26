@@ -13,6 +13,7 @@ import {connect} from "react-redux";
 import * as CustomerActions from "../actions/CustomerActions";
 import networkReducer from "../reducers/NetworkReducer";
 import * as ToolBarActions from "../actions/ToolBarActions";
+import Communications from "../services/Communications";
 import PosStorage from "../database/PosStorage";
 
 class Toolbar extends Component {
@@ -63,6 +64,11 @@ class Toolbar extends Component {
     };
 	onVersion= () =>{
 		console.log("onVersion");
+		Communications.getCustomers()
+			.then( customers => {
+				console.log("CUSTOMERS -" + JSON.stringify(customers));
+			});
+
 	};
 
 	onLogout= () =>{

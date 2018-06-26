@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert} from "react-native";
+import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import PropTypes from 'prop-types';
 
@@ -25,7 +25,7 @@ class SettingsProperty extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {propertyText : this.props.valueFn(this.props.parent)};
-		console.log("--------- height " + height);
+
 	}
 
 
@@ -52,6 +52,22 @@ class SettingsProperty extends Component {
 	}
 }
 
+class SettingsButton extends Component {
+
+	render() {
+		return (
+			<View style={[styles.submit, {marginLeft:30}] }>
+				<View style={{ justifyContent: 'center', height: 80, alignItems: 'center' }}>
+					<TouchableHighlight underlayColor='#c0c0c0'
+										onPress={() => this.props.pressFn()}>
+						<Text style={[styles.buttonText]}>{this.props.label}</Text>
+					</TouchableHighlight>
+				</View>
+			</View>
+		);
+	}
+}
+
 class Settings extends Component {
 	constructor(props) {
 		super(props);
@@ -59,6 +75,7 @@ class Settings extends Component {
 		this.site = React.createRef();
 		this.user = React.createRef();
 		this.password = React.createRef();
+		this.state = {isMockData:this.props.settings.settings.useMockData}
 	}
 	componentDidMount() {
 		console.log("Settings:Mounted");
@@ -118,38 +135,32 @@ class Settings extends Component {
 								valueFn = {this.getPassword}
 								ref={this.password}/>
 							<View style ={{flexDirection:'row', flex:1, alignItems:'center'}}>
-								<View style={styles.submit}>
-									<View style={{justifyContent:'center', height:80, alignItems:'center'}}>
-										<TouchableHighlight underlayColor = '#c0c0c0'
-															onPress={() => this.onSaveSettings()}>
-											<Text style={ [ styles.buttonText]}>{'Save Settings'}</Text>
-										</TouchableHighlight>
-									</View>
-								</View>
-								<View style={[ {marginLeft:50}, styles.submit]}>
-									<View style={{justifyContent:'center', height:80, alignItems:'center'}}>
-										<TouchableHighlight underlayColor = '#c0c0c0'
-															onPress={() => this.onConnection()}>
-											<Text style={ [ styles.buttonText]}>{'Connect'}</Text>
-										</TouchableHighlight>
-									</View>
-								</View>
-								<View style={[ {marginLeft:50}, styles.submit]}>
-									<View style={{justifyContent:'center', height:80, alignItems:'center'}}>
-										<TouchableHighlight underlayColor = '#c0c0c0'
-															onPress={() => this.onClearAll()}>
-											<Text style={ [ styles.buttonText]}>{'Clear...'}</Text>
-										</TouchableHighlight>
-									</View>
-								</View>
+								<SettingsButton
+									pressFn = {this.onSaveSettings.bind(this)}
+									label = 'Save Settings'/>
+								<SettingsButton
+									pressFn = {this.onConnection.bind(this)}
+									label = 'Connect'/>
+								<SettingsButton
+									pressFn = {this.onClearAll.bind(this)}
+									label = 'Clear...'/>
 							</View>
-
+							<View style ={{flexDirection:'row', flex:1, alignItems:'center', marginTop:30}}>
+								<Text style = {styles.checkLabel} >{"Use simulated data"}</Text>
+								<CheckBox
+									style = {{marginLeft:30}}
+									value={this.state.isMockData}
+									onValueChange={this.useMockDataChange.bind(this)}/>
+							</View>
 						</View>
 
 					</KeyboardAwareScrollView>
 			</View>
 
 		);
+	}
+	useMockDataChange(){
+		this.setState( {isMockData: !this.state.isMockData});
 	}
 	getUrl(me){
 		return me.props.settings.settings.semaUrl;
@@ -165,7 +176,6 @@ class Settings extends Component {
 	}
 
 	onCancelSettings (){
-		console.log("foooo " + JSON.stringify(Communications) + " url " + Communications._url);
 		this.props.toolbarActions.ShowScreen("main");
 	}
 	closeHandler(){
@@ -200,7 +210,7 @@ class Settings extends Component {
 		);
 
 	}
-	onConnection() {
+	onConnection( ) {
 		Communications.initialize(
 			this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
@@ -250,11 +260,17 @@ class Settings extends Component {
 		}
 	}
 	saveSettings(){
+		let prevMock = PosStorage.getSettings().useMockData;
 		PosStorage.saveSettings(this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
-			this.password.current.state.propertyText );
+			this.password.current.state.propertyText,
+			this.state.isMockData);
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
+		if( prevMock != this.state.isMockData){
+			// switching between real and mock data. -delete customers/products ect
+			PosStorage.clearDataOnly();
+		}
 
 	}
 
@@ -335,6 +351,10 @@ const styles = StyleSheet.create({
 		borderColor:"#2858a7",
 		borderWidth:5,
 		borderRadius:10
+	},
+	checkLabel: {
+		left: 20,
+		fontSize:24,
 	},
 
 });

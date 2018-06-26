@@ -46,10 +46,12 @@ class JibuApp extends Component {
 			let configuration = this.posStorage.getConfiguration();
 			this.props.settingsActions.setSettings( settings );
 			this.props.settingsActions.setConfiguration(configuration);
-			Communications.initialize( settings.semaUrl, settings.site, settings.user, settings.password);
-			Communications.setToken( configuration.token );
-			Communications.setSiteId(configuration.siteId);
 
+			Communications.initialize( settings.settings.semaUrl, settings.settings.site, settings.settings.user, settings.settings.password);
+			Communications.setToken( configuration.configuration.token );
+			Communications.setSiteId(configuration.configuration.siteId);
+
+			console.log( "PosStorage - " + JSON.stringify(PosStorage));
 			console.log( "Communications - " + JSON.stringify(Communications));
 
 			let timeout = 200;

@@ -54,7 +54,7 @@ class PosStorage {
 		this.lastCustomerSync = null;
 		this.lastSalesSync = null;
 		this.lastProductsSync = null;
-		this.settings = {settings:{semaUrl:"Not Set", site:"", user:"", password:""}};
+		this.settings = {settings:{semaUrl:"Not Set", site:"", user:"", password:"", useMockData:true}};
 		this.configuration = {configuration:{token:"", siteId:""}};
 	}
 
@@ -125,10 +125,24 @@ class PosStorage {
 		this.removeKey(versionKey );
 		this.salesKeys = [];
 		this.customers = [];
-		this.settings = {settings:{semaUrl:"Not Set", site:"", user:"", password:""}};
+		this.settings = {settings:{semaUrl:"Not Set", site:"", user:"", password:"", useMockData:true}};
 		this.configuration = {configuration:{token:"", siteId:""}};
-
 	}
+	clearDataOnly(){
+		// Clear all data - leave config alone
+		this.customersKeys = [];
+		this.pendingCustomers = [];
+		let keyArray = [
+			[customersKey,  this.stringify(this.customersKeys)],				// Array of customer keys
+			[pendingCustomersKey, this.stringify(this.pendingCustomers)]	// Array pending customer
+		];
+		AsyncStorage.multiSet( keyArray).then( error => {
+			if( error ) {
+				console.log("PosStorage:clearDataOnly: Error: " + error);
+			}
+		});
+	}
+
 	makeCustomerKey( customer ){
 		return (customerItemKey + '_' + customer.customerId);
 	}
@@ -198,11 +212,10 @@ class PosStorage {
 	}
 	addCustomers( customerArray ){
 		if( this.customers.length > 0 ){
-			console.log("AddCustomers - need to merge....");
-			// Return the updated array of customers so the the UI will get updated
+			console.log("PosStorage:addCustomers - need to merge...." + JSON.stringify(customerArray) );
 			return null;
 		}else{
-			console.log("No existing customers no need to merge....");
+			console.log("PosStorage:addCustomers: No existing customers no need to merge....");
 			this.customers = customerArray;
 			const keyValueArray = customerArray.map( (customer) => {
 				return [ this.makeCustomerKey(customer), this.stringify(customer)];
@@ -284,8 +297,8 @@ class PosStorage {
 		return this.settings;
 	}
 
-	saveSettings( url, site, user, password ){
-		let settings = {settings:{semaUrl:url, site:site, user:user, password:password}};
+	saveSettings( url, site, user, password, useMockData ){
+		let settings = {settings:{semaUrl:url, site:site, user:user, password:password, useMockData:useMockData}};
 		this.settings = settings;
 		this.setKey( settingsKey, this.stringify( settings));
 

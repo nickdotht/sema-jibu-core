@@ -10,6 +10,9 @@ class Communications {
 		this._siteId ="";
 	}
 	initialize( url, site, user, password){
+		if( ! url.endsWith('/')){
+			url = url + '/';
+		}
 		this._url = url;
 		this._site = site;
 		this._user = user;
@@ -87,36 +90,20 @@ class Communications {
 		})
 
 	}
-	getCustomers(){
+	getCustomers() {
 		let options = {
 			method: 'GET',
-			headers: { Authorization : 'Bearer ' + this._token }
+			headers: { Authorization: 'Bearer ' + this._token }
 		}
-
-		return new Promise( (resolve, reject ) => {
-			fetch(this._url + 'untapped/kiosks', options)
-				.then((response) => {
-					console.log( response.status);
-					response.json()
-						.then((responseJson) => {
-							let result = -1;
-							for( let i = 0; i < responseJson.kiosks.length; i++){
-								if( responseJson.kiosks[i].name === siteName ){
-									result = responseJson.kiosks[i].id;
-									break;
-								}
-							}
-							resolve(result);
-						})
-						.catch( (error )=>{
-							resolve(-1);
-						})
-				})
-				.catch((error) => {
-					resolve(-1);
-				});
-		})
-
+		return fetch(this._url + 'sema/site/customers?site-id=' + this._siteId, options)
+			.then((response) => response.json())
+			.then((responseJson) => {
+				return responseJson
+			})
+			.catch((error) => {
+				console.log("getCustomers: " + error);
+				return {}
+			});
 	}
 
 };
