@@ -6,7 +6,7 @@ chai.use(chaiHttp);
 const should = chai.should();
 const sprintf = require('sprintf-js').sprintf;
 require('datejs');
-var findKioskIndex = require('./Utilities/findKioskIndex');
+var findKioskIndex = require('./Utilities/findKioskId');
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 

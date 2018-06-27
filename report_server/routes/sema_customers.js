@@ -126,8 +126,6 @@ function putLogic(originalAtts, newAtts) {
 
 	arr.push(originalAtts["id"]);
 	return arr;
-
-
 }
 
 
@@ -272,7 +270,9 @@ router.post('/', async (req, res) => {
 			console.log("siteId: ", req.body["siteId"]);
 
 
-			let customer = new Customer(req);
+			let customer = new Customer(req.body["contactName"], req.body["customerType"], req.body["siteId"]);
+			customer.requestToClass(req);
+
 			let postSqlParams = [customer.customerId, customer.address, customer.contactName, customer.customerType,
 				customer.gpsCoordinates, customer.siteId, customer.Name, customer.phoneNumber,
 				customer.createdDate, customer.updatedDate, customer.gender];
@@ -395,21 +395,21 @@ const getCustomers = (query, params, res ) => {
 				}
 				else {
 					semaLog.info('customers - succeeded');
-
 					try {
 						if (Array.isArray(result) && result.length >= 1) {
-							const values = result.map(item => {
-								const toKeep = {};
-
-								for (let i = 0; i < attsToGrab.length; i++) {
-									toKeep[attsToGrab[i]] = item[attsToGrab[i]];
-								}
-								return toKeep;
+							var values = result.map(item => {
+								customer = new Customer(item["contact_name"], item["customer_type_id"], item["kiosk_id"]);
+								customer.databaseToClass(item);
+								return customer.classToPlain(item);
 							});
+
+
 							resolve(res.json({ customers: values }));
 						} else {
 							resolve(res.json({ customers: [] }));
 						}
+
+
 
 
 					} catch (err) {
