@@ -17,6 +17,7 @@ import * as ToolbarActions from "../../actions/ToolBarActions";
 
 import CustomerBarButton from './CustomerBarButton';
 import * as OrderActions from "../../actions/OrderActions";
+import Events from "react-native-simple-events";
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -60,6 +61,17 @@ class CustomerBar extends Component {
 			editFunction: true,
 			deleteFunction: true
 		}
+	}
+	componentDidMount() {
+		console.log("CustomerBar:componentDidMount");
+		Events.on('onOrder', 'toolbarEvent1', this.onOrder.bind(this) );
+	}
+	componentWillUnmount(){
+		Events.rm('onOrder', 'toolbarEvent1') ;
+	}
+	onOrder( ){
+		console.log("CustomerBar: onOrder");
+		this.onOrder();
 	}
 
 	render() {

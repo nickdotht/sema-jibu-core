@@ -117,7 +117,10 @@ class CustomerList extends Component {
 			return (
 				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row', height:50, alignItems:'center'}]}>
 					<View style={{flex: 2}}>
-						<Text style={[styles.baseItem, styles.leftMargin]}>{item.contactName}</Text>
+						<TouchableHighlight
+							onPress={() => this.onPressItemName(item)}>
+							<Text style={[styles.baseItem, styles.leftMargin]}>{item.contactName}</Text>
+						</TouchableHighlight>
 					</View>
 					<View style={{flex: 1.5}}>
 						<Text style={[styles.baseItem]}>{item.phoneNumber}</Text>
@@ -168,12 +171,20 @@ class CustomerList extends Component {
 		return false;
 	};
 
+	onPressItemName = (item) =>{
+		console.log("_onPressItemName");
+		this.props.CustomerSelected(item);
+		this.setState({refresh: !this.state.refresh});
+	};
+
 	onPressItem = (item) =>{
 		console.log("_onPressItem");
 		this.props.CustomerSelected(item);
 		// this.setState({ selectedCustomer:item });
 		this.setState({refresh: !this.state.refresh});
+		Events.trigger('onOrder', {customer: item});
 	};
+
 	showHeader = () =>{
 		console.log("Displaying header");
 		return (
