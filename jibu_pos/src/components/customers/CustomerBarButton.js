@@ -6,7 +6,7 @@ class CustomerBarButton extends React.Component {
 	render() {
 		return (
 			<View style={styles.Button}>
-				<TouchableHighlight onPress={this.props.handler}>
+				<TouchableHighlight onPress={this.props.handler} disabled ={!this.props.enabled}>
 					<Image source={this.props.image}  resizeMode ='stretch'
 						   style={[styles.iconSize, {marginLeft:15}, this.getOpacity(this.props.enabled)]}/>
 				</TouchableHighlight>
