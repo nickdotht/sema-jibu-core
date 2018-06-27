@@ -1,58 +1,45 @@
 import React from 'react';
 
-export default class Communications {
-	constructor( url, site, user, password ){
+class Communications {
+	constructor(  ){
+		this._url = "";
+		this._site = "";
+		this._user = "";
+		this._password= "";
+		this._token = "";
+		this._siteId ="";
+	}
+	initialize( url, site, user, password){
+		if( ! url.endsWith('/')){
+			url = url + '/';
+		}
 		this._url = url;
 		this._site = site;
 		this._user = user;
 		this._password= password;
-
+		this._token = "not set";
 	}
-	// login() {
-	// 	console.log("logging into " + this._url + '/untapped/login');
-	// 	return new Promise( (resolve, reject) =>{
-	// 		try {
-	// 			fetch(this._url + 'untapped/login', {
-	// 				method: 'POST',
-	// 				headers: {
-	// 					Accept: 'application/json',
-	// 					'Content-Type': 'application/json',
-	// 				},
-	// 				body: JSON.stringify({
-	// 					usernameOrEmail: this._user,
-	// 					password: this._password,
-	// 				}),
-	// 			})
-	// 				.then((response) => response.json())
-	// 				.then((responseJson) => {
-	// 					resolve(responseJson);
-	// 				})
-	// 				.catch((error) => {
-	// 					console.log(error);
-	// 					reject(error);
-	// 				});
-	// 		}catch( error ){
-	// 			reject(error);
-	// 		}
-	// 	})console.log(  JSON.stringify(response));
-	// }
+	setToken( token ){
+		this._token = token;
+	}
+	setSiteId( siteId ){
+		this._siteId = siteId;
+	}
 	login(){
-		var foo = null;
-		return fetch('http://facebook.github.io/react-native/movies.json')
-			.then((response) => response.json())
-			.then((responseJson) => {
-				console.log(">>>>>>" + JSON.stringify(responseJson));
-				return [response, responseJson];
-			})
+		let options = {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				usernameOrEmail: this._user,
+				password: this._password,
+			}),
+		}
 
-			.catch((error) => {
-				console.log("=======================================================" + JSON.stringify(error));
-				return error;
-			});
-	}
-	login2(){
 		return new Promise( (resolve, reject ) => {
-			fetch(this._url + 'untapped/login')
+			fetch(this._url + 'untapped/login', options)
 				.then((response) => {
 					console.log( response.status);
 					response.json()
@@ -66,8 +53,60 @@ export default class Communications {
 				})
 				.catch((error) => {
 					console.log(error + " OUTER " + JSON.stringify(error));
-					reject({status:418, response:error});	// This is the I'm a teapot error
+					reject({status:418, response:error});	// This is the "I'm a teapot error"
 				});
 		})
 	}
+	getSiteId( token, siteName){
+		let options = {
+			method: 'GET',
+			headers: {
+				Authorization : 'Bearer ' + token
+			},
+		}
+
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'untapped/kiosks', options)
+				.then((response) => {
+					console.log( response.status);
+					response.json()
+						.then((responseJson) => {
+							let result = -1;
+							for( let i = 0; i < responseJson.kiosks.length; i++){
+								if( responseJson.kiosks[i].name === siteName ){
+									result = responseJson.kiosks[i].id;
+									break;
+								}
+							}
+							resolve(result);
+						})
+						.catch( (error )=>{
+							resolve(-1);
+						})
+				})
+				.catch((error) => {
+					resolve(-1);
+				});
+		})
+
+	}
+	getCustomers() {
+		let options = {
+			method: 'GET',
+			headers: { Authorization: 'Bearer ' + this._token }
+		}
+		return fetch(this._url + 'sema/site/customers?site-id=' + this._siteId, options)
+			.then((response) => response.json())
+			.then((responseJson) => {
+				return responseJson
+			})
+			.catch((error) => {
+				console.log("getCustomers: " + error);
+				return {}
+			});
+	}
+	createCustomer() {
+
+	}
 };
+export default new Communications();

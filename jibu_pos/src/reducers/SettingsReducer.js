@@ -1,13 +1,14 @@
 import { SET_SETTINGS} from "../actions/SettingsActions"
 
-let initialState = {settings:{semaUrl:"XX", site:"", user:"", password:""}};
+let initialState = {settings:{semaUrl:"XX", site:"Kampala", user:"", password:"", token:"", sitedId:"",useMockData:true}};
 
 const settingsReducer = (state = initialState, action) => {
 	let newState;
 	console.log("settingsReducer: " +action.type);
 	switch (action.type) {
 		case SET_SETTINGS:
-			newState = {settings:action.data.settings};
+			newState = {...state};
+			newState.settings = action.data ;
 			console.log( JSON.stringify(newState));
 			return newState;
 

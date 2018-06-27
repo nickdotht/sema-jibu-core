@@ -9,7 +9,6 @@ import Toolbar from './Toolbar';
 import {CustomerViews} from './customers/CustomerViews'
 import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
-import DashboardReport from './reports/DashboardReport';
 import Login from './Login';
 import CustomerEdit from './customers/CustomerEdit';
 import Settings from './Settings';
@@ -25,6 +24,7 @@ import * as SettingsActions from '../actions/SettingsActions';
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
 import SiteReport from "./reports/SiteReport";
+import Communications from "../services/Communications";
 
 console.ignoredYellowBox = ['Warning: isMounted'];
 
@@ -40,9 +40,20 @@ class JibuApp extends Component {
 	componentDidMount() {
 		console.log("JibuApp - Mounted");
 		this.posStorage.initialize().then( (isInitialized) => {
-			this.props.settingsActions.setSettings(this.posStorage.getSettings());
+
+			let settings = this.posStorage.getSettings();
+			this.props.settingsActions.setSettings( settings );
+			// this.props.settingsActions.setConfiguration(configuration);
+
+			Communications.initialize( settings.semaUrl, settings.site, settings.user, settings.password);
+			Communications.setToken( settings.token );
+			Communications.setSiteId(settings.siteId);
+
+			console.log( "PosStorage - " + JSON.stringify(PosStorage));
+			console.log( "Communications - " + JSON.stringify(Communications));
+
 			let timeout = 200;
-			if (isInitialized) {
+			if (isInitialized && this.posStorage.getCustomers().length > 0) {
 				// Data already configured
 				this.state.synchronization.customersLoaded = true;
 				this.props.customerActions.SetCustomers(this.posStorage.getCustomers());
@@ -77,7 +88,7 @@ class JibuApp extends Component {
 	};
 
 	getLoginOrHomeScreen(){
-		if( this.props.showScreen.isLoggedIn || true) {
+		if( this.props.showScreen.isLoggedIn ) {
 			return (
 				<View style={{flex: 1}}>
 					<Toolbar/>

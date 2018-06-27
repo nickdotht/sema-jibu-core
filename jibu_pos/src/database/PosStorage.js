@@ -21,6 +21,7 @@ const pendingCustomersKey = '@Sema:PendingCustomersKey';
 const pendingSalesKey = '@Sema:PendingSalesKey';
 
 const settingsKey = '@Sema:SettingsKey';
+// const configurationKey = '@Sema:ConfigurationKey';
 
 class PosStorage {
 	constructor() {
@@ -53,7 +54,7 @@ class PosStorage {
 		this.lastCustomerSync = null;
 		this.lastSalesSync = null;
 		this.lastProductsSync = null;
-		this.settings = {settings:{semaUrl:"ABC", site:"", user:"", password:""}};
+		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 
 	initialize() {
@@ -101,7 +102,6 @@ class PosStorage {
 							this.pendingCustomers = this.parseJson(results[6][1]);	// Array of pending customers
 							this.pendingSales = this.parseJson(results[7][1]);	// Array of pending sales
 							this.settings = this.parseJson(results[8][1]);		// Settings
-
 							this.loadCustomersFromKeys()
 								.then(()=>{ resolve(true);})
 								.catch((err) =>reject(err));
@@ -116,17 +116,49 @@ class PosStorage {
 	}
 
 
-	ClearAll(){
+	clearAll(){
 		this.removeKey(salesKey );
 		this.removeKey(customersKey );
 		this.removeKey(versionKey );
 		this.salesKeys = [];
+		this.customers = [];
+		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
+	clearDataOnly(){
+		// Clear all data - leave config alone
+		this.customersKeys = [];
+		this.pendingCustomers = [];
+		this.salesKeys = [];
+		this.pendingSales = [];
+		this.customers = [];
+		let keyArray = [
+			[customersKey,  this.stringify(this.customersKeys)],
+			[pendingCustomersKey, this.stringify(this.pendingCustomers)],
+			[salesKey,  this.stringify(this.salesKeys)],
+			[pendingSalesKey, this.stringify(this.pendingSales)]
+		];
+		AsyncStorage.multiSet( keyArray).then( error => {
+			if( error ) {
+				console.log("PosStorage:clearDataOnly: Error: " + error);
+			}
+		});
+	}
+
 	makeCustomerKey( customer ){
-		return (customerItemKey + '_' + customer.id);
+		return (customerItemKey + '_' + customer.customerId);
 	}
-	createCustomer(phone, name, address ){
-		const newCustomer = { id:uuidv1(), contact_name:name, phone_number:phone, address:address, due_amount:0 };
+	createCustomer(phone, name, address, siteId ){
+		const now = new Date();
+		const newCustomer = {
+			customerId:uuidv1(),
+			contactName:name,
+			phoneNumber:phone,
+			address:address,
+			siteId:siteId,
+			createdDate:now,
+			updatedDate:now
+
+		};
 		let key = this.makeCustomerKey(newCustomer);
 		this.customers.push( newCustomer );
 		newCustomer.syncAction = "create";
@@ -171,8 +203,8 @@ class PosStorage {
 	}
 	updateCustomer( customer, phone, name, address){
 		let key = this.makeCustomerKey(customer);
-		customer.contact_name = name; 	// FIXUP - Won't be contact_name forever
-		customer.phone_number = phone; 	// FIXUP - Won't be phone_number forever
+		customer.contactName = name; 	// FIXUP - Won't be contactName forever
+		customer.phoneNumber = phone; 	// FIXUP - Won't be phone_number forever
 		customer.address = address; 	// FIXUP - Won't be address forever
 		customer.syncAction = "update";
 
@@ -191,11 +223,10 @@ class PosStorage {
 	}
 	addCustomers( customerArray ){
 		if( this.customers.length > 0 ){
-			console.log("AddCustomers - need to merge....");
-			// Return the updated array of customers so the the UI will get updated
+			console.log("PosStorage:addCustomers - need to merge...." + JSON.stringify(customerArray) );
 			return null;
 		}else{
-			console.log("No existing customers no need to merge....");
+			console.log("PosStorage:addCustomers: No existing customers no need to merge....");
 			this.customers = customerArray;
 			const keyValueArray = customerArray.map( (customer) => {
 				return [ this.makeCustomerKey(customer), this.stringify(customer)];
@@ -235,9 +266,9 @@ class PosStorage {
 		console.log("PosStorage: getCustomers. Count " + this.customers.length);
 		return this.customers;
 	}
-	getSettings(){
-		console.log("PosStorage: getSettings.");
-		return this.settings;
+	getPendingCustomers(){
+		console.log("PosStorage: getPendingCustomers. Count " + this.pendingCustomers.length);
+		return this.pendingCustomers;
 	}
 
 	getSales(){
@@ -276,13 +307,29 @@ class PosStorage {
 
 		});
 	}
+	getSettings(){
+		console.log("PosStorage: getSettings.");
+		return this.settings;
+	}
 
-	saveSettings( url, site, user, password ){
-		let settings = {settings:{semaUrl:url, site:site, user:user, password:password}};
+	saveSettings( url, site, user, password, token, siteId, useMockData ){
+		let settings = {semaUrl:url, site:site, user:user, password:password, token:token, siteId:siteId, useMockData:useMockData};
 		this.settings = settings;
 		this.setKey( settingsKey, this.stringify( settings));
 
 	}
+	// getConfiguration(){
+	// 	console.log("PosStorage: getConfiguration.");
+	// 	return this.configuration;
+	// }
+  //
+	// saveConfiguration( token, siteId ){
+	// 	let configuration = {configuration:{token:token, siteId:siteId}};
+	// 	this.configuration = configuration;
+	// 	this.setKey( configurationKey, this.stringify( configuration));
+  //
+	// }
+
 	stringify( jsObject){
 		return JSON.stringify(jsObject);
 	}

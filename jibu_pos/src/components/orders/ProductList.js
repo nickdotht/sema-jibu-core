@@ -31,7 +31,7 @@ class ProductList extends Component {
 						</TouchableOpacity>
 					)}
 					keyExtractor={item => item.id}
-					numColumns={3}
+					numColumns={4}
 					horizontal={false}
 				/>
 			</View>
@@ -51,7 +51,7 @@ class ProductList extends Component {
 	getItem = (item, index, separators) =>{
 		// console.log( "getItem -Product cell width" + this.state.columnWidth)
 		return (
-			<View style={[this.getItemBackground(index ), {flex:1, height:this.props.viewWidth/3, width:this.props.viewWidth/3}]}>
+			<View style={[this.getItemBackground(index ), {flex:1, height:this.props.viewWidth/4, width:this.props.viewWidth/4}]}>
 				<Image
 					source={{uri: this.getImage(item) }}
 					// resizeMode='center'

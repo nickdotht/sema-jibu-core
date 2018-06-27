@@ -17,7 +17,7 @@ class CustomerList extends Component {
 		};
 	}
 	componentDidMount() {
-		console.log("CustomerList:componentDidMount");
+		console.log("CustomerList:componentDidMount - filter: " + this.props.filter);
 		Events.on('ScrollCustomerTo', 'customerId1', this.onScrollCustomerTo.bind(this) );
 	}
 	componentWillUnmount(){
@@ -59,7 +59,7 @@ class CustomerList extends Component {
 							{this.getRow(item, index, separators)}
 						</TouchableHighlight>
 					)}
-					keyExtractor={item => item.id}
+					keyExtractor={item => item.customerId}
 					initialNumToRender={50}
 				/>
 				<SearchWatcher parent = {this}>{this.props.searchString}</SearchWatcher>
@@ -67,16 +67,16 @@ class CustomerList extends Component {
 		);
 	}
 	prepareData = () => {
-		if (this.props.customers.length > 0 && this.props.customers[0].id !== '9999999-9999-9999-9999-9999999') {
+		if (this.props.customers.length > 0 && this.props.customers[0].customerId !== '9999999-9999-9999-9999-9999999') {
 			const anonymous = {
-				"id": "9999999-9999-9999-9999-9999999",
+				"customerId": "9999999-9999-9999-9999-9999999",
 				"version": 3,
 				"address": "----------------------------",
-				"contact_name": "Walkup Client",
+				"contactName": "Walkup Client",
 				"customer_type_id": 120,
-				"due_amount": "",
+				"dueAmount": "",
 				"name": "",
-				"phone_number": "----------------------------",
+				"phoneNumber": "----------------------------",
 				"active": "1",
 				"sales_channel": "anonymous"
 			};
@@ -87,36 +87,49 @@ class CustomerList extends Component {
 			data.push(this.props.customers[0]);
 			if (this.props.customers.length > 1) {
 				data = this.props.customers.slice(1);
-
+				data = this.filterItems( data );
 				data.sort((a, b) => {
-					return (a.contact_name < b.contact_name ? -1 : 1)
+					return (a.contactName < b.contactName ? -1 : 1)
 				});
 				data.unshift(this.props.customers[0]);
 			}
 		}
 		return data;
-	}
+	};
+	filterItems = (data) => {
+		let filteredItems = [];
+		for( let i = 0; i < data.length; i++ ){
+			if( this.filterItem( data[i])){
+				filteredItems.push(data[i]);
+			}
+		}
+		return filteredItems;
+	};
+
 	getRow = (item, index, separators) =>{
 		// console.log("getRow -index: " + index)
 		let isSelected = false;
-		if( this.props.selectedCustomer && this.props.selectedCustomer.id === item.id){
-			console.log("Selected item is " + item.id);
+		if( this.props.selectedCustomer && this.props.selectedCustomer.customerId === item.customerId){
+			console.log("Selected item is " + item.customerId);
 			isSelected = true;
 		}
-		if( this.filterItem(item) ) {
+		if( true ) {
 			return (
 				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row', height:50, alignItems:'center'}]}>
 					<View style={{flex: 2}}>
-						<Text style={[styles.baseItem, styles.leftMargin]}>{item.contact_name}</Text>
+						<TouchableHighlight
+							onPress={() => this.onPressItemName(item)}>
+							<Text style={[styles.baseItem, styles.leftMargin]}>{item.contactName}</Text>
+						</TouchableHighlight>
 					</View>
 					<View style={{flex: 1.5}}>
-						<Text style={[styles.baseItem]}>{item.phone_number}</Text>
+						<Text style={[styles.baseItem]}>{item.phoneNumber}</Text>
 					</View>
 					<View style={{flex: 2}}>
 						<Text style={[styles.baseItem]}>{item.address}</Text>
 					</View>
 					<View style={{flex: .75}}>
-						<Text style={[styles.baseItem]}>{item.due_amount}</Text>
+						<Text style={[styles.baseItem]}>{item.dueAmount}</Text>
 					</View>
 					<View style={{flex: 1}}>
 						<Text style={[styles.baseItem]}>{this.getCustomerType(item)}</Text>
@@ -143,11 +156,11 @@ class CustomerList extends Component {
 		if (this.props.filter === "all" ||
 			(this.props.filter === "reseller" && item.sales_channel === "reseller") ||
 			(this.props.filter === "walkup" && item.sales_channel !== "reseller") ||
-			(this.props.filter === "credit" && item.due_amount >0 )){
+			(this.props.filter === "credit" && item.dueAmount >0 )){
 			if (this.state.searchString.length >= 2) {
 				const filterString = this.state.searchString.toLowerCase();
-				if (item.contact_name.toLowerCase().startsWith(filterString) ||
-					item.phone_number.startsWith(filterString)) {
+				if (item.contactName.toLowerCase().startsWith(filterString) ||
+					item.phoneNumber.startsWith(filterString)) {
 					return true;
 				} else {
 					return false;
@@ -158,12 +171,20 @@ class CustomerList extends Component {
 		return false;
 	};
 
+	onPressItemName = (item) =>{
+		console.log("_onPressItemName");
+		this.props.CustomerSelected(item);
+		this.setState({refresh: !this.state.refresh});
+	};
+
 	onPressItem = (item) =>{
 		console.log("_onPressItem");
 		this.props.CustomerSelected(item);
 		// this.setState({ selectedCustomer:item });
 		this.setState({refresh: !this.state.refresh});
+		Events.trigger('onOrder', {customer: item});
 	};
+
 	showHeader = () =>{
 		console.log("Displaying header");
 		return (
