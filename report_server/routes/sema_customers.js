@@ -270,7 +270,7 @@ router.post('/', async (req, res) => {
 			console.log("siteId: ", req.body["siteId"]);
 
 
-			let customer = new Customer(req.body["contactName"], req.body["contactName"], req.body["siteId"]);
+			let customer = new Customer(req.body["contactName"], req.body["customerType"], req.body["siteId"]);
 			customer.requestToClass(req);
 
 			let postSqlParams = [customer.customerId, customer.address, customer.contactName, customer.customerType,
@@ -403,18 +403,6 @@ const getCustomers = (query, params, res ) => {
 								return customer.classToPlain(item);
 							});
 
-
-
-							/*
-							const values = result.map(item => {
-								const toKeep = {};
-
-								for (let i = 0; i < attsToGrab.length; i++) {
-									toKeep[attsToGrab[i]] = item[attsToGrab[i]];
-								}
-								return toKeep;
-							});
-							*/
 
 							resolve(res.json({ customers: values }));
 						} else {

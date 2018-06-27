@@ -4,7 +4,7 @@ const chai = require('chai');
 chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const should = chai.should();
-var findKioskIndex = require('./Utilities/findKioskIndex');
+var findKioskIndex = require('./Utilities/findKioskId');
 process.env.NODE_ENV = 'test';  // Set environment to test
 
 describe('Testing Kiosks', function () {

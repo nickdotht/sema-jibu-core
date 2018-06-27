@@ -56,7 +56,7 @@ app.use('/untapped/kiosks', seama_kiosks);
 app.use('/untapped/water-operations', isAuthenticated, seama_water_operations);
 app.use('/untapped/sales', isAuthenticated, sema_sales);
 app.use('/untapped/sales-by-channel', isAuthenticated, sema_sales_by_channel);
-app.use('/sema/site/customers/', sema_customers);
+app.use('/sema/site/customers/', isAuthenticated,sema_customers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
