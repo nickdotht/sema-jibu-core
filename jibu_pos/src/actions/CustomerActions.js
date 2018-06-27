@@ -46,7 +46,6 @@ export function LoadCustomers( ) {
 			Communications.getCustomers()
 				.then( web_customers => {
 					if (web_customers.hasOwnProperty("customers")) {
-						console.log("foo");
 						let customers = web_customers.customers.map(customer => {
 							return {
 								customerId: customer.id,

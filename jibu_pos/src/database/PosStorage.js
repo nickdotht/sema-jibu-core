@@ -116,7 +116,7 @@ class PosStorage {
 	}
 
 
-	ClearAll(){
+	clearAll(){
 		this.removeKey(salesKey );
 		this.removeKey(customersKey );
 		this.removeKey(versionKey );
@@ -128,9 +128,14 @@ class PosStorage {
 		// Clear all data - leave config alone
 		this.customersKeys = [];
 		this.pendingCustomers = [];
+		this.salesKeys = [];
+		this.pendingSales = [];
+		this.customers = [];
 		let keyArray = [
-			[customersKey,  this.stringify(this.customersKeys)],				// Array of customer keys
-			[pendingCustomersKey, this.stringify(this.pendingCustomers)]	// Array pending customer
+			[customersKey,  this.stringify(this.customersKeys)],
+			[pendingCustomersKey, this.stringify(this.pendingCustomers)],
+			[salesKey,  this.stringify(this.salesKeys)],
+			[pendingSalesKey, this.stringify(this.pendingSales)]
 		];
 		AsyncStorage.multiSet( keyArray).then( error => {
 			if( error ) {

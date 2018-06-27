@@ -23,7 +23,7 @@ const marginInputItems = width/2 -inputTextWidth/2;
 class SettingsProperty extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {propertyText : this.props.valueFn(this.props.parent)};
+		this.state = {propertyText : this.props.valueFn()};
 
 	}
 
@@ -105,34 +105,30 @@ class Settings extends Component {
 						<SettingsProperty
 							marginTop={10}
 							placeHolder='Sema Service URL, (http://sema-service)'
-							parent={this}
 							label="SEMA service URL"
 							isSecure={false}
-							valueFn={this.getUrl}
+							valueFn={this.getUrl.bind(this)}
 							ref={this.url}/>
 						<SettingsProperty
 							marginTop={marginSpacing}
 							placeHolder='Site'
-							parent={this}
 							isSecure={false}
 							label="Site"
-							valueFn={this.getSite}
+							valueFn={this.getSite.bind(this)}
 							ref={this.site}/>
 						<SettingsProperty
 							marginTop={marginSpacing}
 							placeHolder='User'
-							parent={this}
 							label="User email"
 							isSecure={false}
-							valueFn={this.getUser}
+							valueFn={this.getUser.bind(this)}
 							ref={this.user}/>
 						<SettingsProperty
 							marginTop={marginSpacing}
 							placeHolder='Password'
-							parent={this}
 							label="password"
 							isSecure={true}
-							valueFn={this.getPassword}
+							valueFn={this.getPassword.bind(this)}
 							ref={this.password}/>
 						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
 							<SettingsButton
@@ -164,20 +160,20 @@ class Settings extends Component {
 		this.setState({ isMockData: !this.state.isMockData });
 	}
 
-	getUrl(me) {
-		return me.props.settings.semaUrl;
+	getUrl() {
+		return this.props.settings.semaUrl;
 	}
 
-	getUser(me) {
-		return me.props.settings.user;
+	getUser() {
+		return this.props.settings.user;
 	}
 
-	getPassword(me) {
-		return me.props.settings.password;
+	getPassword() {
+		return this.props.settings.password;
 	}
 
-	getSite(me) {
-		return me.props.settings.site;
+	getSite() {
+		return this.props.settings.site;
 	}
 
 	onCancelSettings() {
@@ -199,14 +195,13 @@ class Settings extends Component {
 		let alertMessage = "Clear All Data";
 		Alert.alert(
 			alertMessage,
-			'Are you sure you want to delete all data, settings and configuration. (This cannot be undone)',
+			'Are you sure you want to delete all data? (This cannot be undone)',
 			[
 				{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
 				{
 					text: 'Yes', onPress: () => {
-						PosStorage.ClearAll();
+						PosStorage.clearDataOnly();
 						this.props.settingsActions.setSettings(PosStorage.getSettings());
-						// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 						this.props.customerActions.SetCustomers(PosStorage.getCustomers());
 						this.closeHandler();
 
