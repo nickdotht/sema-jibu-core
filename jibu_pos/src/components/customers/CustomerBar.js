@@ -80,17 +80,20 @@ class CustomerBar extends Component {
 			<View style={{ flexDirection:'row', height:100, backgroundColor:'white',  alignItems:'center'}}>
 				<CustomerBarButton
 					title = "Add"
-					handler = {this.onAdd}
+					handler = {this.onAdd.bind(this)}
+					image = {require('../../images/customer-add.png')}
 					enabled = {this.state.addFunction}
 				/>
 				<CustomerBarButton
 					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
-					handler = {this.onOrder}
+					handler = {this.onOrder.bind(this)}
+					image = {require('../../images/customer-order.png')}
 					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contactName')}
 				/>
 				<CustomerBarButton
 					title = "Edit"
-					handler = {this.onEdit}
+					handler = {this.onEdit.bind(this)}
+					image = {require('../../images/customer-edit.png')}
 					enabled = {this.state.editFunction &&
 						this.props.selectedCustomer.hasOwnProperty('contactName') &&
 						this.props.selectedCustomer.sales_channel !== 'anonymous' }
@@ -98,7 +101,8 @@ class CustomerBar extends Component {
 
 				<CustomerBarButton
 					title = "Delete"
-					handler = {this.onDelete}
+					handler = {this.onDelete.bind(this)}
+					image = {require('../../images/customer-delete.png')}
 					enabled = {this.state.deleteFunction &&
 						this.props.selectedCustomer.hasOwnProperty('contactName') &&
 						this.props.selectedCustomer.sales_channel !== 'anonymous' }
@@ -124,53 +128,69 @@ class CustomerBar extends Component {
 
 	};
 
-	onDelete = () =>{
-		console.log("CustomerBar:onDelete");
-		let alertMessage = "Delete  customer " + this.props.selectedCustomer.contactName;
-		Alert.alert(
-			alertMessage,
-			'Are you sure you want to delete this customer?',
-			[
-				{text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-				{text: 'OK', onPress: () => {
-						PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
-						this.props.customerActions.CustomerSelected({});		// Clear selected customer
-						this.props.customerActions.SetCustomers( PosStorage.getCustomers());
+	onDelete = ()=>{
+		if(this.state.deleteFunction &&
+			this.props.selectedCustomer.hasOwnProperty('contactName') &&
+			this.props.selectedCustomer.sales_channel !== 'anonymous') {
 
-					}},
-			],
-			{ cancelable: false }
-		);
+			console.log("CustomerBar:onDelete");
+			let alertMessage = "Delete  customer " + this.props.selectedCustomer.contactName;
+			Alert.alert(
+				alertMessage,
+				'Are you sure you want to delete this customer?',
+				[
+					{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+					{
+						text: 'OK', onPress: () => {
+							PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
+							this.props.customerActions.CustomerSelected({});		// Clear selected customer
+							this.props.customerActions.SetCustomers(PosStorage.getCustomers());
 
-	};
-	onEdit = () =>{
-		console.log("CustomerBar:onEdit");
-		this.props.toolbarActions.ShowScreen("editCustomer");
-	};
-	onOrder = () =>{
-		console.log("CustomerBar:onOrder");
-		if( !this.props.showView.showNewOrder) {
-			this.props.customerBarActions.ShowHideCustomers(0);
-			this.setState({'addFunction': false});
-			this.setState({'editFunction': false})
-			this.setState({'deleteFunction': false});
-			this.setState({'orderFunction': true});
-			this.props.orderActions.ClearOrder();
-			this.props.orderActions.SetOrderFlow('products');
-		}else{
-			this.props.customerBarActions.ShowHideCustomers(1);
-			this.setState({'addFunction': true});
-			this.setState({'editFunction': true})
-			this.setState({'deleteFunction': true});
-			this.setState({'orderFunction': true});
-
+						}
+					},
+				],
+				{ cancelable: false }
+			);
 		}
-
 	};
-	onAdd = () =>{
-		console.log("CustomerBar:onAdd");
-		this.props.toolbarActions.ShowScreen("newCustomer");
+	onEdit = ()=>{
+		if(this.state.editFunction &&
+			this.props.selectedCustomer.hasOwnProperty('contactName') &&
+			this.props.selectedCustomer.sales_channel !== 'anonymous') {
 
+			console.log("CustomerBar:onEdit");
+			this.props.toolbarActions.ShowScreen("editCustomer");
+		}
+	};
+
+	onOrder = ()=>{
+		if(this.state.orderFunction &&
+			this.props.selectedCustomer.hasOwnProperty('contactName')){
+
+			console.log("CustomerBar:onOrder");
+			if (!this.props.showView.showNewOrder) {
+				this.props.customerBarActions.ShowHideCustomers(0);
+				this.setState({ 'addFunction': false });
+				this.setState({ 'editFunction': false })
+				this.setState({ 'deleteFunction': false });
+				this.setState({ 'orderFunction': true });
+				this.props.orderActions.ClearOrder();
+				this.props.orderActions.SetOrderFlow('products');
+			} else {
+				this.props.customerBarActions.ShowHideCustomers(1);
+				this.setState({ 'addFunction': true });
+				this.setState({ 'editFunction': true })
+				this.setState({ 'deleteFunction': true });
+				this.setState({ 'orderFunction': true });
+
+			}
+		}
+	};
+	onAdd = ()=>{
+		if(this.state.addFunction ) {
+			console.log("CustomerBar:onAdd");
+			this.props.toolbarActions.ShowScreen("newCustomer");
+		}
 	};
 
 
@@ -204,7 +224,7 @@ const styles = StyleSheet.create({
 		borderColor: '#404040',
 		borderRadius: 10,
 		backgroundColor: "#FFFFFF",
-		flex:.25,
+		flex:.4,
 		alignSelf:'center',
 		marginLeft:30
 	},

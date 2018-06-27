@@ -54,7 +54,7 @@ class PosStorage {
 		this.lastCustomerSync = null;
 		this.lastSalesSync = null;
 		this.lastProductsSync = null;
-		this.settings = {semaUrl:"Not Set", site:"", user:"", password:"", token:"", siteId:"", useMockData:true};
+		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 
 	initialize() {
@@ -122,7 +122,7 @@ class PosStorage {
 		this.removeKey(versionKey );
 		this.salesKeys = [];
 		this.customers = [];
-		this.settings = {semaUrl:"Not Set", site:"", user:"", password:"", token:"", siteId:"", useMockData:true};
+		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 	clearDataOnly(){
 		// Clear all data - leave config alone
