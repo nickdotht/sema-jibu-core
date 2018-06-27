@@ -5,7 +5,7 @@ export function setSettings( settings){
 	console.log("setSettings - action");
 	return (dispatch) => { dispatch({type: SET_SETTINGS, data:settings});};
 }
-export function setConfiguration( configuration){
-	console.log("setConfiguration - action");
-	return (dispatch) => { dispatch({type: SET_CONFIGURATION, data:configuration});};
-}
+// export function setConfiguration( configuration){
+// 	console.log("setConfiguration - action");
+// 	return (dispatch) => { dispatch({type: SET_CONFIGURATION, data:configuration});};
+// }

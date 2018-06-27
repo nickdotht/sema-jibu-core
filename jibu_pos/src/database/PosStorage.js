@@ -21,7 +21,7 @@ const pendingCustomersKey = '@Sema:PendingCustomersKey';
 const pendingSalesKey = '@Sema:PendingSalesKey';
 
 const settingsKey = '@Sema:SettingsKey';
-const configurationKey = '@Sema:ConfigurationKey';
+// const configurationKey = '@Sema:ConfigurationKey';
 
 class PosStorage {
 	constructor() {
@@ -54,8 +54,7 @@ class PosStorage {
 		this.lastCustomerSync = null;
 		this.lastSalesSync = null;
 		this.lastProductsSync = null;
-		this.settings = {settings:{semaUrl:"Not Set", site:"", user:"", password:"", useMockData:true}};
-		this.configuration = {configuration:{token:"", siteId:""}};
+		this.settings = {semaUrl:"Not Set", site:"", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 
 	initialize() {
@@ -77,8 +76,7 @@ class PosStorage {
 							[lastProductsSyncKey,currentDateTime],
 							[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 							[pendingSalesKey, this.stringify(this.pendingSales)],
-							[settingsKey, this.stringify(this.settings)],
-							[configurationKey, this.stringify(this.configuration)]];
+							[settingsKey, this.stringify(this.settings)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
 							console.log( "PosStorage:initialize: Error: " + error );
 							resolve(false)})
@@ -89,7 +87,7 @@ class PosStorage {
 						let keyArray = [customersKey,salesKey,productsKey,lastCustomerSyncKey,
 							lastSalesSyncKey,lastProductsSyncKey,
 							pendingCustomersKey, pendingSalesKey,
-							settingsKey, configurationKey];
+							settingsKey];
 						AsyncStorage.multiGet(keyArray ).then( function(results){
 							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
@@ -104,7 +102,6 @@ class PosStorage {
 							this.pendingCustomers = this.parseJson(results[6][1]);	// Array of pending customers
 							this.pendingSales = this.parseJson(results[7][1]);	// Array of pending sales
 							this.settings = this.parseJson(results[8][1]);		// Settings
-							this.configuration = this.parseJson(results[9][1]);	// Token siteId
 							this.loadCustomersFromKeys()
 								.then(()=>{ resolve(true);})
 								.catch((err) =>reject(err));
@@ -125,8 +122,7 @@ class PosStorage {
 		this.removeKey(versionKey );
 		this.salesKeys = [];
 		this.customers = [];
-		this.settings = {settings:{semaUrl:"Not Set", site:"", user:"", password:"", useMockData:true}};
-		this.configuration = {configuration:{token:"", siteId:""}};
+		this.settings = {semaUrl:"Not Set", site:"", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 	clearDataOnly(){
 		// Clear all data - leave config alone
@@ -297,23 +293,23 @@ class PosStorage {
 		return this.settings;
 	}
 
-	saveSettings( url, site, user, password, useMockData ){
-		let settings = {settings:{semaUrl:url, site:site, user:user, password:password, useMockData:useMockData}};
+	saveSettings( url, site, user, password, token, siteId, useMockData ){
+		let settings = {semaUrl:url, site:site, user:user, password:password, token:token, siteId:siteId, useMockData:useMockData};
 		this.settings = settings;
 		this.setKey( settingsKey, this.stringify( settings));
 
 	}
-	getConfiguration(){
-		console.log("PosStorage: getConfiguration.");
-		return this.configuration;
-	}
-
-	saveConfiguration( token, siteId ){
-		let configuration = {configuration:{token:token, siteId:siteId}};
-		this.configuration = configuration;
-		this.setKey( configurationKey, this.stringify( configuration));
-
-	}
+	// getConfiguration(){
+	// 	console.log("PosStorage: getConfiguration.");
+	// 	return this.configuration;
+	// }
+  //
+	// saveConfiguration( token, siteId ){
+	// 	let configuration = {configuration:{token:token, siteId:siteId}};
+	// 	this.configuration = configuration;
+	// 	this.setKey( configurationKey, this.stringify( configuration));
+  //
+	// }
 
 	stringify( jsObject){
 		return JSON.stringify(jsObject);

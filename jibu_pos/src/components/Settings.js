@@ -13,13 +13,12 @@ import * as CustomerActions from "../actions/CustomerActions";
 
 import Communications from '../services/Communications';
 
-var inputFontHeight = 24;
-var {height, width} = Dimensions.get('window');
-var inputFontHeight = Math.round((24 * height)/752);
-var marginTextInput = Math.round((5 * height)/752);
-var marginSpacing = Math.round((20 * height)/752);
-var inputTextWidth = 400;
-var marginInputItems = width/2 -inputTextWidth/2;
+const {height, width} = Dimensions.get('window');
+const inputFontHeight = Math.round((24 * height)/752);
+const marginTextInput = Math.round((5 * height)/752);
+const marginSpacing = Math.round((20 * height)/752);
+const inputTextWidth = 400;
+const marginInputItems = width/2 -inputTextWidth/2;
 
 class SettingsProperty extends Component {
 	constructor(props) {
@@ -75,142 +74,151 @@ class Settings extends Component {
 		this.site = React.createRef();
 		this.user = React.createRef();
 		this.password = React.createRef();
-		this.state = {isMockData:this.props.settings.settings.useMockData}
+		this.state = { isMockData: this.props.settings.useMockData }
 	}
+
 	componentDidMount() {
 		console.log("Settings:Mounted");
 	}
 
 	render() {
 		return (
-			<View style={{flex:1}}>
-				<View style = {{flexDirection:'row'}}>
+			<View style={{ flex: 1 }}>
+				<View style={{ flexDirection: 'row' }}>
 
-					<View style ={{flexDirection:'row', flex:1, alignItems:'center', height:100}}>
-						<Text style = {[styles.headerText]}>{'Settings'}</Text>
+					<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', height: 100 }}>
+						<Text style={[styles.headerText]}>{'Settings'}</Text>
 					</View>
-					<View style ={{flexDirection:'row-reverse', flex:1, alignItems:'center', height:100}}>
+					<View style={{ flexDirection: 'row-reverse', flex: 1, alignItems: 'center', height: 100 }}>
 						<TouchableHighlight
 							onPress={() => this.onCancelSettings()}>
-							<Image source={require('../images/icons8-cancel-50.png')} style={{marginRight:100}}/>
+							<Image source={require('../images/icons8-cancel-50.png')} style={{ marginRight: 100 }}/>
 						</TouchableHighlight>
 					</View>
 				</View>
 
 				<KeyboardAwareScrollView
-						style={{flex:1}}
-						resetScrollToCoords={{ x: 0, y: 0 }}
-						scrollEnabled={false}>
-						<View style ={{flex:1, alignItems:'center' }}>
-							<SettingsProperty
-								marginTop = {10}
-								placeHolder = 'Sema Service URL, (http://sema-service)'
-								parent ={this}
-								label = "SEMA service URL"
-								isSecure = {false}
-								valueFn = {this.getUrl}
-								ref={this.url}/>
-							<SettingsProperty
-								marginTop = {marginSpacing}
-								placeHolder = 'Site'
-								parent ={this}
-								isSecure = {false}
-								label = "Site"
-								valueFn = {this.getSite}
-								ref={this.site}/>
-							<SettingsProperty
-								marginTop = {marginSpacing}
-								placeHolder = 'User'
-								parent ={this}
-								label = "User email"
-								isSecure = {false}
-								valueFn = {this.getUser}
-								ref={this.user}/>
-							<SettingsProperty
-								marginTop = {marginSpacing}
-								placeHolder = 'Password'
-								parent ={this}
-								label = "password"
-								isSecure = {true}
-								valueFn = {this.getPassword}
-								ref={this.password}/>
-							<View style ={{flexDirection:'row', flex:1, alignItems:'center'}}>
-								<SettingsButton
-									pressFn = {this.onSaveSettings.bind(this)}
-									label = 'Save Settings'/>
-								<SettingsButton
-									pressFn = {this.onConnection.bind(this)}
-									label = 'Connect'/>
-								<SettingsButton
-									pressFn = {this.onClearAll.bind(this)}
-									label = 'Clear...'/>
-							</View>
-							<View style ={{flexDirection:'row', flex:1, alignItems:'center', marginTop:30}}>
-								<Text style = {styles.checkLabel} >{"Use simulated data"}</Text>
-								<CheckBox
-									style = {{marginLeft:30}}
-									value={this.state.isMockData}
-									onValueChange={this.useMockDataChange.bind(this)}/>
-							</View>
+					style={{ flex: 1 }}
+					resetScrollToCoords={{ x: 0, y: 0 }}
+					scrollEnabled={false}>
+					<View style={{ flex: 1, alignItems: 'center' }}>
+						<SettingsProperty
+							marginTop={10}
+							placeHolder='Sema Service URL, (http://sema-service)'
+							parent={this}
+							label="SEMA service URL"
+							isSecure={false}
+							valueFn={this.getUrl}
+							ref={this.url}/>
+						<SettingsProperty
+							marginTop={marginSpacing}
+							placeHolder='Site'
+							parent={this}
+							isSecure={false}
+							label="Site"
+							valueFn={this.getSite}
+							ref={this.site}/>
+						<SettingsProperty
+							marginTop={marginSpacing}
+							placeHolder='User'
+							parent={this}
+							label="User email"
+							isSecure={false}
+							valueFn={this.getUser}
+							ref={this.user}/>
+						<SettingsProperty
+							marginTop={marginSpacing}
+							placeHolder='Password'
+							parent={this}
+							label="password"
+							isSecure={true}
+							valueFn={this.getPassword}
+							ref={this.password}/>
+						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
+							<SettingsButton
+								pressFn={this.onSaveSettings.bind(this)}
+								label='Save Settings'/>
+							<SettingsButton
+								pressFn={this.onConnection.bind(this)}
+								label='Connect'/>
+							<SettingsButton
+								pressFn={this.onClearAll.bind(this)}
+								label='Clear...'/>
 						</View>
+						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', marginTop: 30 }}>
+							<Text style={styles.checkLabel}>{"Use simulated data"}</Text>
+							<CheckBox
+								style={{ marginLeft: 30 }}
+								value={this.state.isMockData}
+								onValueChange={this.useMockDataChange.bind(this)}/>
+						</View>
+					</View>
 
-					</KeyboardAwareScrollView>
+				</KeyboardAwareScrollView>
 			</View>
 
 		);
 	}
-	useMockDataChange(){
-		this.setState( {isMockData: !this.state.isMockData});
-	}
-	getUrl(me){
-		return me.props.settings.settings.semaUrl;
-	}
-	getUser(me){
-		return me.props.settings.settings.user;
-	}
-	getPassword(me){
-		return me.props.settings.settings.password;
-	}
-	getSite(me){
-		return me.props.settings.settings.site;
+
+	useMockDataChange() {
+		this.setState({ isMockData: !this.state.isMockData });
 	}
 
-	onCancelSettings (){
+	getUrl(me) {
+		return me.props.settings.semaUrl;
+	}
+
+	getUser(me) {
+		return me.props.settings.user;
+	}
+
+	getPassword(me) {
+		return me.props.settings.password;
+	}
+
+	getSite(me) {
+		return me.props.settings.site;
+	}
+
+	onCancelSettings() {
 		this.props.toolbarActions.ShowScreen("main");
 	}
-	closeHandler(){
+
+	closeHandler() {
 		this.onCancelSettings();
 	};
 
-	onSaveSettings(){
+	onSaveSettings() {
 
 		// TODO - Validate fields and set focus to invalid field;
-		this.saveSettings();
+		this.saveSettings(this.props.settings.token, this.props.settings.siteId);
 	};
 
-	onClearAll(){
+	onClearAll() {
 		console.log("Settings:onClearAll");
 		let alertMessage = "Clear All Data";
-		let that = this;
 		Alert.alert(
 			alertMessage,
 			'Are you sure you want to delete all data, settings and configuration. (This cannot be undone)',
 			[
-				{text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
-				{text: 'Yes', onPress: () => {
+				{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+				{
+					text: 'Yes', onPress: () => {
 						PosStorage.ClearAll();
 						this.props.settingsActions.setSettings(PosStorage.getSettings());
-						this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
+						// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 						this.props.customerActions.SetCustomers(PosStorage.getCustomers());
 						this.closeHandler();
 
-					}},
+					}
+				},
 			],
 			{ cancelable: false }
 		);
 
 	}
-	onConnection( ) {
+
+	onConnection() {
 		Communications.initialize(
 			this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
@@ -221,22 +229,23 @@ class Settings extends Component {
 			Communications.login()
 				.then(result => {
 					console.log("Passed - status" + result.status + " " + JSON.stringify(result.response));
-					if( result.status === 200){
-						Communications.getSiteId( result.response.token, this.site.current.state.propertyText )
-							.then( siteId => {
-								if( siteId == -1 ){
-									message ="Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' does not exist";
-								}else{
-									this.saveSettings();
-									Communications.setToken( result.response.token);
-									PosStorage.saveConfiguration( result.response.token, siteId );
-									this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
+					if (result.status === 200) {
+						Communications.getSiteId(result.response.token, this.site.current.state.propertyText)
+							.then(siteId => {
+								if (siteId === -1) {
+									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' does not exist";
+								} else {
+
+									this.saveSettings(result.response.token, siteId);
+									Communications.setToken(result.response.token);
+									// PosStorage.saveConfiguration( result.response.token, siteId );
+									// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 								}
 								Alert.alert(
-								"Network Connection",
-									message, [ { text: 'OK', style: 'cancel' }, ], { cancelable: true }
+									"Network Connection",
+									message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
 								);
-								if( siteId != -1 ){
+								if (siteId !== -1) {
 									this.closeHandler();
 								}
 							});
@@ -245,33 +254,36 @@ class Settings extends Component {
 						message = result.response.msg + "(Error code: " + result.status + ")";
 						Alert.alert(
 							"Network Connection",
-							message, [ { text: 'OK', style: 'cancel' }, ], { cancelable: true }
+							message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
 						);
 					}
 				})
-				.catch(result => {console.log( "Failed- status "+ result.status + " " +  result.response);
+				.catch(result => {
+					console.log("Failed- status " + result.status + " " + result.response);
 					Alert.alert(
 						"Network Connection",
-						result.response.message, [ { text: 'OK', style: 'cancel' }, ], { cancelable: true }
+						result.response.message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
 					);
 				})
-		}catch( error ){
-			console.log( JSON.stringify(error));
+		} catch (error) {
+			console.log(JSON.stringify(error));
 		}
 	}
-	saveSettings(){
+
+	saveSettings( token, siteId) {
 		let prevMock = PosStorage.getSettings().useMockData;
 		PosStorage.saveSettings(this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText,
+			token,
+			siteId,
 			this.state.isMockData);
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
-		if( prevMock != this.state.isMockData){
+		if (prevMock !== this.state.isMockData) {
 			// switching between real and mock data. -delete customers/products ect
 			PosStorage.clearDataOnly();
 		}
-
 	}
 
 }
@@ -284,7 +296,7 @@ Settings.propTypes = {
 
 
 function mapStateToProps(state, props) {
-	return {settings: state.settingsReducer};
+	return {settings: state.settingsReducer.settings};
 }
 function mapDispatchToProps(dispatch) {
 	return {

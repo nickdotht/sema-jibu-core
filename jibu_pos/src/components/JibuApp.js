@@ -9,7 +9,6 @@ import Toolbar from './Toolbar';
 import {CustomerViews} from './customers/CustomerViews'
 import CustomerBar from "./customers/CustomerBar";
 import OrderView from "./orders/OrderView"
-import DashboardReport from './reports/DashboardReport';
 import Login from './Login';
 import CustomerEdit from './customers/CustomerEdit';
 import Settings from './Settings';
@@ -43,13 +42,12 @@ class JibuApp extends Component {
 		this.posStorage.initialize().then( (isInitialized) => {
 
 			let settings = this.posStorage.getSettings();
-			let configuration = this.posStorage.getConfiguration();
 			this.props.settingsActions.setSettings( settings );
-			this.props.settingsActions.setConfiguration(configuration);
+			// this.props.settingsActions.setConfiguration(configuration);
 
-			Communications.initialize( settings.settings.semaUrl, settings.settings.site, settings.settings.user, settings.settings.password);
-			Communications.setToken( configuration.configuration.token );
-			Communications.setSiteId(configuration.configuration.siteId);
+			Communications.initialize( settings.semaUrl, settings.site, settings.user, settings.password);
+			Communications.setToken( settings.token );
+			Communications.setSiteId(settings.siteId);
 
 			console.log( "PosStorage - " + JSON.stringify(PosStorage));
 			console.log( "Communications - " + JSON.stringify(Communications));
@@ -149,7 +147,7 @@ function mapStateToProps(state, props) {
 		network: state.networkReducer.network,
 		showView: state.customerBarReducer.showView,
 		showScreen: state.toolBarReducer.showScreen,
-		settings:state.settingsReducer
+		settings:state.settingsReducer.settings
 
 	};
 }

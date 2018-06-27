@@ -1,6 +1,6 @@
-import { SET_SETTINGS, SET_CONFIGURATION} from "../actions/SettingsActions"
+import { SET_SETTINGS} from "../actions/SettingsActions"
 
-let initialState = {settings:{semaUrl:"XX", site:"", user:"", password:""}, configuration:{token:"", siteId:""}};
+let initialState = {settings:{semaUrl:"XX", site:"", user:"", password:"", token:"", sitedId:"",useMockData:true}};
 
 const settingsReducer = (state = initialState, action) => {
 	let newState;
@@ -8,12 +8,7 @@ const settingsReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case SET_SETTINGS:
 			newState = {...state};
-			newState.settings = action.data.settings ;
-			console.log( JSON.stringify(newState));
-			return newState;
-		case SET_CONFIGURATION:
-			newState = {...state};
-			newState.configuration = action.data.configuration ;
+			newState.settings = action.data ;
 			console.log( JSON.stringify(newState));
 			return newState;
 

@@ -11,10 +11,8 @@ import packageJson from '../../package.json';
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as CustomerActions from "../actions/CustomerActions";
-import networkReducer from "../reducers/NetworkReducer";
 import * as ToolBarActions from "../actions/ToolBarActions";
 import Communications from "../services/Communications";
-import PosStorage from "../database/PosStorage";
 
 class Toolbar extends Component {
     render() {
@@ -28,7 +26,7 @@ class Toolbar extends Component {
 					<Text style = {[styles.text_style, {marginLeft:20}, this.getNetworkStyle()]}>{this.getNetworkState()}</Text>
 					<Text style = {[styles.text_style, {marginLeft:30}]}>Site:</Text>
 					<View style = {[styles.site_container, {marginLeft:20}]}>
-						<Text style = {styles.site_text}>{this.props.settings.settings.site}</Text>
+						<Text style = {styles.site_text}>{this.props.settings.site}</Text>
 					</View>
 				</View>
 				<View style = {[styles.rightToolbar]}>
@@ -88,7 +86,7 @@ function mapStateToProps(state, props) {
 	return {
 		network: state.networkReducer.network,
 		showScreen: state.toolBarReducer.showScreen,
-		settings:state.settingsReducer
+		settings:state.settingsReducer.settings
 	};
 }
 

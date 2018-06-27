@@ -17,7 +17,7 @@ export function CustomerSelected( customer){
 export function LoadCustomers( ) {
 	console.log("LoadCustomers - action");
 	let settings = PosStorage.getSettings();
-	if( settings.settings.useMockData ) {
+	if( settings.useMockData ) {
 		return (dispatch) => {
 			setTimeout(() => {
 				console.log("LoadCustomers - loaded");
