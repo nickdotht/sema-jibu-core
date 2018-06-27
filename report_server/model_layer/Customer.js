@@ -9,73 +9,80 @@ class Customer {
 		this._dueAmount = value;
 	}
 
-	get version() {
-		return this._version;
+
+	constructor(contactName, customerType, siteId) {
+		this._customerId = uuidv1();
+		this._address = null;
+		this._contactName = contactName;
+		this._customerType = customerType;
+		this._gpsCoordinates = null;
+		this._siteId = siteId;
+		this._Name = null;
+		this._phoneNumber = null;
+		var today = new Date();
+		var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+		this._createdDate = date;
+		this._updatedDate = date;
+		this._gender = null;
+		this._dueAmount = 0;
 	}
 
-	set version(value) {
-		this._version = value;
+	databaseToClass(res) {
+		if (res.hasOwnProperty("id"))
+			this._customerId = res["id"];
+
+		if (res.hasOwnProperty("address"))
+			this._address = res["address"];
+
+		if (res.hasOwnProperty("gps_coordinates"))
+			this._gpsCoordinates = res["gps_coordinates"];
+
+		if (res.hasOwnProperty("name"))
+			this._Name = res["name"];
+
+		if (res.hasOwnProperty("phone_number"))
+			this._phoneNumber = res["phone_number"];
+
+		if (res.hasOwnProperty("created_date"))
+			this._createdDate = new Date(res["created_date"]);
+
+		if (res.hasOwnProperty("updated_date"))
+			this._updatedDate = new Date(res["updated_date"]);
+
+		if (res.hasOwnProperty("gender"))
+			this._gender = res["gender"];
+
+		if (res.hasOwnProperty("due_amount"))
+			this._dueAmount = res["due_amount"];
 	}
-	constructor(req) {
+
+	requestToClass(req) {
 		if (req.body.hasOwnProperty("customerId"))
 			this._customerId = req.body["customerId"];
-		else
-			this._customerId = uuidv1();
-
 
 		if (req.body.hasOwnProperty("address"))
 			this._address = req.body["address"];
-		else
-			this._address = null;
-
-		this._contactName = req.body["contactName"];
-
-		this._customerType = req.body["customerType"];
 
 		if (req.body.hasOwnProperty("gpsCoordinates"))
-		 	this._gpsCoordinates = req.body["gpsCoordinates"];
-		else
-			this._gpsCoordinates = null;
-
-		this._siteId = req.body["siteId"];
+			this._gpsCoordinates = req.body["gpsCoordinates"];
 
 		if (req.body.hasOwnProperty("Name"))
 			this._Name = req.body["Name"];
-		else
-			this._Name = null;
 
 		if (req.body.hasOwnProperty("phoneNumber"))
 			this._phoneNumber = req.body["phoneNumber"];
-		else
-			this._phoneNumber = null;
 
 		if (req.body.hasOwnProperty("createdDate"))
 			this._createdDate = new Date(req.body["createdDate"]);
-		else {
-			var today = new Date();
-			var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-			this._createdDate = date;
-		}
 
 		if (req.body.hasOwnProperty("updatedDate"))
 			this._updatedDate = new Date(req.body["updatedDate"]);
-		else {
-			var today = new Date();
-			var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-			this._updatedDate = date;
-		}
 
 		if (req.body.hasOwnProperty("gender"))
 			this._gender = req.body["gender"];
-		else
-			this._gender = null;
 
 		if (req.body.hasOwnProperty("dueAmount"))
 			this._dueAmount = req.body["dueAmount"];
-		else
-			this._dueAmount = 0;
-
-		this._version = 1;
 	}
 
 	classToPlain() {
@@ -91,7 +98,7 @@ class Customer {
 				updatedDate: this._updatedDate,
 				gender: this.gender,
 				dueAmount: this._dueAmount,
-				version: this._version}
+				}
 	}
 
 
