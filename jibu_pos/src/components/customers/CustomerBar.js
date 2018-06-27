@@ -17,6 +17,7 @@ import * as ToolbarActions from "../../actions/ToolBarActions";
 
 import CustomerBarButton from './CustomerBarButton';
 import * as OrderActions from "../../actions/OrderActions";
+import Events from "react-native-simple-events";
 
 class SelectedCustomerDetails extends React.Component {
 	render() {
@@ -34,15 +35,15 @@ class SelectedCustomerDetails extends React.Component {
 		);
 	}
 	getName (){
-		if( this.props.selectedCustomer.hasOwnProperty("contact_name")){
-			return this.props.selectedCustomer.contact_name;
+		if( this.props.selectedCustomer.hasOwnProperty("contactName")){
+			return this.props.selectedCustomer.contactName;
 		}else{
 			return "";
 		}
 	};
 	getPhone (){
-		if( this.props.selectedCustomer.hasOwnProperty("phone_number")){
-			return this.props.selectedCustomer.phone_number;
+		if( this.props.selectedCustomer.hasOwnProperty("phoneNumber")){
+			return this.props.selectedCustomer.phoneNumber;
 		}else{
 			return "";
 		}
@@ -61,6 +62,17 @@ class CustomerBar extends Component {
 			deleteFunction: true
 		}
 	}
+	componentDidMount() {
+		console.log("CustomerBar:componentDidMount");
+		Events.on('onOrder', 'toolbarEvent1', this.onOrder.bind(this) );
+	}
+	componentWillUnmount(){
+		Events.rm('onOrder', 'toolbarEvent1') ;
+	}
+	onOrder( ){
+		console.log("CustomerBar: onOrder");
+		this.onOrder();
+	}
 
 	render() {
 		return (
@@ -74,18 +86,22 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder}
-					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
+					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contactName')}
 				/>
 				<CustomerBarButton
 					title = "Edit"
 					handler = {this.onEdit}
-					enabled = {this.state.editFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
+					enabled = {this.state.editFunction &&
+						this.props.selectedCustomer.hasOwnProperty('contactName') &&
+						this.props.selectedCustomer.sales_channel !== 'anonymous' }
 				/>
 
 				<CustomerBarButton
 					title = "Delete"
 					handler = {this.onDelete}
-					enabled = {this.state.deleteFunction && this.props.selectedCustomer.hasOwnProperty('contact_name')}
+					enabled = {this.state.deleteFunction &&
+						this.props.selectedCustomer.hasOwnProperty('contactName') &&
+						this.props.selectedCustomer.sales_channel !== 'anonymous' }
 				/>
 
 				<TextInput
@@ -110,7 +126,7 @@ class CustomerBar extends Component {
 
 	onDelete = () =>{
 		console.log("CustomerBar:onDelete");
-		let alertMessage = "Delete  customer " + this.props.selectedCustomer.contact_name;
+		let alertMessage = "Delete  customer " + this.props.selectedCustomer.contactName;
 		Alert.alert(
 			alertMessage,
 			'Are you sure you want to delete this customer?',

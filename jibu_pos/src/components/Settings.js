@@ -1,30 +1,31 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image} from "react-native";
+import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import PropTypes from 'prop-types';
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import Synchronization from "../services/Synchronization";
 
 import PosStorage from "../database/PosStorage";
 import * as SettingsActions from "../actions/SettingsActions";
 import * as ToolbarActions from "../actions/ToolBarActions";
+import * as CustomerActions from "../actions/CustomerActions";
 
 import Communications from '../services/Communications';
 
-var inputFontHeight = 24;
-var {height, width} = Dimensions.get('window');
-var inputFontHeight = Math.round((24 * height)/752);
-var marginTextInput = Math.round((5 * height)/752);
-var marginSpacing = Math.round((20 * height)/752);
-var inputTextWidth = 400;
-var marginInputItems = width/2 -inputTextWidth/2;
+const {height, width} = Dimensions.get('window');
+const inputFontHeight = Math.round((24 * height)/752);
+const marginTextInput = Math.round((5 * height)/752);
+const marginSpacing = Math.round((20 * height)/752);
+const inputTextWidth = 400;
+const marginInputItems = width/2 -inputTextWidth/2;
 
 class SettingsProperty extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {propertyText : this.props.valueFn(this.props.parent)};
-		console.log("--------- height " + height);
+		this.state = {propertyText : this.props.valueFn()};
+
 	}
 
 
@@ -51,6 +52,22 @@ class SettingsProperty extends Component {
 	}
 }
 
+class SettingsButton extends Component {
+
+	render() {
+		return (
+			<View style={[styles.submit, {marginLeft:30}] }>
+				<View style={{ justifyContent: 'center', height: 70, alignItems: 'center' }}>
+					<TouchableHighlight underlayColor='#c0c0c0'
+										onPress={() => this.props.pressFn()}>
+						<Text style={[styles.buttonText]}>{this.props.label}</Text>
+					</TouchableHighlight>
+				</View>
+			</View>
+		);
+	}
+}
+
 class Settings extends Component {
 	constructor(props) {
 		super(props);
@@ -58,133 +75,217 @@ class Settings extends Component {
 		this.site = React.createRef();
 		this.user = React.createRef();
 		this.password = React.createRef();
+		this.state = { isMockData: this.props.settings.useMockData }
 	}
+
 	componentDidMount() {
 		console.log("Settings:Mounted");
 	}
 
 	render() {
 		return (
-			<View style={{flex:1}}>
-				<View style = {{flexDirection:'row'}}>
+			<View style={{ flex: 1 }}>
+				<View style={{ flexDirection: 'row' }}>
 
-					<View style ={{flexDirection:'row', flex:1, alignItems:'center', height:100}}>
-						<Text style = {[styles.headerText]}>{'Settings'}</Text>
+					<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', height: 100 }}>
+						<Text style={[styles.headerText]}>{'Settings'}</Text>
 					</View>
-					<View style ={{flexDirection:'row-reverse', flex:1, alignItems:'center', height:100}}>
+					<View style={{ flexDirection: 'row-reverse', flex: 1, alignItems: 'center', height: 100 }}>
 						<TouchableHighlight
 							onPress={() => this.onCancelSettings()}>
-							<Image source={require('../images/icons8-cancel-50.png')} style={{marginRight:100}}/>
+							<Image source={require('../images/icons8-cancel-50.png')} style={{ marginRight: 100 }}/>
 						</TouchableHighlight>
 					</View>
 				</View>
 
 				<KeyboardAwareScrollView
-						style={{flex:1}}
-						resetScrollToCoords={{ x: 0, y: 0 }}
-						scrollEnabled={false}>
-						<View style ={{flex:1, alignItems:'center' }}>
-							<SettingsProperty
-								marginTop = {10}
-								placeHolder = 'Sema Service URL, (http://sema-service)'
-								parent ={this}
-								label = "SEMA service URL"
-								isSecure = {false}
-								valueFn = {this.getUrl}
-								ref={this.url}/>
-							<SettingsProperty
-								marginTop = {marginSpacing}
-								placeHolder = 'Site'
-								parent ={this}
-								isSecure = {false}
-								label = "Site"
-								valueFn = {this.getSite}
-								ref={this.site}/>
-							<SettingsProperty
-								marginTop = {marginSpacing}
-								placeHolder = 'User'
-								parent ={this}
-								label = "User email"
-								isSecure = {false}
-								valueFn = {this.getUser}
-								ref={this.user}/>
-							<SettingsProperty
-								marginTop = {marginSpacing}
-								placeHolder = 'Password'
-								parent ={this}
-								label = "password"
-								isSecure = {true}
-								valueFn = {this.getPassword}
-								ref={this.password}/>
-							<View style ={{flexDirection:'row', flex:1, alignItems:'center'}}>
-								<View style={styles.submit}>
-									<View style={{justifyContent:'center', height:80, alignItems:'center'}}>
-										<TouchableHighlight underlayColor = '#c0c0c0'
-															onPress={() => this.onUpdateSettings()}>
-											<Text style={ [ styles.buttonText]}>{'Update Settings'}</Text>
-										</TouchableHighlight>
-									</View>
-								</View>
-								<View style={[ {marginLeft:50}, styles.submit]}>
-									<View style={{justifyContent:'center', height:80, alignItems:'center'}}>
-										<TouchableHighlight underlayColor = '#c0c0c0'
-															onPress={() => this.onTestConnection()}>
-											<Text style={ [ styles.buttonText]}>{'Test Connection'}</Text>
-										</TouchableHighlight>
-									</View>
-								</View>
-							</View>
-
+					style={{ flex: 1 }}
+					resetScrollToCoords={{ x: 0, y: 0 }}
+					scrollEnabled={false}>
+					<View style={{ flex: 1, alignItems: 'center' }}>
+						<SettingsProperty
+							marginTop={10}
+							placeHolder='Sema Service URL, (http://sema-service)'
+							label="SEMA service URL"
+							isSecure={false}
+							valueFn={this.getUrl.bind(this)}
+							ref={this.url}/>
+						<SettingsProperty
+							marginTop={marginSpacing}
+							placeHolder='Site'
+							isSecure={false}
+							label="Site"
+							valueFn={this.getSite.bind(this)}
+							ref={this.site}/>
+						<SettingsProperty
+							marginTop={marginSpacing}
+							placeHolder='User'
+							label="User email"
+							isSecure={false}
+							valueFn={this.getUser.bind(this)}
+							ref={this.user}/>
+						<SettingsProperty
+							marginTop={marginSpacing}
+							placeHolder='Password'
+							label="password"
+							isSecure={true}
+							valueFn={this.getPassword.bind(this)}
+							ref={this.password}/>
+						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
+							<SettingsButton
+								pressFn={this.onSaveSettings.bind(this)}
+								label='Save Settings'/>
+							<SettingsButton
+								pressFn={this.onConnection.bind(this)}
+								label='Connect'/>
+							<SettingsButton
+								pressFn={this.onClearAll.bind(this)}
+								label='Clear...'/>
+							<SettingsButton
+								pressFn={this.onSynchronize.bind(this)}
+								label='Synchronize Now'/>
 						</View>
+						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', marginTop: 30 }}>
+							<Text style={styles.checkLabel}>{"Use simulated data"}</Text>
+							<CheckBox
+								style={{ marginLeft: 30 }}
+								value={this.state.isMockData}
+								onValueChange={this.useMockDataChange.bind(this)}/>
+						</View>
+					</View>
 
-					</KeyboardAwareScrollView>
+				</KeyboardAwareScrollView>
 			</View>
 
 		);
 	}
-	getUrl(me){
-		return me.props.settings.semaUrl;
-	}
-	getUser(me){
-		return me.props.settings.user;
-	}
-	getPassword(me){
-		return me.props.settings.password;
-	}
-	getSite(me){
-		return me.props.settings.site;
+
+	useMockDataChange() {
+		this.setState({ isMockData: !this.state.isMockData });
 	}
 
-	onCancelSettings (){
+	getUrl() {
+		return this.props.settings.semaUrl;
+	}
+
+	getUser() {
+		return this.props.settings.user;
+	}
+
+	getPassword() {
+		return this.props.settings.password;
+	}
+
+	getSite() {
+		return this.props.settings.site;
+	}
+
+	onCancelSettings() {
 		this.props.toolbarActions.ShowScreen("main");
 	}
-	closeHandler(){
+
+	closeHandler() {
 		this.onCancelSettings();
 	};
 
-	onUpdateSettings(){
+	onSaveSettings() {
 
 		// TODO - Validate fields and set focus to invalid field;
-		PosStorage.saveSettings(this.url.current.state.propertyText,
-			this.site.current.state.propertyText,
-			this.user.current.state.propertyText,
-			this.password.current.state.propertyText );
-		this.props.settingsActions.setSettings(PosStorage.getSettings());
-		this.closeHandler();
+		this.saveSettings(this.props.settings.token, this.props.settings.siteId);
 	};
 
-	onTestConnection() {
-		let communications = new Communications(
+	onSynchronize(){
+		Synchronization.syncNowTemp();
+	}
+
+	onClearAll() {
+		console.log("Settings:onClearAll");
+		let alertMessage = "Clear All Data";
+		Alert.alert(
+			alertMessage,
+			'Are you sure you want to delete all data? (This cannot be undone)',
+			[
+				{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+				{
+					text: 'Yes', onPress: () => {
+						PosStorage.clearDataOnly();
+						this.props.settingsActions.setSettings(PosStorage.getSettings());
+						this.props.customerActions.SetCustomers(PosStorage.getCustomers());
+						this.closeHandler();
+
+					}
+				},
+			],
+			{ cancelable: false }
+		);
+
+	}
+
+	onConnection() {
+		Communications.initialize(
 			this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText);
 		try {
-			communications.login2()
-				.then(result => console.log("Passed - status" + result.status + " " + JSON.stringify(result.response)))
-				.catch(result => console.log( "Failed- status "+ result.status + " " +  result.response))
-		}catch( error ){
-			console.log( JSON.stringify(error));
+			let message = "Successfully connected to the SEMA service";
+			Communications.login()
+				.then(result => {
+					console.log("Passed - status" + result.status + " " + JSON.stringify(result.response));
+					if (result.status === 200) {
+						Communications.getSiteId(result.response.token, this.site.current.state.propertyText)
+							.then(siteId => {
+								if (siteId === -1) {
+									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' does not exist";
+								} else {
+
+									this.saveSettings(result.response.token, siteId);
+									Communications.setToken(result.response.token);
+									// PosStorage.saveConfiguration( result.response.token, siteId );
+									// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
+								}
+								Alert.alert(
+									"Network Connection",
+									message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+								);
+								if (siteId !== -1) {
+									this.closeHandler();
+								}
+							});
+
+					} else {
+						message = result.response.msg + "(Error code: " + result.status + ")";
+						Alert.alert(
+							"Network Connection",
+							message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+						);
+					}
+				})
+				.catch(result => {
+					console.log("Failed- status " + result.status + " " + result.response);
+					Alert.alert(
+						"Network Connection",
+						result.response.message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+					);
+				})
+		} catch (error) {
+			console.log(JSON.stringify(error));
+		}
+	}
+
+	saveSettings( token, siteId) {
+		let prevMock = PosStorage.getSettings().useMockData;
+		PosStorage.saveSettings(this.url.current.state.propertyText,
+			this.site.current.state.propertyText,
+			this.user.current.state.propertyText,
+			this.password.current.state.propertyText,
+			token,
+			siteId,
+			this.state.isMockData);
+		this.props.settingsActions.setSettings(PosStorage.getSettings());
+		if (prevMock !== this.state.isMockData) {
+			// switching between real and mock data. -delete customers/products ect
+			PosStorage.clearDataOnly();
 		}
 	}
 
@@ -192,7 +293,8 @@ class Settings extends Component {
 
 Settings.propTypes = {
 	settings: PropTypes.object.isRequired,
-	settingsActions: PropTypes.object.isRequired
+	settingsActions: PropTypes.object.isRequired,
+	customerActions: PropTypes.object.isRequired
 };
 
 
@@ -202,7 +304,8 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
 	return {
 		toolbarActions:bindActionCreators(ToolbarActions, dispatch),
-		settingsActions:bindActionCreators(SettingsActions, dispatch)
+		settingsActions:bindActionCreators(SettingsActions, dispatch),
+		customerActions:bindActionCreators(CustomerActions, dispatch)
 	};
 }
 
@@ -231,9 +334,10 @@ const styles = StyleSheet.create({
 		fontSize:28,
 		color:'white',
 		textAlign:'center',
-		width:300,
-		paddingTop:30,
-		paddingBottom:30
+		// paddingTop:10,
+		paddingLeft:30,
+		paddingRight:30
+		// paddingBottom:10
 	},
 	inputText:{
 		fontSize:inputFontHeight,
@@ -263,6 +367,10 @@ const styles = StyleSheet.create({
 		borderColor:"#2858a7",
 		borderWidth:5,
 		borderRadius:10
+	},
+	checkLabel: {
+		left: 20,
+		fontSize:24,
 	},
 
 });
