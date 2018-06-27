@@ -55,7 +55,7 @@ class JibuApp extends Component {
 			console.log( "Communications - " + JSON.stringify(Communications));
 
 			let timeout = 200;
-			if (isInitialized) {
+			if (isInitialized && this.posStorage.getCustomers().length > 0) {
 				// Data already configured
 				this.state.synchronization.customersLoaded = true;
 				this.props.customerActions.SetCustomers(this.posStorage.getCustomers());
