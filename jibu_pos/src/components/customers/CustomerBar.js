@@ -79,13 +79,17 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = "Edit"
 					handler = {this.onEdit}
-					enabled = {this.state.editFunction && this.props.selectedCustomer.hasOwnProperty('contactName')}
+					enabled = {this.state.editFunction &&
+						this.props.selectedCustomer.hasOwnProperty('contactName') &&
+						this.props.selectedCustomer.sales_channel !== 'anonymous' }
 				/>
 
 				<CustomerBarButton
 					title = "Delete"
 					handler = {this.onDelete}
-					enabled = {this.state.deleteFunction && this.props.selectedCustomer.hasOwnProperty('contactNname')}
+					enabled = {this.state.deleteFunction &&
+						this.props.selectedCustomer.hasOwnProperty('contactName') &&
+						this.props.selectedCustomer.sales_channel !== 'anonymous' }
 				/>
 
 				<TextInput
