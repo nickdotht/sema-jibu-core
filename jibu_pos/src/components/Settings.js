@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import Synchronization from "../services/Synchronization";
 
 import PosStorage from "../database/PosStorage";
 import * as SettingsActions from "../actions/SettingsActions";
@@ -56,7 +57,7 @@ class SettingsButton extends Component {
 	render() {
 		return (
 			<View style={[styles.submit, {marginLeft:30}] }>
-				<View style={{ justifyContent: 'center', height: 80, alignItems: 'center' }}>
+				<View style={{ justifyContent: 'center', height: 70, alignItems: 'center' }}>
 					<TouchableHighlight underlayColor='#c0c0c0'
 										onPress={() => this.props.pressFn()}>
 						<Text style={[styles.buttonText]}>{this.props.label}</Text>
@@ -140,6 +141,9 @@ class Settings extends Component {
 							<SettingsButton
 								pressFn={this.onClearAll.bind(this)}
 								label='Clear...'/>
+							<SettingsButton
+								pressFn={this.onSynchronize.bind(this)}
+								label='Synchronize Now'/>
 						</View>
 						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', marginTop: 30 }}>
 							<Text style={styles.checkLabel}>{"Use simulated data"}</Text>
@@ -189,6 +193,10 @@ class Settings extends Component {
 		// TODO - Validate fields and set focus to invalid field;
 		this.saveSettings(this.props.settings.token, this.props.settings.siteId);
 	};
+
+	onSynchronize(){
+		Synchronization.syncNowTemp();
+	}
 
 	onClearAll() {
 		console.log("Settings:onClearAll");
@@ -326,9 +334,10 @@ const styles = StyleSheet.create({
 		fontSize:28,
 		color:'white',
 		textAlign:'center',
-		width:300,
-		paddingTop:30,
-		paddingBottom:30
+		// paddingTop:10,
+		paddingLeft:30,
+		paddingRight:30
+		// paddingBottom:10
 	},
 	inputText:{
 		fontSize:inputFontHeight,

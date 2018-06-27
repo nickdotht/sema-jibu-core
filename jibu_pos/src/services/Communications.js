@@ -105,6 +105,8 @@ class Communications {
 				return {}
 			});
 	}
+	createCustomer() {
 
+	}
 };
 export default new Communications();

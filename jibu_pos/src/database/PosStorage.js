@@ -147,8 +147,18 @@ class PosStorage {
 	makeCustomerKey( customer ){
 		return (customerItemKey + '_' + customer.customerId);
 	}
-	createCustomer(phone, name, address ){
-		const newCustomer = { customerId:uuidv1(), contactName:name, phoneNumber:phone, address:address, due_amount:0 };
+	createCustomer(phone, name, address, siteId ){
+		const now = new Date();
+		const newCustomer = {
+			customerId:uuidv1(),
+			contactName:name,
+			phoneNumber:phone,
+			address:address,
+			siteId:siteId,
+			createdDate:now,
+			updatedDate:now
+
+		};
 		let key = this.makeCustomerKey(newCustomer);
 		this.customers.push( newCustomer );
 		newCustomer.syncAction = "create";
@@ -255,6 +265,10 @@ class PosStorage {
 	getCustomers(){
 		console.log("PosStorage: getCustomers. Count " + this.customers.length);
 		return this.customers;
+	}
+	getPendingCustomers(){
+		console.log("PosStorage: getPendingCustomers. Count " + this.pendingCustomers.length);
+		return this.pendingCustomers;
 	}
 
 	getSales(){

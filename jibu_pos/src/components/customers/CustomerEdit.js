@@ -170,7 +170,8 @@ class CustomerEdit extends Component {
 			let newCustomer = PosStorage.createCustomer(
 				this.phone.current.state.propertyText,
 			 	this.name.current.state.propertyText,
-				this.address.current.state.propertyText);
+				this.address.current.state.propertyText,
+				this.props.settings.siteId);
 			this.props.customerActions.CustomerSelected(newCustomer);
 		}
 
@@ -203,12 +204,16 @@ class CustomerEdit extends Component {
 CustomerEdit.propTypes = {
 	isEdit: PropTypes.bool.isRequired,
 	toolbarActions: PropTypes.object.isRequired,
-	customerActions: PropTypes.object.isRequired
+	customerActions: PropTypes.object.isRequired,
+	settings: PropTypes.object.isRequired,
 };
 
 
 function mapStateToProps(state, props) {
-	return {selectedCustomer: state.customerReducer.selectedCustomer};
+	return {
+		selectedCustomer: state.customerReducer.selectedCustomer,
+		settings: state.settingsReducer.settings
+	};
 }
 function mapDispatchToProps(dispatch) {
 	return {
