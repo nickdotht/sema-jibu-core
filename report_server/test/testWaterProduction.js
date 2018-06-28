@@ -10,7 +10,7 @@ var findKioskIndex = require('./Utilities/findKioskId');
 
 process.env.NODE_ENV = 'test';  // Set environment to test
 
-describe('Testing Water Production API', function () {
+describe.skip('Testing Water Production API', function () {
 	let server;
 	this.timeout(6000);
 	beforeEach( () => {
