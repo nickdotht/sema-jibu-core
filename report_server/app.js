@@ -52,7 +52,7 @@ app.use(express.static(path.join(__dirname, 'public_react/build/')));
 app.use('/', index);
 app.use('/untapped/health-check', seama_health_check);
 app.use('/untapped/login', seama_login);
-app.use('/untapped/kiosks', seama_kiosks);
+app.use('/untapped/kiosks', isAuthenticated, seama_kiosks);
 app.use('/untapped/water-operations', isAuthenticated, seama_water_operations);
 app.use('/untapped/sales', isAuthenticated, sema_sales);
 app.use('/untapped/sales-by-channel', isAuthenticated, sema_sales_by_channel);
