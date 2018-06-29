@@ -14,14 +14,23 @@ export default class Synchronization {
 	}
 
 	static syncNowTemp(){
-		// const pendingCustomers = PosStorage.getPendingCustomers().slice();
-		// for( let customer in pendingCustomers){
-		// 	Communications.createCustomer( customer )
-		// 		.then( (createdCustomer) =>{
-		// 			PosStorage.removePendingCustomer(createdCustomer)
-		// 		})
-		// 		.catch(error => console.log("Synchronization:syncNowTemp Create Customer failed"))
-    //
-		// }
+		try {
+			const pendingCustomers = PosStorage.getPendingCustomers().slice();
+			pendingCustomers.forEach(customerKey => {
+				const customer = PosStorage.getCustomerFromKey(customerKey);
+				if (customer != null) {
+					if( customer.syncAction === "create") {
+						Communications.createCustomer(customer)
+							.then((createdCustomer) => {
+								console.log("Synchronization:syncNowTemp - Removing customer from pending list - " + customerKey);
+								PosStorage.removePendingCustomer(customerKey) })
+							.catch(error => console.log("Synchronization:syncNowTemp Create Customer failed"));
+					}
+				}
+			})
+		}catch( error ){
+			console.log( error.message );
+		}
+
 	}
 };

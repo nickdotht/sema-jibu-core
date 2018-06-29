@@ -147,6 +147,10 @@ class PosStorage {
 	makeCustomerKey( customer ){
 		return (customerItemKey + '_' + customer.customerId);
 	}
+	customerIdFromKey( customerKey ){
+		const prefix = customerItemKey + '_';
+		return customerKey.slice( prefix.length );
+	}
 	createCustomer(phone, name, address, siteId ){
 		const now = new Date();
 		const newCustomer = {
@@ -260,7 +264,31 @@ class PosStorage {
 			}
 		});
 	}
+	removePendingCustomer( customerKey ){
+		console.log("PostStorage:removePendingCustomer" );
+		const index = this.pendingCustomers.indexOf(customerKey);
+		if (index > -1) {
+			this.pendingCustomers = this.pendingCustomers.splice(index, 1);
+			let keyArray = [[pendingCustomersKey, this.stringify(this.pendingCustomers)]];
+			AsyncStorage.multiSet( keyArray).then( error => {
+				if( error ) {
+					console.log("PosStorage:removePendingCustomer: Error: " + error);
+				}
+			});
 
+		}
+
+	}
+
+	getCustomerFromKey( customerKey ){
+		const customerId = this.customerIdFromKey(customerKey);
+		for( let index = 0; index < this.customers.length; index++ ){
+			if( this.customers[index].customerId === customerId ){
+				return this.customers[index];
+			}
+		}
+		return null;
+	}
 
 	getCustomers(){
 		console.log("PosStorage: getCustomers. Count " + this.customers.length);

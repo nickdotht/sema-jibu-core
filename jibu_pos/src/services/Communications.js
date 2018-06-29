@@ -105,8 +105,48 @@ class Communications {
 				return {}
 			});
 	}
-	createCustomer() {
+	// createCustomer( customer ) {
+	// 	let options = {
+	// 		method: 'POST',
+	// 		headers: { Authorization: 'Bearer ' + this._token },
+	// 		body: JSON.stringify(customer )
+  //
+	// 	}
+	// 	return fetch(this._url + 'sema/site/customers', options)
+	// 		.then((response) => response.json())
+	// 		.then((responseJson) => {
+	// 			return responseJson
+	// 		})
+	// 		.catch((error) => {
+	// 			console.log("createCustomer: " + error.message);
+	// 			return {}
+	// 		});
+	// }
+	createCustomer( customer ) {
+		let options = {
+			method: 'POST',
+			headers: { Authorization: 'Bearer ' + this._token },
+			body: JSON.stringify(customer )
 
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/customers', options)
+				.then((response) => {
+					response.json()
+						.then((responseJson) => {
+							resolve( responseJson)
+						})
+						.catch((error) => {
+							console.log("createCustomer - Parse JSON: " + error.message);
+							reject();
+						});
+				})
+				.catch((error) => {
+					console.log("createCustomer - Fetch: " + error.message);
+					reject();
+				});
+		});
 	}
+
 };
 export default new Communications();

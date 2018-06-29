@@ -46,21 +46,7 @@ export function LoadCustomers( ) {
 			Communications.getCustomers()
 				.then( web_customers => {
 					if (web_customers.hasOwnProperty("customers")) {
-						let customers = web_customers.customers.map(customer => {
-							return {
-								customerId: customer.id,
-								address: customer.address,
-								contactName: customer.contact_name,
-								customer_type_id: customer.customer_type_id,
-								dueAmount: customer.due_amount,
-								name: customer.name,
-								phoneNumber: customer.phone_number,
-								active: customer.active,
-								sales_channel: customer.sales_channel,
-							}
-						});
-
-						dispatch({ type: CUSTOMERS_LOADED, data: customers });
+						dispatch({ type: CUSTOMERS_LOADED, data: web_customers.customers });
 					}else{
 						dispatch({ type: CUSTOMERS_LOADED, data: [] });
 					}
