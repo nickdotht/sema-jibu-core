@@ -14,51 +14,51 @@ export function CustomerSelected( customer){
 		dispatch({type: CUSTOMER_SELECTED, data:data});
 	};
 }
-export function LoadCustomers( ) {
-	console.log("LoadCustomers - action");
-	let settings = PosStorage.getSettings();
-	if( settings.useMockData ) {
-		return (dispatch) => {
-			setTimeout(() => {
-				console.log("LoadCustomers - loaded");
-				let customers = mock_customers;
-				if (Array.isArray(mock_customers)) {
-					customers = mock_customers.map(customer => {
-						return {
-							customerId: customer.id,
-							address: customer.address,
-							contactName: customer.contact_name,
-							customer_type_id: customer.customer_type_id,
-							dueAmount: customer.due_amount,
-							name: customer.name,
-							phoneNumber: customer.phone_number,
-							active: customer.active,
-							sales_channel: customer.sales_channel,
-						}
-					});
-				}
-				dispatch({ type: CUSTOMERS_LOADED, data: customers });
-			}, 200);
-
-		};
-	}else{
-		return (dispatch) => {
-			Communications.getCustomers()
-				.then( web_customers => {
-					if (web_customers.hasOwnProperty("customers")) {
-						dispatch({ type: CUSTOMERS_LOADED, data: web_customers.customers });
-					}else{
-						dispatch({ type: CUSTOMERS_LOADED, data: [] });
-					}
-				})
-				.catch(error => {
-					console.log( "LoadCustomers - error " + error);
-					dispatch({ type: CUSTOMERS_LOADED, data: []});
-				});
-
-		}
-	}
-}
+// export function LoadCustomers( ) {
+// 	console.log("LoadCustomers - action");
+// 	let settings = PosStorage.getSettings();
+// 	if( settings.useMockData ) {
+// 		return (dispatch) => {
+// 			setTimeout(() => {
+// 				console.log("LoadCustomers - loaded");
+// 				let customers = mock_customers;
+// 				if (Array.isArray(mock_customers)) {
+// 					customers = mock_customers.map(customer => {
+// 						return {
+// 							customerId: customer.id,
+// 							address: customer.address,
+// 							contactName: customer.contact_name,
+// 							customer_type_id: customer.customer_type_id,
+// 							dueAmount: customer.due_amount,
+// 							name: customer.name,
+// 							phoneNumber: customer.phone_number,
+// 							active: customer.active,
+// 							sales_channel: customer.sales_channel,
+// 						}
+// 					});
+// 				}
+// 				dispatch({ type: CUSTOMERS_LOADED, data: customers });
+// 			}, 200);
+//
+// 		};
+// 	}else{
+// 		return (dispatch) => {
+// 			Communications.getCustomers()
+// 				.then( web_customers => {
+// 					if (web_customers.hasOwnProperty("customers")) {
+// 						dispatch({ type: CUSTOMERS_LOADED, data: web_customers.customers });
+// 					}else{
+// 						dispatch({ type: CUSTOMERS_LOADED, data: [] });
+// 					}
+// 				})
+// 				.catch(error => {
+// 					console.log( "LoadCustomers - error " + error);
+// 					dispatch({ type: CUSTOMERS_LOADED, data: []});
+// 				});
+//
+// 		}
+// 	}
+// }
 
 export function setCustomers( customers ) {
 	console.log("setCustomers - action. No of customers " + customers.length);

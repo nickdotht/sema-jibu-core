@@ -33,8 +33,7 @@ class JibuApp extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {synchronization: {customersLoaded:false,
-										productsLoaded:false},
+		this.state = {synchronization: {productsLoaded:false},
 					  isConnected: false};
 		this.posStorage = PosStorage;
 	}
@@ -56,7 +55,6 @@ class JibuApp extends Component {
 			let timeout = 200;
 			if (isInitialized && this.posStorage.getCustomers().length > 0) {
 				// Data already configured
-				this.state.synchronization.customersLoaded = true;
 				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 				timeout = 20000;	// First sync after a bit
 			}
@@ -92,11 +90,6 @@ class JibuApp extends Component {
         return (this.getLoginOrHomeScreen());
     }
 
-    SynchronizeCustomers() {
-		console.log("SynchronizeCustomers - ignored");
-		// this.state.synchronization.customersLoaded = true;
-		// this.posStorage.addCustomers( this.props.customers);
-	}
 
 
 	getLoginOrHomeScreen(){
@@ -123,7 +116,6 @@ class ScreenSwitcher extends Component {
 				<View style={{ flex: 1 }}>
 					<CustomerBar/>
 					<ViewSwitcher Jibu={this.props.Jibu}/>
-					<CustomerLoaderWatcher parent={ this.props.Jibu}/>
 				</View>
 
 			);
@@ -174,20 +166,7 @@ function mapDispatchToProps(dispatch) {
 //Connect everything
 export default connect(mapStateToProps, mapDispatchToProps)(JibuApp);
 
-class CustomerLoaderWatcher extends React.Component {
-	render() {
-		return this.loaderEvent();
 
-	}
-	loaderEvent(){
-		console.log("CustomerLoaderWatcher. No of customers: " + this.props.parent.props.customers.length);
-		if( this.props.parent.props.customers.length > 0 && this.props.parent.state.synchronization.customersLoaded  === false){
-			// Must synchronize loaded customers with the ones we have
-			this.props.parent.SynchronizeCustomers();
-		}
-		return null;
-	}
-}
 
 const styles = StyleSheet.create({
     container: {

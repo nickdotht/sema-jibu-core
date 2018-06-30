@@ -9,7 +9,6 @@ export default class Synchronization {
 		let loadCustomers = loadCustomersFn;
 		setTimeout(() => {
 			console.log("Synchronizing...");
-			state.customersLoaded = false;
 			loadCustomers();
 		}, timeout);
 	}

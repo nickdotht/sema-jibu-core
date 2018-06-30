@@ -293,8 +293,11 @@ class PosStorage {
 	getCustomerFromKey( customerKey ){
 		return new Promise( resolve => {
 			this.getKey( customerKey )
-				.then( customer => resolve( customer) )
-				.catch( resolve(null));
+				.then( customer => {
+					resolve( this.parseJson(customer)) } )
+				.catch( error =>{
+
+				 	resolve(null)});
 		})
 	}
 

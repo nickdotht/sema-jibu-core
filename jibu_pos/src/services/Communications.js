@@ -101,7 +101,7 @@ class Communications {
 				return responseJson
 			})
 			.catch((error) => {
-				console.log("getCustomers: " + error);
+				console.log("Communications:getCustomers: " + error);
 				return {}
 			});
 	}
