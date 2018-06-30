@@ -159,6 +159,7 @@ class PosStorage {
 			phoneNumber:phone,
 			address:address,
 			siteId:siteId,
+			customerType:128,	// TODO - Hard coded - very fragile
 			createdDate:now,
 			updatedDate:now
 
@@ -225,26 +226,35 @@ class PosStorage {
 		});
 
 	}
-	addCustomers( customerArray ){
-		if( this.customers.length > 0 ){
-			console.log("PosStorage:addCustomers - need to merge...." + JSON.stringify(customerArray) );
-			return null;
+	addNewCustomers( customerArray ){
+		console.log("PosStorage:addCustomers: No existing customers no need to merge....");
+		this.customers = customerArray;
+		const keyValueArray = customerArray.map( (customer) => {
+			return [ this.makeCustomerKey(customer), this.stringify(customer)];
+		});
+		const keyArray = customerArray.map( (customer) => {
+			return this.makeCustomerKey(customer);
+		});
+		this.customersKeys  = keyArray;
+		keyValueArray.push([ customersKey, this.stringify(keyArray) ] );
+		AsyncStorage.multiSet(keyValueArray ).then( error => {
+			if( error ) {
+				console.log("PosStorage:addCustomers: Error: " + error);
+			}
+		});
+	}
+
+	// Merge new customers into existing ones
+	mergeCustomers( webCustomers){
+		// TODO combine webCustomers with pendingCustomers and keep the latest one
+		let newCustomersAdded = webCustomers.length > 0 ? true : false;
+		if( this.customers.length  == 0 ){
+			this.addNewCustomers( webCustomers);
+			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
 		}else{
-			console.log("PosStorage:addCustomers: No existing customers no need to merge....");
-			this.customers = customerArray;
-			const keyValueArray = customerArray.map( (customer) => {
-				return [ this.makeCustomerKey(customer), this.stringify(customer)];
-			});
-			const keyArray = customerArray.map( (customer) => {
-				return this.makeCustomerKey(customer);
-			});
-			keyValueArray.push([ customersKey, this.stringify(keyArray) ] );
-			AsyncStorage.multiSet(keyValueArray ).then( error => {
-				if( error ) {
-					console.log("PosStorage:addCustomers: Error: " + error);
-				}
-			});
-			return this.customers;
+			// Need to merge webCustomers with existing and pending customers
+			console.log( "PosStorage:mergeCustomers. Merging " +  webCustomers.length + " web Customers into existing and pending customers" );
+			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
 		}
 	}
 
@@ -268,7 +278,7 @@ class PosStorage {
 		console.log("PostStorage:removePendingCustomer" );
 		const index = this.pendingCustomers.indexOf(customerKey);
 		if (index > -1) {
-			this.pendingCustomers = this.pendingCustomers.splice(index, 1);
+			let deletedItems = this.pendingCustomers.splice(index, 1);
 			let keyArray = [[pendingCustomersKey, this.stringify(this.pendingCustomers)]];
 			AsyncStorage.multiSet( keyArray).then( error => {
 				if( error ) {
@@ -281,13 +291,11 @@ class PosStorage {
 	}
 
 	getCustomerFromKey( customerKey ){
-		const customerId = this.customerIdFromKey(customerKey);
-		for( let index = 0; index < this.customers.length; index++ ){
-			if( this.customers[index].customerId === customerId ){
-				return this.customers[index];
-			}
-		}
-		return null;
+		return new Promise( resolve => {
+			this.getKey( customerKey )
+				.then( customer => resolve( customer) )
+				.catch( resolve(null));
+		})
 	}
 
 	getCustomers(){

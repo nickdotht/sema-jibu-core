@@ -159,16 +159,16 @@ const updateCustomers = (query, params, res ) => {
 
 
 router.delete('/:id', async (req, res) => {
-	semaLog.info('sema_customer - Enter');
+	semaLog.info('sema_customer Delete - Enter');
 
-	console.log(req.params.id);
+	semaLog.info(req.params.id);
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("validation error");
+			semaLog.error("validation error");
 			res.status(400).send(errors.toString());
 		}
 		else {
@@ -250,7 +250,7 @@ router.post('/', async (req, res) => {
 
 	//var postSqlParams = [];
 
-	console.log(req.body);
+	semaLog.info(req.body);
 	req.check("customerType", "Parameter customer-type is missing").exists();
 	req.check("contactName", "Parameter contact-name is missing").exists();
 	req.check("siteId", "Parameter site-id is missing").exists();
@@ -260,7 +260,7 @@ router.post('/', async (req, res) => {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("validation error");
+			semaLog.error("validation error");
 			res.status(400).send(errors.toString());
 		}
 		else {
@@ -277,7 +277,9 @@ router.post('/', async (req, res) => {
 				customer.gpsCoordinates, customer.siteId, customer.Name, customer.phoneNumber,
 				customer.createdDate, customer.updatedDate, customer.gender];
 
-			insertCustomers(customer, sqlInsertCustomer, postSqlParams, res);
+			insertCustomers(customer, sqlInsertCustomer, postSqlParams, res)
+				.then(result =>{})
+				.catch(error =>{})
 		}
 	});
 

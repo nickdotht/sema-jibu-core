@@ -105,41 +105,57 @@ class Communications {
 				return {}
 			});
 	}
-	// createCustomer( customer ) {
-	// 	let options = {
-	// 		method: 'POST',
-	// 		headers: { Authorization: 'Bearer ' + this._token },
-	// 		body: JSON.stringify(customer )
-  //
-	// 	}
-	// 	return fetch(this._url + 'sema/site/customers', options)
-	// 		.then((response) => response.json())
-	// 		.then((responseJson) => {
-	// 			return responseJson
-	// 		})
-	// 		.catch((error) => {
-	// 			console.log("createCustomer: " + error.message);
-	// 			return {}
-	// 		});
-	// }
+
 	createCustomer( customer ) {
 		let options = {
 			method: 'POST',
-			headers: { Authorization: 'Bearer ' + this._token },
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + this._token
+			},
 			body: JSON.stringify(customer )
 
 		}
 		return new Promise( (resolve, reject ) => {
 			fetch(this._url + 'sema/site/customers', options)
 				.then((response) => {
-					response.json()
-						.then((responseJson) => {
-							resolve( responseJson)
-						})
-						.catch((error) => {
-							console.log("createCustomer - Parse JSON: " + error.message);
-							reject();
-						});
+					if (response.status === 200) {
+						response.json()
+							.then((responseJson) => {
+								resolve(responseJson)
+							})
+							.catch((error) => {
+								console.log("createCustomer - Parse JSON: " + error.message);
+								reject();
+							});
+					}else {
+						console.log("createCustomer - Fetch status: " + response.status);
+						reject();
+					}
+				})
+				.catch((error) => {
+					console.log("createCustomer - Fetch: " + error.message);
+					reject();
+				});
+		});
+	}
+	deleteCustomer( customer ) {
+		let options = {
+			method: 'DELETE',
+			headers: {
+				Authorization: 'Bearer ' + this._token
+			},
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/customers/' + customer.customerId, options)
+				.then((response) => {
+					if (response.status === 200) {
+						resolve();
+					}else {
+						console.log("createCustomer - Fetch status: " + response.status);
+						reject();
+					}
 				})
 				.catch((error) => {
 					console.log("createCustomer - Fetch: " + error.message);

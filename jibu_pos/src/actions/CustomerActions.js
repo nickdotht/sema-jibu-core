@@ -60,8 +60,8 @@ export function LoadCustomers( ) {
 	}
 }
 
-export function SetCustomers( customers ) {
-	console.log("SetCustomers - action. No of customers " + customers.length);
+export function setCustomers( customers ) {
+	console.log("setCustomers - action. No of customers " + customers.length);
 
 	return (dispatch) => {dispatch({type: CUSTOMERS_SET, data:customers})};
 

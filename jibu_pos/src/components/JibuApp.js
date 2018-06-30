@@ -25,6 +25,7 @@ import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
 import SiteReport from "./reports/SiteReport";
 import Communications from "../services/Communications";
+import Events from "react-native-simple-events";
 
 console.ignoredYellowBox = ['Warning: isMounted'];
 
@@ -56,11 +57,11 @@ class JibuApp extends Component {
 			if (isInitialized && this.posStorage.getCustomers().length > 0) {
 				// Data already configured
 				this.state.synchronization.customersLoaded = true;
-				this.props.customerActions.SetCustomers(this.posStorage.getCustomers());
+				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 				timeout = 20000;	// First sync after a bit
 			}
 			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
-			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
+			// Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});
 		NetInfo.isConnected.fetch().then(isConnected => {
@@ -68,24 +69,35 @@ class JibuApp extends Component {
 			this.props.networkActions.NetworkConnection(isConnected);
 		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
+		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this) );
 
 		console.log("Mounted-Done");
 
 	}
-    render() {
-        return (this.getLoginOrHomeScreen());
-    }
+	componentWillUnmount(){
+		Events.rm('CustomersUpdated', 'customerUpdate1') ;
+		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );
+	}
 
-    SynchronizeCustomers() {
-		console.log("SynchronizeCustomers");
-		this.state.synchronization.customersLoaded = true;
-		this.posStorage.addCustomers( this.props.customers);
+	onCustomersUpdated = () =>{
+		this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 	}
 
 	handleConnectivityChange = isConnected => {
 		console.log("handleConnectivityChange: " + isConnected);
 		this.props.networkActions.NetworkConnection(isConnected);
 	};
+
+	render() {
+        return (this.getLoginOrHomeScreen());
+    }
+
+    SynchronizeCustomers() {
+		console.log("SynchronizeCustomers - ignored");
+		// this.state.synchronization.customersLoaded = true;
+		// this.posStorage.addCustomers( this.props.customers);
+	}
+
 
 	getLoginOrHomeScreen(){
 		if( this.props.showScreen.isLoggedIn ) {

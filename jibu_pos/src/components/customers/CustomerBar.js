@@ -144,7 +144,7 @@ class CustomerBar extends Component {
 						text: 'OK', onPress: () => {
 							PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
 							this.props.customerActions.CustomerSelected({});		// Clear selected customer
-							this.props.customerActions.SetCustomers(PosStorage.getCustomers());
+							this.props.customerActions.setCustomers(PosStorage.getCustomers());
 
 						}
 					},
