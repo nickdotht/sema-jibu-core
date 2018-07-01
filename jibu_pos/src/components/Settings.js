@@ -247,6 +247,7 @@ class Settings extends Component {
 
 									this.saveSettings(result.response.token, siteId);
 									Communications.setToken(result.response.token);
+									Communications.setSiteId(siteId);
 									// PosStorage.saveConfiguration( result.response.token, siteId );
 									// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 								}

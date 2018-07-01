@@ -3,8 +3,12 @@ import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
 import Events from "react-native-simple-events";
 
-export default class Synchronization {
-	static scheduleSync( syncState, timeout, loadCustomersFn){
+class Synchronization {
+	initialize( lastCustomerSync){
+		this.lastCustomerSync = lastCustomerSync;
+
+	}
+	scheduleSync( syncState, timeout, loadCustomersFn){
 		let state = syncState;
 		let loadCustomers = loadCustomersFn;
 		setTimeout(() => {
@@ -13,15 +17,15 @@ export default class Synchronization {
 		}, timeout);
 	}
 
-	static synchronize(){
+	synchronize(){
 		try {
-			Synchronization.synchronizeCustomers();
+			this.synchronizeCustomers();
 		}catch( error ){
 			console.log( error.message );
 		}
 
 	}
-	static synchronizeCustomers(){
+	synchronizeCustomers(){
 		console.log( "Synchronization:synchronizeCustomers - Begin" );
 		Communications.getCustomers()
 			.then( web_customers => {
@@ -49,7 +53,7 @@ export default class Synchronization {
 												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.contactName);
 												PosStorage.removePendingCustomer(customerKey)
 											})
-											.catch(error => console.log("Synchronization:synchronizeCustomers Delete Customer failed"));
+											.catch(error => console.log("Synchronization:synchronizeCustomers Delete Customer failed " + error));
 
 									}
 
@@ -57,7 +61,7 @@ export default class Synchronization {
 									PosStorage.removePendingCustomer(customerKey);
 								}
 							});
-					})
+					});
 					if( updated ){
 						Events.trigger('CustomersUpdated', {} );
 					}
@@ -66,7 +70,6 @@ export default class Synchronization {
 			.catch(error => {
 				console.log( "Communications.getCustomers - error " + error);
 			});
-
-
 	}
-};
+}
+export default  new Synchronization();

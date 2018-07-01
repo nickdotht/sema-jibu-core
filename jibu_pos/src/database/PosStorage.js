@@ -51,9 +51,10 @@ class PosStorage {
 		this.pendingSales = [];
 
 		// Last sync DateTime is the last date time that items were synchronized with the server
-		this.lastCustomerSync = null;
-		this.lastSalesSync = null;
-		this.lastProductsSync = null;
+		let firstSyncDate = new Date('November 7, 1953');
+		this.lastCustomerSync = firstSyncDate;
+		this.lastSalesSync = firstSyncDate;
+		this.lastProductsSync = firstSyncDate;
 		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 
@@ -65,15 +66,14 @@ class PosStorage {
 					if (version == null) {
 						console.log("Pos Storage: Not initialized");
 						this.version = '1';
-						let currentDateTime = new Date().toISOString();
 						let keyArray = [
 							[versionKey, this.version],
 							[customersKey, this.stringify(this.customersKeys)],
 							[salesKey, this.stringify(this.salesKeys)],
 							[productsKey, this.stringify(this.productsKeys)],
-							[lastCustomerSyncKey,currentDateTime],
-							[lastSalesSyncKey,currentDateTime],
-							[lastProductsSyncKey,currentDateTime],
+							[lastCustomerSyncKey,this.lastCustomerSync.toISOString()],
+							[lastSalesSyncKey,this.lastSalesSync.toISOString()],
+							[lastProductsSyncKey,this.lastProductsSync.toISOString()],
 							[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 							[pendingSalesKey, this.stringify(this.pendingSales)],
 							[settingsKey, this.stringify(this.settings)]];
@@ -115,6 +115,9 @@ class PosStorage {
 		});
 	}
 
+	getLastCustomerSync(){
+		return this.lastCustomerSync;
+	}
 
 	clearAll(){
 		this.removeKey(salesKey );

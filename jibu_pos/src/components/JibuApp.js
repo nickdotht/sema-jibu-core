@@ -59,6 +59,7 @@ class JibuApp extends Component {
 				timeout = 20000;	// First sync after a bit
 			}
 			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
+			Synchronization.initialize( PosStorage.getLastCustomerSync());
 			// Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});

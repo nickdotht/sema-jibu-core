@@ -315,15 +315,13 @@ const insertCustomers = (customer, query, params, res ) => {
 
 
 router.get('/', function(req, res) {
-	semaLog.info('customers - Enter');
+	semaLog.info('Get Customers - Enter');
 
 	// const sessData = req.session;
 	// const connection = connectionTable[sessData.id];
 
 	//let results = initResults();
 	req.check("site-id", "Parameter site-id is missing").exists();
-
-	console.log("LOG - Site-id: " + req.query['site-id']);
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
@@ -334,6 +332,7 @@ router.get('/', function(req, res) {
 			res.status(400).send(errors.toString());
 		}
 		else {
+			semaLog.info("Site-id: " + req.query['site-id']);
 			if (req.query.hasOwnProperty("updated-date")) {
 				let updatedDate = new Date(req.query["updated-date"]);
 				if (!isNaN(updatedDate)) {
