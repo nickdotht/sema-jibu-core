@@ -51,7 +51,7 @@ class PosStorage {
 		this.pendingSales = [];
 
 		// Last sync DateTime is the last date time that items were synchronized with the server
-		let firstSyncDate = new Date('November 7, 1953');
+		let firstSyncDate = new Date('November 7, 1973');
 		this.lastCustomerSync = firstSyncDate;
 		this.lastSalesSync = firstSyncDate;
 		this.lastProductsSync = firstSyncDate;
@@ -134,7 +134,7 @@ class PosStorage {
 		this.salesKeys = [];
 		this.pendingSales = [];
 		this.customers = [];
-		let firstSyncDate = new Date('November 7, 1953');
+		let firstSyncDate = new Date('November 7, 1973');
 		this.lastCustomerSync = firstSyncDate;
 		this.lastSalesSync = firstSyncDate;
 		this.lastProductsSync = firstSyncDate;
@@ -367,6 +367,11 @@ class PosStorage {
 		this.settings = settings;
 		this.setKey( settingsKey, this.stringify( settings));
 
+	}
+
+	setLastCustomerSync( lastSyncTime ){
+		this.lastCustomerSync = lastSyncTime;
+		this.setKey( lastCustomerSyncKey,this.lastCustomerSync.toISOString());
 	}
 	// getConfiguration(){
 	// 	console.log("PosStorage: getConfiguration.");

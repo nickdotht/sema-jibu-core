@@ -16,7 +16,10 @@ class Synchronization {
 			loadCustomers();
 		}, timeout);
 	}
-
+	updateLastCustomerSync(){
+		this.lastCustomerSync = new Date();
+		PosStorage.setLastCustomerSync( this.lastCustomerSync );
+	}
 	synchronize(){
 		try {
 			this.synchronizeCustomers();
@@ -27,9 +30,10 @@ class Synchronization {
 	}
 	synchronizeCustomers(){
 		console.log( "Synchronization:synchronizeCustomers - Begin" );
-		Communications.getCustomers()
+		Communications.getCustomers( this.lastCustomerSync )
 			.then( web_customers => {
 				if (web_customers.hasOwnProperty("customers")) {
+					this.updateLastCustomerSync();
 					console.log( "Synchronization:synchronizeCustomers No of new remote customers: " + web_customers.customers.length);
 					// Get the list of customers that need to be sent to the server
 					let { pendingCustomers, updated} = PosStorage.mergeCustomers( web_customers.customers );

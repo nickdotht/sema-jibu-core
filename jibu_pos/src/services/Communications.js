@@ -90,12 +90,17 @@ class Communications {
 		})
 
 	}
-	getCustomers() {
+	getCustomers( updatedSince ) {
 		let options = {
 			method: 'GET',
 			headers: { Authorization: 'Bearer ' + this._token }
 		}
-		return fetch(this._url + 'sema/site/customers?site-id=' + this._siteId, options)
+		let url = 'sema/site/customers?site-id=' + this._siteId;
+
+		if( updatedSince ){
+			url = url + '&updated-date=' + updatedSince.toISOString();
+		}
+		return fetch(this._url + url, options)
 			.then((response) => response.json())
 			.then((responseJson) => {
 				return responseJson
