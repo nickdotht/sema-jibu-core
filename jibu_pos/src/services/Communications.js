@@ -163,6 +163,40 @@ class Communications {
 				});
 		});
 	}
+	updateCustomer( customer ) {
+		let options = {
+			method: 'PUT',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + this._token
+			},
+			body: JSON.stringify(customer )
+
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/customers/' + customer.customerId, options)
+				.then((response) => {
+					if (response.status === 200) {
+						response.json()
+							.then((responseJson) => {
+								resolve(responseJson)
+							})
+							.catch((error) => {
+								console.log("updateCustomer - Parse JSON: " + error.message);
+								reject();
+							});
+					}else {
+						console.log("updateCustomer - Fetch status: " + response.status);
+						reject();
+					}
+				})
+				.catch((error) => {
+					console.log("createCustomer - Fetch: " + error.message);
+					reject();
+				});
+		});
+	}
 
 };
 export default new Communications();

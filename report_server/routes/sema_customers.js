@@ -50,16 +50,16 @@ const sqlUpdateCustomers = 	"UPDATE customer_account " +
 
 
 router.put('/:id', async (req, res) => {
-	semaLog.info('sema_customer - Enter');
+	semaLog.info('Update sema_customer - Enter');
 
-	console.log(req.params.id);
+	semaLog.info("CustomerId: " + req.params.id);
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("validation error");
+			semaLog.error("validation error");
 			res.status(400).send(errors.toString());
 		}
 		else {
@@ -106,9 +106,10 @@ function putLogic(originalAtts, newAtts) {
 	else
 		arr.push(originalAtts["phone_number"]);
 
-	if (newAtts.hasOwnProperty("updatedDate"))
-		arr.push(newAtts["updatedDate"]);
-	else {
+	if (newAtts.hasOwnProperty("updatedDate")) {
+		let updatedDate = new Date(newAtts["updatedDate"]);
+		arr.push(updatedDate);
+	}else {
 		var today = new Date();
 		var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 		arr.push(date);

@@ -134,12 +134,19 @@ class PosStorage {
 		this.salesKeys = [];
 		this.pendingSales = [];
 		this.customers = [];
+		let firstSyncDate = new Date('November 7, 1953');
+		this.lastCustomerSync = firstSyncDate;
+		this.lastSalesSync = firstSyncDate;
+		this.lastProductsSync = firstSyncDate;
+
 		let keyArray = [
 			[customersKey,  this.stringify(this.customersKeys)],
 			[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 			[salesKey,  this.stringify(this.salesKeys)],
-			[pendingSalesKey, this.stringify(this.pendingSales)]
-		];
+			[pendingSalesKey, this.stringify(this.pendingSales)],
+			[lastCustomerSyncKey,this.lastCustomerSync.toISOString()],
+			[lastSalesSyncKey,this.lastSalesSync.toISOString()],
+			[lastProductsSyncKey,this.lastProductsSync.toISOString()]];
 		AsyncStorage.multiSet( keyArray).then( error => {
 			if( error ) {
 				console.log("PosStorage:clearDataOnly: Error: " + error);
@@ -214,6 +221,7 @@ class PosStorage {
 		customer.contactName = name; 	// FIXUP - Won't be contactName forever
 		customer.phoneNumber = phone; 	// FIXUP - Won't be phone_number forever
 		customer.address = address; 	// FIXUP - Won't be address forever
+		customer.updatedDate = new Date();
 		customer.syncAction = "update";
 
 		this.pendingCustomers.push( key );

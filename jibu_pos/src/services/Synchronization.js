@@ -41,7 +41,7 @@ class Synchronization {
 									if (customer.syncAction === "create") {
 										console.log("Synchronization:synchronizeCustomers -creating customer - " + customer.contactName);
 										Communications.createCustomer(customer)
-											.then((createdCustomer) => {
+											.then(() => {
 												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.contactName);
 												PosStorage.removePendingCustomer(customerKey)
 											})
@@ -49,11 +49,20 @@ class Synchronization {
 									} else if (customer.syncAction === "delete") {
 										console.log("Synchronization:synchronizeCustomers -deleting customer - " + customer.contactName);
 										Communications.deleteCustomer(customer)
-											.then((deleteCustomer) => {
+											.then(() => {
 												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.contactName);
 												PosStorage.removePendingCustomer(customerKey)
 											})
 											.catch(error => console.log("Synchronization:synchronizeCustomers Delete Customer failed " + error));
+
+									} else if (customer.syncAction === "update") {
+										console.log("Synchronization:synchronizeCustomers -updating customer - " + customer.contactName);
+										Communications.updateCustomer(customer)
+											.then(() => {
+												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.contactName);
+												PosStorage.removePendingCustomer(customerKey)
+											})
+											.catch(error => console.log("Synchronization:synchronizeCustomers Update Customer failed " + error));
 
 									}
 
