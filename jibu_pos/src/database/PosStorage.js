@@ -256,16 +256,71 @@ class PosStorage {
 	}
 
 	// Merge new customers into existing ones
-	mergeCustomers( webCustomers){
-		// TODO combine webCustomers with pendingCustomers and keep the latest one
-		let newCustomersAdded = webCustomers.length > 0 ? true : false;
+	mergeCustomers( remoteCustomers){
+		let newCustomersAdded = remoteCustomers.length > 0 ? true : false;
 		if( this.customers.length  == 0 ){
-			this.addNewCustomers( webCustomers);
+			this.addNewCustomers( remoteCustomers);
 			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
 		}else{
 			// Need to merge webCustomers with existing and pending customers
-			console.log( "PosStorage:mergeCustomers. Merging " +  webCustomers.length + " web Customers into existing and pending customers" );
+			console.log( "PosStorage:mergeCustomers. Merging " +  remoteCustomers.length + " web Customers into existing and pending customers" );
+			let webCustomersToUpdate = [];
+			remoteCustomers.forEach( remoteCustomer => {
+				const webCustomerKey = this.makeCustomerKey(remoteCustomer);
+				const pendingIndex = this.pendingCustomers.indexOf(webCustomerKey);
+				if (pendingIndex != -1) {
+					let localCustomer = this.getLocalCustomer(remoteCustomer.customerId );
+					if( localCustomer &&  remoteCustomer.updatedDate > localCustomer.updatedDate ){
+						// remoteCustomer is the latest
+						console.log("PostStorage - mergeCustomers. Remote customer " + webCustomerKey.contactName + " is later:")
+						webCustomersToUpdate.push( remoteCustomer );
+						this.pendingCustomers.slice(pendingIndex, 1)
+					}else{
+						console.log("PostStorage - mergeCustomers. Local customer " + webCustomerKey.contactName + " is later:")
+					}
+
+				}else{
+					webCustomersToUpdate.push( remoteCustomer );
+				}
+			});
+			this.mergeRemoteCustomers( webCustomersToUpdate );
 			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
+		}
+	}
+	mergeRemoteCustomers( remoteCustomers){
+		let isNewCustomers = false;
+		remoteCustomers.forEach( function(customer){
+			let customerKey = this.makeCustomerKey(customer);
+			let keyIndex = this.customersKeys.indexOf(customerKey);
+			if( keyIndex == -1 ){
+				isNewCustomers = true;
+				this.customersKeys.push(customerKey );
+				this.customers.push(customer);
+			}else{
+				this.setKey( customerKey,this.stringify(customer));		// Just update the existing customer
+				this.setLocalCustomer(customer)
+			}
+		}.bind(this));
+		if( isNewCustomers ){
+			this.setKey( customersKey,this.stringify(this.customersKeys));
+		}
+
+	}
+	getLocalCustomer( customerId ){
+		for( let index = 0; index < this.customers.length; index++ ){
+			if(this.customers[index].customerId ===  customerId){
+				return this.customers[index];
+			}
+		}
+		return null;
+	}
+
+	setLocalCustomer( customer ){
+		for( let index = 0; index < this.customers.length; index++ ){
+			if(this.customers[index].customerId ===  customer.customerId){
+				this.customers[index] = customer;
+				return;
+			}
 		}
 	}
 
@@ -373,17 +428,6 @@ class PosStorage {
 		this.lastCustomerSync = lastSyncTime;
 		this.setKey( lastCustomerSyncKey,this.lastCustomerSync.toISOString());
 	}
-	// getConfiguration(){
-	// 	console.log("PosStorage: getConfiguration.");
-	// 	return this.configuration;
-	// }
-  //
-	// saveConfiguration( token, siteId ){
-	// 	let configuration = {configuration:{token:token, siteId:siteId}};
-	// 	this.configuration = configuration;
-	// 	this.setKey( configurationKey, this.stringify( configuration));
-  //
-	// }
 
 	stringify( jsObject){
 		return JSON.stringify(jsObject);
