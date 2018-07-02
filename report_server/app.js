@@ -17,6 +17,7 @@ var seama_water_operations = require('./routes/sema_water_operations');
 var sema_sales = require('./routes/sema_sales');
 var sema_sales_by_channel = require('./routes/sema_sales_by_channel');
 var sema_customers = require('./routes/sema_customers');
+var sema_products = require('./routes/sema_products');
 
 const winston = require('winston');
 
@@ -57,6 +58,7 @@ app.use('/untapped/water-operations', isAuthenticated, seama_water_operations);
 app.use('/untapped/sales', isAuthenticated, sema_sales);
 app.use('/untapped/sales-by-channel', isAuthenticated, sema_sales_by_channel);
 app.use('/sema/site/customers/', isAuthenticated,sema_customers);
+app.use('/sema/site/products/', sema_products);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
