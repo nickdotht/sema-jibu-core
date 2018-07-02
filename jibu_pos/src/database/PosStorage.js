@@ -51,9 +51,10 @@ class PosStorage {
 		this.pendingSales = [];
 
 		// Last sync DateTime is the last date time that items were synchronized with the server
-		this.lastCustomerSync = null;
-		this.lastSalesSync = null;
-		this.lastProductsSync = null;
+		let firstSyncDate = new Date('November 7, 1973');
+		this.lastCustomerSync = firstSyncDate;
+		this.lastSalesSync = firstSyncDate;
+		this.lastProductsSync = firstSyncDate;
 		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 
@@ -65,15 +66,14 @@ class PosStorage {
 					if (version == null) {
 						console.log("Pos Storage: Not initialized");
 						this.version = '1';
-						let currentDateTime = new Date().toISOString();
 						let keyArray = [
 							[versionKey, this.version],
 							[customersKey, this.stringify(this.customersKeys)],
 							[salesKey, this.stringify(this.salesKeys)],
 							[productsKey, this.stringify(this.productsKeys)],
-							[lastCustomerSyncKey,currentDateTime],
-							[lastSalesSyncKey,currentDateTime],
-							[lastProductsSyncKey,currentDateTime],
+							[lastCustomerSyncKey,this.lastCustomerSync.toISOString()],
+							[lastSalesSyncKey,this.lastSalesSync.toISOString()],
+							[lastProductsSyncKey,this.lastProductsSync.toISOString()],
 							[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 							[pendingSalesKey, this.stringify(this.pendingSales)],
 							[settingsKey, this.stringify(this.settings)]];
@@ -115,6 +115,9 @@ class PosStorage {
 		});
 	}
 
+	getLastCustomerSync(){
+		return this.lastCustomerSync;
+	}
 
 	clearAll(){
 		this.removeKey(salesKey );
@@ -131,12 +134,19 @@ class PosStorage {
 		this.salesKeys = [];
 		this.pendingSales = [];
 		this.customers = [];
+		let firstSyncDate = new Date('November 7, 1973');
+		this.lastCustomerSync = firstSyncDate;
+		this.lastSalesSync = firstSyncDate;
+		this.lastProductsSync = firstSyncDate;
+
 		let keyArray = [
 			[customersKey,  this.stringify(this.customersKeys)],
 			[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 			[salesKey,  this.stringify(this.salesKeys)],
-			[pendingSalesKey, this.stringify(this.pendingSales)]
-		];
+			[pendingSalesKey, this.stringify(this.pendingSales)],
+			[lastCustomerSyncKey,this.lastCustomerSync.toISOString()],
+			[lastSalesSyncKey,this.lastSalesSync.toISOString()],
+			[lastProductsSyncKey,this.lastProductsSync.toISOString()]];
 		AsyncStorage.multiSet( keyArray).then( error => {
 			if( error ) {
 				console.log("PosStorage:clearDataOnly: Error: " + error);
@@ -147,6 +157,10 @@ class PosStorage {
 	makeCustomerKey( customer ){
 		return (customerItemKey + '_' + customer.customerId);
 	}
+	customerIdFromKey( customerKey ){
+		const prefix = customerItemKey + '_';
+		return customerKey.slice( prefix.length );
+	}
 	createCustomer(phone, name, address, siteId ){
 		const now = new Date();
 		const newCustomer = {
@@ -155,6 +169,7 @@ class PosStorage {
 			phoneNumber:phone,
 			address:address,
 			siteId:siteId,
+			customerType:128,	// TODO - Hard coded - very fragile
 			createdDate:now,
 			updatedDate:now
 
@@ -206,6 +221,7 @@ class PosStorage {
 		customer.contactName = name; 	// FIXUP - Won't be contactName forever
 		customer.phoneNumber = phone; 	// FIXUP - Won't be phone_number forever
 		customer.address = address; 	// FIXUP - Won't be address forever
+		customer.updatedDate = new Date();
 		customer.syncAction = "update";
 
 		this.pendingCustomers.push( key );
@@ -221,26 +237,90 @@ class PosStorage {
 		});
 
 	}
-	addCustomers( customerArray ){
-		if( this.customers.length > 0 ){
-			console.log("PosStorage:addCustomers - need to merge...." + JSON.stringify(customerArray) );
-			return null;
+	addNewCustomers( customerArray ){
+		console.log("PosStorage:addCustomers: No existing customers no need to merge....");
+		this.customers = customerArray;
+		const keyValueArray = customerArray.map( (customer) => {
+			return [ this.makeCustomerKey(customer), this.stringify(customer)];
+		});
+		const keyArray = customerArray.map( (customer) => {
+			return this.makeCustomerKey(customer);
+		});
+		this.customersKeys  = keyArray;
+		keyValueArray.push([ customersKey, this.stringify(keyArray) ] );
+		AsyncStorage.multiSet(keyValueArray ).then( error => {
+			if( error ) {
+				console.log("PosStorage:addCustomers: Error: " + error);
+			}
+		});
+	}
+
+	// Merge new customers into existing ones
+	mergeCustomers( remoteCustomers){
+		let newCustomersAdded = remoteCustomers.length > 0 ? true : false;
+		if( this.customers.length  == 0 ){
+			this.addNewCustomers( remoteCustomers);
+			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
 		}else{
-			console.log("PosStorage:addCustomers: No existing customers no need to merge....");
-			this.customers = customerArray;
-			const keyValueArray = customerArray.map( (customer) => {
-				return [ this.makeCustomerKey(customer), this.stringify(customer)];
-			});
-			const keyArray = customerArray.map( (customer) => {
-				return this.makeCustomerKey(customer);
-			});
-			keyValueArray.push([ customersKey, this.stringify(keyArray) ] );
-			AsyncStorage.multiSet(keyValueArray ).then( error => {
-				if( error ) {
-					console.log("PosStorage:addCustomers: Error: " + error);
+			// Need to merge webCustomers with existing and pending customers
+			console.log( "PosStorage:mergeCustomers. Merging " +  remoteCustomers.length + " web Customers into existing and pending customers" );
+			let webCustomersToUpdate = [];
+			remoteCustomers.forEach( remoteCustomer => {
+				const webCustomerKey = this.makeCustomerKey(remoteCustomer);
+				const pendingIndex = this.pendingCustomers.indexOf(webCustomerKey);
+				if (pendingIndex != -1) {
+					let localCustomer = this.getLocalCustomer(remoteCustomer.customerId );
+					if( localCustomer &&  remoteCustomer.updatedDate > localCustomer.updatedDate ){
+						// remoteCustomer is the latest
+						console.log("PostStorage - mergeCustomers. Remote customer " + webCustomerKey.contactName + " is later:")
+						webCustomersToUpdate.push( remoteCustomer );
+						this.pendingCustomers.slice(pendingIndex, 1)
+					}else{
+						console.log("PostStorage - mergeCustomers. Local customer " + webCustomerKey.contactName + " is later:")
+					}
+
+				}else{
+					webCustomersToUpdate.push( remoteCustomer );
 				}
 			});
-			return this.customers;
+			this.mergeRemoteCustomers( webCustomersToUpdate );
+			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
+		}
+	}
+	mergeRemoteCustomers( remoteCustomers){
+		let isNewCustomers = false;
+		remoteCustomers.forEach( function(customer){
+			let customerKey = this.makeCustomerKey(customer);
+			let keyIndex = this.customersKeys.indexOf(customerKey);
+			if( keyIndex == -1 ){
+				isNewCustomers = true;
+				this.customersKeys.push(customerKey );
+				this.customers.push(customer);
+			}else{
+				this.setKey( customerKey,this.stringify(customer));		// Just update the existing customer
+				this.setLocalCustomer(customer)
+			}
+		}.bind(this));
+		if( isNewCustomers ){
+			this.setKey( customersKey,this.stringify(this.customersKeys));
+		}
+
+	}
+	getLocalCustomer( customerId ){
+		for( let index = 0; index < this.customers.length; index++ ){
+			if(this.customers[index].customerId ===  customerId){
+				return this.customers[index];
+			}
+		}
+		return null;
+	}
+
+	setLocalCustomer( customer ){
+		for( let index = 0; index < this.customers.length; index++ ){
+			if(this.customers[index].customerId ===  customer.customerId){
+				this.customers[index] = customer;
+				return;
+			}
 		}
 	}
 
@@ -260,7 +340,32 @@ class PosStorage {
 			}
 		});
 	}
+	removePendingCustomer( customerKey ){
+		console.log("PostStorage:removePendingCustomer" );
+		const index = this.pendingCustomers.indexOf(customerKey);
+		if (index > -1) {
+			let deletedItems = this.pendingCustomers.splice(index, 1);
+			let keyArray = [[pendingCustomersKey, this.stringify(this.pendingCustomers)]];
+			AsyncStorage.multiSet( keyArray).then( error => {
+				if( error ) {
+					console.log("PosStorage:removePendingCustomer: Error: " + error);
+				}
+			});
 
+		}
+
+	}
+
+	getCustomerFromKey( customerKey ){
+		return new Promise( resolve => {
+			this.getKey( customerKey )
+				.then( customer => {
+					resolve( this.parseJson(customer)) } )
+				.catch( error =>{
+
+				 	resolve(null)});
+		})
+	}
 
 	getCustomers(){
 		console.log("PosStorage: getCustomers. Count " + this.customers.length);
@@ -318,17 +423,11 @@ class PosStorage {
 		this.setKey( settingsKey, this.stringify( settings));
 
 	}
-	// getConfiguration(){
-	// 	console.log("PosStorage: getConfiguration.");
-	// 	return this.configuration;
-	// }
-  //
-	// saveConfiguration( token, siteId ){
-	// 	let configuration = {configuration:{token:token, siteId:siteId}};
-	// 	this.configuration = configuration;
-	// 	this.setKey( configurationKey, this.stringify( configuration));
-  //
-	// }
+
+	setLastCustomerSync( lastSyncTime ){
+		this.lastCustomerSync = lastSyncTime;
+		this.setKey( lastCustomerSyncKey,this.lastCustomerSync.toISOString());
+	}
 
 	stringify( jsObject){
 		return JSON.stringify(jsObject);

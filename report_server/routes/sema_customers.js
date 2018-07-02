@@ -50,16 +50,16 @@ const sqlUpdateCustomers = 	"UPDATE customer_account " +
 
 
 router.put('/:id', async (req, res) => {
-	semaLog.info('sema_customer - Enter');
+	semaLog.info('Update sema_customer - Enter');
 
-	console.log(req.params.id);
+	semaLog.info("CustomerId: " + req.params.id);
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("validation error");
+			semaLog.error("validation error");
 			res.status(400).send(errors.toString());
 		}
 		else {
@@ -106,9 +106,10 @@ function putLogic(originalAtts, newAtts) {
 	else
 		arr.push(originalAtts["phone_number"]);
 
-	if (newAtts.hasOwnProperty("updatedDate"))
-		arr.push(newAtts["updatedDate"]);
-	else {
+	if (newAtts.hasOwnProperty("updatedDate")) {
+		let updatedDate = new Date(newAtts["updatedDate"]);
+		arr.push(updatedDate);
+	}else {
 		var today = new Date();
 		var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
 		arr.push(date);
@@ -159,16 +160,16 @@ const updateCustomers = (query, params, res ) => {
 
 
 router.delete('/:id', async (req, res) => {
-	semaLog.info('sema_customer - Enter');
+	semaLog.info('sema_customer Delete - Enter');
 
-	console.log(req.params.id);
+	semaLog.info(req.params.id);
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("validation error");
+			semaLog.error("validation error");
 			res.status(400).send(errors.toString());
 		}
 		else {
@@ -250,7 +251,7 @@ router.post('/', async (req, res) => {
 
 	//var postSqlParams = [];
 
-	console.log(req.body);
+	semaLog.info(req.body);
 	req.check("customerType", "Parameter customer-type is missing").exists();
 	req.check("contactName", "Parameter contact-name is missing").exists();
 	req.check("siteId", "Parameter site-id is missing").exists();
@@ -260,7 +261,7 @@ router.post('/', async (req, res) => {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			console.log("validation error");
+			semaLog.error("validation error");
 			res.status(400).send(errors.toString());
 		}
 		else {
@@ -277,7 +278,9 @@ router.post('/', async (req, res) => {
 				customer.gpsCoordinates, customer.siteId, customer.Name, customer.phoneNumber,
 				customer.createdDate, customer.updatedDate, customer.gender];
 
-			insertCustomers(customer, sqlInsertCustomer, postSqlParams, res);
+			insertCustomers(customer, sqlInsertCustomer, postSqlParams, res)
+				.then(result =>{})
+				.catch(error =>{})
 		}
 	});
 
@@ -313,15 +316,13 @@ const insertCustomers = (customer, query, params, res ) => {
 
 
 router.get('/', function(req, res) {
-	semaLog.info('customers - Enter');
+	semaLog.info('Get Customers - Enter');
 
 	// const sessData = req.session;
 	// const connection = connectionTable[sessData.id];
 
 	//let results = initResults();
 	req.check("site-id", "Parameter site-id is missing").exists();
-
-	console.log("LOG - Site-id: " + req.query['site-id']);
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
@@ -332,6 +333,7 @@ router.get('/', function(req, res) {
 			res.status(400).send(errors.toString());
 		}
 		else {
+			semaLog.info("Site-id: " + req.query['site-id']);
 			if (req.query.hasOwnProperty("updated-date")) {
 				let updatedDate = new Date(req.query["updated-date"]);
 				if (!isNaN(updatedDate)) {

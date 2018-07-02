@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox} from "react-native";
+import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox, ActivityIndicator} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import PropTypes from 'prop-types';
 
@@ -75,7 +75,7 @@ class Settings extends Component {
 		this.site = React.createRef();
 		this.user = React.createRef();
 		this.password = React.createRef();
-		this.state = { isMockData: this.props.settings.useMockData }
+		this.state = { isMockData: this.props.settings.useMockData, animating: false };
 	}
 
 	componentDidMount() {
@@ -155,6 +155,11 @@ class Settings extends Component {
 					</View>
 
 				</KeyboardAwareScrollView>
+				{this.state.animating &&
+					<View style={styles.activityIndicator}>
+						<ActivityIndicator size='large' />
+					</View>
+				}
 			</View>
 
 		);
@@ -195,7 +200,7 @@ class Settings extends Component {
 	};
 
 	onSynchronize(){
-		Synchronization.syncNowTemp();
+		Synchronization.synchronize();
 	}
 
 	onClearAll() {
@@ -210,7 +215,7 @@ class Settings extends Component {
 					text: 'Yes', onPress: () => {
 						PosStorage.clearDataOnly();
 						this.props.settingsActions.setSettings(PosStorage.getSettings());
-						this.props.customerActions.SetCustomers(PosStorage.getCustomers());
+						this.props.customerActions.setCustomers(PosStorage.getCustomers());
 						this.closeHandler();
 
 					}
@@ -222,6 +227,7 @@ class Settings extends Component {
 	}
 
 	onConnection() {
+		this.setState({animating: true});
 		Communications.initialize(
 			this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
@@ -241,9 +247,11 @@ class Settings extends Component {
 
 									this.saveSettings(result.response.token, siteId);
 									Communications.setToken(result.response.token);
+									Communications.setSiteId(siteId);
 									// PosStorage.saveConfiguration( result.response.token, siteId );
 									// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 								}
+								this.setState({animating: false});
 								Alert.alert(
 									"Network Connection",
 									message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
@@ -254,6 +262,7 @@ class Settings extends Component {
 							});
 
 					} else {
+						this.setState({animating: false});
 						message = result.response.msg + "(Error code: " + result.status + ")";
 						Alert.alert(
 							"Network Connection",
@@ -263,12 +272,14 @@ class Settings extends Component {
 				})
 				.catch(result => {
 					console.log("Failed- status " + result.status + " " + result.response);
+					this.setState({animating: false});
 					Alert.alert(
 						"Network Connection",
 						result.response.message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
 					);
 				})
 		} catch (error) {
+			this.setState({animating: false});
 			console.log(JSON.stringify(error));
 		}
 	}
@@ -372,7 +383,15 @@ const styles = StyleSheet.create({
 		left: 20,
 		fontSize:24,
 	},
-
+	activityIndicator: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+		alignItems: 'center',
+		justifyContent: 'center'
+	}
 });
 
 

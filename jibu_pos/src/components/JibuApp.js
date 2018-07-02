@@ -25,6 +25,7 @@ import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
 import SiteReport from "./reports/SiteReport";
 import Communications from "../services/Communications";
+import Events from "react-native-simple-events";
 
 console.ignoredYellowBox = ['Warning: isMounted'];
 
@@ -32,8 +33,7 @@ class JibuApp extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {synchronization: {customersLoaded:false,
-										productsLoaded:false},
+		this.state = {synchronization: {productsLoaded:false},
 					  isConnected: false};
 		this.posStorage = PosStorage;
 	}
@@ -55,12 +55,12 @@ class JibuApp extends Component {
 			let timeout = 200;
 			if (isInitialized && this.posStorage.getCustomers().length > 0) {
 				// Data already configured
-				this.state.synchronization.customersLoaded = true;
-				this.props.customerActions.SetCustomers(this.posStorage.getCustomers());
+				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 				timeout = 20000;	// First sync after a bit
 			}
 			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
-			Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
+			Synchronization.initialize( PosStorage.getLastCustomerSync());
+			// Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 		});
 		NetInfo.isConnected.fetch().then(isConnected => {
@@ -68,24 +68,30 @@ class JibuApp extends Component {
 			this.props.networkActions.NetworkConnection(isConnected);
 		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
+		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this) );
 
 		console.log("Mounted-Done");
 
 	}
-    render() {
-        return (this.getLoginOrHomeScreen());
-    }
+	componentWillUnmount(){
+		Events.rm('CustomersUpdated', 'customerUpdate1') ;
+		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );
+	}
 
-    SynchronizeCustomers() {
-		console.log("SynchronizeCustomers");
-		this.state.synchronization.customersLoaded = true;
-		this.posStorage.addCustomers( this.props.customers);
+	onCustomersUpdated = () =>{
+		this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 	}
 
 	handleConnectivityChange = isConnected => {
 		console.log("handleConnectivityChange: " + isConnected);
 		this.props.networkActions.NetworkConnection(isConnected);
 	};
+
+	render() {
+        return (this.getLoginOrHomeScreen());
+    }
+
+
 
 	getLoginOrHomeScreen(){
 		if( this.props.showScreen.isLoggedIn ) {
@@ -111,7 +117,6 @@ class ScreenSwitcher extends Component {
 				<View style={{ flex: 1 }}>
 					<CustomerBar/>
 					<ViewSwitcher Jibu={this.props.Jibu}/>
-					<CustomerLoaderWatcher parent={ this.props.Jibu}/>
 				</View>
 
 			);
@@ -162,20 +167,7 @@ function mapDispatchToProps(dispatch) {
 //Connect everything
 export default connect(mapStateToProps, mapDispatchToProps)(JibuApp);
 
-class CustomerLoaderWatcher extends React.Component {
-	render() {
-		return this.loaderEvent();
 
-	}
-	loaderEvent(){
-		console.log("CustomerLoaderWatcher. No of customers: " + this.props.parent.props.customers.length);
-		if( this.props.parent.props.customers.length > 0 && this.props.parent.state.synchronization.customersLoaded  === false){
-			// Must synchronize loaded customers with the ones we have
-			this.props.parent.SynchronizeCustomers();
-		}
-		return null;
-	}
-}
 
 const styles = StyleSheet.create({
     container: {

@@ -150,23 +150,27 @@ class CustomerList extends Component {
 	}
 
 	filterItem = (item )=> {
-		if( item.sales_channel === "anonymous"){
-			return true;
-		}
-		if (this.props.filter === "all" ||
-			(this.props.filter === "reseller" && item.sales_channel === "reseller") ||
-			(this.props.filter === "walkup" && item.sales_channel !== "reseller") ||
-			(this.props.filter === "credit" && item.dueAmount >0 )){
-			if (this.state.searchString.length >= 2) {
-				const filterString = this.state.searchString.toLowerCase();
-				if (item.contactName.toLowerCase().startsWith(filterString) ||
-					item.phoneNumber.startsWith(filterString)) {
-					return true;
-				} else {
-					return false;
-				}
+		try {
+			if (item.sales_channel === "anonymous") {
+				return true;
 			}
-			return true;
+			if (this.props.filter === "all" ||
+				(this.props.filter === "reseller" && item.sales_channel === "reseller") ||
+				(this.props.filter === "walkup" && item.sales_channel !== "reseller") ||
+				(this.props.filter === "credit" && item.dueAmount > 0)) {
+				if (this.state.searchString.length >= 2) {
+					const filterString = this.state.searchString.toLowerCase();
+					if (item.contactName.toLowerCase().startsWith(filterString) ||
+						item.phoneNumber.startsWith(filterString)) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+				return true;
+			}
+		}catch( error ){
+			console.log( "CustomerList:filterItem " + error);
 		}
 		return false;
 	};
