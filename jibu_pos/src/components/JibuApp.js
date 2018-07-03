@@ -39,7 +39,7 @@ class JibuApp extends Component {
 	}
 	componentDidMount() {
 		console.log("JibuApp - Mounted");
-		this.posStorage.initialize().then( (isInitialized) => {
+		this.posStorage.initialize( false ).then( (isInitialized) => {
 
 			let settings = this.posStorage.getSettings();
 			this.props.settingsActions.setSettings( settings );
