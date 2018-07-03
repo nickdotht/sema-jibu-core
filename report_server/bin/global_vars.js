@@ -9,11 +9,12 @@ const path	= require('path');
 const mysql	= require('mysql2');
 const pe	= require('parse-error');
 const env	= process.env.NODE_ENV || 'development';
+const semaLog = require(`../seama_services/sema_logger`);
 
 // So we can always have an absolute path to the root dir
 __basedir	= path.resolve(__dirname, '..');
 
-// Database configurations for different usage accross the app
+// Database configurations for different uses (sequelize/mysql2) accross the app
 __dbConfig	= require(`${__basedir}/config/database`)[env];
 
 // Clone the global DB config and add additional options
@@ -29,10 +30,14 @@ __hp = promise =>
 		.catch(err => [pe(err)]);
 
 // te stands for Throw Error
-__te = (err_message, log) => {
-	if(log === true){
-		console.error(err_message);
+__te = (err, response, httpErrorCode, results) => {
+	let stackTrace = "NA";
+
+	if( err.hasOwnProperty("stack")){
+		stackTrace = err.stack;
 	}
 
-	throw new Error(err_message);
+	semaLog.error("ERROR: ", err.message, "HTTP Error code: ", httpErrorCode, "Stack: ", stackTrace);
+	response.status(httpErrorCode);
+	response.json(results);
 }
