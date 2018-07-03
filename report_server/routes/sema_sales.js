@@ -61,69 +61,53 @@ const sqlLMostRecentCustomer =
 	ORDER BY created_date DESC \
 	LIMIT 2';
 
-router.get('/', function(request, response) {
-	semaLog.info('sales - Enter, kiosk_id:',request.query.kioskID );
+router.get('/', async (request, response) => {
+	semaLog.info('sales - Enter, kiosk_id:', request.query.kioskID);
 	let results = initResults();
 
 	request.check("kioskID", "Parameter kioskID is missing").exists();
 	request.check("groupby", "Parameter groupby is missing").exists();
 
-	request.getValidationResult().then(function(result) {
-		if (!result.isEmpty()) {
-			const errors = result.array().map((elem) => {
-				return elem.msg;
-			});
-			semaLog.error("VALIDATION ERROR: ", errors );
-			response.status(400).send(errors.toString());
-		} else {
-			let endDate =null;
-			if( request.query.hasOwnProperty("enddate")) {
-				endDate = new Date(Date.parse(request.query.enddate));
-			}
-			// Use the most recent receipt as the end date if now is specified (Because there may
-			// be many receipts, we don't want the SQL query to span too much tine}
-			__pool.getConnection((err, connection) => {
-				getMostRecentReceipt(connection, request.query, endDate).then((receiptEndDate) => {
-					getMostRecentCustomer(connection, request.query, endDate).then((customerEndDate) => {
-						getTotalCustomers(connection, request.query, results).then(() => {
-							getTotalRevenue(connection, request.query, results).then(() => {
-								getRevenueByPeriod(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
-									getGallonsPerCustomer(connection, request.query, results).then(() => {
-										getCustomersByPeriod(connection, request.query, (endDate) ? endDate : customerEndDate, results).then(() => {
-											getRetailerRevenue(connection, request.query, (endDate) ? endDate : receiptEndDate, results).then(() => {
-												yieldResults(response, results);
-											}).catch(err => {
-												yieldError(err, response, 500, results);
-											})
-										}).catch(err => {
-											yieldError(err, response, 500, results);
-										})
-									}).catch(err => {
-										yieldError(err, response, 500, results);
-									})
-								}).catch(err => {
-									yieldError(err, response, 500, results);
-								})
-							}).catch(err => {
-								yieldError(err, response, 500, results);
-							})
-						}).catch(err => {
-							yieldError(err, response, 500, results);
-						});
-					}).catch(err => {
-						yieldError(err, response, 500, results);
-					});
-				}).then(() => {
-					connection.release();
-				});
-			});
+	const result = await request.getValidationResult();
+
+	if (!result.isEmpty()) {
+		const errors = result.array().map(elem => elem.msg);
+		semaLog.error("VALIDATION ERROR: ", errors );
+		return response.status(400).send(errors.toString());
+	}
+
+	let endDate = null;
+
+	if(request.query.hasOwnProperty("enddate")) {
+		endDate = new Date(Date.parse(request.query.enddate));
+	}
+
+	// Use the most recent receipt as the end date if now is specified (Because there may
+	// be many receipts, we don't want the SQL query to span too much tine}
+	__pool.getConnection(async (err, connection) => {
+		try {
+			const receiptEndDate = await getMostRecentReceipt(connection, request.query, endDate);
+			const customerEndDate = await getMostRecentCustomer(connection, request.query, endDate);
+			await getTotalCustomers(connection, request.query, results);
+			await getTotalRevenue(connection, request.query, results);
+			await getRevenueByPeriod(connection, request.query, (endDate) ? endDate : receiptEndDate, results);
+			await getGallonsPerCustomer(connection, request.query, results);
+			await getCustomersByPeriod(connection, request.query, (endDate) ? endDate : customerEndDate, results);
+			await getRetailerRevenue(connection, request.query, (endDate) ? endDate : receiptEndDate, results);
+
+			connection.release();
+			semaLog.info("Sales exit");
+			response.json(results);
+		} catch (err) {
+			connection.release();
+			return __te(err, response, 500, results);
 		}
 	});
 });
 
 const getTotalCustomers = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
-		connection.query(sqlTotalCustomers, [requestParams.kioskID], function (err, sqlResult ) {
+		connection.query(sqlTotalCustomers, [requestParams.kioskID], (err, sqlResult ) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -138,7 +122,7 @@ const getTotalCustomers = (connection, requestParams, results ) => {
 
 const getTotalRevenue = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
-		connection.query(sqlTotalRevenue, [requestParams.kioskID], function (err, sqlResult ) {
+		connection.query(sqlTotalRevenue, [requestParams.kioskID], (err, sqlResult ) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -161,7 +145,7 @@ const getRevenueByPeriod = (connection, requestParams, endDate, results ) => {
 		results.totalRevenue.period = requestParams.groupby;
 		PeriodData.UpdatePeriodDates( results.totalRevenue.periods, endDate, requestParams.groupby );
 		const sql = sprintf(sqlRevenueByPeriod, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
-		connection.query(sql, [requestParams.kioskID], function (err, sqlResult ) {
+		connection.query(sql, [requestParams.kioskID], (err, sqlResult) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -201,7 +185,7 @@ const getCustomersByPeriod = (connection, requestParams, endDate, results ) => {
 			results.newCustomers.period = requestParams.groupby;
 			PeriodData.UpdatePeriodDates( results.newCustomers.periods, endDate, requestParams.groupby );
 			const sql = sprintf(sqlCustomersByPeriod, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
-			connection.query(sql, [requestParams.kioskID], function (err, sqlResult) {
+			connection.query(sql, [requestParams.kioskID], (err, sqlResult) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -240,7 +224,7 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
 		results.gallonsPerCustomer.period = requestParams.groupby;
 		const sql = sprintf(sqlGallonsPerCustomer, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
-		connection.query(sql, [requestParams.kioskID], function (err, sqlResult ) {
+		connection.query(sql, [requestParams.kioskID], (err, sqlResult ) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -263,7 +247,7 @@ const getRetailerRevenue = (connection, requestParams, endDate, results ) => {
 	return new Promise((resolve, reject) => {
 		let beginDate = calcBeginDate( endDate, requestParams.groupby );
 		const sql = sprintf(sqlRetailerRevenue, requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase(), requestParams.groupby.toUpperCase());
-		connection.query(sql, [requestParams.kioskID, beginDate, endDate], function (err, sqlResult) {
+		connection.query(sql, [requestParams.kioskID, beginDate, endDate], (err, sqlResult) => {
 			if (err) {
 				reject(err);
 			} else {
@@ -368,25 +352,7 @@ const getPrevPeriodSales = ( retailer, sqlResult, index, nextPeriod ) => {
 	return -1;
 };
 
-
-const yieldResults =(res, results ) =>{
-	semaLog.info("Sales exit");
-	res.json(results);
-};
-
-const yieldError = (err, response, httpErrorCode, results ) =>{
-	let stackTrace = "NA";
-	if( err.hasOwnProperty("stack")){
-		stackTrace = err.stack;
-	}
-	semaLog.error("ERROR: ", err.message, "HTTP Error code: ", httpErrorCode, "Stack: ", stackTrace);
-	response.status(httpErrorCode);
-	response.json(results);
-};
-
-
-
-function initResults() {
+const initResults = () => {
 	return {
 		newCustomers: {period: "N/A", periods:PeriodData.init3Periods()},
 		totalRevenue: {total: "N/A", period: "N/A", periods:PeriodData.init3Periods()},
@@ -413,7 +379,7 @@ const calcBeginDate = ( endDate, period ) =>{
 	}
 };
 
-function periodData () {
+const periodData = () => {
 	this.beginDate = "N/A";
 	this.endDate = "N/A;";
 	this.periodValue = "N/A";
