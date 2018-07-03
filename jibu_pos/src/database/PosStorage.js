@@ -58,12 +58,12 @@ class PosStorage {
 		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
 	}
 
-	initialize() {
-		console.log("PosStorage: initialize");
+	initialize( forceNew ) {
+		console.log("PosStorage: initialize - forceNew=" + forceNew);
 		return new Promise((resolve, reject) => {
 			this.getKey(versionKey)
 				.then((version) => {
-					if (version == null) {
+					if (version == null || forceNew === true ) {
 						console.log("Pos Storage: Not initialized");
 						this.version = '1';
 						let keyArray = [
@@ -237,7 +237,7 @@ class PosStorage {
 		});
 
 	}
-	addNewCustomers( customerArray ){
+	addRemoteCustomers(customerArray ){
 		console.log("PosStorage:addCustomers: No existing customers no need to merge....");
 		this.customers = customerArray;
 		const keyValueArray = customerArray.map( (customer) => {
@@ -259,7 +259,7 @@ class PosStorage {
 	mergeCustomers( remoteCustomers){
 		let newCustomersAdded = remoteCustomers.length > 0 ? true : false;
 		if( this.customers.length  == 0 ){
-			this.addNewCustomers( remoteCustomers);
+			this.addRemoteCustomers( remoteCustomers);
 			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
 		}else{
 			// Need to merge webCustomers with existing and pending customers
