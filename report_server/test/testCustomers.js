@@ -27,23 +27,25 @@ describe('Testing Customers API', function () {
 	describe('DELETE /sema/site/customers - should delete', function() {
 		it('Should fail with 400 error code', (done) => {
 			authenticate(server).then(function(token) {
-				let url = '/sema/site/customers/';
-				chai.request(server)
-					.post(url)
-					.set('Content-Type', 'application/json; charset=UTF-8')
-					.send({ 'customerType': '1', 'contactName': 'X', 'siteId': '1', 'customerId': '999999' })
-					.set('Authorization', token)
-					.end(function(err, res) {
-						let url = sprintf('/sema/site/customers/%s', '999999');
-						res.should.have.status(200);
-						chai.request(server)
-							.delete(url)
-							.set('Authorization', token)
-							.end(function(err, res) {
-								res.should.have.status(200);
-								done(err);
-							});
-					});
+				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+					let url = '/sema/site/customers/';
+					chai.request(server)
+						.post(url)
+						.set('Content-Type', 'application/json; charset=UTF-8')
+						.send({ 'customerType': '1', 'contactName': 'X', 'siteId': kiosk.id, 'customerId': '999999' })
+						.set('Authorization', token)
+						.end(function(err, res) {
+							let url = sprintf('/sema/site/customers/%s', '999999');
+							res.should.have.status(200);
+							chai.request(server)
+								.delete(url)
+								.set('Authorization', token)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									done(err);
+								});
+						});
+				});
 			});
 		});
 	});
