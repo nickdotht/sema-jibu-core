@@ -161,8 +161,12 @@ class PosStorage {
 		const prefix = customerItemKey + '_';
 		return customerKey.slice( prefix.length );
 	}
+
 	createCustomer(phone, name, address, siteId ){
 		const now = new Date();
+		this.createCustomerFull( phone, name, address, siteId, now, now)
+	}
+	createCustomerFull(phone, name, address, siteId, createdDate, updatedDate ){
 		const newCustomer = {
 			customerId:uuidv1(),
 			contactName:name,
@@ -170,8 +174,8 @@ class PosStorage {
 			address:address,
 			siteId:siteId,
 			customerType:128,	// TODO - Hard coded - very fragile
-			createdDate:now,
-			updatedDate:now
+			createdDate:createdDate,
+			updatedDate:updatedDate
 
 		};
 		let key = this.makeCustomerKey(newCustomer);
@@ -265,24 +269,33 @@ class PosStorage {
 			// Need to merge webCustomers with existing and pending customers
 			console.log( "PosStorage:mergeCustomers. Merging " +  remoteCustomers.length + " web Customers into existing and pending customers" );
 			let webCustomersToUpdate = [];
+			let isPendingModified = false;
 			remoteCustomers.forEach( remoteCustomer => {
 				const webCustomerKey = this.makeCustomerKey(remoteCustomer);
 				const pendingIndex = this.pendingCustomers.indexOf(webCustomerKey);
 				if (pendingIndex != -1) {
 					let localCustomer = this.getLocalCustomer(remoteCustomer.customerId );
-					if( localCustomer &&  remoteCustomer.updatedDate > localCustomer.updatedDate ){
+					if(localCustomer ) {
+						console.log("PostStorage - mergeCustomers. Local Date " + new Date(localCustomer.updatedDate) +
+							" Remote Date " + remoteCustomer.updatedDate );
+					}
+					if( localCustomer &&  remoteCustomer.updatedDate > new Date(localCustomer.updatedDate) ){
 						// remoteCustomer is the latest
-						console.log("PostStorage - mergeCustomers. Remote customer " + webCustomerKey.contactName + " is later:")
+						console.log("PostStorage - mergeCustomers. Remote customer " + remoteCustomer.contactName + " is later:")
 						webCustomersToUpdate.push( remoteCustomer );
-						this.pendingCustomers.slice(pendingIndex, 1)
+						this.pendingCustomers.splice(pendingIndex, 1);
+						isPendingModified = true;
 					}else{
-						console.log("PostStorage - mergeCustomers. Local customer " + webCustomerKey.contactName + " is later:")
+						console.log("PostStorage - mergeCustomers. Local customer " + localCustomer.contactName + " is later:")
 					}
 
 				}else{
 					webCustomersToUpdate.push( remoteCustomer );
 				}
 			});
+			if( isPendingModified ){
+				this.setKey( pendingCustomersKey, this.stringify(this.pendingCustomers));
+			}
 			this.mergeRemoteCustomers( webCustomersToUpdate );
 			return { pendingCustomers:this.pendingCustomers.slice(), updated:newCustomersAdded};
 		}
@@ -296,6 +309,7 @@ class PosStorage {
 				isNewCustomers = true;
 				this.customersKeys.push(customerKey );
 				this.customers.push(customer);
+				this.setKey( customerKey,this.stringify(customer));
 			}else{
 				this.setKey( customerKey,this.stringify(customer));		// Just update the existing customer
 				this.setLocalCustomer(customer)
