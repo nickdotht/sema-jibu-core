@@ -1,5 +1,5 @@
 
-import { CUSTOMER_SELECTED, CUSTOMERS_LOADED, CUSTOMERS_SET, CUSTOMERS_SEARCH } from "../actions/CustomerActions"
+import { CUSTOMER_SELECTED, CUSTOMERS_SET, CUSTOMERS_SEARCH } from "../actions/CustomerActions"
 import PosStorage from "../database/PosStorage";
 
 let initialState = {selectedCustomer:{}, customers:[], searchString:""};
@@ -21,15 +21,6 @@ const customerReducer = (state = initialState, action) => {
 			newState = {...state};
 			newState.searchString = action.data ;
 			return newState;
-		case CUSTOMERS_LOADED:
-			let updatedCustomers = PosStorage.addCustomers(action.data);
-			if(updatedCustomers ){
-				newState = {...state};
-				newState.customers = updatedCustomers ;
-				return newState;
-			}else{
-				return state;
-			}
 
 
 		default:

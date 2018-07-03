@@ -90,23 +90,118 @@ class Communications {
 		})
 
 	}
-	getCustomers() {
+	getCustomers( updatedSince ) {
 		let options = {
 			method: 'GET',
 			headers: { Authorization: 'Bearer ' + this._token }
 		}
-		return fetch(this._url + 'sema/site/customers?site-id=' + this._siteId, options)
+		let url = 'sema/site/customers?site-id=' + this._siteId;
+
+		if( updatedSince ){
+			url = url + '&updated-date=' + updatedSince.toISOString();
+		}
+		return fetch(this._url + url, options)
 			.then((response) => response.json())
 			.then((responseJson) => {
 				return responseJson
 			})
 			.catch((error) => {
-				console.log("getCustomers: " + error);
+				console.log("Communications:getCustomers: " + error);
 				return {}
 			});
 	}
-	createCustomer() {
 
+	createCustomer( customer ) {
+		let options = {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + this._token
+			},
+			body: JSON.stringify(customer )
+
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/customers', options)
+				.then((response) => {
+					if (response.status === 200) {
+						response.json()
+							.then((responseJson) => {
+								resolve(responseJson)
+							})
+							.catch((error) => {
+								console.log("createCustomer - Parse JSON: " + error.message);
+								reject();
+							});
+					}else {
+						console.log("createCustomer - Fetch status: " + response.status);
+						reject();
+					}
+				})
+				.catch((error) => {
+					console.log("createCustomer - Fetch: " + error.message);
+					reject();
+				});
+		});
 	}
+	deleteCustomer( customer ) {
+		let options = {
+			method: 'DELETE',
+			headers: {
+				Authorization: 'Bearer ' + this._token
+			},
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/customers/' + customer.customerId, options)
+				.then((response) => {
+					if (response.status === 200) {
+						resolve();
+					}else {
+						console.log("createCustomer - Fetch status: " + response.status);
+						reject();
+					}
+				})
+				.catch((error) => {
+					console.log("createCustomer - Fetch: " + error.message);
+					reject();
+				});
+		});
+	}
+	updateCustomer( customer ) {
+		let options = {
+			method: 'PUT',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + this._token
+			},
+			body: JSON.stringify(customer )
+
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/customers/' + customer.customerId, options)
+				.then((response) => {
+					if (response.status === 200) {
+						response.json()
+							.then((responseJson) => {
+								resolve(responseJson)
+							})
+							.catch((error) => {
+								console.log("updateCustomer - Parse JSON: " + error.message);
+								reject();
+							});
+					}else {
+						console.log("updateCustomer - Fetch status: " + response.status);
+						reject();
+					}
+				})
+				.catch((error) => {
+					console.log("createCustomer - Fetch: " + error.message);
+					reject();
+				});
+		});
+	}
+
 };
 export default new Communications();
