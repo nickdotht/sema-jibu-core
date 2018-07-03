@@ -1,36 +1,25 @@
+const request = require('supertest');
+const expect = require('chai').expect;
+const chai = require('chai');
 const express = require('express');
 const router = express.Router();
 const semaLog = require('../seama_services/sema_logger');
 const bodyParser = require('body-parser');
 const Product = require('../model_layer/Product');
 
-var sqlQuery = "SELECT * FROM product WHERE updated_date > ?";
+var sqlQueryDate = "SELECT * FROM product WHERE updated_date > ?";
+var sqlQuery = "SELECT * FROM product";
 
 
 router.get('/', function(req, res) {
 	semaLog.info('customers - Enter');
-
-
-	//let results = initResults();
-	req.check("updated-date", "Parameter updated-date is missing").exists();
-
-	console.log("LOG - updated-date: " + req.query['updated-date']);
-
-	req.getValidationResult().then(function(result) {
-		if (!result.isEmpty()) {
-			const errors = result.array().map((elem) => {
-				return elem.msg;
-			});
-			semaLog.error("updated-date VALIDATION ERROR: ", errors);
-			res.status(400).send(errors.toString());
-		}
-		else {
-			getProducts(sqlQuery, req.query["updated-date"], res);
-		}
-	});
-
+	if (req.query.hasOwnProperty("updated-date")) {
+		getProducts(sqlQueryDate, req.query["updated-date"], res);
+	}
+	else {
+		getProducts(sqlQuery, [], res);
+	}
 });
-
 
 const getProducts = (query, params, res ) => {
 	return new Promise((resolve, reject) => {
