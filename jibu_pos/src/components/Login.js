@@ -15,7 +15,8 @@ class Login extends Component {
 		this.state = {
 			isLoginComplete:false,
 			username:"",
-			password:""
+			password:"",
+			invalidCredentials:false
 		};
 
 	}
@@ -44,7 +45,7 @@ class Login extends Component {
 										underlineColorAndroid='transparent'
 										placeholder = 'User name or email'
 										value = {this.state.username}
-										onChangeText={(text) => this.setState({username:text})}/>
+										onChangeText={(text) => {this.setState({username:text}); this.setState({ invalidCredentials: false })}}/>
 
 								</View>
 								<View style ={[{marginTop:40}, styles.inputContainer]}>
@@ -54,9 +55,10 @@ class Login extends Component {
 										secureTextEntry = {true}
 										placeholder = 'Password'
 										value = {this.state.password}
-										onChangeText={(text) => this.setState({password:text})}/>
+										onChangeText={(text) => {this.setState({password:text}); this.setState({ invalidCredentials: false })}}/>
 
 								</View>
+								{this.ShowInvalidCredentials()}
 								<View style={styles.signIn}>
 									<View style={{justifyContent:'center', height:100, width:'30%', alignItems:'center'}}>
 										<TouchableHighlight underlayColor = '#c0c0c0'
@@ -89,6 +91,8 @@ class Login extends Component {
 			if( settings.user.toLowerCase() === this.state.username.toLowerCase() &&
 				settings.password.toLowerCase() === this.state.password.toLowerCase()){
 				this.setState({ isLoginComplete: true });
+			}else{
+				this.setState({invalidCredentials:true})
 			}
 
 		}else {
@@ -118,7 +122,18 @@ class Login extends Component {
 			</View>
 		);
 	};
+	ShowInvalidCredentials = () => {
+		if (this.state.invalidCredentials) {
+			return (
+				<View style={[{ marginTop: 30 }, styles.errorContainer]}>
+					<Text style={styles.inputText}>Invalid user name and/or password</Text>
+				</View>
 
+			)
+		}else{
+			return null;
+		}
+	}
 }
 
 
@@ -152,6 +167,12 @@ const styles = StyleSheet.create({
 		borderColor:"#2858a7",
 		backgroundColor:'white'
 	},
+	errorContainer:{
+		borderWidth:4,
+		borderColor:"#a72828",
+		backgroundColor:'white'
+	},
+
 	inputText:{
 		fontSize:24,
 		alignSelf:'center',
