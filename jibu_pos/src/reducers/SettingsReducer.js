@@ -1,6 +1,6 @@
 import { SET_SETTINGS} from "../actions/SettingsActions"
 
-let initialState = {settings:{semaUrl:"XX", site:"Kampala", user:"", password:"", token:"", sitedId:"",useMockData:true}};
+let initialState = {settings:{semaUrl:"", site:"", user:"", password:"", token:"", sitedId:"",useMockData:true}};
 
 const settingsReducer = (state = initialState, action) => {
 	let newState;

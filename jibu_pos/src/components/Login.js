@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as ToolbarActions from "../actions/ToolBarActions";
+import PosStorage from "../database/PosStorage";
 
 
 class Login extends Component {
@@ -12,8 +13,11 @@ class Login extends Component {
 		super(props);
 
 		this.state = {
-			isLoginComplete:false
+			isLoginComplete:false,
+			username:"",
+			password:""
 		};
+
 	}
 	componentDidMount() {
 		console.log("Login = Mounted");
@@ -38,7 +42,9 @@ class Login extends Component {
 									<TextInput
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
-										placeholder = 'User name or email'/>
+										placeholder = 'User name or email'
+										value = {this.state.username}
+										onChangeText={(text) => this.setState({username:text})}/>
 
 								</View>
 								<View style ={[{marginTop:40}, styles.inputContainer]}>
@@ -46,7 +52,10 @@ class Login extends Component {
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
 										secureTextEntry = {true}
-										placeholder = 'Password'/>
+										placeholder = 'Password'
+										value = {this.state.password}
+										onChangeText={(text) => this.setState({password:text})}/>
+
 								</View>
 								<View style={styles.signIn}>
 									<View style={{justifyContent:'center', height:100, width:'30%', alignItems:'center'}}>
@@ -75,7 +84,17 @@ class Login extends Component {
 	};
 
 	onLogin= ()=>{
-		this.setState( {isLoginComplete:true} );
+		let settings = PosStorage.getSettings();
+		if( settings.user.length > 0 && settings.password.length > 0 ){
+			if( settings.user.toLowerCase() === this.state.username.toLowerCase() &&
+				settings.password.toLowerCase() === this.state.password.toLowerCase()){
+				this.setState({ isLoginComplete: true });
+			}
+
+		}else {
+			// Allow login with no credentials. (User can't access service with credentials anyway)
+			this.setState({ isLoginComplete: true });
+		}
 	};
 	ShowLoggingIn = () =>{
 		let that = this;
@@ -83,7 +102,7 @@ class Login extends Component {
 			setTimeout(() => {
 				that.closeHandler();
 				that.props.toolbarActions.SetLoggedIn(true);
-			}, 1500);
+			}, 500);
 		}
 		return (
 			<View style={{

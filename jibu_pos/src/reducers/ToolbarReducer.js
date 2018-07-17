@@ -12,6 +12,7 @@ const toolBarReducer = (state = initialState, action) => {
 			return newState;
 
 		case SET_LOGGED_IN:
+			console.log( "toolBarReducer - SET_LOGGED_IN " + action.data.loggedIn);
 			newState = { showScreen :{screenToShow:state.showScreen.screenToShow, isLoggedIn:action.data.loggedIn}};
 			return newState;
 
