@@ -19,6 +19,7 @@ import {connect} from "react-redux";
 import * as CustomerActions from '../actions/CustomerActions';
 import * as NetworkActions from '../actions/NetworkActions';
 import * as SettingsActions from '../actions/SettingsActions';
+import * as ProductActions from '../actions/ProductActions';
 
 
 import PosStorage from "../database/PosStorage";
@@ -54,13 +55,18 @@ class JibuApp extends Component {
 			console.log( "Communications - " + JSON.stringify(Communications));
 
 			let timeout = 200;
-			if (isInitialized && this.posStorage.getCustomers().length > 0) {
+			if (isInitialized ) {
 				// Data already configured
 				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
+				this.props.productActions.setProducts(this.posStorage.getProducts());
+			}
+			if (isInitialized && this.posStorage.getCustomers().length > 0) {
+				// Data already configured
 				timeout = 20000;	// First sync after a bit
 			}
+
 			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
-			Synchronization.initialize( PosStorage.getLastCustomerSync());
+			Synchronization.initialize( PosStorage.getLastCustomerSync(), PosStorage.getLastProductSync());
 			// Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 			// Determine the startup screen as follows:
@@ -206,6 +212,7 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
 	return {
 		customerActions:bindActionCreators(CustomerActions, dispatch),
+		productActions:bindActionCreators(ProductActions, dispatch),
 		networkActions:bindActionCreators(NetworkActions, dispatch),
 		toolbarActions:bindActionCreators(ToolbarActions, dispatch),
 		settingsActions:bindActionCreators(SettingsActions, dispatch)};

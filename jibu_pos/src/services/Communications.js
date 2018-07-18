@@ -202,6 +202,26 @@ class Communications {
 				});
 		});
 	}
+	getProducts( updatedSince ) {
+		let options = {
+			method: 'GET',
+			headers: { Authorization: 'Bearer ' + this._token }
+		}
+		let url = 'sema/products';
+
+		if( updatedSince ){
+			url = url + '?updated-date=' + updatedSince.toISOString();
+		}
+		return fetch(this._url + url, options)
+			.then((response) => response.json())
+			.then((responseJson) => {
+				return responseJson
+			})
+			.catch((error) => {
+				console.log("Communications:getProducts: " + error);
+				return {}
+			});
+	}
 
 };
 export default new Communications();

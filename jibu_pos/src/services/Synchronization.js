@@ -4,8 +4,9 @@ import Communications from '../services/Communications';
 import Events from "react-native-simple-events";
 
 class Synchronization {
-	initialize( lastCustomerSync){
+	initialize( lastCustomerSync, lastProductSync){
 		this.lastCustomerSync = lastCustomerSync;
+		this.lastProductSync = lastProductSync;
 
 	}
 	scheduleSync( syncState, timeout, loadCustomersFn){
@@ -20,9 +21,15 @@ class Synchronization {
 		this.lastCustomerSync = new Date();
 		PosStorage.setLastCustomerSync( this.lastCustomerSync );
 	}
+	updateLastProductSync(){
+		this.lastProductSync = new Date();
+		PosStorage.setLastProductSync( this.lastProductSync );
+	}
+
 	synchronize(){
 		try {
 			this.synchronizeCustomers();
+			this.synchronizeProducts();
 		}catch( error ){
 			console.log( error.message );
 		}
@@ -84,5 +91,21 @@ class Synchronization {
 				console.log( "Communications.getCustomers - error " + error);
 			});
 	}
+	synchronizeProducts(){
+		console.log( "Synchronization:synchronizeProducts - Begin" );
+		Communications.getProducts( this.lastProductSync )
+			.then( products => {
+				if (products.hasOwnProperty("products")) {
+					this.updateLastProductSync();
+					console.log( "Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
+					PosStorage.mergeProducts( products.products );
+
+				}
+			})
+			.catch(error => {
+				console.log( "Communications.getProducts - error " + error);
+			});
+	}
+
 }
 export default  new Synchronization();

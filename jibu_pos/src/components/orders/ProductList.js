@@ -12,7 +12,7 @@ class ProductList extends Component {
 	}
 	componentDidMount() {
 		console.log("ProductList = Mounted");
-		this.props.productActions.LoadProducts();
+		// this.props.productActions.LoadProducts();
 	}
 
 	render() {
