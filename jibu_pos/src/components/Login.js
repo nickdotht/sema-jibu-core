@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as ToolbarActions from "../actions/ToolBarActions";
+import PosStorage from "../database/PosStorage";
 
 
 class Login extends Component {
@@ -12,8 +13,12 @@ class Login extends Component {
 		super(props);
 
 		this.state = {
-			isLoginComplete:false
+			isLoginComplete:false,
+			username:"",
+			password:"",
+			invalidCredentials:false
 		};
+
 	}
 	componentDidMount() {
 		console.log("Login = Mounted");
@@ -38,7 +43,9 @@ class Login extends Component {
 									<TextInput
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
-										placeholder = 'User name or email'/>
+										placeholder = 'User name or email'
+										value = {this.state.username}
+										onChangeText={(text) => {this.setState({username:text}); this.setState({ invalidCredentials: false })}}/>
 
 								</View>
 								<View style ={[{marginTop:40}, styles.inputContainer]}>
@@ -46,8 +53,12 @@ class Login extends Component {
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
 										secureTextEntry = {true}
-										placeholder = 'Password'/>
+										placeholder = 'Password'
+										value = {this.state.password}
+										onChangeText={(text) => {this.setState({password:text}); this.setState({ invalidCredentials: false })}}/>
+
 								</View>
+								{this.ShowInvalidCredentials()}
 								<View style={styles.signIn}>
 									<View style={{justifyContent:'center', height:100, width:'30%', alignItems:'center'}}>
 										<TouchableHighlight underlayColor = '#c0c0c0'
@@ -75,7 +86,19 @@ class Login extends Component {
 	};
 
 	onLogin= ()=>{
-		this.setState( {isLoginComplete:true} );
+		let settings = PosStorage.getSettings();
+		if( settings.user.length > 0 && settings.password.length > 0 ){
+			if( settings.user.toLowerCase() === this.state.username.toLowerCase() &&
+				settings.password.toLowerCase() === this.state.password.toLowerCase()){
+				this.setState({ isLoginComplete: true });
+			}else{
+				this.setState({invalidCredentials:true})
+			}
+
+		}else {
+			// Allow login with no credentials. (User can't access service with credentials anyway)
+			this.setState({ isLoginComplete: true });
+		}
 	};
 	ShowLoggingIn = () =>{
 		let that = this;
@@ -83,7 +106,7 @@ class Login extends Component {
 			setTimeout(() => {
 				that.closeHandler();
 				that.props.toolbarActions.SetLoggedIn(true);
-			}, 1500);
+			}, 500);
 		}
 		return (
 			<View style={{
@@ -99,7 +122,18 @@ class Login extends Component {
 			</View>
 		);
 	};
+	ShowInvalidCredentials = () => {
+		if (this.state.invalidCredentials) {
+			return (
+				<View style={[{ marginTop: 30 }, styles.errorContainer]}>
+					<Text style={styles.inputText}>Invalid user name and/or password</Text>
+				</View>
 
+			)
+		}else{
+			return null;
+		}
+	}
 }
 
 
@@ -133,6 +167,12 @@ const styles = StyleSheet.create({
 		borderColor:"#2858a7",
 		backgroundColor:'white'
 	},
+	errorContainer:{
+		borderWidth:4,
+		borderColor:"#a72828",
+		backgroundColor:'white'
+	},
+
 	inputText:{
 		fontSize:24,
 		alignSelf:'center',
