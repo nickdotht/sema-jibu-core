@@ -98,7 +98,10 @@ class Synchronization {
 				if (products.hasOwnProperty("products")) {
 					this.updateLastProductSync();
 					console.log( "Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
-					PosStorage.mergeProducts( products.products );
+					const updated = PosStorage.mergeProducts( products.products );
+					if( updated ){
+						Events.trigger('ProductsUpdated', {} );
+					}
 
 				}
 			})

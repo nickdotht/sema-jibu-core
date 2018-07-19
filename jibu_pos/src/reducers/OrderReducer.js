@@ -13,7 +13,7 @@ const orderReducer = (state = initialState, action) => {
 			newState = {...state};
 			// Check if product exists
 			for( let product of newState.products ){
-				if( product.product.id ===  action.data.product.id){
+				if( product.product.productId ===  action.data.product.productId){
 					product.quantity += action.data.quantity;
 					newState.products = newState.products.slice();
 					return newState;
@@ -30,7 +30,7 @@ const orderReducer = (state = initialState, action) => {
 			newState = {...state};
 			newState.products = [];
 			for( let product of state.products ) {
-				if (product.product.id !== action.data.product.id) {
+				if (product.product.productId !== action.data.product.productId) {
 					newState.products.push(product);
 				}
 			}
@@ -40,7 +40,7 @@ const orderReducer = (state = initialState, action) => {
 			newState = {...state};
 			newState.products = [];
 			for( let product of state.products ) {
-				if (product.product.id === action.data.product.id) {
+				if (product.product.productId === action.data.product.productId) {
 					product.quantity = action.data.quantity;
 				}
 				newState.products.push(product);

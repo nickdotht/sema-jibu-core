@@ -94,18 +94,24 @@ class JibuApp extends Component {
 		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this) );
+		Events.on('ProductsUpdated', 'productUpdate1', this.onProductsUpdated.bind(this) );
 
 		console.log("JibuApp = Mounted-Done");
 
 	}
 	componentWillUnmount(){
 		Events.rm('CustomersUpdated', 'customerUpdate1') ;
+		Events.rm('ProductsUpdated', 'productUpdate1') ;
 		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );
 	}
 
 	onCustomersUpdated = () =>{
 		this.props.customerActions.setCustomers(this.posStorage.getCustomers());
-	}
+	};
+
+	onProductsUpdated = () =>{
+		this.props.productActions.setProducts(this.posStorage.getProducts());
+	};
 
 	handleConnectivityChange = isConnected => {
 		console.log("handleConnectivityChange: " + isConnected);

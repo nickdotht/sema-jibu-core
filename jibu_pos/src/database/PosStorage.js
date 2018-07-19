@@ -484,6 +484,11 @@ class PosStorage {
 		if( isNewProducts ){
 			this.setKey( productsKey,this.stringify(this.productsKeys));
 		}
+		if(remoteProducts.length > 0 ){
+			return true;
+		}else{
+			return false;
+		}
 
 	}
 	setLocalProduct( product ){

@@ -30,7 +30,7 @@ class ProductList extends Component {
 
 						</TouchableOpacity>
 					)}
-					keyExtractor={item => item.id}
+					keyExtractor={item => item.productId}
 					numColumns={4}
 					horizontal={false}
 				/>
@@ -58,7 +58,7 @@ class ProductList extends Component {
 					resizeMethod ='scale'
 					style={{flex:1}}>
 				</Image>
-				<Text style={[styles.imageLabel,this.getLabelBackground()]}>{item.description}{'\n'}${this.getItemPrice(item.price_amount)}</Text>
+				<Text style={[styles.imageLabel,this.getLabelBackground()]}>{item.description}{'\n'}${this.getItemPrice(item.priceAmount)}</Text>
 			</View>
 		);
 	};
@@ -68,7 +68,11 @@ class ProductList extends Component {
 		// return [{id:1, data:"one"}, {id:2, data:"two"}, {id:3, data:"three"}, {id:4, data:"four"}, {id:5, data:"five"}];
 	};
 	getImage = (item)=>{
-		return 'data:image/png;base64,' + item.base64encoded_image
+		if( item.base64encodedImage.startsWith('data:image')){
+			return item.base64encodedImage;
+		}else {
+			return 'data:image/png;base64,' + item.base64encoded_image
+		}
 	};
 
 	onPressItem = (item) =>{
