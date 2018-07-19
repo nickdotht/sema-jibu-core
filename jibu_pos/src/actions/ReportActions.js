@@ -34,14 +34,14 @@ const getSalesData = () =>{
 					let mapProduct = results.get(product.sku);
 					if (mapProduct) {
 						mapProduct.quantity += product.quantity;
-						mapProduct.totalSales += product.quantity * product.price_amount;
+						mapProduct.totalSales += product.quantity * product.priceAmount;
 						mapProduct.totalLiters = (mapProduct.litersPerSku == "N/A") ? "N/A" : mapProduct.litersPerSku * mapProduct.quantity;
 					} else {
 						mapProduct = {
 							sku: product.description,
 							quantity: product.quantity,
-							pricePerSku: product.price_amount,
-							totalSales: product.quantity * product.price_amount,
+							pricePerSku: product.priceAmount,
+							totalSales: product.quantity * product.priceAmount,
 						};
 						mapProduct.litersPerSku = (product.liters_per_sku ) ? product.liters_per_sku : "N/A";
 						mapProduct.totalLiters = (mapProduct.litersPerSku == "N/A") ? "N/A" : mapProduct.litersPerSku * mapProduct.quantity;
