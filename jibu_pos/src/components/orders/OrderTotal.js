@@ -15,7 +15,7 @@ class OrderTotal extends Component {
 		);
 	}
 	getAmount = () =>{
-		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.price_amount)) }, 0);
+		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.priceAmount)) }, 0);
 	};
 	getItemPrice = (amount) =>{
 		if( this.props.channel.salesChannel === "walkup"){

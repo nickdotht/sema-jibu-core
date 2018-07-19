@@ -95,7 +95,7 @@ class PosStorage {
 							}
 							this.customersKeys = this.parseJson(results[0][1]);	// Array of customer keys
 							this.salesKeys = this.parseJson(results[1][1]);	// Array of sales keys
-							this.productsKey = this.parseJson(results[2][1]);	// Array of products keys
+							this.productsKeys = this.parseJson(results[2][1]);	// Array of products keys
 							this.lastCustomerSync = new Date(results[3][1]);	// Last customer sync time
 							this.lastSalesSync = new Date(results[4][1]);	// Last sales sync time
 							this.lastProductsSync = new Date(results[5][1]);	// Last products sync time
@@ -103,7 +103,11 @@ class PosStorage {
 							this.pendingSales = this.parseJson(results[7][1]);	// Array of pending sales
 							this.settings = this.parseJson(results[8][1]);		// Settings
 							this.loadCustomersFromKeys()
-								.then(()=>{ resolve(true);})
+								.then(()=>{
+									this.loadProductsFromKeys()
+										.then(()=> resolve(true));
+
+								})
 								.catch((err) =>reject(err));
 
 						}.bind(this));
@@ -118,22 +122,29 @@ class PosStorage {
 	getLastCustomerSync(){
 		return this.lastCustomerSync;
 	}
-
-	clearAll(){
-		this.removeKey(salesKey );
-		this.removeKey(customersKey );
-		this.removeKey(versionKey );
-		this.salesKeys = [];
-		this.customers = [];
-		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
+	getLastProductSync(){
+		return this.lastProductsSync;
 	}
+
+	// clearAll(){
+	// 	this.removeKey(salesKey );
+	// 	this.removeKey(customersKey );
+	// 	this.removeKey(versionKey );
+	// 	this.salesKeys = [];
+	// 	this.customers = [];
+	// 	this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
+	// }
 	clearDataOnly(){
 		// Clear all data - leave config alone
+		this.customers = [];
 		this.customersKeys = [];
 		this.pendingCustomers = [];
 		this.salesKeys = [];
 		this.pendingSales = [];
-		this.customers = [];
+
+		this.products = [];
+		this.productsKeys = [];
+
 		let firstSyncDate = new Date('November 7, 1973');
 		this.lastCustomerSync = firstSyncDate;
 		this.lastSalesSync = firstSyncDate;
@@ -141,6 +152,7 @@ class PosStorage {
 
 		let keyArray = [
 			[customersKey,  this.stringify(this.customersKeys)],
+			[productsKey,  this.stringify(this.productsKeys)],
 			[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 			[salesKey,  this.stringify(this.salesKeys)],
 			[pendingSalesKey, this.stringify(this.pendingSales)],
@@ -354,6 +366,7 @@ class PosStorage {
 			}
 		});
 	}
+
 	removePendingCustomer( customerKey ){
 		console.log("PostStorage:removePendingCustomer" );
 		const index = this.pendingCustomers.indexOf(customerKey);
@@ -426,6 +439,67 @@ class PosStorage {
 
 		});
 	}
+
+	getProducts(){
+		console.log("PosStorage: getProducts. Count " + this.products.length);
+		return this.products;
+	}
+
+	loadProductsFromKeys(){
+		console.log("loadProductsFromKeys. No of products: " + this.productsKeys.length );
+		return new Promise((resolve, reject) => {
+			try {
+				let that = this;
+				AsyncStorage.multiGet(this.productsKeys).then(results => {
+					that.products = results.map(result => {
+						return that.parseJson(result[1]);
+					});
+					resolve();
+				});
+			}catch( error){
+				reject(error);
+			}
+		});
+	}
+
+	makeProductKey( product ){
+		return (productItemKey + '_' + product.productId);
+	}
+
+	mergeProducts( remoteProducts){
+		let isNewProducts = false;
+		remoteProducts.forEach( function(product){
+			let productKey = this.makeProductKey(product);
+			let keyIndex = this.productsKeys.indexOf(productKey);
+			if( keyIndex == -1 ){
+				isNewProducts = true;
+				this.productsKeys.push(productKey );
+				this.products.push(product);
+				this.setKey( productKey,this.stringify(product));
+			}else{
+				this.setKey( productKey,this.stringify(product));		// Just update the existing customer
+				this.setLocalProduct(product)
+			}
+		}.bind(this));
+		if( isNewProducts ){
+			this.setKey( productsKey,this.stringify(this.productsKeys));
+		}
+		if(remoteProducts.length > 0 ){
+			return true;
+		}else{
+			return false;
+		}
+
+	}
+	setLocalProduct( product ){
+		for( let index = 0; index < this.products.length; index++ ){
+			if(this.products[index].productId ===  product.productId){
+				this.products[index] = product;
+				return;
+			}
+		}
+	}
+
 	getSettings(){
 		console.log("PosStorage: getSettings.");
 		return this.settings;
@@ -441,6 +515,11 @@ class PosStorage {
 	setLastCustomerSync( lastSyncTime ){
 		this.lastCustomerSync = lastSyncTime;
 		this.setKey( lastCustomerSyncKey,this.lastCustomerSync.toISOString());
+	}
+
+	setLastProductSync( lastSyncTime ){
+		this.lastProductsSync = lastSyncTime;
+		this.setKey( lastProductsSyncKey,this.lastProductsSync.toISOString());
 	}
 
 	stringify( jsObject){
