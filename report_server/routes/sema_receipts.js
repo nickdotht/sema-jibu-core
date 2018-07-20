@@ -42,11 +42,11 @@ const insertReceipt = (receipt, query, params, res ) => {
 		__pool.getConnection((err, connection) => {
 			connection.beginTransaction(function(err) {
 				connection.query(query, params, function(err, result) {
-					connection.release();
 					if (err) {
 						semaLog.error('receipts - failed', { err });
 						res.status(500).send(err.message);
 						reject(err);
+						connection.release();
 					}
 					else {
 						semaLog.info('receipts - succeeded');
@@ -55,43 +55,47 @@ const insertReceipt = (receipt, query, params, res ) => {
 						for (let i = 0; i < receipt.products.length; i++) {
 							let sqlProductParams = [receipt.products[i].productId, receipt.products[i].quantity,
 								receipt.products[i].salesPrice, receipt.products[i].receiptId];
-
-							insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams).then(function(result) {
+							console.log("Inserting line item #" + i);
+							insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams, connection).then(function(result) {
+								console.log("Inserted line item #" + resolveCount);
 								resolveCount++;
 								if (result) {
 									successCount++;
 								}
 
 								if (resolveCount == receipt.products.length) {
-									__pool.getConnection((err, connection) => {
-										if (successCount == resolveCount) {
-											connection.commit(function(err) {
-												if (err) {
-													connection.rollback(function() {
-														semaLog.error('receipts - failed', { err });
-														res.status(500).send(err.message);
-														reject(err);
-													});
-												}
-												try {
-													resolve(res.json(receipt.classToPlain()));
-												} catch (err) {
+									if (successCount == resolveCount) {
+										connection.commit(function(err) {
+											if (err) {
+												connection.rollback(function() {
 													semaLog.error('receipts - failed', { err });
 													res.status(500).send(err.message);
 													reject(err);
-												}
-												console.log('Transaction Complete.');
+													connection.release();
 
-											})
-										}
-										else {
-											connection.rollback(function() {
+												});
+											}else{
+												connection.release();
+
+											}
+											try {
+												resolve(res.json(receipt.classToPlain()));
+											} catch (err) {
 												semaLog.error('receipts - failed', { err });
-												res.status(500).send("Error");
+												res.status(500).send(err.message);
 												reject(err);
-											});
-										}
-									});
+											}
+											console.log('Transaction Complete.');
+
+										})
+									} else {
+										connection.rollback(function() {
+											semaLog.error('receipts - failed', { err });
+											res.status(500).send("Error");
+											reject(err);
+											connection.release();
+										});
+									}
 								}
 							})
 						}
@@ -102,23 +106,20 @@ const insertReceipt = (receipt, query, params, res ) => {
 	});
 };
 
-const insertReceiptLineItem = (query, params) => {
+const insertReceiptLineItem = (query, params, connection) => {
 	return new Promise((resolve, reject) => {
-		__pool.getConnection((err, connection) => {
-			connection.query(query, params, function(err, result) {
-				connection.release();
-				if (err) {
-					semaLog.error('receiptsLineItem - Failed');
-					resolve(false);
-				}
-				else {
-					semaLog.info('receiptsLineItem - succeeded');
-					semaLog.info(params);
-					resolve(true);
-				}
-			});
+		connection.query(query, params, function(err, result) {
+			if (err) {
+				semaLog.error('receiptsLineItem - Failed');
+				resolve(false);
+			}
+			else {
+				semaLog.info('receiptsLineItem - succeeded');
+				semaLog.info(params);
+				resolve(true);
+			}
+		});
 
-		})
 	});
 };
 
