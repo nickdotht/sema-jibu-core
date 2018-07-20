@@ -13,7 +13,7 @@ var sqlInsertReceipt = "INSERT INTO receipt " +
 
 var sqlInsertReceiptLineItem = "INSERT INTO receipt_line_item " +
 				"(product_id, quantity, price, receipt_id, version, currency_code, gallons, sku, type) " +
-				"VALUES (?, ?, ?, ?, b'0', 'USD', abc0, 'undefined', 'unknown')";
+				"VALUES (?, ?, ?, ?, b'0', 'USD', 0, 'undefined', 'unknown')";
 
 
 
@@ -56,11 +56,12 @@ const insertReceipt = (receipt, query, params, res ) => {
 							let sqlProductParams = [receipt.products[i].productId, receipt.products[i].quantity,
 								receipt.products[i].salesPrice, receipt.products[i].receiptId];
 
-							insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams, res).then(function(result) {
+							insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams).then(function(result) {
 								resolveCount++;
 								if (result) {
 									successCount++;
 								}
+
 								if (resolveCount == receipt.products.length) {
 									__pool.getConnection((err, connection) => {
 										if (successCount == resolveCount) {
@@ -101,7 +102,7 @@ const insertReceipt = (receipt, query, params, res ) => {
 	});
 };
 
-const insertReceiptLineItem = (query, params, res) => {
+const insertReceiptLineItem = (query, params) => {
 	return new Promise((resolve, reject) => {
 		__pool.getConnection((err, connection) => {
 			connection.query(query, params, function(err, result) {
@@ -112,6 +113,7 @@ const insertReceiptLineItem = (query, params, res) => {
 				}
 				else {
 					semaLog.info('receiptsLineItem - succeeded');
+					semaLog.info(params);
 					resolve(true);
 				}
 			});

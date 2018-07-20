@@ -8,6 +8,7 @@ const sprintf = require('sprintf-js').sprintf;
 var findKioskId = require('./Utilities/findKioskId');
 var authenticate = require('./Utilities/authenticate');
 var findSalesByChannelId = require('./Utilities/findSalesByChannelId');
+var removeReceipts = require('./Utilities/removeReceipts');
 const uuidv1 = require('uuid/v1');
 
 describe('Testing Customers API', function () {
@@ -38,18 +39,35 @@ describe('Testing Customers API', function () {
 							.post(url)
 							.set('Content-Type', 'application/json; charset=UTF-8')
 							.send({
-								'receiptId': uuidv1(),
-								'customerId': '999',
-								'siteId': kiosk.id,
-								'createdDate': '1/1/2000',
-								'totalSales': '1',
-								'cogs': '1',
-								'products': '[{},{}]',
-								'salesChannelId': '1'	//salesChannel.id
+								"receiptId": "2",
+								"customerId": "Brian",
+								"siteId": "1",
+								"createdDate": "9/9/18",
+								"totalSales": "10",
+								"cogs": "9",
+								"products": [
+									{"productId": "17",
+										"quantity": "1",
+										"salesPrice": "1",
+										"receiptId": "2"
+									},
+									{"productId": "18",
+										"quantity": "1",
+										"salesPrice": "2",
+										"receiptId": "2"
+									}
+								],
+								"salesChannelId": "1"
 							})
 							.set('Authorization', token)
 							.end(function(err, res) {
+								let h = 5;
 								done(err);
+								//removeReceipts.removeReceiptLineItems().then(function() {
+								//	removeReceipts.removeReceipts().then(function() {
+								//		done(err);
+								//	});
+								//});
 							});
 					});
 				});
