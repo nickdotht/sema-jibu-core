@@ -21,7 +21,8 @@ const pendingCustomersKey = '@Sema:PendingCustomersKey';
 const pendingSalesKey = '@Sema:PendingSalesKey';
 
 const settingsKey = '@Sema:SettingsKey';
-// const configurationKey = '@Sema:ConfigurationKey';
+
+const tokenExpirationKey = '@Sema:TokenExpirationKey';
 
 class PosStorage {
 	constructor() {
@@ -55,7 +56,9 @@ class PosStorage {
 		this.lastCustomerSync = firstSyncDate;
 		this.lastSalesSync = firstSyncDate;
 		this.lastProductsSync = firstSyncDate;
-		this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
+		this.tokenExpiration = firstSyncDate;
+
+		this.settings = {semaUrl:"", site:"", user:"", password:"", token:"", siteId:"" };
 	}
 
 	initialize( forceNew ) {
@@ -76,7 +79,8 @@ class PosStorage {
 							[lastProductsSyncKey,this.lastProductsSync.toISOString()],
 							[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 							[pendingSalesKey, this.stringify(this.pendingSales)],
-							[settingsKey, this.stringify(this.settings)]];
+							[settingsKey, this.stringify(this.settings)],
+						    [tokenExpirationKey, this.stringify(this.tokenExpiration)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
 							console.log( "PosStorage:initialize: Error: " + error );
 							resolve(false)})
@@ -87,7 +91,7 @@ class PosStorage {
 						let keyArray = [customersKey,salesKey,productsKey,lastCustomerSyncKey,
 							lastSalesSyncKey,lastProductsSyncKey,
 							pendingCustomersKey, pendingSalesKey,
-							settingsKey];
+							settingsKey, tokenExpirationKey];
 						AsyncStorage.multiGet(keyArray ).then( function(results){
 							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
@@ -102,6 +106,7 @@ class PosStorage {
 							this.pendingCustomers = this.parseJson(results[6][1]);	// Array of pending customers
 							this.pendingSales = this.parseJson(results[7][1]);	// Array of pending sales
 							this.settings = this.parseJson(results[8][1]);		// Settings
+							this.tokenExpiration = new Date(results[9][1]);	// Expiration date/time of the token
 							this.loadCustomersFromKeys()
 								.then(()=>{
 									this.loadProductsFromKeys()
@@ -126,14 +131,7 @@ class PosStorage {
 		return this.lastProductsSync;
 	}
 
-	// clearAll(){
-	// 	this.removeKey(salesKey );
-	// 	this.removeKey(customersKey );
-	// 	this.removeKey(versionKey );
-	// 	this.salesKeys = [];
-	// 	this.customers = [];
-	// 	this.settings = {semaUrl:"Not Set", site:"Kampala", user:"", password:"", token:"", siteId:"", useMockData:true};
-	// }
+
 	clearDataOnly(){
 		// Clear all data - leave config alone
 		this.customers = [];
@@ -505,11 +503,22 @@ class PosStorage {
 		return this.settings;
 	}
 
-	saveSettings( url, site, user, password, token, siteId, useMockData ){
-		let settings = {semaUrl:url, site:site, user:user, password:password, token:token, siteId:siteId, useMockData:useMockData};
+	saveSettings( url, site, user, password, token, siteId  ){
+		let settings = {semaUrl:url, site:site, user:user, password:password, token:token, siteId:siteId };
 		this.settings = settings;
 		this.setKey( settingsKey, this.stringify( settings));
 
+	}
+	setTokenExpiration(){
+		// Currently the token is good for one day
+		let expirationDate = new Date();
+		expirationDate.setTime(expirationDate.getTime() + (1*60*60*1000));
+		console.log( "Token will expire at: " + expirationDate.toString());
+		this.setKey( tokenExpirationKey,expirationDate.toISOString());
+		this.tokenExpiration = expirationDate;
+	}
+	getTokenExpiration(){
+		return this.tokenExpiration;
 	}
 
 	setLastCustomerSync( lastSyncTime ){

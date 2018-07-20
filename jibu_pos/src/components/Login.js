@@ -87,7 +87,7 @@ class Login extends Component {
 
 	onLogin= ()=>{
 		let settings = PosStorage.getSettings();
-		if( settings.user.length > 0 && settings.password.length > 0 ){
+		if( settings && settings.user.length > 0 && settings.password.length > 0 ){
 			if( settings.user.toLowerCase() === this.state.username.toLowerCase() &&
 				settings.password.toLowerCase() === this.state.password.toLowerCase()){
 				this.setState({ isLoginComplete: true });
