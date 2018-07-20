@@ -28,8 +28,10 @@ class Synchronization {
 
 	synchronize(){
 		try {
-			this.synchronizeCustomers();
-			this.synchronizeProducts();
+			this.refreshToken().then( ()=>{
+				this.synchronizeCustomers();
+				this.synchronizeProducts();
+			});
 		}catch( error ){
 			console.log( error.message );
 		}
@@ -108,6 +110,35 @@ class Synchronization {
 			.catch(error => {
 				console.log( "Communications.getProducts - error " + error);
 			});
+	}
+
+	refreshToken(){
+		// Check if token exists or has expired
+		return new Promise((resolve ) => {
+			let settings = PosStorage.getSettings();
+			let tokenExpirationDate = PosStorage.getTokenExpiration();
+			let currentDateTime = new Date();
+
+			if( settings.token.length == 0 ||currentDateTime > tokenExpirationDate ){
+				// Either user has previously logged out or its time for a new token
+				console.log("No token or token has expired - Getting a new one");
+				Communications.login()
+					.then(result => {
+						if (result.status === 200) {
+							console.log("New token Acquired");
+							PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user,
+								settings.password, result.response.token, settings.siteId );
+							Communications.setToken(result.response.token);
+							PosStorage.setTokenExpiration();
+						}
+						resolve();
+					});
+
+			}else{
+				console.log("Existing token is valid");
+				resolve();
+			}
+		});
 	}
 
 }

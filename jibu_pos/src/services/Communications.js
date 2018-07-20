@@ -1,4 +1,5 @@
 import React from 'react';
+import PosStorage from "../database/PosStorage";
 
 class Communications {
 	constructor(  ){
@@ -28,13 +29,8 @@ class Communications {
 	login(){
 		let options = {
 			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				usernameOrEmail: this._user,
-				password: this._password,
+			headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+			body: JSON.stringify({ usernameOrEmail: this._user, password: this._password,
 			}),
 		}
 
@@ -58,12 +54,7 @@ class Communications {
 		})
 	}
 	getSiteId( token, siteName){
-		let options = {
-			method: 'GET',
-			headers: {
-				Authorization : 'Bearer ' + token
-			},
-		}
+		let options = { method: 'GET', headers: { Authorization : 'Bearer ' + token } };
 
 		return new Promise( (resolve, reject ) => {
 			fetch(this._url + 'untapped/kiosks', options)
@@ -91,10 +82,7 @@ class Communications {
 
 	}
 	getCustomers( updatedSince ) {
-		let options = {
-			method: 'GET',
-			headers: { Authorization: 'Bearer ' + this._token }
-		}
+		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } };
 		let url = 'sema/site/customers?site-id=' + this._siteId;
 
 		if( updatedSince ){
@@ -222,6 +210,31 @@ class Communications {
 				return {}
 			});
 	}
+
+	// _updateToken(){
+	// 	// Check if token exists or has expired
+	// 	return new Promise((resolve ) => {
+	// 		if( this._token.length == 0 ){
+	// 			console.log("No token - Getting a new one");
+	// 			this.login()
+	// 				.then(result => {
+	// 					if (result.status === 200) {
+	// 						console.log("New token Acquired");
+	// 						let settings = PosStorage.getSettings();
+	// 						PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user,
+	// 							settings.password, result.response.token, settings.siteId, settings.useMockData );
+	// 						this.setToken(result.response.token);
+	// 						;
+	// 					}
+	// 					resolve();
+	// 				});
+  //
+	// 		}else{
+	// 			// Need to check the token expiration
+	// 			resolve();
+	// 		}
+	// 	});
+	// }
 
 };
 export default new Communications();

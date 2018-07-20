@@ -77,8 +77,9 @@ class Toolbar extends Component {
 		let settings = PosStorage.getSettings();
 
 		// Save with empty token - This will force username/password validation
-		PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user, settings.password, "", settings.siteId, settings.useMockData );
+		PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user, settings.password, "", settings.siteId );
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
+		Communications.setToken("");
 
 	};
 

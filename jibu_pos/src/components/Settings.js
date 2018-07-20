@@ -49,6 +49,7 @@ class SettingsProperty extends Component {
 	}
 	onChangeText = (text )=>{
 		this.setState({propertyText :text});
+		this.props.parent.forceUpdate();
 	}
 }
 
@@ -58,13 +59,24 @@ class SettingsButton extends Component {
 		return (
 			<View style={[styles.submit, {marginLeft:30}] }>
 				<View style={{ justifyContent: 'center', height: 70, alignItems: 'center' }}>
-					<TouchableHighlight underlayColor='#c0c0c0'
-										onPress={() => this.props.pressFn()}>
-						<Text style={[styles.buttonText]}>{this.props.label}</Text>
-					</TouchableHighlight>
+					{this.showEnabled()}
 				</View>
 			</View>
 		);
+	}
+	showEnabled(){
+		if( this.props.enableFn()) {
+			console.log( "Enabled - " + this.props.label);
+			return (
+				<TouchableHighlight underlayColor='#c0c0c0'
+									onPress={() => this.props.pressFn()}>
+					<Text style={[styles.buttonText]}>{this.props.label}</Text>
+				</TouchableHighlight>
+			)
+		}else{
+			console.log( "Disabled - " + this.props.label);
+			return(<Text style={[styles.buttonText, {color:"#E0E0E0"}]}>{this.props.label}</Text>);
+		}
 	}
 }
 
@@ -75,7 +87,7 @@ class Settings extends Component {
 		this.site = React.createRef();
 		this.user = React.createRef();
 		this.password = React.createRef();
-		this.state = { isMockData: this.props.settings.useMockData, animating: false };
+		this.state = { animating: false };
 	}
 
 	componentDidMount() {
@@ -104,6 +116,7 @@ class Settings extends Component {
 					scrollEnabled={false}>
 					<View style={{ flex: 1, alignItems: 'center' }}>
 						<SettingsProperty
+							parent = {this}
 							marginTop={10}
 							placeHolder='Sema Service URL, (http://sema-service)'
 							label="SEMA service URL"
@@ -111,6 +124,7 @@ class Settings extends Component {
 							valueFn={this.getUrl.bind(this)}
 							ref={this.url}/>
 						<SettingsProperty
+							parent = {this}
 							marginTop={marginSpacing}
 							placeHolder='Site'
 							isSecure={false}
@@ -118,6 +132,7 @@ class Settings extends Component {
 							valueFn={this.getSite.bind(this)}
 							ref={this.site}/>
 						<SettingsProperty
+							parent = {this}
 							marginTop={marginSpacing}
 							placeHolder='User'
 							label="User email"
@@ -125,6 +140,7 @@ class Settings extends Component {
 							valueFn={this.getUser.bind(this)}
 							ref={this.user}/>
 						<SettingsProperty
+							parent = {this}
 							marginTop={marginSpacing}
 							placeHolder='Password'
 							label="password"
@@ -134,23 +150,20 @@ class Settings extends Component {
 						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
 							<SettingsButton
 								pressFn={this.onSaveSettings.bind(this)}
+								enableFn = {this.enableSaveSettings.bind(this)}
 								label='Save Settings'/>
 							<SettingsButton
 								pressFn={this.onConnection.bind(this)}
+								enableFn = {this.enableConnectionOrSync.bind(this)}
 								label='Connect'/>
 							<SettingsButton
 								pressFn={this.onClearAll.bind(this)}
+								enableFn = {this.enableClearAll.bind(this)}
 								label='Clear...'/>
 							<SettingsButton
 								pressFn={this.onSynchronize.bind(this)}
+								enableFn = {this.enableConnectionOrSync.bind(this)}
 								label='Synchronize Now'/>
-						</View>
-						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', marginTop: 30 }}>
-							<Text style={styles.checkLabel}>{"Use simulated data"}</Text>
-							<CheckBox
-								style={{ marginLeft: 30 }}
-								value={this.state.isMockData}
-								onValueChange={this.useMockDataChange.bind(this)}/>
 						</View>
 					</View>
 
@@ -165,9 +178,6 @@ class Settings extends Component {
 		);
 	}
 
-	useMockDataChange() {
-		this.setState({ isMockData: !this.state.isMockData });
-	}
 
 	getUrl() {
 		return this.props.settings.semaUrl;
@@ -199,6 +209,9 @@ class Settings extends Component {
 		this.saveSettings(this.props.settings.token, this.props.settings.siteId);
 	};
 
+	enableSaveSettings(){
+		return true;
+	}
 	onSynchronize(){
 		Synchronization.synchronize();
 	}
@@ -226,6 +239,9 @@ class Settings extends Component {
 		);
 
 	}
+	enableClearAll(){
+		return true;
+	}
 
 	onConnection() {
 		this.setState({animating: true});
@@ -249,6 +265,7 @@ class Settings extends Component {
 									this.saveSettings(result.response.token, siteId);
 									Communications.setToken(result.response.token);
 									Communications.setSiteId(siteId);
+									PosStorage.setTokenExpiration();
 									// PosStorage.saveConfiguration( result.response.token, siteId );
 									// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 								}
@@ -284,21 +301,27 @@ class Settings extends Component {
 			console.log(JSON.stringify(error));
 		}
 	}
+	enableConnectionOrSync() {
+		let url = (this.url.current ) ? this.url.current.state.propertyText : this.getUrl();
+		let site = (this.site.current ) ? this.site.current.state.propertyText : this.getSite();
+		let user = (this.url.current ) ? this.user.current.state.propertyText : this.getUser();
+		let password = (this.password.current ) ? this.password.current.state.propertyText : this.getPassword();
+
+		if (url.length > 0 && site.length > 0 && user.length > 0 && password.length > 0){
+			return true;
+		}else {
+			return false;
+		}
+	}
 
 	saveSettings( token, siteId) {
-		let prevMock = PosStorage.getSettings().useMockData;
 		PosStorage.saveSettings(this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText,
 			token,
-			siteId,
-			this.state.isMockData);
+			siteId );
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
-		if (prevMock !== this.state.isMockData) {
-			// switching between real and mock data. -delete customers/products ect
-			PosStorage.clearDataOnly();
-		}
 	}
 
 }
