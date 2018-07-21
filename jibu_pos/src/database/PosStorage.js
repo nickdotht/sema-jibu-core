@@ -174,7 +174,7 @@ class PosStorage {
 
 	createCustomer(phone, name, address, siteId ){
 		const now = new Date();
-		this.createCustomerFull( phone, name, address, siteId, now, now)
+		return this.createCustomerFull( phone, name, address, siteId, now, now)
 	}
 	createCustomerFull(phone, name, address, siteId, createdDate, updatedDate ){
 		const newCustomer = {
