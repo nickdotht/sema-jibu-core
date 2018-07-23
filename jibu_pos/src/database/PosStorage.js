@@ -172,18 +172,18 @@ class PosStorage {
 		return customerKey.slice( prefix.length );
 	}
 
-	createCustomer(phone, name, address, siteId ){
+	createCustomer(phone, name, address, siteId, salesChannel ){
 		const now = new Date();
-		return this.createCustomerFull( phone, name, address, siteId, now, now)
+		return this.createCustomerFull( phone, name, address, siteId, salesChannel,  now, now)
 	}
-	createCustomerFull(phone, name, address, siteId, createdDate, updatedDate ){
+	createCustomerFull(phone, name, address, siteId, salesChannel, createdDate, updatedDate ){
 		const newCustomer = {
 			customerId:uuidv1(),
 			contactName:name,
 			phoneNumber:phone,
 			address:address,
 			siteId:siteId,
-			customerType:128,	// TODO - Hard coded - very fragile
+			salesChannel:salesChannel,
 			createdDate:createdDate,
 			updatedDate:updatedDate
 
@@ -230,11 +230,12 @@ class PosStorage {
 			});
 		}
 	}
-	updateCustomer( customer, phone, name, address){
+	updateCustomer( customer, phone, name, address, salesChannel){
 		let key = this.makeCustomerKey(customer);
 		customer.contactName = name; 	// FIXUP - Won't be contactName forever
 		customer.phoneNumber = phone; 	// FIXUP - Won't be phone_number forever
 		customer.address = address; 	// FIXUP - Won't be address forever
+		customer.salesChannel = salesChannel;
 		customer.updatedDate = new Date();
 		customer.syncAction = "update";
 

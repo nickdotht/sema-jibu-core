@@ -78,7 +78,7 @@ class CustomerList extends Component {
 				"name": "",
 				"phoneNumber": "----------------------------",
 				"active": "1",
-				"sales_channel": "anonymous"
+				"salesChannel": "anonymous"
 			};
 			this.props.customers.unshift(anonymous);
 		}
@@ -132,7 +132,7 @@ class CustomerList extends Component {
 						<Text style={[styles.baseItem]}>{item.dueAmount}</Text>
 					</View>
 					<View style={{flex: 1}}>
-						<Text style={[styles.baseItem]}>{this.getCustomerType(item)}</Text>
+						<Text style={[styles.baseItem]}>{this.getCustomerSalesChannel(item)}</Text>
 					</View>
 				</View>
 			);
@@ -141,9 +141,10 @@ class CustomerList extends Component {
 		}
 	};
 
-	getCustomerType(item) {
-		if( item.hasOwnProperty("sales_channel")){
-			return item.sales_channel;
+	getCustomerSalesChannel(item) {
+		if( item.hasOwnProperty("salesChannel")){
+			if(item.salesChannel=== "reseller" ) return "Reseller";
+			else return "Walk-up";
 		}else{
 			return "Walk-up";
 		}
@@ -151,12 +152,12 @@ class CustomerList extends Component {
 
 	filterItem = (item )=> {
 		try {
-			if (item.sales_channel === "anonymous") {
+			if (item.salesChannel === "anonymous") {
 				return true;
 			}
 			if (this.props.filter === "all" ||
-				(this.props.filter === "reseller" && item.sales_channel === "reseller") ||
-				(this.props.filter === "walkup" && item.sales_channel !== "reseller") ||
+				(this.props.filter === "reseller" && item.salesChannel === "reseller") ||
+				(this.props.filter === "walkup" && item.salesChannel !== "reseller") ||
 				(this.props.filter === "credit" && item.dueAmount > 0)) {
 				if (this.state.searchString.length >= 2) {
 					const filterString = this.state.searchString.toLowerCase();
