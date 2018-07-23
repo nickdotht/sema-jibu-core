@@ -6,7 +6,7 @@ const router = express.Router();
 const semaLog = require('../../seama_services/sema_logger');
 
 let sqlDeleteAllReciptLineItems = "TRUNCATE TABLE receipt_line_item";
-let sqlDeleteAllReceipts = "DELETE FROM `sema_test_brian`.`receipt`";
+let sqlDeleteAllReceipts = "DELETE FROM receipt";
 
 const removeReceipts = () => {
 	return new Promise((resolve, reject) => {

@@ -43,25 +43,25 @@ describe('Testing Customers API', function () {
 								.send({
 									"receiptId": "2",
 									"customerId": "Brian",
-									"siteId": "1",
+									"siteId": kiosk.id,
 									"createdDate": "9/9/18",
 									"totalSales": "10",
 									"cogs": "9",
 									"products": [
 										{
-											"productId": "17",
+											"productId": "558",
 											"quantity": "1",
 											"salesPrice": "1",
 											"receiptId": "2"
 										},
 										{
-											"productId": "18",
+											"productId": "559",
 											"quantity": "1",
 											"salesPrice": "2",
 											"receiptId": "2"
 										}
 									],
-									"salesChannelId": "1"
+									"salesChannelId": "122"
 								})
 								.set('Authorization', token)
 								.end(function(err, res) {
@@ -101,11 +101,11 @@ describe('Testing Customers API', function () {
 								.send({
 									"receiptId": "2",
 									"customerId": "Brian",
-									"siteId": "1",
+									"siteId": kiosk.id,
 									"createdDate": "9/9/18",
 									"totalSales": "10",
 									"cogs": "9",
-									"salesChannelId": "1"
+									"salesChannelId": "122"
 								})
 								.set('Authorization', token)
 								.end(function(err, res) {
@@ -132,24 +132,24 @@ describe('Testing Customers API', function () {
 								.send({
 									"receiptId": "2",
 									"customerId": "Brian",
-									"siteId": "1",
+									"siteId": kiosk.id,
 									"createdDate": "9/9/18",
 									"totalSales": "10",
 									"cogs": "9",
 									"products": [
 										{
-											"productId": "17",
+											"productId": "558",
 											"quantity": "1",
 											"receiptId": "2"
 										},
 										{
-											"productId": "18",
+											"productId": "559",
 											"quantity": "1",
 											"salesPrice": "2",
 											"receiptId": "2"
 										}
 									],
-									"salesChannelId": "1"
+									"salesChannelId": "122"
 								})
 								.set('Authorization', token)
 								.end(function(err, res) {
