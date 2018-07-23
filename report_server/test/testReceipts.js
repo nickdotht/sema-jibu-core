@@ -9,6 +9,7 @@ var findKioskId = require('./Utilities/findKioskId');
 var authenticate = require('./Utilities/authenticate');
 var findSalesByChannelId = require('./Utilities/findSalesByChannelId');
 var removeReceipts = require('./Utilities/removeReceipts');
+var getReceipts = require('./Utilities/getReceipts');
 const uuidv1 = require('uuid/v1');
 
 describe('Testing Customers API', function () {
@@ -29,46 +30,133 @@ describe('Testing Customers API', function () {
 		}, 2000);
 	});
 
-	describe('POST /sema/site/receipts', function() {
+	describe('POST /sema/site/receipts. Everything Valid', function() {
 		it('Should pass', (done) => {
 			authenticate(server).then(function(token) {
-				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
-					findSalesByChannelId.findSalesChannelId(server, token, 'UnitTestSalesChannel', kiosk.id).then(function(salesChannel) {
-						let url = '/sema/site/receipts/';
-						chai.request(server)
-							.post(url)
-							.set('Content-Type', 'application/json; charset=UTF-8')
-							.send({
-								"receiptId": "2",
-								"customerId": "Brian",
-								"siteId": "1",
-								"createdDate": "9/9/18",
-								"totalSales": "10",
-								"cogs": "9",
-								"products": [
-									{"productId": "17",
-										"quantity": "1",
-										"salesPrice": "1",
-										"receiptId": "2"
-									},
-									{"productId": "18",
-										"quantity": "1",
-										"salesPrice": "2",
-										"receiptId": "2"
-									}
-								],
-								"salesChannelId": "1"
-							})
-							.set('Authorization', token)
-							.end(function(err, res) {
-								let h = 5;
-								done(err);
-								//removeReceipts.removeReceiptLineItems().then(function() {
-								//	removeReceipts.removeReceipts().then(function() {
-								//		done(err);
-								//	});
-								//});
-							});
+				removeReceipts.removeReceiptLineItems().then(function() {
+					removeReceipts.removeReceipts().then(function() {
+						findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+							let url = '/sema/site/receipts/';
+							chai.request(server)
+								.post(url)
+								.set('Content-Type', 'application/json; charset=UTF-8')
+								.send({
+									"receiptId": "2",
+									"customerId": "Brian",
+									"siteId": "1",
+									"createdDate": "9/9/18",
+									"totalSales": "10",
+									"cogs": "9",
+									"products": [
+										{
+											"productId": "17",
+											"quantity": "1",
+											"salesPrice": "1",
+											"receiptId": "2"
+										},
+										{
+											"productId": "18",
+											"quantity": "1",
+											"salesPrice": "2",
+											"receiptId": "2"
+										}
+									],
+									"salesChannelId": "1"
+								})
+								.set('Authorization', token)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									getReceipts.getReceipts().then(function(receipts) {
+										receipts[0].should.have.property("id").eql(2);
+										getReceipts.getReceiptLineItems().then(function(receiptLineItems) {
+											receiptLineItems[0].should.have.property("price").eql(1);
+											receiptLineItems[1].should.have.property("price").eql(2);
+											removeReceipts.removeReceiptLineItems().then(function() {
+												removeReceipts.removeReceipts().then(function() {
+													done(err);
+												});
+											});
+										});
+									});
+
+								});
+						});
+					});
+				});
+			});
+		});
+	});
+
+
+	describe('POST /sema/site/receipts. No Products', function() {
+		it('Should pass', (done) => {
+			authenticate(server).then(function(token) {
+				removeReceipts.removeReceiptLineItems().then(function() {
+					removeReceipts.removeReceipts().then(function() {
+						findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+							let url = '/sema/site/receipts/';
+							chai.request(server)
+								.post(url)
+								.set('Content-Type', 'application/json; charset=UTF-8')
+								.send({
+									"receiptId": "2",
+									"customerId": "Brian",
+									"siteId": "1",
+									"createdDate": "9/9/18",
+									"totalSales": "10",
+									"cogs": "9",
+									"salesChannelId": "1"
+								})
+								.set('Authorization', token)
+								.end(function(err, res) {
+									res.should.have.status(400);
+									done(err);
+								});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	describe('POST /sema/site/receipts. Missing product attributes.', function() {
+		it('Should pass', (done) => {
+			authenticate(server).then(function(token) {
+				removeReceipts.removeReceiptLineItems().then(function() {
+					removeReceipts.removeReceipts().then(function() {
+						findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+							let url = '/sema/site/receipts/';
+							chai.request(server)
+								.post(url)
+								.set('Content-Type', 'application/json; charset=UTF-8')
+								.send({
+									"receiptId": "2",
+									"customerId": "Brian",
+									"siteId": "1",
+									"createdDate": "9/9/18",
+									"totalSales": "10",
+									"cogs": "9",
+									"products": [
+										{
+											"productId": "17",
+											"quantity": "1",
+											"receiptId": "2"
+										},
+										{
+											"productId": "18",
+											"quantity": "1",
+											"salesPrice": "2",
+											"receiptId": "2"
+										}
+									],
+									"salesChannelId": "1"
+								})
+								.set('Authorization', token)
+								.end(function(err, res) {
+									res.should.have.status(400);
+									done(err);
+								});
+						});
 					});
 				});
 			});

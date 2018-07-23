@@ -26,6 +26,12 @@ router.post('/', async (req, res) => {
 		return res.status(400).send({ msg: "Bad request, missing parts of body. Check documentation" });
 	}
 
+	for (let i=0; i < products.length; i++){
+		if ( !products[i].productId || !products[i].quantity || !products[i].salesPrice || !products[i].receiptId ) {
+			return res.status(400).send({ msg: "Bad request, missing parts of product. Check documentation" });
+		}
+	}
+
 	try {
 		let receipt = new Receipt(req.body);
 		let postSqlParams = [ receipt.receiptId, receipt.customerId, receipt.siteId,

@@ -1,10 +1,17 @@
-let sqlDeleteAllReciptLineItems = "TRUNCATE TABLE receipt_line_item";
-let sqlDeleteALLReceipts = "TRUNCATE TABLE receipt";
+const request = require('supertest');
+const expect = require('chai').expect;
+const chai = require('chai');
+const express = require('express');
+const router = express.Router();
+const semaLog = require('../../seama_services/sema_logger');
 
-const removeReceipts = (query, res) => {
+let sqlDeleteAllReciptLineItems = "TRUNCATE TABLE receipt_line_item";
+let sqlDeleteAllReceipts = "DELETE FROM `sema_test_brian`.`receipt`";
+
+const removeReceipts = () => {
 	return new Promise((resolve, reject) => {
 		__pool.getConnection((err, connection) => {
-			connection.query(query, function(err, result) {
+			connection.query(sqlDeleteAllReceipts, function(err, result) {
 				connection.release();
 				if (err) {
 					semaLog.error('delete all receipts - failed');
@@ -20,10 +27,10 @@ const removeReceipts = (query, res) => {
 	});
 };
 
-const removeReceiptLineItems = (query, res) => {
+const removeReceiptLineItems = () => {
 	return new Promise((resolve, reject) => {
 		__pool.getConnection((err, connection) => {
-			connection.query(query, function(err, result) {
+			connection.query(sqlDeleteAllReciptLineItems, function(err, result) {
 				connection.release();
 				if (err) {
 					semaLog.error('delete all receipt line items - failed');
