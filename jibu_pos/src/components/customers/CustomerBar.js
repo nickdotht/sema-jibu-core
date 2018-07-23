@@ -96,7 +96,7 @@ class CustomerBar extends Component {
 					image = {require('../../images/customer-edit.png')}
 					enabled = {this.state.editFunction &&
 						this.props.selectedCustomer.hasOwnProperty('contactName') &&
-						this.props.selectedCustomer.sales_channel !== 'anonymous' }
+						this.props.selectedCustomer.salesChannel !== 'anonymous' }
 				/>
 
 				<CustomerBarButton
@@ -105,7 +105,7 @@ class CustomerBar extends Component {
 					image = {require('../../images/customer-delete.png')}
 					enabled = {this.state.deleteFunction &&
 						this.props.selectedCustomer.hasOwnProperty('contactName') &&
-						this.props.selectedCustomer.sales_channel !== 'anonymous' }
+						this.props.selectedCustomer.salesChannel !== 'anonymous' }
 				/>
 
 				<TextInput
@@ -131,7 +131,7 @@ class CustomerBar extends Component {
 	onDelete = ()=>{
 		if(this.state.deleteFunction &&
 			this.props.selectedCustomer.hasOwnProperty('contactName') &&
-			this.props.selectedCustomer.sales_channel !== 'anonymous') {
+			this.props.selectedCustomer.salesChannel !== 'anonymous') {
 
 			console.log("CustomerBar:onDelete");
 			let alertMessage = "Delete  customer " + this.props.selectedCustomer.contactName;
@@ -156,7 +156,7 @@ class CustomerBar extends Component {
 	onEdit = ()=>{
 		if(this.state.editFunction &&
 			this.props.selectedCustomer.hasOwnProperty('contactName') &&
-			this.props.selectedCustomer.sales_channel !== 'anonymous') {
+			this.props.selectedCustomer.salesChannel !== 'anonymous') {
 
 			console.log("CustomerBar:onEdit");
 			this.props.toolbarActions.ShowScreen("editCustomer");

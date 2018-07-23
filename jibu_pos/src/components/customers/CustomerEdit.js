@@ -23,6 +23,7 @@ class CustomerProperty extends Component {
 		return (
 			<View style ={[{ marginTop: this.props.marginTop }, styles.inputContainer]}>
 				<TextInput
+					ref = {this.props.reference}
 					style = {[styles.inputText,]}
 					underlineColorAndroid='transparent'
 					placeholder = {this.props.placeHolder}
@@ -43,6 +44,7 @@ class CustomerEdit extends Component {
 		this.phone = React.createRef();
 		this.name = React.createRef();
 		this.address = React.createRef();
+		this.customerChannel = React.createRef();
 	}
 	componentDidMount() {
 		console.log("CustomerEdit = Mounted");
@@ -71,18 +73,21 @@ class CustomerEdit extends Component {
 						scrollEnabled={false}>
 						<View style ={{flex:1, alignItems:'center' }}>
 							<CustomerProperty
+								reference = 'customerNumber'
 								marginTop = {10}
 								placeHolder = 'Telephone Number'
 								parent ={this}
 								valueFn = {this.getTelephoneNumber}
 								ref={this.phone}/>
 							<CustomerProperty
+								reference = 'customerName'
 								marginTop = {20}
 								placeHolder = 'Name'
 								parent ={this}
 								valueFn = {this.getName}
 								ref={this.name}/>
 							<CustomerProperty
+								reference = 'customerAddress'
 								marginTop = {20}
 								placeHolder = 'Address'
 								parent ={this}
@@ -93,6 +98,8 @@ class CustomerEdit extends Component {
 									style ={{width:250}}
 									textStyle={styles.dropdownText}
 									dropdownTextStyle = {[styles.dropdownText, {width:250}]}
+									dropdownStyle ={{borderColor: 'black', borderWidth:2}}
+									ref = {this.customerChannel}
 									defaultValue = {"Customer Channel"}
 									options={['Reseller', 'Walkup']}/>
 								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
@@ -159,24 +166,53 @@ class CustomerEdit extends Component {
 	};
 
 	onEdit(){
-		// TODO - Validate fields and set focus to invalid field
+		let salesChannel = "walkup";
+		if( this._textIsEmpty( this.phone.current.state.propertyText) ){
+			this.phone.current.refs.customerNumber.focus();
+			return;
+		}
+		if( this._textIsEmpty( this.name.current.state.propertyText) ){
+			this.name.current.refs.customerName.focus();
+			return;
+		}
+		if( this._textIsEmpty( this.address.current.state.propertyText ) ){
+			this.address.current.refs.customerAddress.focus();
+			return;
+		}
+		if( this.customerChannel.current.state.selectedIndex === -1){
+			this.customerChannel.current.show();
+			return;
+
+		}else{
+			salesChannel = this.customerChannel.current.props.options[ this.customerChannel.current.state.selectedIndex];
+			salesChannel = salesChannel.toLowerCase();
+		}
 		if( this.props.isEdit ){
 			PosStorage.updateCustomer(
 				this.props.selectedCustomer,
 				this.phone.current.state.propertyText,
 				this.name.current.state.propertyText,
-				this.address.current.state.propertyText );
+				this.address.current.state.propertyText,
+				salesChannel);
 		}else{
 			let newCustomer = PosStorage.createCustomer(
 				this.phone.current.state.propertyText,
 			 	this.name.current.state.propertyText,
 				this.address.current.state.propertyText,
-				this.props.settings.siteId);
+				this.props.settings.siteId,
+				salesChannel);
 			this.props.customerActions.CustomerSelected(newCustomer);
 		}
 
 		this.setState( {isEditInProgress:true} );
 	};
+
+	_textIsEmpty(txt){
+		if( txt === null || txt .length === 0 ){
+			return true;
+		}
+		return false;
+	}
 	showEditInProgress(){
 		let that = this;
 		if( this.state.isEditInProgress ) {
