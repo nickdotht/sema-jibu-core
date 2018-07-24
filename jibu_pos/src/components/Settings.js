@@ -229,7 +229,10 @@ class Settings extends Component {
 						PosStorage.clearDataOnly();
 						this.props.settingsActions.setSettings(PosStorage.getSettings());
 						this.props.customerActions.setCustomers(PosStorage.getCustomers());
-						Synchronization.initialize( PosStorage.getLastCustomerSync(), PosStorage.getLastProductSync());
+						Synchronization.initialize(
+							PosStorage.getLastCustomerSync(),
+							PosStorage.getLastProductSync(),
+							PosStorage.getLastSalesSync());
 						this.closeHandler();
 
 					}

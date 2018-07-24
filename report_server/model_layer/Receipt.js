@@ -4,7 +4,7 @@ class Receipt {
 		this._receiptId = jsonBody["receiptId"];
 		this._customerId = jsonBody["customerId"];
 		this._siteId = jsonBody["siteId"];
-		this._createdDate = jsonBody["createdDate"];
+		this._createdDate = new Date( jsonBody["createdDate"]);
 		this._totalSales = jsonBody["totalSales"];
 		this._cogs = jsonBody["receiptId"];
 		this._products = jsonBody["products"];

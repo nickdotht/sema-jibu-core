@@ -2,11 +2,13 @@ import mock_customers from "../mock_data/customers";
 import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
 import Events from "react-native-simple-events";
+import { Alert } from "react-native";
 
 class Synchronization {
-	initialize( lastCustomerSync, lastProductSync){
+	initialize( lastCustomerSync, lastProductSync, lastSalesSync){
 		this.lastCustomerSync = lastCustomerSync;
 		this.lastProductSync = lastProductSync;
+		this.lastSalesSync = lastSalesSync;
 
 	}
 	scheduleSync( syncState, timeout, loadCustomersFn){
@@ -25,13 +27,21 @@ class Synchronization {
 		this.lastProductSync = new Date();
 		PosStorage.setLastProductSync( this.lastProductSync );
 	}
+	updateLastSalesSync(){
+		this.lastSalesSync = new Date();
+		PosStorage.setLastSalesSync( this.lastSalesSync );
+	}
 
 	synchronize(){
 		try {
 			this.refreshToken().then( ()=>{
 				this.synchronizeCustomers();
 				this.synchronizeProducts();
+				this.synchronizeSales();
+			}).catch( error => {
+				console.log(error.message);
 			});
+
 		}catch( error ){
 			console.log( error.message );
 		}
@@ -112,9 +122,30 @@ class Synchronization {
 			});
 	}
 
+	synchronizeSales(){
+		console.log( "Synchronization:synchronizeSales - Begin" );
+		PosStorage.loadSalesReceipts( this.lastSalesSync )
+			.then( salesReceipts => {
+				console.log("Number of sales receipts: " + salesReceipts.length );
+				salesReceipts.forEach( (receipt) =>{
+					Communications.createReceipt(receipt.sale)
+						.then( result =>{
+							console.log( "Synchronization:synchronizeSales - success: " );
+							PosStorage.removePendingSale(receipt.key );
+						})
+						.catch(error => {
+							console.log("Synchronization:synchronizeCustomers Create receipt failed")
+						});
+				})
+			})
+			.catch(error => {
+				console.log( "Communications.synchronizeSales - error " + error);
+			});
+	}
+
 	refreshToken(){
 		// Check if token exists or has expired
-		return new Promise((resolve ) => {
+		return new Promise((resolve, reject ) => {
 			let settings = PosStorage.getSettings();
 			let tokenExpirationDate = PosStorage.getTokenExpiration();
 			let currentDateTime = new Date();
@@ -132,7 +163,11 @@ class Synchronization {
 							PosStorage.setTokenExpiration();
 						}
 						resolve();
-					});
+					})
+					.catch(result => {
+						console.log("Failed- status " + result.status + " " + result.response);
+						reject( result.response );
+					})
 
 			}else{
 				console.log("Existing token is valid");
