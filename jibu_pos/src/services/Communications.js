@@ -100,6 +100,8 @@ class Communications {
 	}
 
 	createCustomer( customer ) {
+		// TODO - Resolve customer type.... Is it needed, currently hardcoded...
+		customer.customerType = 128;		// FRAGILE
 		let options = {
 			method: 'POST',
 			headers: {
@@ -143,10 +145,10 @@ class Communications {
 		return new Promise( (resolve, reject ) => {
 			fetch(this._url + 'sema/site/customers/' + customer.customerId, options)
 				.then((response) => {
-					if (response.status === 200) {
+					if (response.status === 200 || response.status === 404 ) {
 						resolve();
 					}else {
-						console.log("createCustomer - Fetch status: " + response.status);
+						console.log("deleteCustomer - Fetch status: " + response.status);
 						reject();
 					}
 				})
@@ -211,30 +213,64 @@ class Communications {
 			});
 	}
 
-	// _updateToken(){
-	// 	// Check if token exists or has expired
-	// 	return new Promise((resolve ) => {
-	// 		if( this._token.length == 0 ){
-	// 			console.log("No token - Getting a new one");
-	// 			this.login()
-	// 				.then(result => {
-	// 					if (result.status === 200) {
-	// 						console.log("New token Acquired");
-	// 						let settings = PosStorage.getSettings();
-	// 						PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user,
-	// 							settings.password, result.response.token, settings.siteId, settings.useMockData );
-	// 						this.setToken(result.response.token);
-	// 						;
-	// 					}
-	// 					resolve();
-	// 				});
-  //
-	// 		}else{
-	// 			// Need to check the token expiration
-	// 			resolve();
-	// 		}
-	// 	});
-	// }
+	createReceipt( receipt ) {
+		let options = {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + this._token
+			},
+			body: JSON.stringify(this._remoteReceiptFromReceipt( receipt) )
 
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/receipts', options)
+				.then((response) => {
+					if (response.status === 200) {
+						response.json()
+							.then((responseJson) => {
+								resolve(responseJson)
+							})
+							.catch((error) => {
+								console.log("createReceipt - Parse JSON: " + error.message);
+								reject();
+							});
+					}else if(response.status === 409 ){
+						// Indicates this receipt has already been added
+						console.log("createReceipt - Receipt already exists");
+						resolve({})
+					}else {
+						console.log("createReceipt - Fetch status: " + response.status);
+						reject();
+					}
+				})
+				.catch((error) => {
+					console.log("createReceipt - Fetch: " + error.message);
+					reject();
+				});
+		});
+	}
+	_remoteReceiptFromReceipt( receipt ){
+	let remoteReceipt = {
+		receiptId: receipt.receiptId,
+		customerId: receipt.customerId,
+		siteId: receipt.siteId,
+		createdDate: new Date(receipt.createdDate),
+		totalSales: receipt.cash + receipt.credit + receipt.mobile,
+		salesChannelId: 122,
+		cogs:"0",		// TODO - Implement this...
+		products: []
+	};
+		receipt.products.forEach( product => {
+			let remoteProduct = {
+				productId:product.id,
+				quantity: product.quantity,
+				receiptId: remoteReceipt.receiptId,
+				salesPrice:product.priceAmount
+			}
+		});
+		return remoteReceipt;
+	}
 };
 export default new Communications();

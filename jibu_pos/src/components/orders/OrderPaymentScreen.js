@@ -244,7 +244,14 @@ class OrderPaymentScreen extends Component {
 	};
 
 	formatAndSaveSale = () =>{
-		let sale = {cash:this.props.payment.cash, credit:this.props.payment.credit, mobile:this.props.payment.mobile, products:[] };
+		let sale = {
+			cash:this.props.payment.cash,
+			credit:this.props.payment.credit,
+			mobile:this.props.payment.mobile,
+			customerId: this.props.selectedCustomer.customerId,
+			salesChannel: this.props.selectedCustomer.salesChannel,
+			siteId: this.props.selectedCustomer.siteId,
+			products:[] };
 		sale.products = this.props.products.map( product => {
 			let productSale = {};
 			productSale.id = product.product.productId;

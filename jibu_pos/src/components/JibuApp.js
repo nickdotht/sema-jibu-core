@@ -66,7 +66,10 @@ class JibuApp extends Component {
 			}
 
 			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
-			Synchronization.initialize( PosStorage.getLastCustomerSync(), PosStorage.getLastProductSync());
+			Synchronization.initialize(
+				PosStorage.getLastCustomerSync(),
+				PosStorage.getLastProductSync(),
+				PosStorage.getLastSalesSync());
 			// Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
 
 			// Determine the startup screen as follows:

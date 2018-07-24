@@ -130,6 +130,9 @@ class PosStorage {
 	getLastProductSync(){
 		return this.lastProductsSync;
 	}
+	getLastSalesSync(){
+		return this.lastSalesSync;
+	}
 
 
 	clearDataOnly(){
@@ -411,6 +414,8 @@ class PosStorage {
 		console.log("PosStorage: addSale" );
 		return new Promise((resolve, reject) => {
 			let saleDateTime = new Date(Date.now());
+			sale.receiptId = uuidv1();
+			sale.createdDate = saleDateTime;
 			let saleDateKey = saleDateTime.toISOString();
 			this.salesKeys.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
 			this.pendingSales.push(saleItemKey + saleDateKey);
@@ -431,6 +436,55 @@ class PosStorage {
 		console.log("PosStorage:loadSale" );
 		return new Promise((resolve, reject) => {
 			this.getKey(saleKey.saleKey )
+				.then( sale => {
+					resolve( this.parseJson(sale));
+				})
+				.catch(err => reject(err))
+
+		});
+	}
+
+	loadSalesReceipts(lastSalesSyncDate) {
+		console.log("PosStorage:loadSalesReceipts" );
+		return new Promise((resolve, reject) => {
+			let results = [];
+			let sales = this.pendingSales;
+			let resolvedCount = 0;
+			if( sales.length === 0 ){
+				resolve( results )
+			}else {
+				for (let index = 0; index < sales.length; index++) {
+					this._loadPendingSale(sales[index]).then((sale) => {
+						results.push({key:sales[resolvedCount], sale: sale});
+						resolvedCount++;
+						if ((resolvedCount) === sales.length) {
+							resolve(results);
+						}
+					});
+				}
+			}
+		});
+	};
+
+	removePendingSale( saleKey ){
+		console.log("PostStorage:removePendingSale" );
+		const index = this.pendingSales.indexOf(saleKey);
+		if (index > -1) {
+			let deletedItems = this.pendingSales.splice(index, 1);
+			let keyArray = [[pendingSalesKey, this.stringify(this.pendingSales)]];
+			AsyncStorage.multiSet( keyArray).then( error => {
+				if( error ) {
+					console.log("PosStorage:removePendingSale: Error: " + error);
+				}
+			});
+
+		}
+
+	}
+
+	_loadPendingSale( saleKey){
+		return new Promise((resolve, reject) => {
+			this.getKey(saleKey )
 				.then( sale => {
 					resolve( this.parseJson(sale));
 				})
@@ -530,6 +584,12 @@ class PosStorage {
 	setLastProductSync( lastSyncTime ){
 		this.lastProductsSync = lastSyncTime;
 		this.setKey( lastProductsSyncKey,this.lastProductsSync.toISOString());
+	}
+
+	setLastSalesSync( lastSyncTime ){
+		this.lastSalesSync = lastSyncTime;
+		this.setKey( lastSalesSyncKey,this.lastSalesSync.toISOString());
+
 	}
 
 	stringify( jsObject){
