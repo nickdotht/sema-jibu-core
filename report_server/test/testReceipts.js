@@ -12,7 +12,7 @@ var removeReceipts = require('./Utilities/removeReceipts');
 var getReceipts = require('./Utilities/getReceipts');
 const uuidv1 = require('uuid/v1');
 
-describe.skip('Testing Receipts API', function () {
+describe('Testing Receipts API', function () {
 	let server;
 	this.timeout(6000);
 	beforeEach((done) => {
