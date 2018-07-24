@@ -50,7 +50,9 @@ const insertReceipt = (receipt, query, params, res ) => {
 				connection.query(query, params, function(err, result) {
 					if (err) {
 						semaLog.error('receipts - failed', { err });
-						// Use http 'conflict if this is a duplicate
+						connection.rollback();
+
+							// Use http 'conflict if this is a duplicate
 						res.status(err.code === "ER_DUP_ENTRY" ? 409: 500).send(err.message);
 						reject(err);
 						connection.release();
@@ -60,11 +62,12 @@ const insertReceipt = (receipt, query, params, res ) => {
 						if( receipt.products.length === 0 ){
 							commitTransaction(receipt, connection, resolve, reject, res);
 						}else {
+							let receiptId = result.insertId;
 							let successCount = 0;
 							let resolveCount = 0;
 							for (let i = 0; i < receipt.products.length; i++) {
 								let sqlProductParams = [receipt.products[i].productId, receipt.products[i].quantity,
-									receipt.products[i].salesPrice, receipt.products[i].receiptId];
+									receipt.products[i].salesPrice, receiptId];
 								console.log("Inserting line item #" + i);
 								insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams, connection).then(function(result) {
 									console.log("Inserted line item #" + resolveCount);
@@ -125,11 +128,11 @@ const insertReceiptLineItem = (query, params, connection) => {
 	return new Promise((resolve, reject) => {
 		connection.query(query, params, function(err, result) {
 			if (err) {
-				semaLog.error('receiptsLineItem - Failed');
+				semaLog.error('insertReceiptLineItem - Failed, err: ' +err.message);
 				resolve(false);
 			}
 			else {
-				semaLog.info('receiptsLineItem - succeeded');
+				semaLog.info('insertReceiptLineItem - succeeded');
 				semaLog.info(params);
 				resolve(true);
 			}

@@ -269,6 +269,7 @@ class Communications {
 				receiptId: remoteReceipt.receiptId,
 				salesPrice:product.priceAmount
 			}
+			remoteReceipt.products.push( remoteProduct);
 		});
 		return remoteReceipt;
 	}
