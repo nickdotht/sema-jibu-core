@@ -12,7 +12,7 @@ var removeReceipts = require('./Utilities/removeReceipts');
 var getReceipts = require('./Utilities/getReceipts');
 const uuidv1 = require('uuid/v1');
 
-describe('Testing Customers API', function () {
+describe('Testing Receipts API', function () {
 	let server;
 	this.timeout(6000);
 	beforeEach((done) => {
@@ -67,7 +67,7 @@ describe('Testing Customers API', function () {
 								.end(function(err, res) {
 									res.should.have.status(200);
 									getReceipts.getReceipts().then(function(receipts) {
-										receipts[0].should.have.property("id").eql(2);
+										receipts[0].should.have.property("uuid").eql("2");
 										getReceipts.getReceiptLineItems().then(function(receiptLineItems) {
 											receiptLineItems[0].should.have.property("price").eql(1);
 											receiptLineItems[1].should.have.property("price").eql(2);
