@@ -9,7 +9,7 @@ var findKioskId = require('./Utilities/findKioskId');
 var authenticate = require('./Utilities/authenticate');
 var findCustomerId = require('./Utilities/findCustomerId');
 
-describe('Testing Customers API', function () {
+describe.skip('Testing Customers API', function () {
 	let server;
 	this.timeout(6000);
 	beforeEach( (done) => {
