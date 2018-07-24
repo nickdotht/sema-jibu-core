@@ -38,7 +38,7 @@ class Toolbar extends Component {
 					<TouchableHighlight onPress={() => this.onLogout()}>
 						<Text style = {[styles.text_style,{marginRight:20}]}>Logout</Text>
 					</TouchableHighlight>
-					<Text style = {[styles.text_style,{marginRight:20} ]}>Dan Nolan</Text>
+					<Text style = {[styles.text_style,{marginRight:20} ]}>{this.props.settings.user}</Text>
 					<TouchableHighlight onPress={() => this.onShowRemoteReport()}>
 						<Image source={require('../images/report-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
 					</TouchableHighlight>

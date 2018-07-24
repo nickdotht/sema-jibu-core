@@ -2,22 +2,30 @@ import mock_customers from "../mock_data/customers";
 import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
 import Events from "react-native-simple-events";
-import { Alert } from "react-native";
 
 class Synchronization {
 	initialize( lastCustomerSync, lastProductSync, lastSalesSync){
+		console.log("Synchronization:initialize");
 		this.lastCustomerSync = lastCustomerSync;
 		this.lastProductSync = lastProductSync;
 		this.lastSalesSync = lastSalesSync;
-
+		this.intervalId = null;
+		this.syncInterval = 60*1000;
+		this.isConnected = false;
 	}
-	scheduleSync( syncState, timeout, loadCustomersFn){
-		let state = syncState;
-		let loadCustomers = loadCustomersFn;
+	setConnected( isConnected ){
+		console.log( "Synchronization:setConnected - " + isConnected );
+		this.isConnected = isConnected;
+	}
+	scheduleSync( timeout ){
+		let that = this;
 		setTimeout(() => {
 			console.log("Synchronizing...");
-			loadCustomers();
+			that.doSynchronize( );
 		}, timeout);
+		this.intervalId = setInterval( ()=>{
+			that.doSynchronize();
+		}, this.syncInterval);
 	}
 	updateLastCustomerSync(){
 		this.lastCustomerSync = new Date();
@@ -31,7 +39,13 @@ class Synchronization {
 		this.lastSalesSync = new Date();
 		PosStorage.setLastSalesSync( this.lastSalesSync );
 	}
-
+	doSynchronize( ){
+		if( this.isConnected ) {
+			this.synchronize();
+		}else{
+			console.log( "Communications:doSynchronize - Won't sync - Network not connected");
+		}
+	}
 	synchronize(){
 		try {
 			this.refreshToken().then( ()=>{

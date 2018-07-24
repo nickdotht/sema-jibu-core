@@ -6,6 +6,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as ToolbarActions from "../actions/ToolBarActions";
 import PosStorage from "../database/PosStorage";
+import Synchronization from "../services/Synchronization";
 
 
 class Login extends Component {
@@ -91,12 +92,13 @@ class Login extends Component {
 			if( settings.user.toLowerCase() === this.state.username.toLowerCase() &&
 				settings.password.toLowerCase() === this.state.password.toLowerCase()){
 				this.setState({ isLoginComplete: true });
+				Synchronization.scheduleSync( 10000 );	// Sync after 10 seconds
 			}else{
 				this.setState({invalidCredentials:true})
 			}
 
 		}else {
-			// Allow login with no credentials. (User can't access service with credentials anyway)
+			// Allow login with no credentials. (User can't access service without credentials anyway)
 			this.setState({ isLoginComplete: true });
 		}
 	};

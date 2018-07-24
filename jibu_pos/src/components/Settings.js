@@ -57,12 +57,15 @@ class SettingsButton extends Component {
 
 	render() {
 		return (
-			<View style={[styles.submit, {marginLeft:30}] }>
-				<View style={{ justifyContent: 'center', height: 70, alignItems: 'center' }}>
+			<View style={[styles.submit, {marginLeft:30}, this.getOpacity()] }>
+				<View style={[{ justifyContent: 'center', height: 70, alignItems: 'center'}] }>
 					{this.showEnabled()}
 				</View>
 			</View>
 		);
+	}
+	getOpacity(){
+		return (this.props.enableFn()) ? {opacity:1} : {opacity:.7};
 	}
 	showEnabled(){
 		if( this.props.enableFn()) {
@@ -75,7 +78,7 @@ class SettingsButton extends Component {
 			)
 		}else{
 			console.log( "Disabled - " + this.props.label);
-			return(<Text style={[styles.buttonText, {color:"#E0E0E0"}]}>{this.props.label}</Text>);
+			return(<Text style={[styles.buttonText]}>{this.props.label}</Text>);
 		}
 	}
 }
