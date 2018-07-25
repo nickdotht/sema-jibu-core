@@ -92,7 +92,7 @@ class Login extends Component {
 			if( settings.user.toLowerCase() === this.state.username.toLowerCase() &&
 				settings.password.toLowerCase() === this.state.password.toLowerCase()){
 				this.setState({ isLoginComplete: true });
-				Synchronization.scheduleSync( 10000 );	// Sync after 10 seconds
+				Synchronization.scheduleSync( );
 			}else{
 				this.setState({invalidCredentials:true})
 			}

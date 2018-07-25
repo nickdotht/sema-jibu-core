@@ -41,9 +41,6 @@ class JibuApp extends Component {
 	}
 	componentDidMount() {
 		console.log("JibuApp - Mounted");
-		this.testTimeoutId  = setInterval(()=>{
-			console.log("==============================================================Whooooooo");
-		}, 60000 );
 		this.posStorage.initialize( false ).then( (isInitialized) => {
 
 			let settings = this.posStorage.getSettings();
@@ -57,22 +54,23 @@ class JibuApp extends Component {
 			console.log( "PosStorage - " + JSON.stringify(PosStorage));
 			console.log( "Communications - " + JSON.stringify(Communications));
 
-			let timeout = 200;
+			// let timeout = 200;
 			if (isInitialized ) {
 				// Data already configured
 				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 				this.props.productActions.setProducts(this.posStorage.getProducts());
 			}
-			if (isInitialized && this.posStorage.getCustomers().length > 0) {
-				// Data already configured
-				timeout = 20000;	// First sync after a bit
-			}
+			// if (isInitialized && this.posStorage.getCustomers().length > 0) {
+			// 	// Data already configured
+			// 	timeout = 20000;	// First sync after a bit
+			// }
 
 			Synchronization.initialize(
 				PosStorage.getLastCustomerSync(),
 				PosStorage.getLastProductSync(),
 				PosStorage.getLastSalesSync());
 			Synchronization.setConnected(this.props.network.isNWConnected );
+
 			// Determine the startup screen as follows:
 			// If the settings contain url, site, username, password and token, proceed to main screen
 			// If the settings contain url, site, username, password but NOT token, proceed to login screen, (No token => user has logged out)
@@ -82,7 +80,7 @@ class JibuApp extends Component {
 				this.props.toolbarActions.SetLoggedIn(true);
 				this.props.toolbarActions.ShowScreen("main");
 				console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
-				Synchronization.scheduleSync( timeout );
+				Synchronization.scheduleSync( );
 			}else if( this.isSettingsComplete() ){
 				console.log("JibuApp - login required - No Token");
 				this.props.toolbarActions.SetLoggedIn(false);
@@ -107,7 +105,6 @@ class JibuApp extends Component {
 
 	}
 	componentWillUnmount(){
-		clearInterval(this.testTimeoutId);
 		Events.rm('CustomersUpdated', 'customerUpdate1') ;
 		Events.rm('ProductsUpdated', 'productUpdate1') ;
 		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );

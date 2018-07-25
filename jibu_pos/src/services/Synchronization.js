@@ -10,6 +10,7 @@ class Synchronization {
 		this.lastProductSync = lastProductSync;
 		this.lastSalesSync = lastSalesSync;
 		this.intervalId = null;
+		this.firstSyncId = null;
 		this.syncInterval = 60*1000;
 		this.isConnected = false;
 	}
@@ -17,9 +18,21 @@ class Synchronization {
 		console.log( "Synchronization:setConnected - " + isConnected );
 		this.isConnected = isConnected;
 	}
-	scheduleSync( timeout ){
+	scheduleSync( ){
+		let timeout = 10000; // Sync after 10 seconds
+		if( this.firstSyncId != null ){
+			clearTimeout( this.firstSyncId );
+		}
+		if( this.intervalId != null  ){
+			clearInterval(this.intervalId);
+		}
+		if( PosStorage.getCustomers().length == 0 || PosStorage.getProducts().length == 0 ){
+			// No local customers or products, sync now
+			timeout = 1000;
+		}
+
 		let that = this;
-		setTimeout(() => {
+		this.firstSyncId = setTimeout(() => {
 			console.log("Synchronizing...");
 			that.doSynchronize( );
 		}, timeout);
@@ -140,7 +153,7 @@ class Synchronization {
 		console.log( "Synchronization:synchronizeSales - Begin" );
 		PosStorage.loadSalesReceipts( this.lastSalesSync )
 			.then( salesReceipts => {
-				console.log("Number of sales receipts: " + salesReceipts.length );
+				console.log("Synchronization:synchronizeSales - Number of sales receipts: " + salesReceipts.length );
 				salesReceipts.forEach( (receipt) =>{
 					Communications.createReceipt(receipt.sale)
 						.then( result =>{

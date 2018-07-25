@@ -272,6 +272,7 @@ class Settings extends Component {
 									Communications.setToken(result.response.token);
 									Communications.setSiteId(siteId);
 									PosStorage.setTokenExpiration();
+									Synchronization.scheduleSync();
 									// PosStorage.saveConfiguration( result.response.token, siteId );
 									// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
 								}
