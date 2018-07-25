@@ -54,23 +54,22 @@ class JibuApp extends Component {
 			console.log( "PosStorage - " + JSON.stringify(PosStorage));
 			console.log( "Communications - " + JSON.stringify(Communications));
 
-			let timeout = 200;
+			// let timeout = 200;
 			if (isInitialized ) {
 				// Data already configured
 				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 				this.props.productActions.setProducts(this.posStorage.getProducts());
 			}
-			if (isInitialized && this.posStorage.getCustomers().length > 0) {
-				// Data already configured
-				timeout = 20000;	// First sync after a bit
-			}
+			// if (isInitialized && this.posStorage.getCustomers().length > 0) {
+			// 	// Data already configured
+			// 	timeout = 20000;	// First sync after a bit
+			// }
 
-			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
 			Synchronization.initialize(
 				PosStorage.getLastCustomerSync(),
 				PosStorage.getLastProductSync(),
 				PosStorage.getLastSalesSync());
-			// Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
+			Synchronization.setConnected(this.props.network.isNWConnected );
 
 			// Determine the startup screen as follows:
 			// If the settings contain url, site, username, password and token, proceed to main screen
@@ -80,6 +79,8 @@ class JibuApp extends Component {
 				console.log("JibuApp - Auto login - All settings exist");
 				this.props.toolbarActions.SetLoggedIn(true);
 				this.props.toolbarActions.ShowScreen("main");
+				console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
+				Synchronization.scheduleSync( );
 			}else if( this.isSettingsComplete() ){
 				console.log("JibuApp - login required - No Token");
 				this.props.toolbarActions.SetLoggedIn(false);
@@ -94,6 +95,7 @@ class JibuApp extends Component {
 		NetInfo.isConnected.fetch().then(isConnected => {
 			console.log('Network is ' + (isConnected ? 'online' : 'offline'));
 			this.props.networkActions.NetworkConnection(isConnected);
+			Synchronization.setConnected( isConnected );
 		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this) );
@@ -119,6 +121,7 @@ class JibuApp extends Component {
 	handleConnectivityChange = isConnected => {
 		console.log("handleConnectivityChange: " + isConnected);
 		this.props.networkActions.NetworkConnection(isConnected);
+		Synchronization.setConnected( isConnected );
 	};
 
 	render() {

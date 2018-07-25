@@ -2,22 +2,43 @@ import mock_customers from "../mock_data/customers";
 import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
 import Events from "react-native-simple-events";
-import { Alert } from "react-native";
 
 class Synchronization {
 	initialize( lastCustomerSync, lastProductSync, lastSalesSync){
+		console.log("Synchronization:initialize");
 		this.lastCustomerSync = lastCustomerSync;
 		this.lastProductSync = lastProductSync;
 		this.lastSalesSync = lastSalesSync;
-
+		this.intervalId = null;
+		this.firstSyncId = null;
+		this.syncInterval = 60*1000;
+		this.isConnected = false;
 	}
-	scheduleSync( syncState, timeout, loadCustomersFn){
-		let state = syncState;
-		let loadCustomers = loadCustomersFn;
-		setTimeout(() => {
+	setConnected( isConnected ){
+		console.log( "Synchronization:setConnected - " + isConnected );
+		this.isConnected = isConnected;
+	}
+	scheduleSync( ){
+		let timeout = 10000; // Sync after 10 seconds
+		if( this.firstSyncId != null ){
+			clearTimeout( this.firstSyncId );
+		}
+		if( this.intervalId != null  ){
+			clearInterval(this.intervalId);
+		}
+		if( PosStorage.getCustomers().length == 0 || PosStorage.getProducts().length == 0 ){
+			// No local customers or products, sync now
+			timeout = 1000;
+		}
+
+		let that = this;
+		this.firstSyncId = setTimeout(() => {
 			console.log("Synchronizing...");
-			loadCustomers();
+			that.doSynchronize( );
 		}, timeout);
+		this.intervalId = setInterval( ()=>{
+			that.doSynchronize();
+		}, this.syncInterval);
 	}
 	updateLastCustomerSync(){
 		this.lastCustomerSync = new Date();
@@ -31,7 +52,13 @@ class Synchronization {
 		this.lastSalesSync = new Date();
 		PosStorage.setLastSalesSync( this.lastSalesSync );
 	}
-
+	doSynchronize( ){
+		if( this.isConnected ) {
+			this.synchronize();
+		}else{
+			console.log( "Communications:doSynchronize - Won't sync - Network not connected");
+		}
+	}
 	synchronize(){
 		try {
 			this.refreshToken().then( ()=>{
@@ -126,7 +153,7 @@ class Synchronization {
 		console.log( "Synchronization:synchronizeSales - Begin" );
 		PosStorage.loadSalesReceipts( this.lastSalesSync )
 			.then( salesReceipts => {
-				console.log("Number of sales receipts: " + salesReceipts.length );
+				console.log("Synchronization:synchronizeSales - Number of sales receipts: " + salesReceipts.length );
 				salesReceipts.forEach( (receipt) =>{
 					Communications.createReceipt(receipt.sale)
 						.then( result =>{
