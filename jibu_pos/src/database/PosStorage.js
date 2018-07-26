@@ -565,9 +565,9 @@ class PosStorage {
 
 	}
 	setTokenExpiration(){
-		// Currently the token is good for one day
+		// Currently the token is good for one day (24 hours)
 		let expirationDate = new Date();
-		expirationDate.setTime(expirationDate.getTime() + (1*60*60*1000));
+		expirationDate.setTime(expirationDate.getTime() + (22*60*60*1000));
 		console.log( "Token will expire at: " + expirationDate.toString());
 		this.setKey( tokenExpirationKey,expirationDate.toISOString());
 		this.tokenExpiration = expirationDate;

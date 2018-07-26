@@ -216,9 +216,32 @@ class Settings extends Component {
 		return true;
 	}
 	onSynchronize(){
-		Synchronization.synchronize();
+		Synchronization.synchronize()
+			.then( syncResult =>{
+				console.log( "Synchronization-result: " +  JSON.stringify( syncResult));
+				// let foo = this._getSyncResults(syncResult);
+				Alert.alert(
+					"Synchronization Results",
+					this._getSyncResults(syncResult), [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+				);
+			});
 	}
+	_getSyncResults(syncResult){
+		if( syncResult.status != "success") return "Synchronization error: " + syncResult.error;
+		if( syncResult.hasOwnProperty("customers") && syncResult.customers.error != null ) return "Synchronization error: " + syncResult.customers.error;
+		if( syncResult.hasOwnProperty("products") && syncResult.products.error != null ) return "Synchronization error: " + syncResult.products.error;
+		if( syncResult.hasOwnProperty("sales") && syncResult.sales.error != null ) return "Synchronization error: " + syncResult.sales.error;
 
+		else{
+			if( syncResult.customers.localCustomers == 0 && syncResult.customers.remoteCustomers == 0 &&
+				syncResult.products.remoteProducts == 0 && syncResult.sales.localReceipts == 0 ) {
+				return "Data is up to date";
+			}else{ return `${syncResult.customers.localCustomers + syncResult.customers.remoteCustomers } customers updated
+${syncResult.products.remoteProducts} products updated
+${syncResult.sales.localReceipts} sales receipts updated`;
+			}
+		}
+	}
 	onClearAll() {
 		console.log("Settings:onClearAll");
 		let alertMessage = "Clear All Data";

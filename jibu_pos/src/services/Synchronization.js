@@ -19,7 +19,8 @@ class Synchronization {
 		this.isConnected = isConnected;
 	}
 	scheduleSync( ){
-		let timeout = 10000; // Sync after 10 seconds
+		console.log( "Synchronization:scheduleSync - Starting synchronization" );
+		let timeoutX = 10000; // Sync after 10 seconds
 		if( this.firstSyncId != null ){
 			clearTimeout( this.firstSyncId );
 		}
@@ -28,14 +29,14 @@ class Synchronization {
 		}
 		if( PosStorage.getCustomers().length == 0 || PosStorage.getProducts().length == 0 ){
 			// No local customers or products, sync now
-			timeout = 1000;
+			timeoutX = 1000;
 		}
 
 		let that = this;
 		this.firstSyncId = setTimeout(() => {
 			console.log("Synchronizing...");
 			that.doSynchronize( );
-		}, timeout);
+		}, timeoutX);
 		this.intervalId = setInterval( ()=>{
 			that.doSynchronize();
 		}, this.syncInterval);
@@ -60,21 +61,45 @@ class Synchronization {
 		}
 	}
 	synchronize(){
-		try {
-			this.refreshToken().then( ()=>{
-				this.synchronizeCustomers();
-				this.synchronizeProducts();
-				this.synchronizeSales();
-			}).catch( error => {
-				console.log(error.message);
-			});
+		let syncResult = {status:"success", error:""}
+		return new Promise((resolve ) => {
+			try {
+				this.refreshToken().then(() => {
+					const promiseCustomers = this.synchronizeCustomers()
+						.then( customerSync =>{
+							syncResult.customers = customerSync;
+						});
+					const promiseProducts = this.synchronizeProducts()
+						.then( productSync =>{
+							syncResult.products = productSync;
+						});
+					const promiseSales= this.synchronizeSales()
+						.then( saleSync =>{
+							syncResult.sales = saleSync;
+						});
 
-		}catch( error ){
-			console.log( error.message );
-		}
+					Promise.all([promiseCustomers, promiseProducts, promiseSales])
+						.then( values =>{
+							resolve(syncResult);
+						});
+				}).catch(error => {
+					syncResult.error = error.message;
+					syncResult.status = "failure";
+					resolve(syncResult)
+					console.log(error.message);
+				});
+
+			} catch (error) {
+				syncResult.error = error.message;
+				syncResult.status = "failure";
+				resolve(syncResult)
+				console.log(error.message);
+			}
+		});
 
 	}
 	synchronizeCustomers(){
+		return new Promise( resolve => {
 		console.log( "Synchronization:synchronizeCustomers - Begin" );
 		Communications.getCustomers( this.lastCustomerSync )
 			.then( web_customers => {
@@ -84,6 +109,7 @@ class Synchronization {
 					// Get the list of customers that need to be sent to the server
 					let { pendingCustomers, updated} = PosStorage.mergeCustomers( web_customers.customers );
 					console.log( "Synchronization:synchronizeCustomers No of local pending customers: " + pendingCustomers.length);
+					resolve( {error:null, localCustomers:  pendingCustomers.length, remoteCustomers: web_customers.customers.length});
 					pendingCustomers.forEach(customerKey => {
 						PosStorage.getCustomerFromKey(customerKey)
 							.then( customer => {
@@ -127,47 +153,57 @@ class Synchronization {
 				}
 			})
 			.catch(error => {
-				console.log( "Communications.getCustomers - error " + error);
+				console.log( "Synchronization.getCustomers - error " + error);
+				resolve( {error:error.message, localCustomers:  null, remoteCustomers:null});
 			});
+		});
 	}
 	synchronizeProducts(){
-		console.log( "Synchronization:synchronizeProducts - Begin" );
-		Communications.getProducts( this.lastProductSync )
-			.then( products => {
-				if (products.hasOwnProperty("products")) {
-					this.updateLastProductSync();
-					console.log( "Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
-					const updated = PosStorage.mergeProducts( products.products );
-					if( updated ){
-						Events.trigger('ProductsUpdated', {} );
-					}
+		return new Promise( resolve => {
+			console.log("Synchronization:synchronizeProducts - Begin");
+			Communications.getProducts(this.lastProductSync)
+				.then(products => {
+					resolve( {error:null, remoteProducts: products.products.length});
+					if (products.hasOwnProperty("products")) {
+						this.updateLastProductSync();
+						console.log("Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
+						const updated = PosStorage.mergeProducts(products.products);
+						if (updated) {
+							Events.trigger('ProductsUpdated', {});
+						}
 
-				}
-			})
-			.catch(error => {
-				console.log( "Communications.getProducts - error " + error);
-			});
+					}
+				})
+				.catch(error => {
+					resolve( {error:error.message, remoteProducts: null});
+					console.log("Synchronization.getProducts - error " + error);
+				});
+		});
 	}
 
 	synchronizeSales(){
-		console.log( "Synchronization:synchronizeSales - Begin" );
-		PosStorage.loadSalesReceipts( this.lastSalesSync )
-			.then( salesReceipts => {
-				console.log("Synchronization:synchronizeSales - Number of sales receipts: " + salesReceipts.length );
-				salesReceipts.forEach( (receipt) =>{
-					Communications.createReceipt(receipt.sale)
-						.then( result =>{
-							console.log( "Synchronization:synchronizeSales - success: " );
-							PosStorage.removePendingSale(receipt.key );
-						})
-						.catch(error => {
-							console.log("Synchronization:synchronizeCustomers Create receipt failed")
-						});
+		return new Promise( resolve => {
+			console.log("Synchronization:synchronizeSales - Begin");
+			PosStorage.loadSalesReceipts(this.lastSalesSync)
+				.then(salesReceipts => {
+					console.log("Synchronization:synchronizeSales - Number of sales receipts: " + salesReceipts.length);
+					resolve( {error:null, localReceipts:  salesReceipts.length});
+					salesReceipts.forEach((receipt) => {
+						Communications.createReceipt(receipt.sale)
+							.then(result => {
+								console.log("Synchronization:synchronizeSales - success: ");
+								PosStorage.removePendingSale(receipt.key);
+							})
+							.catch(error => {
+								console.log("Synchronization:synchronizeCustomers Create receipt failed")
+							});
+					})
 				})
-			})
-			.catch(error => {
-				console.log( "Communications.synchronizeSales - error " + error);
-			});
+				.catch(error => {
+					resolve( {error:error.message, localReceipts: null});
+					console.log("Synchronization.synchronizeSales - error " + error);
+				});
+		});
 	}
 
 	refreshToken(){
