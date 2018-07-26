@@ -79,7 +79,7 @@ class JibuApp extends Component {
 				console.log("JibuApp - Auto login - All settings exist");
 				this.props.toolbarActions.SetLoggedIn(true);
 				this.props.toolbarActions.ShowScreen("main");
-				console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
+				console.log("JibuApp - starting synchronization");
 				Synchronization.scheduleSync( );
 			}else if( this.isSettingsComplete() ){
 				console.log("JibuApp - login required - No Token");

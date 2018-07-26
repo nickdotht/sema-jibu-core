@@ -95,7 +95,7 @@ class Communications {
 			})
 			.catch((error) => {
 				console.log("Communications:getCustomers: " + error);
-				return {}
+				throw( error );
 			});
 	}
 
@@ -209,7 +209,7 @@ class Communications {
 			})
 			.catch((error) => {
 				console.log("Communications:getProducts: " + error);
-				return {}
+				throw( error );
 			});
 	}
 
