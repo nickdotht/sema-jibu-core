@@ -1,6 +1,3 @@
-const request = require('supertest');
-const expect = require('chai').expect;
-const chai = require('chai');
 const express = require('express');
 const router = express.Router();
 const semaLog = require('../seama_services/sema_logger');
@@ -21,26 +18,44 @@ var sqlInsertReceiptLineItem = "INSERT INTO receipt_line_item " +
 
 router.post('/', async (req, res) => {
 	semaLog.info('CREATE RECEIPT sema_receipts- Enter');
-	const { receiptId, customerId,siteId, createdDate, totalSales, cogs, products, salesChannelId} = req.body;
-	if( !receiptId || !customerId ||!siteId || !createdDate || !totalSales || !cogs || !products || !salesChannelId ) {
-		return res.status(400).send({ msg: "Bad request, missing parts of body. Check documentation" });
-	}
+	req.check("receiptId", "receiptId is missing").exists();
+	req.check("customerId", "customerId is missing").exists();
+	req.check("siteId", "siteId is missing").exists();
+	req.check("createdDate", "createdDate is missing").exists();
+	req.check("totalSales", "totalSales is missing").exists();
+	req.check("cogs", "cogs is missing").exists();
+	req.check("products", "products is missing").exists();
+	req.check("salesChannelId", "salesChannelId is missing").exists();
 
-	for (let i=0; i < products.length; i++){
-		if ( !products[i].productId || !products[i].quantity || !products[i].salesPrice || !products[i].receiptId ) {
-			return res.status(400).send({ msg: "Bad request, missing parts of product. Check documentation" });
+	req.getValidationResult().then(function(result) {
+		if (!result.isEmpty()) {
+			const errors = result.array().map((elem) => {
+				return elem.msg;
+			});
+			semaLog.error("Validation error: " + errors.toString());
+			res.status(400).send(errors.toString());
+		}else{
+			const { receiptId, customerId,siteId, createdDate, totalSales, cogs, products, salesChannelId} = req.body;
+
+			for (let i=0; i < products.length; i++){
+				if ( !products[i].productId || !products[i].quantity || !products[i].salesPrice || !products[i].receiptId ) {
+					semaLog.error("Bad request, missing parts of product");
+					return res.status(400).send({ msg: "Bad request, missing parts of product. Check documentation" });
+				}
+			}
+
+			try {
+				let receipt = new Receipt(req.body);
+				let postSqlParams = [ receipt.receiptId, receipt.customerId, receipt.siteId,
+					receipt.createdDate, receipt.totalSales, receipt.salesChannelId ];
+				insertReceipt(receipt, sqlInsertReceipt, postSqlParams, res);
+			} catch(err) {
+				semaLog.warn(`sema_receipts - Error: ${err}`);
+				return res.status(500).send({ msg: "Internal Server Error" });
+			}
 		}
-	}
+	});
 
-	try {
-		let receipt = new Receipt(req.body);
-		let postSqlParams = [ receipt.receiptId, receipt.customerId, receipt.siteId,
-			receipt.createdDate, receipt.totalSales, receipt.salesChannelId ];
-		insertReceipt(receipt, sqlInsertReceipt, postSqlParams, res);
-	} catch(err) {
-		semaLog.warn(`sema_receipts - Error: ${err}`);
-		return res.status(500).send({ msg: "Internal Server Error" });
-	}
 });
 
 const insertReceipt = (receipt, query, params, res ) => {
@@ -68,9 +83,9 @@ const insertReceipt = (receipt, query, params, res ) => {
 							for (let i = 0; i < receipt.products.length; i++) {
 								let sqlProductParams = [receipt.products[i].productId, receipt.products[i].quantity,
 									receipt.products[i].salesPrice, receiptId];
-								console.log("Inserting line item #" + i);
+								semaLog.info("Inserting line item #" + i);
 								insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams, connection).then(function(result) {
-									console.log("Inserted line item #" + resolveCount);
+									semaLog.info("Inserted line item #" + resolveCount);
 									resolveCount++;
 									if (result) {
 										successCount++;
@@ -119,7 +134,7 @@ const commitTransaction = ( receipt, connection, resolve, reject, res) => {
 			res.status(500).send(err.message);
 			reject(err);
 		}
-		console.log('Receipt Transaction Complete.');
+		semaLog.info('Receipt Transaction Complete.');
 
 	})
 }

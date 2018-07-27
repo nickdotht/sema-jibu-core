@@ -226,7 +226,7 @@ class OrderPaymentScreen extends Component {
 			this.formatAndSaveSale()
 			setTimeout(() => {
 				that.closeHandler()
-			}, 1500);
+			}, 500);
 		}
 		return (
 			<View style={{
@@ -252,6 +252,10 @@ class OrderPaymentScreen extends Component {
 			salesChannel: this.props.selectedCustomer.salesChannel,
 			siteId: this.props.selectedCustomer.siteId,
 			products:[] };
+		if( ! sale.siteId ){
+			// This fixes issues with the pseudo walkup customer
+			sale.siteId = PosStorage.getSettings().siteId;
+		}
 		sale.products = this.props.products.map( product => {
 			let productSale = {};
 			productSale.id = product.product.productId;
