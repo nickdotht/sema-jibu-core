@@ -434,6 +434,23 @@ class PosStorage {
 			sale.createdDate = saleDateTime;
 			let saleDateKey = saleDateTime.toISOString();
 			this.salesKeys.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
+			if( this.salesKeys.length > 1 ){
+				let oldest = this.salesKeys[0];
+				let firstDate = new Date( oldest.saleDateTime);
+				firstDate = new Date( firstDate.getTime() + 30 * 24 *60 *60 * 1000);
+				const now = new Date();
+				if( firstDate < now ){
+					// Older than 30 days remove it
+					this.salesKeys.shift();
+					AsyncStorage.removeItem(oldest.saleKey).then( error => {
+						if (error) {
+							console.log("error removing " + oldest.saleKey);
+						} else {
+							console.log("Removed " + oldest.saleKey)
+						}
+					});
+				}
+			}
 			this.pendingSales.push(saleItemKey + saleDateKey);
 			let keyArray = [
 				[ saleItemKey + saleDateKey, this.stringify(sale)],		// The sale
