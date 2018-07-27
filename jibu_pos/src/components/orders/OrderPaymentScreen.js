@@ -226,7 +226,7 @@ class OrderPaymentScreen extends Component {
 			this.formatAndSaveSale()
 			setTimeout(() => {
 				that.closeHandler()
-			}, 1500);
+			}, 500);
 		}
 		return (
 			<View style={{

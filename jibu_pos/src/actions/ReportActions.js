@@ -3,11 +3,11 @@ import PosStorage from "../database/PosStorage";
 export const SALES_REPORT_FROM_ORDERS = 'SALES_REPORT_FROM_ORDERS';
 
 
-export function GetSalesReportData( ) {
+export function GetSalesReportData( beginDate, endDate ) {
 	console.log("GetSalesReportData - action");
 
 	return (dispatch) => {
-		getSalesData()
+		getSalesData(beginDate, endDate)
 			.then( salesData =>{
 				dispatch({type: SALES_REPORT_FROM_ORDERS, data:{salesData:salesData}})
 			})
@@ -19,10 +19,10 @@ export function GetSalesReportData( ) {
 
 }
 
-const getSalesData = () =>{
+const getSalesData = (beginDate, endDate) =>{
 	return new Promise((resolve, reject) => {
 		let results = new Map();
-		let sales = PosStorage.getSales();
+		let sales = PosStorage.getFilteredSales(beginDate, endDate);
 		let resolvedCount = 0;
 		if( sales.length === 0 ){
 			resolve({totalLiters: 0, totalSales: 0, salesItems:[]});

@@ -409,7 +409,23 @@ class PosStorage {
 		console.log("PosStorage: getSales. Count " + this.salesKeys.length);
 		return this.salesKeys;
 	}
+	getFilteredSales( beginDate, endDate ){
+		console.log("PosStorage: getSales. between " + beginDate.toString() + " and " + endDate.toString());
+		// Note that sales are order earliest to latest
+		let sales = [];
+		for( let index = 0; index < this.salesKeys.length; index ++ ){
+			const nextSale = new Date(this.salesKeys[index].saleDateTime );
+			if( nextSale > endDate ){
+				return sales;
+			}else{
+				if( nextSale >= beginDate && nextSale <= endDate ){
+					sales.push( this.salesKeys[index]);
+				}
+			}
+		}
+		return sales;
 
+	}
 	addSale( sale){
 		console.log("PosStorage: addSale" );
 		return new Promise((resolve, reject) => {
