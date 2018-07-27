@@ -242,7 +242,7 @@ class Communications {
 						resolve({})
 					}else {
 						console.log("createReceipt - Fetch status: " + response.status);
-						reject();
+						reject(response.status);
 					}
 				})
 				.catch((error) => {

@@ -195,7 +195,11 @@ class Synchronization {
 								PosStorage.removePendingSale(receipt.key);
 							})
 							.catch(error => {
-								console.log("Synchronization:synchronizeCustomers Create receipt failed")
+								console.log("Synchronization:synchronizeCustomers Create receipt failed: error-" + error);
+								if( error === 400){
+									// This is unre-coverable... remove the pending sale
+									PosStorage.removePendingSale(receipt.key);
+								}
 							});
 					})
 				})
