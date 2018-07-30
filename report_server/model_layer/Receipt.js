@@ -1,19 +1,31 @@
 class Receipt {
 
 	constructor(jsonBody){
-		this._receiptId = jsonBody["receiptId"];
+		this._createdAt = new Date( jsonBody["createdAt"]);
+		this._updatedAt = this._createdAt;
+		this._currencyCode = jsonBody["currencyCode"];
 		this._customerId = jsonBody["customerId"];
+		this._amountCash = jsonBody["amountCash"];
+		this._amountMobile = jsonBody["amountMobile"];
+		this._amountLoan = jsonBody["amountLoan"];
+		this._amountCard = jsonBody["amountCard"];
 		this._siteId = jsonBody["siteId"];
-		this._createdDate = new Date( jsonBody["createdDate"]);
+		this._paymentType = "";	// ????
+		this._salesChannelId = jsonBody["salesChannelName"];
+		this._customerType = jsonBody["customerType"];
 		this._totalSales = jsonBody["totalSales"];
-		this._cogs = jsonBody["receiptId"];
+		this._cogs = jsonBody["cogs"];
+		this._receiptId = jsonBody["receiptId"];
 		this._products = jsonBody["products"];
-		this._salesChannelId = jsonBody["salesChannelId"];
 	}
 
 
 	classToPlain() {
 		return {
+			createdAt:this._createdAt,
+			updatedAt: this._updatedAt,
+			currencyCode: this._currencyCode,
+
 			receiptId: this._receiptId,
 			customerId: this._customerId,
 			siteId: this._siteId,
@@ -24,69 +36,68 @@ class Receipt {
 			salesChannelId: this._salesChannelId
 		}
 	}
-
-	get receiptId() {
-		return this._receiptId;
+	get createdAt() {
+		return this._createdAt;
 	}
 
-	set receiptId(value) {
-		this._receiptId = value;
+	get updatedAt() {
+		return this._updatedAt;
+	}
+	get currencyCode() {
+		return this._currencyCode;
+	}
+	get amountCash() {
+		return this._amountCash;
 	}
 
-	get products() {
-		return this._products;
+	get amountMobile() {
+		return this._amountMobile;
 	}
 
-	set products(value) {
-		this._products = value;
+	get amountLoan() {
+		return this._amountLoan;
 	}
 
-	get customerId() {
-		return this._customerId;
-	}
-
-	set customerId(value) {
-		this._customerId = value;
+	get amountCard() {
+		return this._amountCard;
 	}
 
 	get siteId() {
 		return this._siteId;
 	}
 
-	set siteId(value) {
-		this._siteId = value;
+	get paymentType() {
+		return this._paymentType;
+	}
+	get salesChannelId() {
+		return this._salesChannelId;
 	}
 
-	get createdDate() {
-		return this._createdDate;
-	}
-
-	set createdDate(value) {
-		this._createdDate = value;
+	get customerType() {
+		return this._customerType;
 	}
 
 	get totalSales() {
 		return this._totalSales;
 	}
-
-	set totalSales(value) {
-		this._totalSales = value;
-	}
-
 	get cogs() {
 		return this._cogs;
 	}
 
-	set cogs(value) {
-		this._cogs = value;
+
+	get receiptId() {
+		return this._receiptId;
 	}
 
-	get salesChannelId() {
-		return this._salesChannelId;
+
+
+	get products() {
+		return this._products;
 	}
 
-	set salesChannelId(value) {
-		this._salesChannelId = value;
+
+	get customerId() {
+		return this._customerId;
 	}
 
 }

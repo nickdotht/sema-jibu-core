@@ -5,8 +5,11 @@ const bodyParser = require('body-parser');
 const Receipt = require('../model_layer/Receipt');
 
 var sqlInsertReceipt = "INSERT INTO receipt " +
-				"(uuid, customer_account_id, kiosk_id, created_date, total, sales_channel_id, version, currency_code, is_sponsor_selected, payment_mode, payment_type) " +
-				"VALUES (?,?,?,?,?,?,1,'USD',b'0','unknown', 'unknown')";
+				"(created_at, updated_at, currency_code, " +
+	"amount_cash, amount_mobile, amount_loan, amount_card, " +
+	"kiosk_id, payment_type, customer_type_id, total, " +
+	"cogs, uuid, customer_account_id, sales_channel_id ) " +
+	"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )";
 
 var sqlInsertReceiptLineItem = "INSERT INTO receipt_line_item " +
 				"(product_id, quantity, price, receipt_id, version, currency_code, gallons, sku, type) " +
@@ -18,14 +21,20 @@ var sqlInsertReceiptLineItem = "INSERT INTO receipt_line_item " +
 
 router.post('/', async (req, res) => {
 	semaLog.info('CREATE RECEIPT sema_receipts- Enter');
-	req.check("receiptId", "receiptId is missing").exists();
+	req.check("createdAt", "createdAt is missing").exists();
+	req.check("currencyCode", "currencyCode is missing").exists();
 	req.check("customerId", "customerId is missing").exists();
+	req.check("amountCash", "amountCash is missing").exists();
+	req.check("amountMobile", "amountMobile is missing").exists();
+	req.check("amountLoan", "amountLoan is missing").exists();
+	req.check("amountCard", "amountCard is missing").exists();
+
+	req.check("receiptId", "receiptId is missing").exists();
 	req.check("siteId", "siteId is missing").exists();
-	req.check("createdDate", "createdDate is missing").exists();
 	req.check("totalSales", "totalSales is missing").exists();
 	req.check("cogs", "cogs is missing").exists();
 	req.check("products", "products is missing").exists();
-	req.check("salesChannelId", "salesChannelId is missing").exists();
+	req.check("salesChannelName", "salesChannelName is missing").exists();
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
@@ -35,7 +44,7 @@ router.post('/', async (req, res) => {
 			semaLog.error("Validation error: " + errors.toString());
 			res.status(400).send(errors.toString());
 		}else{
-			const { receiptId, customerId,siteId, createdDate, totalSales, cogs, products, salesChannelId} = req.body;
+			const products = req.body["products"];
 
 			for (let i=0; i < products.length; i++){
 				if ( !products[i].productId || !products[i].quantity || !products[i].salesPrice || !products[i].receiptId ) {
@@ -46,8 +55,12 @@ router.post('/', async (req, res) => {
 
 			try {
 				let receipt = new Receipt(req.body);
-				let postSqlParams = [ receipt.receiptId, receipt.customerId, receipt.siteId,
-					receipt.createdDate, receipt.totalSales, receipt.salesChannelId ];
+				let postSqlParams = [ receipt.createdAt, receipt.updatedAt,receipt.currencyCode,
+					receipt.amountCash, receipt.amountMobile, receipt.amountLoan, receipt.amountCard,
+
+					receipt.siteId, receipt.paymentType , receipt.customerType, receipt.totalSales, receipt.cogs, receipt.receiptId ];
+
+				// Before the insert... resolve customer_account_id, sales_channel_id, and add to postSqlParams array
 				insertReceipt(receipt, sqlInsertReceipt, postSqlParams, res);
 			} catch(err) {
 				semaLog.warn(`sema_receipts - Error: ${err}`);

@@ -30,7 +30,7 @@ describe('Testing Receipts API', function () {
 		}, 2000);
 	});
 
-	describe('POST /sema/site/receipts. Everything Valid', function() {
+	describe('POST /sema/site/receipts. Empty products array', function() {
 		it('Should pass', (done) => {
 			authenticate(server).then(function(token) {
 				removeReceipts.removeReceiptLineItems().then(function() {
@@ -45,6 +45,50 @@ describe('Testing Receipts API', function () {
 									"customerId": "Brian",
 									"siteId": kiosk.id,
 									"createdDate": "9/9/18",
+									"totalSales": "10",
+									"cogs": "9",
+									"products": [],
+									"salesChannelId": "122"
+								})
+								.set('Authorization', token)
+								.end(function(err, res) {
+									res.should.have.status(200);
+									getReceipts.getReceipts().then(function(receipts) {
+										receipts[0].should.have.property("uuid").eql("2");
+										getReceipts.getReceiptLineItems().then(function(receiptLineItems) {
+											receiptLineItems.length.should.eql(0)
+											removeReceipts.removeReceiptLineItems().then(function() {
+												removeReceipts.removeReceipts().then(function() {
+													done(err);
+												});
+											});
+										});
+									});
+
+								});
+						});
+					});
+				});
+			});
+		});
+	});
+	describe('POST /sema/site/receipts. Everything Valid - 2 products', function() {
+		it('Should pass', (done) => {
+			authenticate(server).then(function(token) {
+				removeReceipts.removeReceiptLineItems().then(function() {
+					removeReceipts.removeReceipts().then(function() {
+						findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+							let url = '/sema/site/receipts/';
+							chai.request(server)
+								.post(url)
+								.set('Content-Type', 'application/json; charset=UTF-8')
+								.send({
+									"createdAt": "9/9/18",
+									"currencyCode":"USD",
+									"customerId": "Brian",
+									"receiptId": "2",
+									"siteId": kiosk.id,
+									"currencyCode":"USD",
 									"totalSales": "10",
 									"cogs": "9",
 									"products": [
