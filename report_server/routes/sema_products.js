@@ -7,7 +7,7 @@ const semaLog = require('../seama_services/sema_logger');
 const bodyParser = require('body-parser');
 const Product = require('../model_layer/Product');
 
-var sqlQueryDate = "SELECT * FROM product WHERE updated_date > ?";
+var sqlQueryDate = "SELECT * FROM product WHERE updated_at > ?";
 var sqlQuery = "SELECT * FROM product";
 
 
