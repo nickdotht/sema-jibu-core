@@ -247,21 +247,21 @@ const deleteCustomers = (query, params, res ) => {
 
 
 router.post('/', async (req, res) => {
-	semaLog.info('sema_customer - Enter');
+	semaLog.info('CREATE sema_customer - Enter');
 
 	//var postSqlParams = [];
 
 	semaLog.info(req.body);
-	req.check("customerType", "Parameter customer-type is missing").exists();
-	req.check("contactName", "Parameter contact-name is missing").exists();
-	req.check("siteId", "Parameter site-id is missing").exists();
+	req.check("customerType", "Parameter customerType is missing").exists();
+	req.check("contactName", "Parameter contactName is missing").exists();
+	req.check("siteId", "Parameter siteId is missing").exists();
 
 	req.getValidationResult().then(function(result) {
 		if (!result.isEmpty()) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
-			semaLog.error("validation error");
+			semaLog.error("Validation error: " + errors.toString());
 			res.status(400).send(errors.toString());
 		}
 		else {
@@ -297,7 +297,7 @@ const insertCustomers = (customer, query, params, res ) => {
 					reject(err);
 				}
 				else {
-					semaLog.info('customers - succeeded');
+					semaLog.info('CREATE customer - succeeded');
 
 					try {
 						resolve(res.json(customer.classToPlain()));

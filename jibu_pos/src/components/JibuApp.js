@@ -19,6 +19,7 @@ import {connect} from "react-redux";
 import * as CustomerActions from '../actions/CustomerActions';
 import * as NetworkActions from '../actions/NetworkActions';
 import * as SettingsActions from '../actions/SettingsActions';
+import * as ProductActions from '../actions/ProductActions';
 
 
 import PosStorage from "../database/PosStorage";
@@ -26,6 +27,7 @@ import Synchronization from "../services/Synchronization";
 import SiteReport from "./reports/SiteReport";
 import Communications from "../services/Communications";
 import Events from "react-native-simple-events";
+import * as ToolbarActions from "../actions/ToolBarActions";
 
 console.ignoredYellowBox = ['Warning: isMounted'];
 
@@ -52,39 +54,74 @@ class JibuApp extends Component {
 			console.log( "PosStorage - " + JSON.stringify(PosStorage));
 			console.log( "Communications - " + JSON.stringify(Communications));
 
-			let timeout = 200;
-			if (isInitialized && this.posStorage.getCustomers().length > 0) {
+			// let timeout = 200;
+			if (isInitialized ) {
 				// Data already configured
 				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
-				timeout = 20000;	// First sync after a bit
+				this.props.productActions.setProducts(this.posStorage.getProducts());
 			}
-			console.log("JibuApp - scheduling synchronization in " + timeout + "(ms");
-			Synchronization.initialize( PosStorage.getLastCustomerSync());
-			// Synchronization.scheduleSync( this.state.synchronization, timeout, this.props.customerActions.LoadCustomers );
+			// if (isInitialized && this.posStorage.getCustomers().length > 0) {
+			// 	// Data already configured
+			// 	timeout = 20000;	// First sync after a bit
+			// }
+
+			Synchronization.initialize(
+				PosStorage.getLastCustomerSync(),
+				PosStorage.getLastProductSync(),
+				PosStorage.getLastSalesSync());
+			Synchronization.setConnected(this.props.network.isNWConnected );
+
+			// Determine the startup screen as follows:
+			// If the settings contain url, site, username, password and token, proceed to main screen
+			// If the settings contain url, site, username, password but NOT token, proceed to login screen, (No token => user has logged out)
+			// Otherwise proceed to the settings screen.
+			if( this.isLoginComplete() ){
+				console.log("JibuApp - Auto login - All settings exist");
+				this.props.toolbarActions.SetLoggedIn(true);
+				this.props.toolbarActions.ShowScreen("main");
+				console.log("JibuApp - starting synchronization");
+				Synchronization.scheduleSync( );
+			}else if( this.isSettingsComplete() ){
+				console.log("JibuApp - login required - No Token");
+				this.props.toolbarActions.SetLoggedIn(false);
+			}else{
+				console.log("JibuApp - Settings not complete");
+				this.props.toolbarActions.SetLoggedIn(true);	// So that the login screen doesn't show
+				this.props.toolbarActions.ShowScreen("settings");
+
+			}
 
 		});
 		NetInfo.isConnected.fetch().then(isConnected => {
 			console.log('Network is ' + (isConnected ? 'online' : 'offline'));
 			this.props.networkActions.NetworkConnection(isConnected);
+			Synchronization.setConnected( isConnected );
 		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this) );
+		Events.on('ProductsUpdated', 'productUpdate1', this.onProductsUpdated.bind(this) );
 
-		console.log("Mounted-Done");
+		console.log("JibuApp = Mounted-Done");
 
 	}
 	componentWillUnmount(){
 		Events.rm('CustomersUpdated', 'customerUpdate1') ;
+		Events.rm('ProductsUpdated', 'productUpdate1') ;
 		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );
 	}
 
 	onCustomersUpdated = () =>{
 		this.props.customerActions.setCustomers(this.posStorage.getCustomers());
-	}
+	};
+
+	onProductsUpdated = () =>{
+		this.props.productActions.setProducts(this.posStorage.getProducts());
+	};
 
 	handleConnectivityChange = isConnected => {
 		console.log("handleConnectivityChange: " + isConnected);
 		this.props.networkActions.NetworkConnection(isConnected);
+		Synchronization.setConnected( isConnected );
 	};
 
 	render() {
@@ -94,6 +131,7 @@ class JibuApp extends Component {
 
 
 	getLoginOrHomeScreen(){
+		console.log("getLoginOrHomeScreen - isLoggedIn: " +this.props.showScreen.isLoggedIn);
 		if( this.props.showScreen.isLoggedIn ) {
 			return (
 				<View style={{flex: 1}}>
@@ -108,6 +146,32 @@ class JibuApp extends Component {
 			);
 		}
 	}
+
+	isLoginComplete(){
+		let settings = this.posStorage.getSettings();
+		console.log("isLoginComplete " + JSON.stringify(settings));
+		if( settings.semaUrl.length > 0 &&
+			settings.site.length > 0 &&
+			settings.user.length > 0 &&
+			settings.password.length > 0 &&
+			settings.token.length > 0 ){
+			console.log("All settings valid - Proceed to main screen");
+			return true;
+		}
+		return false;
+	}
+	isSettingsComplete(){
+		let settings = this.posStorage.getSettings();
+		if( settings.semaUrl.length > 0 &&
+			settings.site.length > 0 &&
+			settings.user.length > 0 &&
+			settings.password.length > 0 &&
+			settings.token.length == 0 ){
+			return true;
+		}
+		return false;
+	}
+
 }
 class ScreenSwitcher extends Component {
 
@@ -160,7 +224,9 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
 	return {
 		customerActions:bindActionCreators(CustomerActions, dispatch),
+		productActions:bindActionCreators(ProductActions, dispatch),
 		networkActions:bindActionCreators(NetworkActions, dispatch),
+		toolbarActions:bindActionCreators(ToolbarActions, dispatch),
 		settingsActions:bindActionCreators(SettingsActions, dispatch)};
 }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import PosStorage from "../database/PosStorage";
 
 class Communications {
 	constructor(  ){
@@ -28,13 +29,8 @@ class Communications {
 	login(){
 		let options = {
 			method: 'POST',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				usernameOrEmail: this._user,
-				password: this._password,
+			headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+			body: JSON.stringify({ usernameOrEmail: this._user, password: this._password,
 			}),
 		}
 
@@ -58,12 +54,7 @@ class Communications {
 		})
 	}
 	getSiteId( token, siteName){
-		let options = {
-			method: 'GET',
-			headers: {
-				Authorization : 'Bearer ' + token
-			},
-		}
+		let options = { method: 'GET', headers: { Authorization : 'Bearer ' + token } };
 
 		return new Promise( (resolve, reject ) => {
 			fetch(this._url + 'untapped/kiosks', options)
@@ -91,10 +82,7 @@ class Communications {
 
 	}
 	getCustomers( updatedSince ) {
-		let options = {
-			method: 'GET',
-			headers: { Authorization: 'Bearer ' + this._token }
-		}
+		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } };
 		let url = 'sema/site/customers?site-id=' + this._siteId;
 
 		if( updatedSince ){
@@ -107,11 +95,13 @@ class Communications {
 			})
 			.catch((error) => {
 				console.log("Communications:getCustomers: " + error);
-				return {}
+				throw( error );
 			});
 	}
 
 	createCustomer( customer ) {
+		// TODO - Resolve customer type.... Is it needed, currently hardcoded...
+		customer.customerType = 128;		// FRAGILE
 		let options = {
 			method: 'POST',
 			headers: {
@@ -155,10 +145,10 @@ class Communications {
 		return new Promise( (resolve, reject ) => {
 			fetch(this._url + 'sema/site/customers/' + customer.customerId, options)
 				.then((response) => {
-					if (response.status === 200) {
+					if (response.status === 200 || response.status === 404 ) {
 						resolve();
 					}else {
-						console.log("createCustomer - Fetch status: " + response.status);
+						console.log("deleteCustomer - Fetch status: " + response.status);
 						reject();
 					}
 				})
@@ -202,6 +192,86 @@ class Communications {
 				});
 		});
 	}
+	getProducts( updatedSince ) {
+		let options = {
+			method: 'GET',
+			headers: { Authorization: 'Bearer ' + this._token }
+		}
+		let url = 'sema/products';
 
+		if( updatedSince ){
+			url = url + '?updated-date=' + updatedSince.toISOString();
+		}
+		return fetch(this._url + url, options)
+			.then((response) => response.json())
+			.then((responseJson) => {
+				return responseJson
+			})
+			.catch((error) => {
+				console.log("Communications:getProducts: " + error);
+				throw( error );
+			});
+	}
+
+	createReceipt( receipt ) {
+		let options = {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + this._token
+			},
+			body: JSON.stringify(this._remoteReceiptFromReceipt( receipt) )
+
+		}
+		return new Promise( (resolve, reject ) => {
+			fetch(this._url + 'sema/site/receipts', options)
+				.then((response) => {
+					if (response.status === 200) {
+						response.json()
+							.then((responseJson) => {
+								resolve(responseJson)
+							})
+							.catch((error) => {
+								console.log("createReceipt - Parse JSON: " + error.message);
+								reject();
+							});
+					}else if(response.status === 409 ){
+						// Indicates this receipt has already been added
+						console.log("createReceipt - Receipt already exists");
+						resolve({})
+					}else {
+						console.log("createReceipt - Fetch status: " + response.status);
+						reject(response.status);
+					}
+				})
+				.catch((error) => {
+					console.log("createReceipt - Fetch: " + error.message);
+					reject();
+				});
+		});
+	}
+	_remoteReceiptFromReceipt( receipt ){
+	let remoteReceipt = {
+		receiptId: receipt.receiptId,
+		customerId: receipt.customerId,
+		siteId: receipt.siteId,
+		createdDate: new Date(receipt.createdDate),
+		totalSales: receipt.cash + receipt.credit + receipt.mobile,
+		salesChannelId: 122,
+		cogs:"0",		// TODO - Implement this...
+		products: []
+	};
+		receipt.products.forEach( product => {
+			let remoteProduct = {
+				productId:product.id,
+				quantity: product.quantity,
+				receiptId: remoteReceipt.receiptId,
+				salesPrice:product.priceAmount
+			}
+			remoteReceipt.products.push( remoteProduct);
+		});
+		return remoteReceipt;
+	}
 };
 export default new Communications();

@@ -45,7 +45,7 @@ class OrderItems extends Component {
 							{this.getRow(item, index, separators)}
 						</TouchableHighlight>
 					)}
-					keyExtractor={item => item.product.id.toString()}
+					keyExtractor={item => item.product.productId.toString()}
 				/>
 				<Modal visible = {this.state.isQuantityVisible}
 					   backdropColor={'red'}
@@ -79,7 +79,7 @@ class OrderItems extends Component {
 					<Text style={[styles.baseItem]}>{item.quantity}</Text>
 				</View>
 				<View style={ [ {flex: 1}]}>
-					<Text style={[styles.baseItem]}>{(item.quantity * this.getItemPrice( item.product.price_amount))}</Text>
+					<Text style={[styles.baseItem]}>{(item.quantity * this.getItemPrice( item.product.priceAmount))}</Text>
 				</View>
 			</View>
 		);

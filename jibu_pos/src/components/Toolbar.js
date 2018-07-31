@@ -13,6 +13,8 @@ import {connect} from "react-redux";
 import * as CustomerActions from "../actions/CustomerActions";
 import * as ToolBarActions from "../actions/ToolBarActions";
 import Communications from "../services/Communications";
+import PosStorage from "../database/PosStorage";
+import * as SettingsActions from "../actions/SettingsActions";
 
 class Toolbar extends Component {
     render() {
@@ -36,7 +38,7 @@ class Toolbar extends Component {
 					<TouchableHighlight onPress={() => this.onLogout()}>
 						<Text style = {[styles.text_style,{marginRight:20}]}>Logout</Text>
 					</TouchableHighlight>
-					<Text style = {[styles.text_style,{marginRight:20} ]}>Dan Nolan</Text>
+					<Text style = {[styles.text_style,{marginRight:20} ]}>{this.props.settings.user}</Text>
 					<TouchableHighlight onPress={() => this.onShowRemoteReport()}>
 						<Image source={require('../images/report-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
 					</TouchableHighlight>
@@ -72,6 +74,13 @@ class Toolbar extends Component {
 	onLogout= () =>{
 		console.log("onLogout");
 		this.props.toolbarActions.SetLoggedIn(false);
+		let settings = PosStorage.getSettings();
+
+		// Save with empty token - This will force username/password validation
+		PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user, settings.password, "", settings.siteId );
+		this.props.settingsActions.setSettings(PosStorage.getSettings());
+		Communications.setToken("");
+
 	};
 
 	onSettings= () =>{
@@ -93,6 +102,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
 	return {customerActions:bindActionCreators(CustomerActions, dispatch),
+		settingsActions:bindActionCreators(SettingsActions, dispatch),
 		toolbarActions:bindActionCreators(ToolBarActions, dispatch)};
 }
 

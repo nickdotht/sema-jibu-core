@@ -148,7 +148,7 @@ class OrderPaymentScreen extends Component {
 	);
 	}
 	calculateOrderDue(){
-		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.price_amount)) }, 0);
+		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.priceAmount)) }, 0);
 	}
 	calculateAmountDue(){
 		return this.props.selectedCustomer.dueAmount;
@@ -226,7 +226,7 @@ class OrderPaymentScreen extends Component {
 			this.formatAndSaveSale()
 			setTimeout(() => {
 				that.closeHandler()
-			}, 1500);
+			}, 500);
 		}
 		return (
 			<View style={{
@@ -244,16 +244,27 @@ class OrderPaymentScreen extends Component {
 	};
 
 	formatAndSaveSale = () =>{
-		let sale = {cash:this.props.payment.cash, credit:this.props.payment.credit, mobile:this.props.payment.mobile, products:[] };
+		let sale = {
+			cash:this.props.payment.cash,
+			credit:this.props.payment.credit,
+			mobile:this.props.payment.mobile,
+			customerId: this.props.selectedCustomer.customerId,
+			salesChannel: this.props.selectedCustomer.salesChannel,
+			siteId: this.props.selectedCustomer.siteId,
+			products:[] };
+		if( ! sale.siteId ){
+			// This fixes issues with the pseudo walkup customer
+			sale.siteId = PosStorage.getSettings().siteId;
+		}
 		sale.products = this.props.products.map( product => {
 			let productSale = {};
-			productSale.id = product.product.id;
+			productSale.id = product.product.productId;
 			productSale.description = product.product.description;
 			productSale.gallons =  product.product.gallons;
 			productSale.liters_per_sku = product.product.liters_per_sku;
 			productSale.sku = product.product.sku;
-			productSale.price_amount = product.product.price_amount;
-			productSale.price_currency  = product.product.price_currency;
+			productSale.priceAmount = product.product.priceAmount;
+			productSale.price_currency  = product.product.priceCurrency;
 			productSale.quantity = product.quantity;
 			return productSale;
 		});
