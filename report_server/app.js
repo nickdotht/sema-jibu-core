@@ -50,6 +50,7 @@ app.use(cookieParser());
 
 // Use for react
 app.use(express.static(path.join(__dirname, 'public_react/build/')));
+app.use(express.static(path.join('..', 'documentations')));
 
 app.use('/', index);
 app.use('/untapped/health-check', seama_health_check);
