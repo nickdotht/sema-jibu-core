@@ -33,13 +33,17 @@ describe('Testing Customers API', function () {
 						customer.should.have.property('contactName').eql('TestCustomer 1');
 						let oldPhone = customer.phoneNumber;
 						let oldAddress = customer.address;
+						let oldUpdatedDate = customer.updatedDate;
 						let url = sprintf('/sema/site/customers/%s', customer.customerId);
+						let now = new Date();
 						chai.request(server)
 							.put(url)
 							.set('Content-Type', 'application/json; charset=UTF-8')
 							.send({ 'phoneNumber': '999-999-9999', 'address': 'somwhere else' })
 							.set('Authorization', token)
 							.end(function(err, res) {
+								let updateDate = new Date( res.body.updatedDate);
+								expect(updateDate ).to.be.above( now );
 								findCustomerId.findCustomerId(server, token, 'TestCustomer 1', kiosk.id).then(function(customer) {
 									customer.should.have.property("phoneNumber").eql("999-999-9999");
 									customer.should.have.property("address").eql("somwhere else");
@@ -47,7 +51,7 @@ describe('Testing Customers API', function () {
 									chai.request(server)
 										.put(url)
 										.set('Content-Type', 'application/json; charset=UTF-8')
-										.send({ 'phoneNumber': oldPhone, 'address': oldAddress })
+										.send({ 'phoneNumber': oldPhone, 'address': oldAddress, 'updatedDate':oldUpdatedDate })
 										.set('Authorization', token)
 										.end(function(err, res) {
 											done(err);

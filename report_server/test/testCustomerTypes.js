@@ -2,10 +2,11 @@ const expect = require('chai').expect;
 const chai = require('chai');
 chaiHttp = require('chai-http');
 chai.use(chaiHttp);
+const should = chai.should();
 let findCustomerType= require('./Utilities/findCustomerTypeId');
 process.env.NODE_ENV = 'test';  // Set environment to test
 
-describe('Testing Sales Channels', function () {
+describe('Testing Customer Types', function () {
 	let server;
 	this.timeout(6000);
 	beforeEach( (done) => {
@@ -19,7 +20,7 @@ describe('Testing Sales Channels', function () {
 		setTimeout( function(){iAmDone()}, 2000);
 	});
 	describe('GET /sema/customer-types', function() {
-		it('should get all customer types', function testSalesChannels(done) {
+		it('should get all customer types', function testCustomerTypes(done) {
 			chai.request(server)
 				.post('/untapped/login')
 				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })

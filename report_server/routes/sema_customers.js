@@ -67,7 +67,7 @@ router.put('/:id', async (req, res) => {
 
 				let customerParams = [ customer.updatedDate, customer.name, customer.salesChannelId,
 				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber, customer.customerId];
-				updateCustomers(sqlUpdateCustomers, customerParams, res)
+				updateCustomers(sqlUpdateCustomers, customerParams, res, customer)
 					.then(result =>{})
 					.catch(error =>{});
 
@@ -81,7 +81,7 @@ router.put('/:id', async (req, res) => {
 
 
 
-const updateCustomers = (query, params, res ) => {
+const updateCustomers = (query, params, res, customer ) => {
 	return new Promise((resolve, reject) => {
 		__pool.getConnection((err, connection) => {
 			connection.query(query, params, function(err, result) {
@@ -95,7 +95,7 @@ const updateCustomers = (query, params, res ) => {
 					semaLog.info('updateCustomers customers - succeeded');
 
 					try {
-						resolve(res.json({Updated: result}));
+						resolve(res.json(customer.classToPlain()));
 					} catch (err) {
 						semaLog.error('updateCustomers customers - failed', { err });
 						res.status(500).send(err.message);

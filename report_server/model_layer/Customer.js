@@ -100,6 +100,8 @@ class Customer {
 
 		if (requestCustomer.hasOwnProperty("updatedDate")) {
 			this._updatedDate = new Date(requestCustomer.updatedDate);
+		}else{
+			this._updatedDate = new Date();
 		}
 		if (requestCustomer.hasOwnProperty("salesChannelId")) {
 			this._salesChannelId = requestCustomer.salesChannelId;
