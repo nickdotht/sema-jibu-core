@@ -30,7 +30,7 @@ describe('Testing Customers API', function () {
 			authenticate(server).then(function(token) {
 				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
 					findCustomerId.findCustomerId(server, token, 'TestCustomer 1', kiosk.id).then(function(customer) {
-						customer.should.have.property('contactName').eql('TestCustomer 1');
+						customer.should.have.property('name').eql('TestCustomer 1');
 						let oldPhone = customer.phoneNumber;
 						let oldAddress = customer.address;
 						let oldUpdatedDate = customer.updatedDate;
@@ -110,12 +110,12 @@ describe('Testing Customers API', function () {
 		it('Should fail with foreign key constraint error 500', (done) => {
 			authenticate(server).then(function(token) {
 				chai.request(server)
-					.post('/sema/site/customers?contactName=Brian&customerType=128&siteId=9999')
+					.post('/sema/site/customers')
 					.send({
 						'customerId': '999999',
 						'customerTypeId': 1,
 						'salesChannelId':1,
-						'contactName': 'A contact',
+						'name': 'A contact',
 						'siteId': 666666,
 						'address': 'Some address',
 						'phoneNumber': '555-1212'
@@ -282,7 +282,7 @@ describe('Testing Customers API', function () {
 							expect(res.body.customers).to.be.an('array');
 							expect(res.body.customers.length).to.be.equal(3);
 							res.body.customers[0].should.have.property("customerId");
-							res.body.customers[0].should.have.property("contactName").eql("TestCustomer 4");
+							res.body.customers[0].should.have.property("name").eql("TestCustomer 4");
 							res.body.customers[0].should.have.property("dueAmount").eql(0);
 							res.body.customers[0].should.have.property("updatedDate").eql("2018-04-01T07:00:00.000Z");
 							done(err);
@@ -307,7 +307,7 @@ describe('Testing Customers API', function () {
 							expect(res.body.customers).to.be.an('array');
 							expect(res.body.customers.length).to.be.equal(1);
 							expect(res.body.customers[0].active).to.be.equal(true);
-							expect(res.body.customers[0].contactName).to.be.equal("TestCustomer 6");
+							expect(res.body.customers[0].name).to.be.equal("TestCustomer 6");
 							expect(res.body.customers[0].createdDate).to.be.equal("2018-05-01T07:00:00.000Z");
 							expect(res.body.customers[0].updatedDate).to.be.equal("2018-05-01T07:00:00.000Z");
 							expect(res.body.customers[0].dueAmount).to.be.equal(0);
@@ -379,7 +379,7 @@ describe('Testing Customers API', function () {
 									'customerId': '999999',
 									'customerTypeId': customerType.id,
 									'salesChannelId': salesChannel.id,
-									'contactName': 'A contact',
+									'name': 'A contact',
 									'siteId': kiosk.id,
 									'address': 'Some address',
 									'phoneNumber': '555-1212'
@@ -388,7 +388,7 @@ describe('Testing Customers API', function () {
 								.end(function(err, res) {
 									res.should.have.status(200);
 									expect(res.body.address).to.be.equal('Some address');
-									expect(res.body.contactName).to.be.equal("A contact");
+									expect(res.body.name).to.be.equal("A contact");
 									expect(res.body.customerId).to.be.equal('999999');
 									expect(res.body.customerTypeId).to.be.equal(customerType.id);
 									expect(res.body.siteId).to.be.equal(kiosk.id);

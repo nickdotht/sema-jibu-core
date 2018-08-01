@@ -204,7 +204,7 @@ router.post('/', async (req, res) => {
 	semaLog.info(req.body);
 	req.check("customerTypeId", "Parameter customerTypeId is missing").exists();
 	req.check("salesChannelId", "Parameter salesChannelId is missing").exists();
-	req.check("contactName", "Parameter contactName is missing").exists();
+	req.check("name", "Parameter name is missing").exists();
 	req.check("siteId", "Parameter siteId is missing").exists();
 	req.check("address", "Parameter address is missing").exists();
 	req.check("phoneNumber", "Parameter phoneNumber is missing").exists();

@@ -5,12 +5,15 @@ chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const should = chai.should();
 const sprintf = require('sprintf-js').sprintf;
-var findKioskId = require('./Utilities/findKioskId');
-var authenticate = require('./Utilities/authenticate');
-var findSalesByChannelId = require('./Utilities/findSalesByChannelId');
-var removeReceipts = require('./Utilities/removeReceipts');
-var getReceipts = require('./Utilities/getReceipts');
-const uuidv1 = require('uuid/v1');
+let findKioskId = require('./Utilities/findKioskId');
+let authenticate = require('./Utilities/authenticate');
+let findSalesChannel= require('./Utilities/findSalesChannelId');
+let findCustomerType= require('./Utilities/findCustomerTypeId');
+let removeReceipts = require('./Utilities/removeReceipts');
+let getReceipts = require('./Utilities/getReceipts');
+let findCustomerId = require('./Utilities/findCustomerId');
+let findProductId = require('./Utilities/findProductId');
+
 
 describe('Testing Receipts API', function () {
 	let server;
@@ -36,94 +39,116 @@ describe('Testing Receipts API', function () {
 				removeReceipts.removeReceiptLineItems().then(function() {
 					removeReceipts.removeReceipts().then(function() {
 						findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
-							let url = '/sema/site/receipts/';
-							chai.request(server)
-								.post(url)
-								.set('Content-Type', 'application/json; charset=UTF-8')
-								.send({
-									"receiptId": "2",
-									"customerId": "Brian",
-									"siteId": kiosk.id,
-									"createdDate": "9/9/18",
-									"totalSales": "10",
-									"cogs": "9",
-									"products": [],
-									"salesChannelId": "122"
-								})
-								.set('Authorization', token)
-								.end(function(err, res) {
-									res.should.have.status(200);
-									getReceipts.getReceipts().then(function(receipts) {
-										receipts[0].should.have.property("uuid").eql("2");
-										getReceipts.getReceiptLineItems().then(function(receiptLineItems) {
-											receiptLineItems.length.should.eql(0)
-											removeReceipts.removeReceiptLineItems().then(function() {
-												removeReceipts.removeReceipts().then(function() {
-													done(err);
+							findSalesChannel.findSalesChannelId(server, token, "sales channel 1"). then(function(salesChannel) {
+								findCustomerType.findCustomerTypeId(server, token, "TestCustomer"). then(function(customerType) {
+									findCustomerId.findCustomerId(server, token, 'TestCustomer 1', kiosk.id).then(function(customer) {
+										let url = '/sema/site/receipts/';
+										chai.request(server)
+											.post(url)
+											.set('Content-Type', 'application/json; charset=UTF-8')
+											.send({
+												"id": "2018072700001",
+												"createdDate": "7/27/18",
+												"currencyCode": "USD",
+												"customerId": customer.customerId,
+												"amountCash": 5,
+												"amountLoan": 4,
+												"siteId": kiosk.id,
+												"paymentType": "What is this for",
+												"salesChannelId": salesChannel.id,
+												"customerTypeId": customerType.id,
+												"total": "10",
+												"cogs": "9",
+												"receiptId": "someUUID",
+												"products": []
+											})
+											.set('Authorization', token)
+											.end(function(err, res) {
+												res.should.have.status(200);
+												getReceipts.getReceipts().then(function(receipts) {
+													receipts[0].should.have.property("uuid").eql("someUUID");
+													getReceipts.getReceiptLineItems().then(function(receiptLineItems) {
+														receiptLineItems.length.should.eql(0)
+														removeReceipts.removeReceiptLineItems().then(function() {
+															removeReceipts.removeReceipts().then(function() {
+																done(err);
+															});
+														});
+													});
 												});
-											});
-										});
-									});
 
+											});
+									});
 								});
+							});
 						});
 					});
 				});
 			});
 		});
 	});
+
+
+
+
 	describe('POST /sema/site/receipts. Everything Valid - 2 products', function() {
 		it('Should pass', (done) => {
 			authenticate(server).then(function(token) {
 				removeReceipts.removeReceiptLineItems().then(function() {
 					removeReceipts.removeReceipts().then(function() {
 						findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
-							let url = '/sema/site/receipts/';
-							chai.request(server)
-								.post(url)
-								.set('Content-Type', 'application/json; charset=UTF-8')
-								.send({
-									"createdAt": "9/9/18",
-									"currencyCode":"USD",
-									"customerId": "Brian",
-									"receiptId": "2",
-									"siteId": kiosk.id,
-									"currencyCode":"USD",
-									"totalSales": "10",
-									"cogs": "9",
-									"products": [
-										{
-											"productId": "558",
-											"quantity": "1",
-											"salesPrice": "1",
-											"receiptId": "2"
-										},
-										{
-											"productId": "559",
-											"quantity": "1",
-											"salesPrice": "2",
-											"receiptId": "2"
-										}
-									],
-									"salesChannelId": "122"
-								})
-								.set('Authorization', token)
-								.end(function(err, res) {
-									res.should.have.status(200);
-									getReceipts.getReceipts().then(function(receipts) {
-										receipts[0].should.have.property("uuid").eql("2");
-										getReceipts.getReceiptLineItems().then(function(receiptLineItems) {
-											receiptLineItems[0].should.have.property("price").eql(1);
-											receiptLineItems[1].should.have.property("price").eql(2);
-											removeReceipts.removeReceiptLineItems().then(function() {
-												removeReceipts.removeReceipts().then(function() {
-													done(err);
+							findCustomerId.findCustomerId(server, token, 'TestCustomer 1', kiosk.id).then(function(customer) {
+								findProductId.findProductId(server, token, 'sku1').then(function(product) {
+									let url = '/sema/site/receipts/';
+									chai.request(server)
+										.post(url)
+										.set('Content-Type', 'application/json; charset=UTF-8')
+										.send({
+											"id": "2018072700001",
+											"createdDate": "7/27/18",
+											"currencyCode": "USD",
+											"customerId": customer.customerId,
+											"amountCash": 5,
+											"amountLoan": 4,
+											"siteId": kiosk.id,
+											"paymentType": "What is this for",
+											"salesChannelId": customer.salesChannelId,
+											"customerTypeId": customer.customerTypeId,
+											"total": "10",
+											"cogs": "9",
+											"receiptId": "someUUID",
+											"products": [
+												{
+													"priceTotal": 7,
+													"quantity": 1,
+													"productId": product.productId,
+													"cogsTotal": 6,
+												},
+												{
+													"priceTotal": 6,
+													"quantity": 3,
+													"productId": product.productId,
+													"cogsTotal": 4,
+												}
+											],
+										})
+										.set('Authorization', token)
+										.end(function(err, res) {
+											res.should.have.status(200);
+											getReceipts.getReceipts().then(function(receipts) {
+												receipts[0].should.have.property("uuid").eql("someUUID");
+												getReceipts.getReceiptLineItems().then(function(receiptLineItems) {
+													receiptLineItems.length.should.eql(2);
+													removeReceipts.removeReceiptLineItems().then(function() {
+														removeReceipts.removeReceipts().then(function() {
+															done(err);
+														});
+													});
 												});
 											});
 										});
-									});
-
 								});
+							});
 						});
 					});
 				});
@@ -131,8 +156,7 @@ describe('Testing Receipts API', function () {
 		});
 	});
 
-
-	describe('POST /sema/site/receipts. No Products', function() {
+	describe('POST /sema/site/receipts. Some parameters missing', function() {
 		it('Should pass', (done) => {
 			authenticate(server).then(function(token) {
 				removeReceipts.removeReceiptLineItems().then(function() {

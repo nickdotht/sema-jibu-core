@@ -49,7 +49,7 @@ class Customer {
 
 	requestToClass(req) {
 		this._address = req.body["address"];
-		this._name = req.body["contactName"];
+		this._name = req.body["name"];
 		this._customerTypeId = req.body["customerTypeId"];
 		this._phoneNumber = req.body["phoneNumber"];
 		this._salesChannelId = req.body["salesChannelId"];
@@ -89,8 +89,8 @@ class Customer {
 		if (requestCustomer.hasOwnProperty("address"))
 			this._address = requestCustomer.address;
 
-		if (requestCustomer.hasOwnProperty("contactName"))
-			this._name = requestCustomer.contactName;
+		if (requestCustomer.hasOwnProperty("name"))
+			this._name = requestCustomer.name;
 
 		if (requestCustomer.hasOwnProperty("gpsCoordinates"))
 			this._gpsCoordinates = requestCustomer.gpsCoordinates;
@@ -118,7 +118,7 @@ class Customer {
 			updatedDate: this._updatedDate.toISOString(),
 			active:this._active,
 			address: this._address,
-			contactName: this._name,
+			name: this._name,
 			customerTypeId: this._customerTypeId,
 			salesChannelId:this._salesChannelId,
 			gpsCoordinates: this._gpsCoordinates,
