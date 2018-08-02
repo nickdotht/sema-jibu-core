@@ -35,8 +35,8 @@ class SelectedCustomerDetails extends React.Component {
 		);
 	}
 	getName (){
-		if( this.props.selectedCustomer.hasOwnProperty("contactName")){
-			return this.props.selectedCustomer.contactName;
+		if( this.props.selectedCustomer.hasOwnProperty("name")){
+			return this.props.selectedCustomer.name;
 		}else{
 			return "";
 		}
@@ -88,14 +88,14 @@ class CustomerBar extends Component {
 					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder.bind(this)}
 					image = {require('../../images/customer-order.png')}
-					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('contactName')}
+					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('name')}
 				/>
 				<CustomerBarButton
 					title = "Edit"
 					handler = {this.onEdit.bind(this)}
 					image = {require('../../images/customer-edit.png')}
 					enabled = {this.state.editFunction &&
-						this.props.selectedCustomer.hasOwnProperty('contactName') &&
+						this.props.selectedCustomer.hasOwnProperty('name') &&
 						this.props.selectedCustomer.salesChannel !== 'anonymous' }
 				/>
 
@@ -104,7 +104,7 @@ class CustomerBar extends Component {
 					handler = {this.onDelete.bind(this)}
 					image = {require('../../images/customer-delete.png')}
 					enabled = {this.state.deleteFunction &&
-						this.props.selectedCustomer.hasOwnProperty('contactName') &&
+						this.props.selectedCustomer.hasOwnProperty('name') &&
 						this.props.selectedCustomer.salesChannel !== 'anonymous' }
 				/>
 
@@ -130,11 +130,11 @@ class CustomerBar extends Component {
 
 	onDelete = ()=>{
 		if(this.state.deleteFunction &&
-			this.props.selectedCustomer.hasOwnProperty('contactName') &&
+			this.props.selectedCustomer.hasOwnProperty('name') &&
 			this.props.selectedCustomer.salesChannel !== 'anonymous') {
 
 			console.log("CustomerBar:onDelete");
-			let alertMessage = "Delete  customer " + this.props.selectedCustomer.contactName;
+			let alertMessage = "Delete  customer " + this.props.selectedCustomer.name;
 			Alert.alert(
 				alertMessage,
 				'Are you sure you want to delete this customer?',
@@ -155,7 +155,7 @@ class CustomerBar extends Component {
 	};
 	onEdit = ()=>{
 		if(this.state.editFunction &&
-			this.props.selectedCustomer.hasOwnProperty('contactName') &&
+			this.props.selectedCustomer.hasOwnProperty('name') &&
 			this.props.selectedCustomer.salesChannel !== 'anonymous') {
 
 			console.log("CustomerBar:onEdit");
@@ -165,7 +165,7 @@ class CustomerBar extends Component {
 
 	onOrder = ()=>{
 		if(this.state.orderFunction &&
-			this.props.selectedCustomer.hasOwnProperty('contactName')){
+			this.props.selectedCustomer.hasOwnProperty('name')){
 
 			console.log("CustomerBar:onOrder");
 			if (!this.props.showView.showNewOrder) {

@@ -58,7 +58,7 @@ class ProductList extends Component {
 					resizeMethod ='scale'
 					style={{flex:1}}>
 				</Image>
-				<Text style={[styles.imageLabel,this.getLabelBackground()]}>{item.description}{'\n'}${this.getItemPrice(item.priceAmount)}</Text>
+				<Text style={[styles.imageLabel,this.getLabelBackground()]}>{item.description}{'\n'}{this.getItemPrice(item.priceAmount)} ush</Text>
 			</View>
 		);
 	};

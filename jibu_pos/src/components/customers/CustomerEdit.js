@@ -45,6 +45,10 @@ class CustomerEdit extends Component {
 		this.name = React.createRef();
 		this.address = React.createRef();
 		this.customerChannel = React.createRef();
+		this.salesChannels = PosStorage.getSalesChannelsForDisplay();
+		this.channelOptions = this.salesChannels.map( channel =>{
+			return channel.displayName;
+		});
 	}
 	componentDidMount() {
 		console.log("CustomerEdit = Mounted");
@@ -100,8 +104,9 @@ class CustomerEdit extends Component {
 									dropdownTextStyle = {[styles.dropdownText, {width:250}]}
 									dropdownStyle ={{borderColor: 'black', borderWidth:2}}
 									ref = {this.customerChannel}
-									defaultValue = {"Customer Channel"}
-									options={['Reseller', 'Walkup']}/>
+									defaultValue = {this.getDefaultValue()}
+									defaultIndex = {this.getDefaultIndex()}
+									options={this.channelOptions}/>
 								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
 							</View>
 							<View style={styles.submit}>
@@ -135,7 +140,7 @@ class CustomerEdit extends Component {
 	}
 	getName(me){
 		if( me.props.isEdit ){
-			return me.props.selectedCustomer.contactName;
+			return me.props.selectedCustomer.name;
 		}else{
 			return ""
 		}
@@ -146,6 +151,29 @@ class CustomerEdit extends Component {
 		}else{
 			return ""
 		}
+
+	}
+	getDefaultValue(){
+		if( this.props.isEdit ){
+			for( let i = 0; i < this.salesChannels.length; i++ ){
+				if( this.salesChannels[i].id == this.props.selectedCustomer.salesChannelId ){
+					return this.salesChannels[i].displayName;
+				}
+			}
+		}
+		return "Customer Channel";
+	}
+
+	getDefaultIndex(){
+		if( this.props.isEdit ){
+			const salesChannels = PosStorage.getSalesChannels();
+			for( let i = 0; i < salesChannels.length; i++ ){
+				if( salesChannels[i].id == this.props.selectedCustomer.salesChannelId ){
+					return i;
+				}
+			}
+		}
+		return -1;
 
 	}
 	getHeaderText(){
@@ -166,7 +194,7 @@ class CustomerEdit extends Component {
 	};
 
 	onEdit(){
-		let salesChannel = "walkup";
+		let salesChannelId = -1;
 		if( this._textIsEmpty( this.phone.current.state.propertyText) ){
 			this.phone.current.refs.customerNumber.focus();
 			return;
@@ -184,8 +212,7 @@ class CustomerEdit extends Component {
 			return;
 
 		}else{
-			salesChannel = this.customerChannel.current.props.options[ this.customerChannel.current.state.selectedIndex];
-			salesChannel = salesChannel.toLowerCase();
+			salesChannelId = this.salesChannels[this.customerChannel.current.state.selectedIndex].id;
 		}
 		if( this.props.isEdit ){
 			PosStorage.updateCustomer(
@@ -193,14 +220,15 @@ class CustomerEdit extends Component {
 				this.phone.current.state.propertyText,
 				this.name.current.state.propertyText,
 				this.address.current.state.propertyText,
-				salesChannel);
+				salesChannelId);
 		}else{
 			let newCustomer = PosStorage.createCustomer(
 				this.phone.current.state.propertyText,
 			 	this.name.current.state.propertyText,
 				this.address.current.state.propertyText,
 				this.props.settings.siteId,
-				salesChannel);
+				salesChannelId,
+				PosStorage.getCustomerTypes()[0].id);	// Note. Jibu uses just one 'generic' customer type
 			this.props.customerActions.CustomerSelected(newCustomer);
 		}
 

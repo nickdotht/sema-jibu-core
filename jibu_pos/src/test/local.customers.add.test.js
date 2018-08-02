@@ -12,14 +12,14 @@ test('Adding a local customer', () => {
 		.then( isInitialized =>{
 			expect(posStorage.getPendingCustomers().length).toBe(0);
 			expect(posStorage.getCustomers().length).toBe(0);
-			posStorage.createCustomer("555-1212", "fred", "here", 1234);
+			posStorage.createCustomer("555-1212", "fred", "here", 1234, 5678);
 			expect(posStorage.getPendingCustomers().length).toBe(1);
 			expect(posStorage.getCustomers().length).toBe(1);
 			return posStorage.initialize( false )
 				.then( isInitialized =>{
 					expect(posStorage.getPendingCustomers().length).toBe(1);
 					expect(posStorage.getCustomers().length).toBe(1);
-					expect(posStorage.getCustomers()[0].contactName).toBe("fred");
+					expect(posStorage.getCustomers()[0].name).toBe("fred");
 					posStorage.deleteCustomer(posStorage.getCustomers()[0]);
 					expect(posStorage.getPendingCustomers().length).toBe(2);
 					expect(posStorage.getCustomers().length).toBe(0);

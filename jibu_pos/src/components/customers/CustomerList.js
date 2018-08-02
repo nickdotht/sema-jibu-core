@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import * as CustomerActions from '../../actions/CustomerActions';
 import Events from 'react-native-simple-events';
+import PosStorage from "../../database/PosStorage";
 
 class CustomerList extends Component {
 	constructor(props) {
@@ -72,10 +73,9 @@ class CustomerList extends Component {
 				"customerId": "9999999-9999-9999-9999-9999999",
 				"version": 3,
 				"address": "----------------------------",
-				"contactName": "Walkup Client",
+				"name": "Walkup Client",
 				"customer_type_id": 120,
 				"dueAmount": "",
-				"name": "",
 				"phoneNumber": "----------------------------",
 				"active": "1",
 				"salesChannel": "anonymous"
@@ -89,7 +89,7 @@ class CustomerList extends Component {
 				data = this.props.customers.slice(1);
 				data = this.filterItems( data );
 				data.sort((a, b) => {
-					return (a.contactName < b.contactName ? -1 : 1)
+					return (a.name < b.name ? -1 : 1)
 				});
 				data.unshift(this.props.customers[0]);
 			}
@@ -98,8 +98,9 @@ class CustomerList extends Component {
 	};
 	filterItems = (data) => {
 		let filteredItems = [];
+		let salesChannels = PosStorage.getSalesChannels();
 		for( let i = 0; i < data.length; i++ ){
-			if( this.filterItem( data[i])){
+			if( this.filterItem( data[i], salesChannels)){
 				filteredItems.push(data[i]);
 			}
 		}
@@ -119,7 +120,7 @@ class CustomerList extends Component {
 					<View style={{flex: 2}}>
 						<TouchableHighlight
 							onPress={() => this.onPressItemName(item)}>
-							<Text style={[styles.baseItem, styles.leftMargin]}>{item.contactName}</Text>
+							<Text style={[styles.baseItem, styles.leftMargin]}>{item.name}</Text>
 						</TouchableHighlight>
 					</View>
 					<View style={{flex: 1.5}}>
@@ -150,8 +151,12 @@ class CustomerList extends Component {
 		}
 	}
 
-	filterItem = (item )=> {
+	filterItem = (item, salesChannels )=> {
 		try {
+			if( !item.hasOwnProperty("salesChannel")){
+				// Map saleschanelId to name
+				item.salesChannel = this._getSalesChannelName(item.salesChannelId, salesChannels);
+			}
 			if (item.salesChannel === "anonymous") {
 				return true;
 			}
@@ -161,7 +166,7 @@ class CustomerList extends Component {
 				(this.props.filter === "credit" && item.dueAmount > 0)) {
 				if (this.state.searchString.length >= 2) {
 					const filterString = this.state.searchString.toLowerCase();
-					if (item.contactName.toLowerCase().startsWith(filterString) ||
+					if (item.name.toLowerCase().startsWith(filterString) ||
 						item.phoneNumber.startsWith(filterString)) {
 						return true;
 					} else {
@@ -175,7 +180,14 @@ class CustomerList extends Component {
 		}
 		return false;
 	};
-
+	_getSalesChannelName(channelId, salesChannels){
+		for( let i = 0; i < salesChannels.length; i++ ){
+			if( salesChannels[i].id === channelId){
+				return salesChannels[i].name;
+			}
+		}
+		return "walkup";
+	}
 	onPressItemName = (item) =>{
 		console.log("_onPressItemName");
 		this.props.CustomerSelected(item);

@@ -255,10 +255,12 @@ ${syncResult.sales.localReceipts} sales receipts updated`;
 						PosStorage.clearDataOnly();
 						this.props.settingsActions.setSettings(PosStorage.getSettings());
 						this.props.customerActions.setCustomers(PosStorage.getCustomers());
+						const saveConnected = Synchronization.isConnected;
 						Synchronization.initialize(
 							PosStorage.getLastCustomerSync(),
 							PosStorage.getLastProductSync(),
 							PosStorage.getLastSalesSync());
+						Synchronization.setConnected(saveConnected);
 						this.closeHandler();
 
 					}

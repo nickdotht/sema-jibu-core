@@ -64,7 +64,9 @@ class Synchronization {
 		let syncResult = {status:"success", error:""}
 		return new Promise((resolve ) => {
 			try {
-				this.refreshToken().then(() => {
+				this._refreshToken().then(() => {
+					const promiseSalesChannels = this.synchronizeSalesChannels();
+					const promiseCustomerTypes = this.synchronizeCustomerTypes();
 					const promiseCustomers = this.synchronizeCustomers()
 						.then( customerSync =>{
 							syncResult.customers = customerSync;
@@ -78,7 +80,7 @@ class Synchronization {
 							syncResult.sales = saleSync;
 						});
 
-					Promise.all([promiseCustomers, promiseProducts, promiseSales])
+					Promise.all([promiseSalesChannels, promiseCustomerTypes, promiseCustomers, promiseProducts, promiseSales])
 						.then( values =>{
 							resolve(syncResult);
 						});
@@ -115,27 +117,27 @@ class Synchronization {
 							.then( customer => {
 								if (customer != null) {
 									if (customer.syncAction === "create") {
-										console.log("Synchronization:synchronizeCustomers -creating customer - " + customer.contactName);
+										console.log("Synchronization:synchronizeCustomers -creating customer - " + customer.name);
 										Communications.createCustomer(customer)
 											.then(() => {
-												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.contactName);
+												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.name);
 												PosStorage.removePendingCustomer(customerKey)
 											})
 											.catch(error => console.log("Synchronization:synchronizeCustomers Create Customer failed"));
 									} else if (customer.syncAction === "delete") {
-										console.log("Synchronization:synchronizeCustomers -deleting customer - " + customer.contactName);
+										console.log("Synchronization:synchronizeCustomers -deleting customer - " + customer.name);
 										Communications.deleteCustomer(customer)
 											.then(() => {
-												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.contactName);
+												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.name);
 												PosStorage.removePendingCustomer(customerKey)
 											})
 											.catch(error => console.log("Synchronization:synchronizeCustomers Delete Customer failed " + error));
 
 									} else if (customer.syncAction === "update") {
-										console.log("Synchronization:synchronizeCustomers -updating customer - " + customer.contactName);
+										console.log("Synchronization:synchronizeCustomers -updating customer - " + customer.name);
 										Communications.updateCustomer(customer)
 											.then(() => {
-												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.contactName);
+												console.log("Synchronization:synchronizeCustomers - Removing customer from pending list - " + customer.name);
 												PosStorage.removePendingCustomer(customerKey)
 											})
 											.catch(error => console.log("Synchronization:synchronizeCustomers Update Customer failed " + error));
@@ -181,6 +183,33 @@ class Synchronization {
 		});
 	}
 
+	synchronizeSalesChannels(){
+		console.log("Synchronization:synchronizeSalesChannels - Begin");
+		Communications.getSalesChannels()
+			.then(salesChannels => {
+				if (salesChannels.hasOwnProperty("salesChannels")) {
+					console.log("Synchronization:synchronizeSalesChannels. No of sales channels: " + salesChannels.salesChannels.length);
+					PosStorage.saveSalesChannels(salesChannels.salesChannels);
+				}
+			})
+			.catch(error => {
+				console.log("Synchronization.getSalesChannels - error " + error);
+			});
+	}
+	synchronizeCustomerTypes(){
+		console.log("Synchronization:synchronizeCustomerTypes - Begin");
+		Communications.getCustomerTypes()
+			.then(customerTypes => {
+				if (customerTypes.hasOwnProperty("customerTypes")) {
+					console.log("Synchronization:synchronizeCustomerTypes. No of customer types: " + customerTypes.customerTypes.length);
+					PosStorage.saveCustomerTypes(customerTypes.customerTypes);
+				}
+			})
+			.catch(error => {
+				console.log("Synchronization.getCustomerTypes - error " + error);
+			});
+	}
+
 	synchronizeSales(){
 		return new Promise( resolve => {
 			console.log("Synchronization:synchronizeSales - Begin");
@@ -209,8 +238,30 @@ class Synchronization {
 				});
 		});
 	}
+	synchronizeProducts(){
+		return new Promise( resolve => {
+			console.log("Synchronization:synchronizeProducts - Begin");
+			Communications.getProducts(this.lastProductSync)
+				.then(products => {
+					resolve( {error:null, remoteProducts: products.products.length});
+					if (products.hasOwnProperty("products")) {
+						this.updateLastProductSync();
+						console.log("Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
+						const updated = PosStorage.mergeProducts(products.products);
+						if (updated) {
+							Events.trigger('ProductsUpdated', {});
+						}
 
-	refreshToken(){
+					}
+				})
+				.catch(error => {
+					resolve( {error:error.message, remoteProducts: null});
+					console.log("Synchronization.getProducts - error " + error);
+				});
+		});
+	}
+
+	_refreshToken(){
 		// Check if token exists or has expired
 		return new Promise((resolve, reject ) => {
 			let settings = PosStorage.getSettings();

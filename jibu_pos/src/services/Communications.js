@@ -251,6 +251,29 @@ class Communications {
 				});
 		});
 	}
+	getSalesChannels( ) {
+		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } }
+		let url = 'sema/sales-channels';
+		return fetch(this._url + url, options)
+			.then((response) => response.json())
+			.then((responseJson) => {return responseJson})
+			.catch((error) => {
+				console.log("Communications:getSalesChannels: " + error);
+				throw( error );
+			});
+	}
+	getCustomerTypes( ) {
+		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } }
+		let url = 'sema/customer-types';
+		return fetch(this._url + url, options)
+			.then((response) => response.json())
+			.then((responseJson) => {return responseJson})
+			.catch((error) => {
+				console.log("Communications:getCustomerTypes: " + error);
+				throw( error );
+			});
+	}
+
 	_remoteReceiptFromReceipt( receipt ){
 	let remoteReceipt = {
 		receiptId: receipt.receiptId,
