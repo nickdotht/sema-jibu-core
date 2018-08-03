@@ -413,4 +413,62 @@ describe('Testing Customers API', function () {
 		});
 	});
 
+	describe('Deactivate/activate /sema/site/customers - customerId', function() {
+		it('Should succeed when a customer is activated/deactivated', (done) => {
+			authenticate(server).then(function(token) {
+				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+					findCustomerId.findCustomerId(server, token, 'TestCustomer 1', kiosk.id).then(function(customer) {
+						customer.should.have.property('name').eql('TestCustomer 1');
+						let oldUpdatedDate = customer.updatedDate;
+						let url = sprintf('/sema/site/customers/%s', customer.customerId);
+						let now = new Date();
+
+						// Deactivate customer
+						chai.request(server)
+							.put(url)
+							.set('Content-Type', 'application/json; charset=UTF-8')
+							.send({ 'active': false, updatedDate:oldUpdatedDate })
+							.set('Authorization', token)
+							.end(function(err, res) {
+								res.should.have.status(200);
+
+								let url2 = sprintf("/sema/site/customers?site-id=%d", kiosk.id);
+								// check result
+								chai.request(server)
+									.get(url2)
+									.set('Authorization', token)
+									.end(function(err, res) {
+										res.should.have.status(200);
+										expect(res.body.customers).to.be.an('array');
+										expect(res.body.customers.length).to.be.equal(5);
+
+										// re-activate
+										chai.request(server)
+											.put(url)
+											.set('Content-Type', 'application/json; charset=UTF-8')
+											.send({ 'active': true, updatedDate:oldUpdatedDate })
+											.set('Authorization', token)
+											.end(function(err, res) {
+												res.should.have.status(200);
+												// check result
+												chai.request(server)
+													.get(url2)
+													.set('Authorization', token)
+													.end(function(err, res) {
+														res.should.have.status(200);
+														expect(res.body.customers).to.be.an('array');
+														expect(res.body.customers.length).to.be.equal(6);
+
+														done(err);
+													});
+											});
+
+								});
+							});
+					});
+				});
+			});
+		});
+	});
+
 });

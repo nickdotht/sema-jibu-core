@@ -109,6 +109,9 @@ class Customer {
 		if (requestCustomer.hasOwnProperty("dueAmount")) {
 			this._dueAmount = requestCustomer.dueAmount;
 		}
+		if (requestCustomer.hasOwnProperty("active")) {
+			this._active = requestCustomer.active;
+		}
 
 	}
 	classToPlain() {
@@ -158,6 +161,9 @@ class Customer {
 	}
 	get salesChannelId() {
 		return this._salesChannelId;
+	}
+	get active() {
+		return this._active;
 	}
 
 }

@@ -135,12 +135,12 @@ class Communications {
 				});
 		});
 	}
+	// Note that deleting a csutomer actually just deactivates the customer
 	deleteCustomer( customer ) {
 		let options = {
-			method: 'DELETE',
-			headers: {
-				Authorization: 'Bearer ' + this._token
-			},
+			method: 'PUT',
+			headers: { Accept: 'application/json', 'Content-Type': 'application/json', Authorization: 'Bearer ' + this._token },
+			body: JSON.stringify({active:false} )
 		}
 		return new Promise( (resolve, reject ) => {
 			fetch(this._url + 'sema/site/customers/' + customer.customerId, options)
@@ -153,7 +153,7 @@ class Communications {
 					}
 				})
 				.catch((error) => {
-					console.log("createCustomer - Fetch: " + error.message);
+					console.log("deleteCustomer - Fetch: " + error.message);
 					reject();
 				});
 		});
@@ -275,26 +275,28 @@ class Communications {
 	}
 
 	_remoteReceiptFromReceipt( receipt ){
-	let remoteReceipt = {
-		receiptId: receipt.receiptId,
-		customerId: receipt.customerId,
-		siteId: receipt.siteId,
-		createdDate: new Date(receipt.createdDate),
-		totalSales: receipt.cash + receipt.credit + receipt.mobile,
-		salesChannelId: 122,
-		cogs:"0",		// TODO - Implement this...
-		products: []
-	};
-		receipt.products.forEach( product => {
-			let remoteProduct = {
-				productId:product.id,
-				quantity: product.quantity,
-				receiptId: remoteReceipt.receiptId,
-				salesPrice:product.priceAmount
-			}
-			remoteReceipt.products.push( remoteProduct);
-		});
-		return remoteReceipt;
+		return receipt;
 	}
+	// let remoteReceipt = {
+	// 	receiptId: receipt.receiptId,
+	// 	customerId: receipt.customerId,
+	// 	siteId: receipt.siteId,
+	// 	createdDate: new Date(receipt.createdDate),
+	// 	totalSales: receipt.cash + receipt.credit + receipt.mobile,
+	// 	salesChannelId: 122,
+	// 	cogs:"0",		// TODO - Implement this...
+	// 	products: []
+	// };
+	// 	receipt.products.forEach( product => {
+	// 		let remoteProduct = {
+	// 			productId:product.id,
+	// 			quantity: product.quantity,
+	// 			receiptId: remoteReceipt.receiptId,
+	// 			salesPrice:product.priceAmount
+	// 		}
+	// 		remoteReceipt.products.push( remoteProduct);
+	// 	});
+	// 	return remoteReceipt;
+	// }
 };
 export default new Communications();

@@ -22,9 +22,9 @@ class Sidebar extends Component {
 				<TouchableHighlight onPress={() => this.onSales()}>
 					<Text style ={[styles.menuText, {color:'#3C93FC'}]}>Sales</Text>
 				</TouchableHighlight>
-				<TouchableHighlight onPress={() => this.onInventory()}>
-					<Text style ={[styles.menuText, ]}>Inventory</Text>
-				</TouchableHighlight>
+				{/*<TouchableHighlight onPress={() => this.onInventory()}>*/}
+					{/*<Text style ={[styles.menuText, ]}>Inventory</Text>*/}
+				{/*</TouchableHighlight>*/}
 			</View>
 		);
 	}
@@ -42,7 +42,7 @@ class Report extends Component {
 		return (
 			<View style ={{flex:4,backgroundColor:colors.COLOR_REPORT__BACKGROUND}}>
 				<SalesReport/>
-				<InventoryReport/>
+				{/*<InventoryReport/>*/}
 			</View>
 		);
 	}

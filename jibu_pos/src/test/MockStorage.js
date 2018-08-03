@@ -38,10 +38,11 @@ export default class MockStorage {
 
 	multiSet = jest.fn(( keys ) =>{
 		return new Promise( (resolve, reject ) =>{
-			console.log( "MockStorage:multiSet")
+			console.log( "MockStorage:multiSet");
 			keys.forEach( keyValue => {
 				const key = keyValue[0];
 				const value = keyValue[1];
+//				console.log( "Key/Value: " + key + " " + value);
 				if (typeof key !== 'string' || typeof value !== 'string'){
 					reject( new Error('key and value must be string'))
 				}else{

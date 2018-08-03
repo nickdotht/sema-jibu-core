@@ -64,6 +64,8 @@ class PosStorage {
 
 		this.settings = {semaUrl:"", site:"", user:"", password:"", token:"", siteId:"" };
 		this.salesChannels = [];
+		this.customerTypes = [];
+
 	}
 
 	initialize( forceNew ) {
@@ -426,7 +428,7 @@ class PosStorage {
 		return this.salesKeys;
 	}
 	getFilteredSales( beginDate, endDate ){
-		console.log("PosStorage: getSales. between " + beginDate.toString() + " and " + endDate.toString());
+		console.log("PosStorage: getFilteredSales. between " + beginDate.toString() + " and " + endDate.toString());
 		// Note that sales are order earliest to latest
 		let sales = [];
 		for( let index = 0; index < this.salesKeys.length; index ++ ){
@@ -442,15 +444,16 @@ class PosStorage {
 		return sales;
 
 	}
-	addSale( sale){
+	addSale( receipt){
 		console.log("PosStorage: addSale" );
 		return new Promise((resolve, reject) => {
 			let saleDateTime = new Date(Date.now());
-			sale.receiptId = uuidv1();
-			sale.createdDate = saleDateTime;
+			receipt.receiptId = uuidv1();
+
 			let saleDateKey = saleDateTime.toISOString();
 			this.salesKeys.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
 			if( this.salesKeys.length > 1 ){
+				// When adding a sale, purge the top one if it is older than 30 days
 				let oldest = this.salesKeys[0];
 				let firstDate = new Date( oldest.saleDateTime);
 				firstDate = new Date( firstDate.getTime() + 30 * 24 *60 *60 * 1000);
@@ -469,7 +472,7 @@ class PosStorage {
 			}
 			this.pendingSales.push(saleItemKey + saleDateKey);
 			let keyArray = [
-				[ saleItemKey + saleDateKey, this.stringify(sale)],		// The sale
+				[ saleItemKey + saleDateKey, this.stringify(receipt)],		// The sale
 				[ salesKey, this.stringify(this.salesKeys)],			// Array of date/time sales keys
 				[ pendingSalesKey, this.stringify(this.pendingSales)]];	// Pending sales keys
 			AsyncStorage.multiSet(keyArray ).then( error =>{

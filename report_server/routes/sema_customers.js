@@ -11,22 +11,22 @@ router.use(bodyParser.urlencoded({ extended: false }));
 
 const sqlSiteIdOnly = "SELECT * " +
 	"FROM customer_account " +
-	"WHERE kiosk_id = ?";
+	"WHERE kiosk_id = ? AND active = b'1'";
 const sqlBeginDateOnly = "SELECT * " +
 	"FROM customer_account " +
-	"WHERE kiosk_id = ? " +
+	"WHERE kiosk_id = ? AND active = b'1'" +
 	"AND created_at >= ?";
 const sqlEndDateOnly = "SELECT * " +
 	"FROM customer_account " +
-	"WHERE kiosk_id = ? " +
+	"WHERE kiosk_id = ? AND active = b'1'" +
 	"AND created_at <= ?";
 const sqlBeginEndDate = "SELECT * " +
 	"FROM customer_account " +
-	"WHERE kiosk_id = ? " +
+	"WHERE kiosk_id = ? AND active = b'1'" +
 	"AND created_at BETWEEN ? AND ?";
 const sqlUpdatedDate = "SELECT * " +
 	"FROM customer_account " +
-	"WHERE kiosk_id = ? " +
+	"WHERE kiosk_id = ? AND active = b'1'" +
 	"AND updated_at > ?";
 
 const sqlDeleteCustomers = "DELETE FROM customer_account WHERE id = ?";
@@ -40,7 +40,7 @@ const sqlInsertCustomer = "INSERT INTO customer_account " +
 const sqlUpdateCustomers = 	"UPDATE customer_account " +
 	"SET updated_at = ?, name = ?, sales_channel_id = ?, " +
 		"due_amount = ?, address_line1 = ?, gps_coordinates = ?, " +
-		"phone_number = ? " +
+		"phone_number = ?, active = ? " +
 	"WHERE id = ?";
 
 
@@ -66,10 +66,16 @@ router.put('/:id', async (req, res) => {
 
 
 				let customerParams = [ customer.updatedDate, customer.name, customer.salesChannelId,
-				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber, customer.customerId];
-				updateCustomers(sqlUpdateCustomers, customerParams, res, customer)
-					.then(result =>{})
-					.catch(error =>{});
+				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber ];
+
+				// Active is set via a 'bit;
+				if(! customer.active){
+					customerParams.push(0);
+				}else{
+					customerParams.push(1);
+				}
+				customerParams.push( customer.customerId );
+				updateCustomers(sqlUpdateCustomers, customerParams, res, customer);
 
 			}, function(reason) {
 				res.status(404).send("PUT customer: Could not find customer with id " + req.params.id);
@@ -82,30 +88,26 @@ router.put('/:id', async (req, res) => {
 
 
 const updateCustomers = (query, params, res, customer ) => {
-	return new Promise((resolve, reject) => {
-		__pool.getConnection((err, connection) => {
-			connection.query(query, params, function(err, result) {
-				connection.release();
-				if (err) {
+	__pool.getConnection((err, connection) => {
+		connection.query(query, params, function(err, result) {
+			connection.release();
+			if (err) {
+				semaLog.error('updateCustomers customers - failed', { err });
+				res.status(500).send(err.message);
+			}
+			else {
+				semaLog.info('updateCustomers customers - succeeded');
+
+				try {
+					res.json(customer.classToPlain());
+				} catch (err) {
 					semaLog.error('updateCustomers customers - failed', { err });
 					res.status(500).send(err.message);
-					reject(err);
 				}
-				else {
-					semaLog.info('updateCustomers customers - succeeded');
+			}
+		});
 
-					try {
-						resolve(res.json(customer.classToPlain()));
-					} catch (err) {
-						semaLog.error('updateCustomers customers - failed', { err });
-						res.status(500).send(err.message);
-						reject(err);
-					}
-				}
-			});
-
-		})
-	});
+	})
 };
 
 

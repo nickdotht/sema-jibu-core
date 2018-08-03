@@ -40,7 +40,7 @@ class Toolbar extends Component {
 					</TouchableHighlight>
 					<Text style = {[styles.text_style,{marginRight:20} ]}>{this.props.settings.user}</Text>
 					<TouchableHighlight onPress={() => this.onShowRemoteReport()}>
-						<Image source={require('../images/report-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
+						{this.getReportOrMainImage()}
 					</TouchableHighlight>
 				</View>
 			</View>
@@ -52,14 +52,24 @@ class Toolbar extends Component {
 	getNetworkStyle  = () =>{
 		return this.props.network.isNWConnected ? {} : {color:'red'};
 	};
+	getReportOrMainImage =() =>{
+		if( this.props.showScreen.screenToShow === "main") {
+			return (
+				<Image source={require('../images/report-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
 
+			)
+		}else{
+			return (
+				<Image source={require('../images/home-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
+			)
+		}
+	}
 	onShowRemoteReport = () =>{
         console.log("onShowRemoteReport");
         if( this.props.showScreen.screenToShow === "main") {
 			this.props.toolbarActions.ShowScreen("report");
 		}else{
 			this.props.toolbarActions.ShowScreen("main");
-
 		}
     };
 	onVersion= () =>{
