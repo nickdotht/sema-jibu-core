@@ -4,7 +4,11 @@ const chai = require('chai');
 chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const should = chai.should();
-var authenticate = require('./Utilities/authenticate');
+const sprintf = require('sprintf-js').sprintf;
+let authenticate = require('./Utilities/authenticate');
+let findKioskId = require('./Utilities/findKioskId');
+let findCustomerId = require('./Utilities/findCustomerId');
+let findProductId = require('./Utilities/findProductId');
 
 
 describe('Testing Products API', function () {
@@ -48,8 +52,8 @@ describe('Testing Products API', function () {
 		});
 	});
 
-	describe('GET /sema/site/customers - no update-date', function() {
-		it('Should return info on all 4 products after 2018-1-1', (done) => {
+	describe('GET /sema/site/products - no update-date', function() {
+		it('Should return info on all 4 products', (done) => {
 			authenticate(server).then(function(token) {
 				chai.request(server)
 					.get("/sema/products")
@@ -63,4 +67,32 @@ describe('Testing Products API', function () {
 			});
 		});
 	});
+
+	describe('GET Should return product mrp info on product/kiosk/salesChannel', function() {
+		it('Should pass', (done) => {
+			authenticate(server).then(function(token) {
+				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+					findProductId.findProductId(server, token, 'sku1').then(function(product) {
+						let url = sprintf("/sema/site/product-mrps?site-id=%d", kiosk.id);
+						chai.request(server)
+							.get(url)
+							.set('Authorization', token)
+							.end(function(err, res) {
+								expect(res.body.productMRPs).to.be.an('array');
+								expect(res.body.productMRPs.length).to.be.equal(5);
+								res.should.have.status(200);
+								for( let index = 0; index < res.body.productMRPs.length; index++ ){
+									if( res.body.productMRPs[index].productId == product.id ){
+										expect(res.body.productMRPs[index].priceAmount).to.be.equal(10);
+										expect(res.body.productMRPs[index].cogsAmount).to.be.equal(4);
+									}
+								}
+								done(err);
+						});
+					});
+				});
+			});
+		});
+	});
+
 });

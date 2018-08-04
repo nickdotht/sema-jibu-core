@@ -21,6 +21,7 @@ var sema_products = require('./routes/sema_products');
 var sema_receipts = require('./routes/sema_receipts');
 var sema_sales_channels = require('./routes/sema_sales_channels');
 var sema_customer_types = require('./routes/sema_customer_types');
+var sema_product_mrps = require('./routes/sema_product_mrps');
 
 const winston = require('winston');
 
@@ -65,6 +66,7 @@ app.use('/sema/site/receipts/', sema_receipts);
 app.use('/sema/products/', isAuthenticated, sema_products);
 app.use('/sema/sales-channels/', isAuthenticated, sema_sales_channels);
 app.use('/sema/customer-types/', isAuthenticated, sema_customer_types);
+app.use('/sema/site/product-mrps/', isAuthenticated, sema_product_mrps);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

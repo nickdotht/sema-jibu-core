@@ -106,10 +106,7 @@ class Settings extends Component {
 						<Text style={[styles.headerText]}>{'Settings'}</Text>
 					</View>
 					<View style={{ flexDirection: 'row-reverse', flex: 1, alignItems: 'center', height: 100 }}>
-						<TouchableHighlight
-							onPress={() => this.onCancelSettings()}>
-							<Image source={require('../images/icons8-cancel-50.png')} style={{ marginRight: 100 }}/>
-						</TouchableHighlight>
+						{this.getSettingsCancel()}
 					</View>
 				</View>
 
@@ -180,7 +177,19 @@ class Settings extends Component {
 
 		);
 	}
+	getSettingsCancel(){
+		if( PosStorage.getCustomerTypes().length > 0 ){
+			return(
+				<TouchableHighlight
+					onPress={() => this.onCancelSettings()}>
+					<Image source={require('../images/icons8-cancel-50.png')} style={{ marginRight: 100 }}/>
+				</TouchableHighlight>
 
+			)
+		}else{
+			return null;
+		}
+	}
 
 	getUrl() {
 		return this.props.settings.semaUrl;
