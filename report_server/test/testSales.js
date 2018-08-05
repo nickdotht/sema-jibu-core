@@ -49,10 +49,10 @@ describe.skip('Testing Sales API', function () {
 	});
 
 	// Refer to the python script - populate_receipt for the expected results
-	describe('GET /untapped/Sales - UnitTest KioskID', () => {
+	describe('GET /sema/Sales - UnitTest KioskID', () => {
 		it('Should get info for one customer with one sale', (done) => {
 			chai.request(server)
-				.get('/untapped/kiosks')
+				.get('/sema/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
@@ -99,7 +99,7 @@ describe.skip('Testing Sales API', function () {
 	describe('GET /untapped/Sales - UnitTest KioskID', () =>{
 		it('Should get sales by retailer', (done) => {
 			chai.request(server)
-				.get('/untapped/kiosks')
+				.get('/sema/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');

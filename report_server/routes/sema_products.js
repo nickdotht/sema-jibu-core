@@ -7,14 +7,16 @@ const semaLog = require('../seama_services/sema_logger');
 const bodyParser = require('body-parser');
 const Product = require('../model_layer/Product');
 
-var sqlQueryDate = "SELECT * FROM product WHERE updated_at > ? AND active = b'1'";
+// Note that the query for updated products must include products recently deactivated as well
+// as active products
+var sqlQueryDate = "SELECT * FROM product WHERE updated_at > ? ";
 var sqlQuery = "SELECT * FROM product WHERE active = b'1'";
 
 
 router.get('/', function(req, res) {
-	semaLog.info('customers - Enter');
+	semaLog.info('GET products - Enter');
 	if (req.query.hasOwnProperty("updated-date")) {
-		getProducts(sqlQueryDate, req.query["updated-date"], res);
+		getProducts(sqlQueryDate, new Date( req.query["updated-date"]), res);
 	}
 	else {
 		getProducts(sqlQuery, [], res);
@@ -27,11 +29,11 @@ const getProducts = (query, params, res ) => {
 		connection.query(query, params, function(err, result) {
 			connection.release();
 			if (err) {
-				semaLog.error('products - failed', { err });
+				semaLog.error('GET products - failed', { err });
 				res.status(500).send(err.message);
 			}
 			else {
-				semaLog.info('products - succeeded');
+				semaLog.info('GET products - succeeded');
 				try {
 					if (Array.isArray(result) && result.length >= 1) {
 
@@ -47,7 +49,7 @@ const getProducts = (query, params, res ) => {
 					}
 
 				} catch (err) {
-					semaLog.error('products - failed', { err });
+					semaLog.error('GET products - failed', { err });
 					res.status(500).send(err.message);
 				}
 			}

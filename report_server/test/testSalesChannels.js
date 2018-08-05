@@ -23,7 +23,7 @@ describe('Testing Sales Channels', function () {
 	describe('GET /sema/sales-channels', function() {
 		it('should get all sales channels', function testSalesChannels(done) {
 			chai.request(server)
-				.post('/untapped/login')
+				.post('/sema/login')
 				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
 				.end(function(err, res) {
 					res.should.have.status(200);

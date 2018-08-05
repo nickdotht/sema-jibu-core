@@ -62,7 +62,7 @@ describe.skip('Testing Water Production API', function () {
 	describe('GET /untapped/water-operations - UnitTest KioskID', () => {
 		it('Should get info for water production with a valid kiosk', (done) => {
 			chai.request(server)
-				.get('/untapped/kiosks')
+				.get('/sema/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');
@@ -117,7 +117,7 @@ describe.skip('Testing Water Production API', function () {
 	describe('GET /untapped/water-operations - UnitTest KioskID', () => {
 		it('Should get info for total production/fill production with a valid kiosk', (done) => {
 			chai.request(server)
-				.get('/untapped/kiosks')
+				.get('/sema/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');

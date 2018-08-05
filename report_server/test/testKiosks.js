@@ -20,17 +20,17 @@ describe('Testing Kiosks', function () {
 		server.close();
 		setTimeout( function(){iAmDone()}, 2000);
 	});
-	describe('GET /untapped/kiosks', function() {
-		it('should get /untapped/kiosks', function testKiosks(done) {
+	describe('GET /sema/kiosks', function() {
+		it('should get /sema/kiosks', function testKiosks(done) {
 			chai.request(server)
-				.post('/untapped/login')
+				.post('/sema/login')
 				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
 				.end(function(err, res) {
 					res.should.have.status(200);
 					res.body.should.have.property('token');
 					let token = "Bearer " + res.body.token;
 					chai.request(server)
-						.get('/untapped/kiosks')
+						.get('/sema/kiosks')
 						.set('Authorization', token)
 						.end(function(err, res) {
 							// console.log(JSON.stringify(res))

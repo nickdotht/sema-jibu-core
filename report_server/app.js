@@ -61,6 +61,10 @@ app.use('/untapped/kiosks', isAuthenticated, seama_kiosks);
 app.use('/untapped/water-operations', isAuthenticated, seama_water_operations);
 app.use('/untapped/sales', isAuthenticated, sema_sales);
 app.use('/untapped/sales-by-channel', isAuthenticated, sema_sales_by_channel);
+
+app.use('/sema/health-check', seama_health_check);
+app.use('/sema/login', seama_login);
+app.use('/sema/kiosks', isAuthenticated, seama_kiosks);
 app.use('/sema/site/customers/', isAuthenticated,sema_customers);
 app.use('/sema/site/receipts/', sema_receipts);
 app.use('/sema/products/', isAuthenticated, sema_products);

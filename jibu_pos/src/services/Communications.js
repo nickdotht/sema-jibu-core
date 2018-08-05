@@ -35,7 +35,7 @@ class Communications {
 		}
 
 		return new Promise( (resolve, reject ) => {
-			fetch(this._url + 'untapped/login', options)
+			fetch(this._url + 'sema/login', options)
 				.then((response) => {
 					console.log( response.status);
 					response.json()
@@ -57,7 +57,7 @@ class Communications {
 		let options = { method: 'GET', headers: { Authorization : 'Bearer ' + token } };
 
 		return new Promise( (resolve, reject ) => {
-			fetch(this._url + 'untapped/kiosks', options)
+			fetch(this._url + 'sema/kiosks', options)
 				.then((response) => {
 					console.log( response.status);
 					response.json()

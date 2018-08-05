@@ -69,7 +69,7 @@ describe('Testing Products API', function () {
 	});
 
 	describe('GET Should return product mrp info on product/kiosk/salesChannel', function() {
-		it('Should pass', (done) => {
+		it('Should pass, returning all 5 product mrps', (done) => {
 			authenticate(server).then(function(token) {
 				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
 					findProductId.findProductId(server, token, 'sku1').then(function(product) {
@@ -89,6 +89,33 @@ describe('Testing Products API', function () {
 								}
 								done(err);
 						});
+					});
+				});
+			});
+		});
+	});
+
+	describe('GET Should return product mrp info on product/kiosk/salesChannel AFTER 1/1/2017', function() {
+		it('Should pass, returning all 1 product mrps', (done) => {
+			authenticate(server).then(function(token) {
+				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
+					findProductId.findProductId(server, token, 'sku1').then(function(product) {
+						let url = sprintf("/sema/site/product-mrps?site-id=%d&updated-date=%s", kiosk.id, new Date("2017-1-1"));
+						chai.request(server)
+							.get(url)
+							.set('Authorization', token)
+							.end(function(err, res) {
+								expect(res.body.productMRPs).to.be.an('array');
+								expect(res.body.productMRPs.length).to.be.equal(1);
+								res.should.have.status(200);
+								for( let index = 0; index < res.body.productMRPs.length; index++ ){
+									if( res.body.productMRPs[index].productId == product.id ){
+										expect(res.body.productMRPs[index].priceAmount).to.be.equal(10);
+										expect(res.body.productMRPs[index].cogsAmount).to.be.equal(4);
+									}
+								}
+								done(err);
+							});
 					});
 				});
 			});

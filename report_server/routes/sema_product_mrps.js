@@ -3,6 +3,7 @@ const router = express.Router();
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const ProductMrp = require('../model_layer/ProductMrp');
 
+var sqlQueryDate = "SELECT * FROM product_mrp WHERE kiosk_id = ? AND updated_at > ? ";
 var sqlQuery = "SELECT * FROM product_mrp WHERE kiosk_id = ?";
 
 router.get('/', function(req, res) {
@@ -16,9 +17,16 @@ router.get('/', function(req, res) {
 			semaLog.error("GET product mrps: validation error: ", errors);
 			res.status(400).send(errors.toString());
 		}else{
+			let params = [req.query["site-id"]];
+			let query = sqlQuery;
+			if (req.query.hasOwnProperty("updated-date")) {
+				params = [req.query["site-id"], new Date( req.query["updated-date"]), ]
+				query = sqlQueryDate;
+			}
+
 			__pool.getConnection((err, connection) => {
 
-				connection.query(sqlQuery, [req.query["site-id"]], (err, result) => {
+				connection.query(query, params, (err, result) => {
 					connection.release();
 					if (err) {
 						semaLog.error('GET product mrps  - failed', { err });
