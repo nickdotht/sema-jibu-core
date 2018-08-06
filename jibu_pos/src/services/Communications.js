@@ -193,10 +193,7 @@ class Communications {
 		});
 	}
 	getProducts( updatedSince ) {
-		let options = {
-			method: 'GET',
-			headers: { Authorization: 'Bearer ' + this._token }
-		}
+		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } };
 		let url = 'sema/products';
 
 		if( updatedSince ){
@@ -270,6 +267,24 @@ class Communications {
 			.then((responseJson) => {return responseJson})
 			.catch((error) => {
 				console.log("Communications:getCustomerTypes: " + error);
+				throw( error );
+			});
+	}
+
+	getProductMrps( updatedSince ) {
+		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } };
+		let url = 'sema/site/product-mrps?site-id=' + this._siteId;
+
+		if( updatedSince ){
+			url = url + '&updated-date=' + updatedSince.toISOString();
+		}
+		return fetch(this._url + url, options)
+			.then((response) => response.json())
+			.then((responseJson) => {
+				return responseJson
+			})
+			.catch((error) => {
+				console.log("Communications:getProductMrps: " + error);
 				throw( error );
 			});
 	}

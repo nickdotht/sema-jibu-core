@@ -65,6 +65,7 @@ class Synchronization {
 		return new Promise((resolve ) => {
 			try {
 				this._refreshToken().then(() => {
+					let lastProductSync = this.lastProductSync;
 					const promiseSalesChannels = this.synchronizeSalesChannels();
 					const promiseCustomerTypes = this.synchronizeCustomerTypes();
 					const promiseCustomers = this.synchronizeCustomers()
@@ -79,8 +80,12 @@ class Synchronization {
 						.then( saleSync =>{
 							syncResult.sales = saleSync;
 						});
+					const promiseProductMrps= this.synchronizeProductMrps(lastProductSync)
+						.then( productMrpSync =>{
+							syncResult.productMrps = productMrpSync;
+						});
 
-					Promise.all([promiseSalesChannels, promiseCustomerTypes, promiseCustomers, promiseProducts, promiseSales])
+					Promise.all([promiseSalesChannels, promiseCustomerTypes, promiseCustomers, promiseProducts, promiseSales, promiseProductMrps])
 						.then( values =>{
 							resolve(syncResult);
 						});
@@ -238,25 +243,20 @@ class Synchronization {
 				});
 		});
 	}
-	synchronizeProducts(){
+	synchronizeProductMrps( lastProductSync){
 		return new Promise( resolve => {
-			console.log("Synchronization:synchronizeProducts - Begin");
-			Communications.getProducts(this.lastProductSync)
-				.then(products => {
-					resolve( {error:null, remoteProducts: products.products.length});
-					if (products.hasOwnProperty("products")) {
-						this.updateLastProductSync();
-						console.log("Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
-						const updated = PosStorage.mergeProducts(products.products);
-						if (updated) {
-							Events.trigger('ProductsUpdated', {});
-						}
-
+			console.log("Synchronization:synchronizeProductMrps - Begin");
+			Communications.getProductMrps(lastProductSync)
+				.then(productMrps => {
+					if (productMrps.hasOwnProperty("productMRPs")) {
+						resolve( {error:null, remoteProductMrps: productMrps.productMRPs.length});
+						console.log("Synchronization:synchronizeProductMrps. No of new remote product MRPs: " + productMrps.productMRPs.length);
+						PosStorage.saveProductMrps(productMrps.productMRPs);
 					}
 				})
 				.catch(error => {
 					resolve( {error:error.message, remoteProducts: null});
-					console.log("Synchronization.getProducts - error " + error);
+					console.log("Synchronization.ProductsMrpsUpdated - error " + error);
 				});
 		});
 	}

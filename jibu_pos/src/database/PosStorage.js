@@ -25,6 +25,7 @@ const settingsKey = '@Sema:SettingsKey';
 const tokenExpirationKey = '@Sema:TokenExpirationKey';
 const salesChannelsKey = '@Sema:SalesChannelsKey';
 const customerTypesKey = '@Sema:CustomerTypesKey';
+const productMrpsKey = '@Sema:ProductMrpsKey';
 
 
 
@@ -65,6 +66,7 @@ class PosStorage {
 		this.settings = {semaUrl:"", site:"", user:"", password:"", token:"", siteId:"" };
 		this.salesChannels = [];
 		this.customerTypes = [];
+		this.productMrpDict = {};
 
 	}
 
@@ -89,7 +91,8 @@ class PosStorage {
 							[settingsKey, this.stringify(this.settings)],
 						    [tokenExpirationKey, this.stringify(this.tokenExpiration)],
 							[salesChannelsKey, this.stringify(this.salesChannels)],
-							[customerTypesKey, this.stringify(this.customerTypes)]];
+							[customerTypesKey, this.stringify(this.customerTypes)],
+							[productMrpsKey, this.stringify(this.productMrpDict)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
 							console.log( "PosStorage:initialize: Error: " + error );
 							resolve(false)})
@@ -100,7 +103,8 @@ class PosStorage {
 						let keyArray = [customersKey,salesKey,productsKey,lastCustomerSyncKey,
 							lastSalesSyncKey,lastProductsSyncKey,
 							pendingCustomersKey, pendingSalesKey,
-							settingsKey, tokenExpirationKey, salesChannelsKey, customerTypesKey];
+							settingsKey, tokenExpirationKey, salesChannelsKey,
+							customerTypesKey, productMrpsKey];
 						AsyncStorage.multiGet(keyArray ).then( function(results){
 							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
@@ -118,6 +122,7 @@ class PosStorage {
 							this.tokenExpiration = new Date(results[9][1]);	// Expiration date/time of the token
 							this.salesChannels = this.parseJson(results[10][1]);		// array of sales channels
 							this.customerTypes = this.parseJson(results[11][1]);		// array of customer types
+							this.productMrpDict = this.parseJson(results[12][1]);		// products MRP dictionary
 							this.loadCustomersFromKeys()
 								.then(()=>{
 									this.loadProductsFromKeys()
@@ -158,6 +163,7 @@ class PosStorage {
 		this.productsKeys = [];
 		this.salesChannels = [];
 		this.customerTypes = [];
+		this.productMrpDict = {};
 
 		let firstSyncDate = new Date('November 7, 1973');
 		this.lastCustomerSync = firstSyncDate;
@@ -173,7 +179,8 @@ class PosStorage {
 			[lastSalesSyncKey,this.lastSalesSync.toISOString()],
 			[lastProductsSyncKey,this.lastProductsSync.toISOString()],
 			[customerTypesKey,this.stringify(this.customerTypes)],
-			[salesChannelsKey,this.stringify(this.salesChannels)]];
+			[salesChannelsKey,this.stringify(this.salesChannels)],
+			[productMrpsKey, this.stringify(this.productMrpDict)]];
 
 		AsyncStorage.multiSet( keyArray).then( error => {
 			if( error ) {
@@ -661,12 +668,39 @@ class PosStorage {
 		});
 	}
 
+	getSalesChannelFromName( name ){
+		for( let i = 0; i < this.salesChannels.length; i++ ){
+			if( this.salesChannels[i].name === name ){
+				return this.salesChannels[i];
+			}
+		}
+		return null;
+	}
 	getCustomerTypes(){
 		return this.customerTypes;
 	}
 	saveCustomerTypes( customerTypesArray  ){
 		this.customerTypes = customerTypesArray;
 		this.setKey( customerTypesKey, this.stringify( customerTypesArray));
+	}
+
+	saveProductMrps( productMrpsArray){
+		productMrpsArray.forEach( productMrp => {
+			const key = this.getProductMrpKey( productMrp );
+			this.productMrpDict[key] = productMrp;
+		});
+		this.setKey( productMrpsKey, this.stringify( this.productMrpDict));
+
+	}
+	getProductMrps(){
+		return this.productMrpDict;
+	}
+	getProductMrpKey( productMrp ){
+		return ""+ productMrp.productId + "-" +  productMrp.salesChannelId;	// ProductId and salesChannelId are unique key
+	}
+
+	getProductMrpKeyFromIds( productId, salesChannelId ){
+		return ""+ productId + "-" +  salesChannelId;
 	}
 
 	stringify( jsObject){

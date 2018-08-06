@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-nati
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as OrderActions from "../../actions/OrderActions";
+import PosStorage from "../../database/PosStorage";
 
 class OrderTotal extends Component {
 	render() {
@@ -15,15 +16,20 @@ class OrderTotal extends Component {
 		);
 	}
 	getAmount = () =>{
-		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.priceAmount)) }, 0);
+		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product)) }, 0);
 	};
-	getItemPrice = (amount) =>{
-		if( this.props.channel.salesChannel === "walkup"){
-			return amount;
-		}else{
-			return .9* amount;
+
+	getItemPrice = (product) =>{
+		let salesChannel = PosStorage.getSalesChannelFromName(this.props.channel.salesChannel);
+		if( salesChannel ){
+			let productMrp = PosStorage.getProductMrps()[PosStorage.getProductMrpKeyFromIds(product.productId, salesChannel.id)];
+			if( productMrp ){
+				return productMrp.priceAmount;
+			}
 		}
-	}
+		return product.priceAmount;	// Just use product price
+	};
+
 }
 
 function mapStateToProps(state, props) {

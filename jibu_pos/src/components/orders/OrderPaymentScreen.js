@@ -84,6 +84,7 @@ class OrderPaymentScreen extends Component {
 	componentDidMount() {
 		console.log("OrderPaymentScreen = Mounted");
 		this.updatePayment(0);
+
 	}
 
 	render() {
@@ -145,10 +146,10 @@ class OrderPaymentScreen extends Component {
 
 			</KeyboardAwareScrollView>
 
-	);
+		);
 	}
 	calculateOrderDue(){
-		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.priceAmount)) }, 0);
+		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product)) }, 0);
 	}
 	calculateAmountDue(){
 		return this.props.selectedCustomer.dueAmount;
@@ -165,12 +166,32 @@ class OrderPaymentScreen extends Component {
 	onCancelOrder =() =>{
 		this.props.orderActions.SetOrderFlow('products');
 	};
-	getItemPrice = (amount) =>{
-		if( this.props.channel.salesChannel === "walkup"){
-			return amount;
-		}else{
-			return .9* amount;
+
+	getItemPrice = (item) =>{
+		let productMrp = this._getItemMrp( item );
+		if( productMrp ){
+			return productMrp.priceAmount;
 		}
+		return item.priceAmount;	// Just use product price
+	};
+
+	getItemCogs = (item) =>{
+		let productMrp = this._getItemMrp( item );
+		if( productMrp ){
+			return productMrp.cogsAmount;
+		}
+		return item.cogsAmount;	// Just use product price
+	};
+
+	_getItemMrp = (item) =>{
+		let salesChannel = PosStorage.getSalesChannelFromName(this.props.channel.salesChannel);
+		if( salesChannel ){
+			let productMrp = PosStorage.getProductMrps()[PosStorage.getProductMrpKeyFromIds(item.productId, salesChannel.id)];
+			if( productMrp ){
+				return productMrp;
+			}
+		}
+		return null;
 	};
 
 	checkBoxChangeCash=()=>{
@@ -271,10 +292,10 @@ class OrderPaymentScreen extends Component {
 		let cogsTotal = 0;
 		receipt.products = this.props.products.map( product => {
 			let receiptLineItem = {};
-			receiptLineItem.priceTotal = product.product.priceAmount * product.quantity;	// TODO Pricing is incorrect
+			receiptLineItem.priceTotal = this.getItemPrice( product.product ) * product.quantity;	// TODO Pricing is incorrect
 			receiptLineItem.quantity = product.quantity;
 			receiptLineItem.productId = product.product.productId;
-			receiptLineItem.cogsTotal = product.product.cogsAmount * product.quantity;
+			receiptLineItem.cogsTotal = this.getItemCogs( product.product ) * product.quantity;
 			// The items below are used for reporting...
 			receiptLineItem.sku = product.product.sku;
 			receiptLineItem.description = product.product.description;

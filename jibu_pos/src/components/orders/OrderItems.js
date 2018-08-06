@@ -3,6 +3,7 @@ import { View, Modal, Text, FlatList, TouchableHighlight, StyleSheet } from "rea
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as OrderActions from "../../actions/OrderActions";
+import PosStorage from "../../database/PosStorage";
 
 const widthQuanityModal = 250;
 const heightQuanityModal = 400;
@@ -79,7 +80,7 @@ class OrderItems extends Component {
 					<Text style={[styles.baseItem]}>{item.quantity}</Text>
 				</View>
 				<View style={ [ {flex: 1}]}>
-					<Text style={[styles.baseItem]}>{(item.quantity * this.getItemPrice( item.product.priceAmount))}</Text>
+					<Text style={[styles.baseItem]}>{(item.quantity * this.getItemPrice( item.product))}</Text>
 				</View>
 			</View>
 		);
@@ -162,14 +163,17 @@ class OrderItems extends Component {
 			this.props.orderActions.SetProductQuantity( this.state.selectedItem.product, this.state.accumulator );
 		}
 	};
-	getItemPrice = (amount) =>{
-		if( this.props.channel.salesChannel === "walkup") {
-			return amount;
-		}else{
-			// DODO - Each channels its own price. 10% discount is a place holder
-			return 0.9 * amount;
+	getItemPrice = (item) =>{
+		let salesChannel = PosStorage.getSalesChannelFromName(this.props.channel.salesChannel);
+		if( salesChannel ){
+			let productMrp = PosStorage.getProductMrps()[PosStorage.getProductMrpKeyFromIds(item.productId, salesChannel.id)];
+			if( productMrp ){
+				return productMrp.priceAmount;
+			}
 		}
+		return item.priceAmount;	// Just use product price
 	};
+
 }
 
 

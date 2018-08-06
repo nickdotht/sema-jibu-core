@@ -240,14 +240,17 @@ class Settings extends Component {
 		if( syncResult.hasOwnProperty("customers") && syncResult.customers.error != null ) return "Synchronization error: " + syncResult.customers.error;
 		if( syncResult.hasOwnProperty("products") && syncResult.products.error != null ) return "Synchronization error: " + syncResult.products.error;
 		if( syncResult.hasOwnProperty("sales") && syncResult.sales.error != null ) return "Synchronization error: " + syncResult.sales.error;
+		if( syncResult.hasOwnProperty("productMrps") && syncResult.productMrps.error != null ) return "Synchronization error: " + syncResult.productMrps.error;
 
 		else{
 			if( syncResult.customers.localCustomers == 0 && syncResult.customers.remoteCustomers == 0 &&
-				syncResult.products.remoteProducts == 0 && syncResult.sales.localReceipts == 0 ) {
+				syncResult.products.remoteProducts == 0 && syncResult.sales.localReceipts == 0 &&
+				syncResult.productMrps.remoteProductMrps == 0 ) {
 				return "Data is up to date";
 			}else{ return `${syncResult.customers.localCustomers + syncResult.customers.remoteCustomers } customers updated
 ${syncResult.products.remoteProducts} products updated
-${syncResult.sales.localReceipts} sales receipts updated`;
+${syncResult.sales.localReceipts} sales receipts updated
+${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 			}
 		}
 	}
