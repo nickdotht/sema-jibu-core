@@ -37,7 +37,7 @@ describe('Testing Login', function () {
 				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
 				.end(function(err, res) {
 					res.should.have.status(200);	// Correct Auth!
-					res.body.should.have.property('version').eql('0.0.0.7');
+					res.body.should.have.property('version').eql('0.0.1.0');
 					res.body.should.have.property('token');
 					done(err);
 				});
