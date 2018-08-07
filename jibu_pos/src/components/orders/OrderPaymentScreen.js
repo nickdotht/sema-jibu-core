@@ -11,7 +11,7 @@ import PosStorage from '../../database/PosStorage'
 class PaymentDescription extends Component {
 	render() {
 		return (
-			<View style={[{flex: 1, flexDirection: 'row', marginTop:20} ]}>
+			<View style={[{flex: 1, flexDirection: 'row', marginTop:"1%"} ]}>
 				<View style={ [{flex: 3}]}>
 					<Text style={[styles.totalTitle]}>{this.props.title}</Text>
 				</View>
@@ -94,7 +94,7 @@ class OrderPaymentScreen extends Component {
 				resetScrollToCoords={{ x: 0, y: 0 }}
 				contentContainerStyle={styles.container}
 				scrollEnabled={false}>
-				<View style ={{justifyContent:'flex-end', flexDirection:"row", right:100, top:20}}>
+				<View style ={{justifyContent:'flex-end', flexDirection:"row", right:100, top:10}}>
 					<TouchableHighlight
 						onPress={() => this.onCancelOrder()}>
 						<Image source={require('../../images/icons8-cancel-50.png')}/>
@@ -129,7 +129,7 @@ class OrderPaymentScreen extends Component {
 					<PaymentDescription title = "Previous Amount Due:" total={this.calculateAmountDue()}/>
 					<PaymentDescription title = "Total Amount Due:" total={this.calculateTotalDue()}/>
 					<View style={styles.completeOrder}>
-						<View style={{justifyContent:'center', height:100}}>
+						<View style={{justifyContent:'center', height:80}}>
 							<TouchableHighlight underlayColor = '#c0c0c0'
 								onPress={() => this.onCompleteOrder()}>
 								<Text style={ [ {paddingTop:20, paddingBottom:20}, styles.buttonText]}>Complete Sale</Text>
@@ -343,34 +343,34 @@ const styles = StyleSheet.create({
 	checkBoxRow: {
 		flex: 1,
 		flexDirection:"row",
-		marginTop:20,
+		marginTop:"1%",
 		alignItems:'center'
 	},
 	checkBox: {
 	},
 	checkLabel: {
 		left: 20,
-		fontSize:24,
+		fontSize:20,
 	},
 	totalSubTotal: {
 		flex: 1,
 		flexDirection:"row"
 	},
 	totalTitle: {
-		fontSize:24,
+		fontSize:20,
 	},
 	totalValue: {
-		fontSize:24,
+		fontSize:20,
 	},
 	completeOrder: {
 		backgroundColor:"#2858a7",
 		borderRadius:30,
-		marginTop:20
+		marginTop:"1%"
 
 	},
 	buttonText:{
 		fontWeight:'bold',
-		fontSize:24,
+		fontSize:20,
 		alignSelf:'center',
 		color:'white'
 	},

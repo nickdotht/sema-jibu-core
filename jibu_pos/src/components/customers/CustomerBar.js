@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
 		borderColor: '#404040',
 		borderRadius: 10,
 		backgroundColor: "#FFFFFF",
-		flex:.4,
+		flex:.3,
 		alignSelf:'center',
 		marginLeft:30
 	},
