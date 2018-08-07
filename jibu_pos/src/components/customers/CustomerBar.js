@@ -87,7 +87,7 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
 					handler = {this.onOrder.bind(this)}
-					image = {require('../../images/customer-order.png')}
+					image = {this.props.showView.showNewOrder ? require('../../images/customer-cancel-order.png') : require('../../images/customer-order.png')}
 					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('name')}
 				/>
 				<CustomerBarButton

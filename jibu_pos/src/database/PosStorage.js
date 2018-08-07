@@ -583,14 +583,25 @@ class PosStorage {
 		remoteProducts.forEach( function(product){
 			let productKey = this.makeProductKey(product);
 			let keyIndex = this.productsKeys.indexOf(productKey);
-			if( keyIndex == -1 ){
+			if( keyIndex == -1 && product.active ){
 				isNewProducts = true;
 				this.productsKeys.push(productKey );
 				this.products.push(product);
 				this.setKey( productKey,this.stringify(product));
-			}else{
-				this.setKey( productKey,this.stringify(product));		// Just update the existing customer
-				this.setLocalProduct(product)
+			}else if( keyIndex != -1 ){
+				if( product.active ) {
+					this.setKey(productKey, this.stringify(product));		// Just update the existing customer
+					this.setLocalProduct(product)
+				}else{
+					// Product has been deactivated - remove it
+					this.productsKeys.splice(keyIndex, 1);
+					isNewProducts = true;
+					this.removeKey(productKey);
+					let productIndex = this.getLocalProductIndex( product );
+					if( productIndex != - 1){
+						this.products.splice(productIndex, 1);
+					}
+				}
 			}
 		}.bind(this));
 		if( isNewProducts ){
@@ -610,6 +621,15 @@ class PosStorage {
 				return;
 			}
 		}
+	}
+
+	getLocalProductIndex( product ){
+		for( let index = 0; index < this.products.length; index++ ){
+			if(this.products[index].productId ===  product.productId){
+				return index;
+			}
+		}
+		return -1;
 	}
 
 	getSettings(){

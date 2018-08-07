@@ -16,7 +16,7 @@ var sqlQuery = "SELECT * FROM product WHERE active = b'1'";
 router.get('/', function(req, res) {
 	semaLog.info('GET products - Enter');
 	if (req.query.hasOwnProperty("updated-date")) {
-		getProducts(sqlQueryDate, new Date( req.query["updated-date"]), res);
+		getProducts(sqlQueryDate, [new Date( req.query["updated-date"])], res);
 	}
 	else {
 		getProducts(sqlQuery, [], res);
@@ -24,7 +24,7 @@ router.get('/', function(req, res) {
 });
 
 const getProducts = (query, params, res ) => {
-	__pool.getConnection((err, connection) => {
+		__pool.getConnection((err, connection) => {
 
 		connection.query(query, params, function(err, result) {
 			connection.release();

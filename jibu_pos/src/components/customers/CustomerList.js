@@ -20,6 +20,7 @@ class CustomerList extends Component {
 	componentDidMount() {
 		console.log("CustomerList:componentDidMount - filter: " + this.props.filter);
 		Events.on('ScrollCustomerTo', 'customerId1', this.onScrollCustomerTo.bind(this) );
+
 	}
 	componentWillUnmount(){
 		Events.rm('ScrollCustomerTo', 'customerId1') ;
@@ -68,6 +69,7 @@ class CustomerList extends Component {
 		);
 	}
 	prepareData = () => {
+		this.salesChannels = PosStorage.getSalesChannelsForDisplay();
 		if (this.props.customers.length > 0 && this.props.customers[0].customerId !== '9999999-9999-9999-9999-9999999') {
 			const anonymous = {
 				"customerId": "9999999-9999-9999-9999-9999999",
@@ -78,7 +80,7 @@ class CustomerList extends Component {
 				"dueAmount": "",
 				"phoneNumber": "----------------------------",
 				"active": "1",
-				"salesChannel": "anonymous"
+				"salesChannelId": "anonymous"
 			};
 			this.props.customers.unshift(anonymous);
 		}
@@ -98,13 +100,13 @@ class CustomerList extends Component {
 	};
 	filterItems = (data) => {
 		let filteredItems = [];
-		let salesChannels = PosStorage.getSalesChannels();
 		for( let i = 0; i < data.length; i++ ){
-			if( this.filterItem( data[i], salesChannels)){
+			if( this.filterItem( data[i], this.salesChannels)){
 				filteredItems.push(data[i]);
 			}
 		}
 		return filteredItems;
+
 	};
 
 	getRow = (item, index, separators) =>{
@@ -143,26 +145,27 @@ class CustomerList extends Component {
 	};
 
 	getCustomerSalesChannel(item) {
-		if( item.hasOwnProperty("salesChannel")){
-			if(item.salesChannel=== "reseller" ) return "Reseller";
-			else return "Walk-up";
-		}else{
+		try {
+			for( let i = 0; i < this.salesChannels.length; i++ ) {
+				if (this.salesChannels[i].id === item.salesChannelId) {
+					return this.salesChannels[i].displayName;
+				}
+			}
+		}catch( error ) {
 			return "Walk-up";
 		}
 	}
 
 	filterItem = (item, salesChannels )=> {
 		try {
-			if( !item.hasOwnProperty("salesChannel")){
-				// Map saleschanelId to name
-				item.salesChannel = this._getSalesChannelName(item.salesChannelId, salesChannels);
-			}
-			if (item.salesChannel === "anonymous") {
+			let salesChannel = this._getSalesChannelName(item.salesChannelId, salesChannels);
+
+			if (item.salesChannelId === -1 ) {
 				return true;
 			}
 			if (this.props.filter === "all" ||
-				(this.props.filter === "reseller" && item.salesChannel === "reseller") ||
-				(this.props.filter === "walkup" && item.salesChannel !== "reseller") ||
+				(this.props.filter === "reseller" && salesChannel === "reseller") ||
+				(this.props.filter === "walkup" && salesChannel !== "reseller") ||
 				(this.props.filter === "credit" && item.dueAmount > 0)) {
 				if (this.state.searchString.length >= 2) {
 					const filterString = this.state.searchString.toLowerCase();

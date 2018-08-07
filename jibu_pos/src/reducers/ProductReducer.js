@@ -9,7 +9,7 @@ const productReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case PRODUCTS_SET:
 			newState = {...state};
-			newState.products = action.data ;
+			newState.products = action.data.slice() ;
 			return newState;
 		default:
 			return state;
