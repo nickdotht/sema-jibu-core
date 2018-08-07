@@ -23,6 +23,11 @@ const pendingSalesKey = '@Sema:PendingSalesKey';
 const settingsKey = '@Sema:SettingsKey';
 
 const tokenExpirationKey = '@Sema:TokenExpirationKey';
+const salesChannelsKey = '@Sema:SalesChannelsKey';
+const customerTypesKey = '@Sema:CustomerTypesKey';
+const productMrpsKey = '@Sema:ProductMrpsKey';
+
+
 
 class PosStorage {
 	constructor() {
@@ -59,6 +64,10 @@ class PosStorage {
 		this.tokenExpiration = firstSyncDate;
 
 		this.settings = {semaUrl:"", site:"", user:"", password:"", token:"", siteId:"" };
+		this.salesChannels = [];
+		this.customerTypes = [];
+		this.productMrpDict = {};
+
 	}
 
 	initialize( forceNew ) {
@@ -80,7 +89,10 @@ class PosStorage {
 							[pendingCustomersKey, this.stringify(this.pendingCustomers)],
 							[pendingSalesKey, this.stringify(this.pendingSales)],
 							[settingsKey, this.stringify(this.settings)],
-						    [tokenExpirationKey, this.stringify(this.tokenExpiration)]];
+						    [tokenExpirationKey, this.stringify(this.tokenExpiration)],
+							[salesChannelsKey, this.stringify(this.salesChannels)],
+							[customerTypesKey, this.stringify(this.customerTypes)],
+							[productMrpsKey, this.stringify(this.productMrpDict)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
 							console.log( "PosStorage:initialize: Error: " + error );
 							resolve(false)})
@@ -91,7 +103,8 @@ class PosStorage {
 						let keyArray = [customersKey,salesKey,productsKey,lastCustomerSyncKey,
 							lastSalesSyncKey,lastProductsSyncKey,
 							pendingCustomersKey, pendingSalesKey,
-							settingsKey, tokenExpirationKey];
+							settingsKey, tokenExpirationKey, salesChannelsKey,
+							customerTypesKey, productMrpsKey];
 						AsyncStorage.multiGet(keyArray ).then( function(results){
 							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
@@ -107,6 +120,9 @@ class PosStorage {
 							this.pendingSales = this.parseJson(results[7][1]);	// Array of pending sales
 							this.settings = this.parseJson(results[8][1]);		// Settings
 							this.tokenExpiration = new Date(results[9][1]);	// Expiration date/time of the token
+							this.salesChannels = this.parseJson(results[10][1]);		// array of sales channels
+							this.customerTypes = this.parseJson(results[11][1]);		// array of customer types
+							this.productMrpDict = this.parseJson(results[12][1]);		// products MRP dictionary
 							this.loadCustomersFromKeys()
 								.then(()=>{
 									this.loadProductsFromKeys()
@@ -145,12 +161,14 @@ class PosStorage {
 
 		this.products = [];
 		this.productsKeys = [];
+		this.salesChannels = [];
+		this.customerTypes = [];
+		this.productMrpDict = {};
 
 		let firstSyncDate = new Date('November 7, 1973');
 		this.lastCustomerSync = firstSyncDate;
 		this.lastSalesSync = firstSyncDate;
 		this.lastProductsSync = firstSyncDate;
-
 		let keyArray = [
 			[customersKey,  this.stringify(this.customersKeys)],
 			[productsKey,  this.stringify(this.productsKeys)],
@@ -159,7 +177,11 @@ class PosStorage {
 			[pendingSalesKey, this.stringify(this.pendingSales)],
 			[lastCustomerSyncKey,this.lastCustomerSync.toISOString()],
 			[lastSalesSyncKey,this.lastSalesSync.toISOString()],
-			[lastProductsSyncKey,this.lastProductsSync.toISOString()]];
+			[lastProductsSyncKey,this.lastProductsSync.toISOString()],
+			[customerTypesKey,this.stringify(this.customerTypes)],
+			[salesChannelsKey,this.stringify(this.salesChannels)],
+			[productMrpsKey, this.stringify(this.productMrpDict)]];
+
 		AsyncStorage.multiSet( keyArray).then( error => {
 			if( error ) {
 				console.log("PosStorage:clearDataOnly: Error: " + error);
@@ -175,18 +197,20 @@ class PosStorage {
 		return customerKey.slice( prefix.length );
 	}
 
-	createCustomer(phone, name, address, siteId, salesChannel ){
+	createCustomer(phone, name, address, siteId, salesChannelId, customerTypeId ){
 		const now = new Date();
-		return this.createCustomerFull( phone, name, address, siteId, salesChannel,  now, now)
+		return this.createCustomerFull( phone, name, address, siteId, salesChannelId, customerTypeId, now, now)
 	}
-	createCustomerFull(phone, name, address, siteId, salesChannel, createdDate, updatedDate ){
+
+	createCustomerFull(phone, name, address, siteId, salesChannelId, customerTypeId, createdDate, updatedDate ){
 		const newCustomer = {
 			customerId:uuidv1(),
-			contactName:name,
+			name:name,
 			phoneNumber:phone,
 			address:address,
 			siteId:siteId,
-			salesChannel:salesChannel,
+			salesChannelId:salesChannelId,
+			customerTypeId:customerTypeId,
 			createdDate:createdDate,
 			updatedDate:updatedDate
 
@@ -233,12 +257,12 @@ class PosStorage {
 			});
 		}
 	}
-	updateCustomer( customer, phone, name, address, salesChannel){
+	updateCustomer( customer, phone, name, address, salesChannelId){
 		let key = this.makeCustomerKey(customer);
-		customer.contactName = name; 	// FIXUP - Won't be contactName forever
-		customer.phoneNumber = phone; 	// FIXUP - Won't be phone_number forever
-		customer.address = address; 	// FIXUP - Won't be address forever
-		customer.salesChannel = salesChannel;
+		customer.name = name;
+		customer.phoneNumber = phone;
+		customer.address = address;
+		customer.salesChannelId = salesChannelId;
 		customer.updatedDate = new Date();
 		customer.syncAction = "update";
 
@@ -275,6 +299,7 @@ class PosStorage {
 
 	// Merge new customers into existing ones
 	mergeCustomers( remoteCustomers){
+		console.log( "PosStorage:mergeCustomers Number of remote customers: " + remoteCustomers.length );
 		let newCustomersAdded = remoteCustomers.length > 0 ? true : false;
 		if( this.customers.length  == 0 ){
 			this.addRemoteCustomers( remoteCustomers);
@@ -295,12 +320,12 @@ class PosStorage {
 					}
 					if( localCustomer &&  remoteCustomer.updatedDate > new Date(localCustomer.updatedDate) ){
 						// remoteCustomer is the latest
-						console.log("PostStorage - mergeCustomers. Remote customer " + remoteCustomer.contactName + " is later:")
+						console.log("PostStorage - mergeCustomers. Remote customer " + remoteCustomer.name + " is later:")
 						webCustomersToUpdate.push( remoteCustomer );
 						this.pendingCustomers.splice(pendingIndex, 1);
 						isPendingModified = true;
 					}else{
-						console.log("PostStorage - mergeCustomers. Local customer " + localCustomer.contactName + " is later:")
+						console.log("PostStorage - mergeCustomers. Local customer " + localCustomer.name + " is later:")
 					}
 
 				}else{
@@ -410,7 +435,7 @@ class PosStorage {
 		return this.salesKeys;
 	}
 	getFilteredSales( beginDate, endDate ){
-		console.log("PosStorage: getSales. between " + beginDate.toString() + " and " + endDate.toString());
+		console.log("PosStorage: getFilteredSales. between " + beginDate.toString() + " and " + endDate.toString());
 		// Note that sales are order earliest to latest
 		let sales = [];
 		for( let index = 0; index < this.salesKeys.length; index ++ ){
@@ -426,15 +451,16 @@ class PosStorage {
 		return sales;
 
 	}
-	addSale( sale){
+	addSale( receipt){
 		console.log("PosStorage: addSale" );
 		return new Promise((resolve, reject) => {
 			let saleDateTime = new Date(Date.now());
-			sale.receiptId = uuidv1();
-			sale.createdDate = saleDateTime;
+			receipt.receiptId = uuidv1();
+
 			let saleDateKey = saleDateTime.toISOString();
 			this.salesKeys.push({saleDateTime:saleDateKey, saleKey:saleItemKey + saleDateKey});
 			if( this.salesKeys.length > 1 ){
+				// When adding a sale, purge the top one if it is older than 30 days
 				let oldest = this.salesKeys[0];
 				let firstDate = new Date( oldest.saleDateTime);
 				firstDate = new Date( firstDate.getTime() + 30 * 24 *60 *60 * 1000);
@@ -453,7 +479,7 @@ class PosStorage {
 			}
 			this.pendingSales.push(saleItemKey + saleDateKey);
 			let keyArray = [
-				[ saleItemKey + saleDateKey, this.stringify(sale)],		// The sale
+				[ saleItemKey + saleDateKey, this.stringify(receipt)],		// The sale
 				[ salesKey, this.stringify(this.salesKeys)],			// Array of date/time sales keys
 				[ pendingSalesKey, this.stringify(this.pendingSales)]];	// Pending sales keys
 			AsyncStorage.multiSet(keyArray ).then( error =>{
@@ -557,14 +583,25 @@ class PosStorage {
 		remoteProducts.forEach( function(product){
 			let productKey = this.makeProductKey(product);
 			let keyIndex = this.productsKeys.indexOf(productKey);
-			if( keyIndex == -1 ){
+			if( keyIndex == -1 && product.active ){
 				isNewProducts = true;
 				this.productsKeys.push(productKey );
 				this.products.push(product);
 				this.setKey( productKey,this.stringify(product));
-			}else{
-				this.setKey( productKey,this.stringify(product));		// Just update the existing customer
-				this.setLocalProduct(product)
+			}else if( keyIndex != -1 ){
+				if( product.active ) {
+					this.setKey(productKey, this.stringify(product));		// Just update the existing customer
+					this.setLocalProduct(product)
+				}else{
+					// Product has been deactivated - remove it
+					this.productsKeys.splice(keyIndex, 1);
+					isNewProducts = true;
+					this.removeKey(productKey);
+					let productIndex = this.getLocalProductIndex( product );
+					if( productIndex != - 1){
+						this.products.splice(productIndex, 1);
+					}
+				}
 			}
 		}.bind(this));
 		if( isNewProducts ){
@@ -584,6 +621,15 @@ class PosStorage {
 				return;
 			}
 		}
+	}
+
+	getLocalProductIndex( product ){
+		for( let index = 0; index < this.products.length; index++ ){
+			if(this.products[index].productId ===  product.productId){
+				return index;
+			}
+		}
+		return -1;
 	}
 
 	getSettings(){
@@ -623,6 +669,58 @@ class PosStorage {
 		this.lastSalesSync = lastSyncTime;
 		this.setKey( lastSalesSyncKey,this.lastSalesSync.toISOString());
 
+	}
+
+	getSalesChannels(){
+		return this.salesChannels;
+	}
+	saveSalesChannels( salesChannelArray  ){
+		this.salesChannels = salesChannelArray;
+		this.setKey( salesChannelsKey, this.stringify( salesChannelArray));
+	}
+	getSalesChannelsForDisplay(){
+		return this.salesChannels.map( salesChannel =>{
+			return {
+				id: salesChannel.id,
+				name: salesChannel.name,
+				displayName: salesChannel.name.charAt(0).toUpperCase() + salesChannel.name.slice(1)
+			};
+		});
+	}
+
+	getSalesChannelFromName( name ){
+		for( let i = 0; i < this.salesChannels.length; i++ ){
+			if( this.salesChannels[i].name === name ){
+				return this.salesChannels[i];
+			}
+		}
+		return null;
+	}
+	getCustomerTypes(){
+		return this.customerTypes;
+	}
+	saveCustomerTypes( customerTypesArray  ){
+		this.customerTypes = customerTypesArray;
+		this.setKey( customerTypesKey, this.stringify( customerTypesArray));
+	}
+
+	saveProductMrps( productMrpsArray){
+		productMrpsArray.forEach( productMrp => {
+			const key = this.getProductMrpKey( productMrp );
+			this.productMrpDict[key] = productMrp;
+		});
+		this.setKey( productMrpsKey, this.stringify( this.productMrpDict));
+
+	}
+	getProductMrps(){
+		return this.productMrpDict;
+	}
+	getProductMrpKey( productMrp ){
+		return ""+ productMrp.productId + "-" +  productMrp.salesChannelId;	// ProductId and salesChannelId are unique key
+	}
+
+	getProductMrpKeyFromIds( productId, salesChannelId ){
+		return ""+ productId + "-" +  salesChannelId;
 	}
 
 	stringify( jsObject){

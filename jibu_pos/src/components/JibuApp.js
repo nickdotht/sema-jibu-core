@@ -72,9 +72,10 @@ class JibuApp extends Component {
 			Synchronization.setConnected(this.props.network.isNWConnected );
 
 			// Determine the startup screen as follows:
-			// If the settings contain url, site, username, password and token, proceed to main screen
-			// If the settings contain url, site, username, password but NOT token, proceed to login screen, (No token => user has logged out)
+			// If the settings contain url, site, username, password, token and customerTypes, proceed to main screen
+			// If the settings contain url, site, username, password, customerTypes but NOT token, proceed to login screen, (No token => user has logged out)
 			// Otherwise proceed to the settings screen.
+			// Note: Without customerTypes. Customers can't be created since Customer creation requires both salesChannelIds AND customerTypes
 			if( this.isLoginComplete() ){
 				console.log("JibuApp - Auto login - All settings exist");
 				this.props.toolbarActions.SetLoggedIn(true);
@@ -154,7 +155,8 @@ class JibuApp extends Component {
 			settings.site.length > 0 &&
 			settings.user.length > 0 &&
 			settings.password.length > 0 &&
-			settings.token.length > 0 ){
+			settings.token.length > 0 &&
+			this.posStorage.getCustomerTypes().length > 0){
 			console.log("All settings valid - Proceed to main screen");
 			return true;
 		}
@@ -166,7 +168,8 @@ class JibuApp extends Component {
 			settings.site.length > 0 &&
 			settings.user.length > 0 &&
 			settings.password.length > 0 &&
-			settings.token.length == 0 ){
+			settings.token.length == 0 &&
+			this.posStorage.getCustomerTypes().length > 0){
 			return true;
 		}
 		return false;

@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import * as ProductActions from '../../actions/ProductActions';
 import * as OrderActions from "../../actions/OrderActions";
+import PosStorage from "../../database/PosStorage";
 
 class ProductList extends Component {
 	constructor(props) {
@@ -58,7 +59,7 @@ class ProductList extends Component {
 					resizeMethod ='scale'
 					style={{flex:1}}>
 				</Image>
-				<Text style={[styles.imageLabel,this.getLabelBackground()]}>{item.description}{'\n'}${this.getItemPrice(item.priceAmount)}</Text>
+				<Text style={[styles.imageLabel,this.getLabelBackground()]}>{item.description}{'\n'}{this.getItemPrice(item)} ush</Text>
 			</View>
 		);
 	};
@@ -90,13 +91,15 @@ class ProductList extends Component {
 			return styles.imageLabelBackgroundReseller;
 		}
 	};
-	getItemPrice = (amount) =>{
-		if( this.props.filter === "walkup") {
-			return amount;
-		}else{
-			// DODO - Each channels its own price. 10% discount is a place holder
-			return 0.9 * amount;
+	getItemPrice = (item) =>{
+		let salesChannel = PosStorage.getSalesChannelFromName(this.props.filter);
+		if( salesChannel ){
+			let productMrp = PosStorage.getProductMrps()[PosStorage.getProductMrpKeyFromIds(item.productId, salesChannel.id)];
+			if( productMrp ){
+				return productMrp.priceAmount;
+			}
 		}
+		return item.priceAmount;	// Just use product price
 	};
 
 }

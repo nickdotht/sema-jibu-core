@@ -84,6 +84,7 @@ class OrderPaymentScreen extends Component {
 	componentDidMount() {
 		console.log("OrderPaymentScreen = Mounted");
 		this.updatePayment(0);
+
 	}
 
 	render() {
@@ -145,10 +146,10 @@ class OrderPaymentScreen extends Component {
 
 			</KeyboardAwareScrollView>
 
-	);
+		);
 	}
 	calculateOrderDue(){
-		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product.priceAmount)) }, 0);
+		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product)) }, 0);
 	}
 	calculateAmountDue(){
 		return this.props.selectedCustomer.dueAmount;
@@ -165,12 +166,32 @@ class OrderPaymentScreen extends Component {
 	onCancelOrder =() =>{
 		this.props.orderActions.SetOrderFlow('products');
 	};
-	getItemPrice = (amount) =>{
-		if( this.props.channel.salesChannel === "walkup"){
-			return amount;
-		}else{
-			return .9* amount;
+
+	getItemPrice = (item) =>{
+		let productMrp = this._getItemMrp( item );
+		if( productMrp ){
+			return productMrp.priceAmount;
 		}
+		return item.priceAmount;	// Just use product price
+	};
+
+	getItemCogs = (item) =>{
+		let productMrp = this._getItemMrp( item );
+		if( productMrp ){
+			return productMrp.cogsAmount;
+		}
+		return item.cogsAmount;	// Just use product price
+	};
+
+	_getItemMrp = (item) =>{
+		let salesChannel = PosStorage.getSalesChannelFromName(this.props.channel.salesChannel);
+		if( salesChannel ){
+			let productMrp = PosStorage.getProductMrps()[PosStorage.getProductMrpKeyFromIds(item.productId, salesChannel.id)];
+			if( productMrp ){
+				return productMrp;
+			}
+		}
+		return null;
 	};
 
 	checkBoxChangeCash=()=>{
@@ -244,31 +265,52 @@ class OrderPaymentScreen extends Component {
 	};
 
 	formatAndSaveSale = () =>{
-		let sale = {
-			cash:this.props.payment.cash,
-			credit:this.props.payment.credit,
-			mobile:this.props.payment.mobile,
-			customerId: this.props.selectedCustomer.customerId,
-			salesChannel: this.props.selectedCustomer.salesChannel,
+		// Assumes that there is at least one product
+		let receiptDate = new Date(Date.now());
+		let receipt = {
+			id:receiptDate.toISOString(),
+			createdDate: receiptDate,
+			currencyCode:this.props.products[0].product.priceCurrency,
+			customerId:this.props.selectedCustomer.customerId,
+			amountCash: this.props.payment.cash,
+			amountLoan:this.props.payment.credit,
+			amountMobile:this.props.payment.mobile,
 			siteId: this.props.selectedCustomer.siteId,
-			products:[] };
-		if( ! sale.siteId ){
+			paymentType:"",		// NOT sure what this is
+			salesChannelId: this.props.selectedCustomer.salesChannelId,
+			customerTypeId: this.props.selectedCustomer.customerTypeId,
+			products:[]
+		};
+		if( ! receipt.siteId ){
 			// This fixes issues with the pseudo walkup customer
-			sale.siteId = PosStorage.getSettings().siteId;
+			receipt.siteId = PosStorage.getSettings().siteId;
 		}
-		sale.products = this.props.products.map( product => {
-			let productSale = {};
-			productSale.id = product.product.productId;
-			productSale.description = product.product.description;
-			productSale.gallons =  product.product.gallons;
-			productSale.liters_per_sku = product.product.liters_per_sku;
-			productSale.sku = product.product.sku;
-			productSale.priceAmount = product.product.priceAmount;
-			productSale.price_currency  = product.product.priceCurrency;
-			productSale.quantity = product.quantity;
-			return productSale;
+
+
+
+		let priceTotal = 0;
+		let cogsTotal = 0;
+		receipt.products = this.props.products.map( product => {
+			let receiptLineItem = {};
+			receiptLineItem.priceTotal = this.getItemPrice( product.product ) * product.quantity;	// TODO Pricing is incorrect
+			receiptLineItem.quantity = product.quantity;
+			receiptLineItem.productId = product.product.productId;
+			receiptLineItem.cogsTotal = this.getItemCogs( product.product ) * product.quantity;
+			// The items below are used for reporting...
+			receiptLineItem.sku = product.product.sku;
+			receiptLineItem.description = product.product.description;
+			if( product.product.unitMeasure == "liters"){
+				receiptLineItem.litersPerSku = product.product.unitPerProduct;
+			}else{
+				receiptLineItem.litersPerSku = "N/A";
+			}
+			priceTotal += receiptLineItem.priceTotal;
+			cogsTotal += receiptLineItem.cogsTotal;
+			return receiptLineItem;
 		});
-		PosStorage.addSale(sale);
+		receipt.total = priceTotal;
+		receipt.cogs = cogsTotal;
+		PosStorage.addSale(receipt);
 	}
 }
 

@@ -18,10 +18,10 @@ describe('Testing Login', function () {
 		server.close();
 		setTimeout( function(){iAmDone()}, 2000);
 	});
-	describe('POST /untapped/login - missing auth', function() {
-		it('should get /untapped/login', function testLoginNoAuth(done) {
+	describe('POST /sema/login - missing auth', function() {
+		it('should get /sema/login', function testLoginNoAuth(done) {
 			chai.request(server)
-				.post('/untapped/login')
+				.post('/sema/login')
 				.end(function(err, res) {
 					res.should.have.status(400);	// No Auth headers!
 					done(err);
@@ -30,23 +30,23 @@ describe('Testing Login', function () {
 	});
 
 
-	describe('POST /untapped/login - correct auth', function() {
-		it('should get /untapped/login', function testLoginNoAuth(done) {
+	describe('POST /sema/login - correct auth', function() {
+		it('should get /sema/login', function testLoginNoAuth(done) {
 			chai.request(server)
-				.post('/untapped/login')
+				.post('/sema/login')
 				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
 				.end(function(err, res) {
 					res.should.have.status(200);	// Correct Auth!
-					res.body.should.have.property('version').eql('0.0.0.7');
+					res.body.should.have.property('version').eql('0.0.1.0');
 					res.body.should.have.property('token');
 					done(err);
 				});
 		});
 	});
-	describe('POST /untapped/login - incorrect auth', function() {
-		it('should get /untapped/login', function testLoginNoAuth(done) {
+	describe('POST /sema/login - incorrect auth', function() {
+		it('should get /sema/login', function testLoginNoAuth(done) {
 			chai.request(server)
-				.post('/untapped/login')
+				.post('/sema/login')
 				.send({ usernameOrEmail:'administrator' , password:'xxxx' })
 				.end(function(err, res) {
 					res.should.have.status(401);	// Invalid Auth!

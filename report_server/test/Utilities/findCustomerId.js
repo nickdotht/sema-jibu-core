@@ -6,22 +6,22 @@ chai.use(chaiHttp);
 const should = chai.should();
 const sprintf = require('sprintf-js').sprintf;
 
-const findCustomerId = (server, token, contactName, siteId) => {
+const findCustomerId = (server, token, name, siteId) => {
 	return new Promise((resolve, reject) => {
 		let url = sprintf('/sema/site/customers?site-id=%s', siteId);
 		chai.request(server)
 			.get(url)
 			.set('Authorization', token)
 			.end(function(err, res) {
-				let customer_index = findCustomerIndex(res.body.customers, contactName);
+				let customer_index = findCustomerIndex(res.body.customers, name);
 				resolve(res.body.customers[customer_index]);
 			});
 	});
 };
 
-function findCustomerIndex(customers, contactName) {
+function findCustomerIndex(customers, name) {
 	for (let i=0; i<customers.length; i++) {
-		if (customers[i].contactName === contactName) {
+		if (customers[i].name === name) {
 			return i;
 		}
 	}

@@ -47,7 +47,7 @@ describe.skip('Testing Sales ByChannel API', function () {
 	describe('GET /untapped/sales-by-channel- UnitTest KioskID', function() {
 		it('Should get info for one customer with one sale', (done) => {
 			chai.request(server)
-				.get('/untapped/kiosks')
+				.get('/sema/kiosks')
 				.end(function(err, res) {
 					expect(res.body.kiosks).to.be.an('array');
 					let site_index = findKioskIndex(res.body.kiosks, 'UnitTest');

@@ -4,10 +4,10 @@ const chai = require('chai');
 chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const should = chai.should();
-var findKioskId = require('./Utilities/findKioskId');
+var findSalesChannel= require('./Utilities/findSalesChannelId');
 process.env.NODE_ENV = 'test';  // Set environment to test
 
-describe('Testing Kiosks', function () {
+describe('Testing Sales Channels', function () {
 	let server;
 	this.timeout(6000);
 	beforeEach( (done) => {
@@ -20,8 +20,8 @@ describe('Testing Kiosks', function () {
 		server.close();
 		setTimeout( function(){iAmDone()}, 2000);
 	});
-	describe('GET /sema/kiosks', function() {
-		it('should get /sema/kiosks', function testKiosks(done) {
+	describe('GET /sema/sales-channels', function() {
+		it('should get all sales channels', function testSalesChannels(done) {
 			chai.request(server)
 				.post('/sema/login')
 				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
@@ -30,30 +30,21 @@ describe('Testing Kiosks', function () {
 					res.body.should.have.property('token');
 					let token = "Bearer " + res.body.token;
 					chai.request(server)
-						.get('/sema/kiosks')
+						.get('/sema/sales-channels')
 						.set('Authorization', token)
 						.end(function(err, res) {
 							// console.log(JSON.stringify(res))
 							res.should.have.status(200);
-							let site_index = findKioskId.findKioskIndex(res.body.kiosks, 'UnitTestCustomers');
-							expect( site_index).to.not.equal(-1);
-							res.body.should.be.a('object');
-							res.body.should.have.property('kiosks');
-							expect(res.body.kiosks).to.be.an('array');
-							res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+							let sc_index = findSalesChannel.findSalesChannelIndex(res.body.salesChannels, 'sales channel 1');
+							expect( sc_index).to.not.equal(-1);
+							res.body.should.have.property('salesChannels');
+							expect(res.body.salesChannels).to.be.an('array');
+							res.body.salesChannels[sc_index].should.have.property('name').eql('sales channel 1');
 							done(err);
 						});
 				});
 		});
 	});
-	describe('404 everything else', function() {
-		it('404 everything else', function testPath(done) {
-			request(server)
-				.get('/untapped/rubbish')
-				.end(function (err ) {
-					done(err);
-				});
-		});
-	});
+
 });
 

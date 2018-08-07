@@ -8,7 +8,7 @@ const should = chai.should();
 const findKioskId = (server, token, siteName) => {
 	return new Promise((resolve, reject) => {
 		chai.request(server)
-			.get('/untapped/kiosks')
+			.get('/sema/kiosks')
 			.set('Authorization', token)
 			.end(function(err, res) {
 				let site_index = findKioskIndex(res.body.kiosks, siteName);

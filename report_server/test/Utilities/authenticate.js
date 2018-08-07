@@ -9,7 +9,7 @@ const should = chai.should();
 const authenticate = (server) => {
 	return new Promise((resolve, reject) => {
 		chai.request(server)
-			.post('/untapped/login')
+			.post('/sema/login')
 			.send({ usernameOrEmail: 'administrator', password: 'dloHaiti' })
 			.end(function(err, res) {
 				res.should.have.status(200);

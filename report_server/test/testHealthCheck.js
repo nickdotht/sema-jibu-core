@@ -17,10 +17,10 @@ describe('Testing health-check', function () {
 		server.close();
 		setTimeout( function(){iAmDone()}, 2000);
 	});
-	describe('GET /untapped/health-check', function() {
-		it('should get /untapped/health-check', function testHealthCheck(done) {
+	describe('GET /sema/health-check', function() {
+		it('should get /sema/health-check', function testHealthCheck(done) {
 			chai.request(server)
-				.get('/untapped/health-check')
+				.get('/sema/health-check')
 				.end(function(err, res) {
 					// console.log(JSON.stringify(res))
 					res.should.have.status(200);

@@ -10,7 +10,7 @@ test('Adding a remote customer', () => {
 	const posStorage = PosStorage.default;
 	return posStorage.initialize( true )
 		.then( isInitialized =>{
-			let customer = {customerId:"111-222", contactName:"fred", phoneNumber:"555-1212"};
+			let customer = {customerId:"111-222", name:"fred", phoneNumber:"555-1212"};
 			let customers = [];
 			expect(posStorage.getPendingCustomers().length).toBe(0);
 			expect(posStorage.getCustomers().length).toBe(0);
