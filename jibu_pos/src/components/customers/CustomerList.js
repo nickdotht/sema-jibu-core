@@ -6,6 +6,8 @@ import * as CustomerActions from '../../actions/CustomerActions';
 import Events from 'react-native-simple-events';
 import PosStorage from "../../database/PosStorage";
 
+const anonymousId = "9999999-9999-9999-9999-9999999";
+
 class CustomerList extends Component {
 	constructor(props) {
 		super(props);
@@ -70,30 +72,19 @@ class CustomerList extends Component {
 	}
 	prepareData = () => {
 		this.salesChannels = PosStorage.getSalesChannelsForDisplay();
-		if (this.props.customers.length > 0 && this.props.customers[0].customerId !== '9999999-9999-9999-9999-9999999') {
-			const anonymous = {
-				"customerId": "9999999-9999-9999-9999-9999999",
-				"version": 3,
-				"address": "----------------------------",
-				"name": "Walkup Client",
-				"customer_type_id": 120,
-				"dueAmount": "",
-				"phoneNumber": "----------------------------",
-				"active": "1",
-				"salesChannelId": "anonymous"
-			};
-			this.props.customers.unshift(anonymous);
-		}
 		let data = [];
 		if (this.props.customers.length > 0) {
-			data.push(this.props.customers[0]);
 			if (this.props.customers.length > 1) {
-				data = this.props.customers.slice(1);
+				data = this.props.customers.slice();
 				data = this.filterItems( data );
 				data.sort((a, b) => {
+					if( a.customerId == anonymousId){
+						return -1;		//anonymous walk-up client always is at the top
+					}else if( b.customerId == anonymousId) {
+						return 1;
+					}
 					return (a.name < b.name ? -1 : 1)
 				});
-				data.unshift(this.props.customers[0]);
 			}
 		}
 		return data;
@@ -160,8 +151,8 @@ class CustomerList extends Component {
 		try {
 			let salesChannel = this._getSalesChannelName(item.salesChannelId, salesChannels);
 
-			if (item.salesChannelId === -1 ) {
-				return true;
+			if (item.customerId === anonymousId ) {
+				return true;	// Anonymous client is always shown
 			}
 			if (this.props.filter === "all" ||
 				(this.props.filter === "reseller" && salesChannel === "reseller") ||
