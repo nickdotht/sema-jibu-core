@@ -1,4 +1,4 @@
-import mock_customers from "../mock_data/customers";
+// import mock_customers from "../mock_data/customers";
 import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
 import Events from "react-native-simple-events";

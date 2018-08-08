@@ -37,10 +37,10 @@ class Login extends Component {
 						resetScrollToCoords={{ x: 0, y: 0 }}
 						scrollEnabled={false}>
 						<View style ={{flex:1, alignItems:'center' }}>
-								<View style ={{marginTop:'5%'}}>
+								<View style ={{marginTop:'1.5%'}}>
 									<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
 								</View>
-								<View style ={[{marginTop:40}, styles.inputContainer]}>
+								<View style ={[{marginTop:'1.5%'}, styles.inputContainer]}>
 									<TextInput
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
@@ -49,7 +49,7 @@ class Login extends Component {
 										onChangeText={(text) => {this.setState({username:text}); this.setState({ invalidCredentials: false })}}/>
 
 								</View>
-								<View style ={[{marginTop:40}, styles.inputContainer]}>
+								<View style ={[{marginTop:'1.5%'}, styles.inputContainer]}>
 									<TextInput
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
@@ -98,8 +98,7 @@ class Login extends Component {
 			}
 
 		}else {
-			// Allow login with no credentials. (User can't access service without credentials anyway)
-			this.setState({ isLoginComplete: true });
+			this.setState({invalidCredentials:true})
 		}
 	};
 	ShowLoggingIn = () =>{
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
 	signIn: {
 		backgroundColor:"#2858a7",
 		borderRadius:20,
-		marginTop:40,
+		marginTop:'1.5%',
 
 	},
 	inputContainer:{

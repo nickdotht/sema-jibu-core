@@ -14,7 +14,7 @@ const customerReducer = (state = initialState, action) => {
 			return newState;
 		case CUSTOMERS_SET:
 			newState = {...state};
-			newState.customers = action.data ;
+			newState.customers = action.data.slice() ;
 
 			return newState;
 		case CUSTOMERS_SEARCH:

@@ -8,10 +8,12 @@ import * as OrderActions from "../../actions/OrderActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
 import PosStorage from '../../database/PosStorage'
 
+const anonymousId = "9999999-9999-9999-9999-9999999";
+
 class PaymentDescription extends Component {
 	render() {
 		return (
-			<View style={[{flex: 1, flexDirection: 'row', marginTop:20} ]}>
+			<View style={[{flex: 1, flexDirection: 'row', marginTop:"1%"} ]}>
 				<View style={ [{flex: 3}]}>
 					<Text style={[styles.totalTitle]}>{this.props.title}</Text>
 				</View>
@@ -94,7 +96,7 @@ class OrderPaymentScreen extends Component {
 				resetScrollToCoords={{ x: 0, y: 0 }}
 				contentContainerStyle={styles.container}
 				scrollEnabled={false}>
-				<View style ={{justifyContent:'flex-end', flexDirection:"row", right:100, top:20}}>
+				<View style ={{justifyContent:'flex-end', flexDirection:"row", right:100, top:10}}>
 					<TouchableHighlight
 						onPress={() => this.onCancelOrder()}>
 						<Image source={require('../../images/icons8-cancel-50.png')}/>
@@ -110,26 +112,20 @@ class OrderPaymentScreen extends Component {
 						checkBoxLabel = {'Cash'}
 						value = {this.props.payment.cash.toString()}
 						valueChange = {this.valuePaymentChange} />
-					<PaymentMethod
-						parent = {this}
-						type = {"credit"}
-						checkBox = {this.state.isCredit}
-						checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
-						checkBoxLabel = {'credit'}
-						value = {this.props.payment.credit} />
+					{this.getCreditComponent()}
 					<PaymentMethod
 						parent = {this}
 						type = {"mobile"}
 						checkBox = {this.state.isMobile}
 						checkBoxChange = {this.checkBoxChangeMobile.bind(this)}
-						checkBoxLabel = {'mobile'}
+						checkBoxLabel = {'Mobile'}
 						value = {this.props.payment.mobile.toString()}
 						valueChange = {this.valuePaymentChange}/>
 					<PaymentDescription title = "Sale Amount Due:" total={this.calculateOrderDue()}/>
 					<PaymentDescription title = "Previous Amount Due:" total={this.calculateAmountDue()}/>
 					<PaymentDescription title = "Total Amount Due:" total={this.calculateTotalDue()}/>
 					<View style={styles.completeOrder}>
-						<View style={{justifyContent:'center', height:100}}>
+						<View style={{justifyContent:'center', height:80}}>
 							<TouchableHighlight underlayColor = '#c0c0c0'
 								onPress={() => this.onCompleteOrder()}>
 								<Text style={ [ {paddingTop:20, paddingBottom:20}, styles.buttonText]}>Complete Sale</Text>
@@ -147,6 +143,21 @@ class OrderPaymentScreen extends Component {
 			</KeyboardAwareScrollView>
 
 		);
+	}
+	getCreditComponent(){
+		if( this.props.selectedCustomer.customerId != anonymousId ){
+			return (
+				<PaymentMethod
+					parent = {this}
+					type = {"credit"}
+					checkBox = {this.state.isCredit}
+					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
+					checkBoxLabel = {'Credit'}
+					value = {this.props.payment.credit} />
+			)
+		}else{
+			return null;
+		}
 	}
 	calculateOrderDue(){
 		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product)) }, 0);
@@ -311,6 +322,17 @@ class OrderPaymentScreen extends Component {
 		receipt.total = priceTotal;
 		receipt.cogs = cogsTotal;
 		PosStorage.addSale(receipt);
+
+		// Update dueAmount if required
+		if( receipt.amountLoan > 0 ){
+			this.props.selectedCustomer.dueAmount += receipt.amountLoan;
+			PosStorage.updateCustomer(
+				this.props.selectedCustomer,
+				this.props.selectedCustomer.phoneNumber,
+				this.props.selectedCustomer.name,
+				this.props.selectedCustomer.address,
+				this.props.selectedCustomer.salesChannelId);
+		}
 	}
 }
 
@@ -343,34 +365,34 @@ const styles = StyleSheet.create({
 	checkBoxRow: {
 		flex: 1,
 		flexDirection:"row",
-		marginTop:20,
+		marginTop:"1%",
 		alignItems:'center'
 	},
 	checkBox: {
 	},
 	checkLabel: {
 		left: 20,
-		fontSize:24,
+		fontSize:20,
 	},
 	totalSubTotal: {
 		flex: 1,
 		flexDirection:"row"
 	},
 	totalTitle: {
-		fontSize:24,
+		fontSize:20,
 	},
 	totalValue: {
-		fontSize:24,
+		fontSize:20,
 	},
 	completeOrder: {
 		backgroundColor:"#2858a7",
 		borderRadius:30,
-		marginTop:20
+		marginTop:"1%"
 
 	},
 	buttonText:{
 		fontWeight:'bold',
-		fontSize:24,
+		fontSize:20,
 		alignSelf:'center',
 		color:'white'
 	},

@@ -4,6 +4,7 @@ import ProductList from "./ProductList";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as OrderActions from "../../actions/OrderActions";
+import PosStorage from "../../database/PosStorage";
 
 class OrderWalkupScreen extends Component {
 	constructor(props) {
@@ -18,6 +19,11 @@ class OrderWalkupScreen extends Component {
 	}
 
 	componentDidMount() {
+		if( this.props.selectedCustomer ){
+			let salesChannel = PosStorage.getSalesChannelFromName("reseller");
+			if( salesChannel && salesChannel.id ==  this.props.selectedCustomer.salesChannelId)
+				this.props.navigation.navigate("Reseller");
+		}
 		this.props.navigation.addListener('didFocus', () => {
 			console.log("OrderWalkupScreen-Focused")
 			this.props.orderActions.SetOrderChannel("walkup");
@@ -36,6 +42,7 @@ class OrderWalkupScreen extends Component {
 function mapStateToProps(state, props) {
 	return {
 		products: state.orderReducer.products,
+		selectedCustomer: state.customerReducer.selectedCustomer,
 		channel: state.orderReducer.channel};
 }
 function mapDispatchToProps(dispatch) {

@@ -59,10 +59,10 @@ class CustomerEdit extends Component {
 			<View style={{flex:1}}>
 				<View style = {{flexDirection:'row'}}>
 
-					<View style ={{flexDirection:'row', flex:1, alignItems:'center', height:100}}>
+					<View style ={{flexDirection:'row', flex:1, alignItems:'center', height:80}}>
 						<Text style = {[styles.headerText]}>{this.getHeaderText()}</Text>
 					</View>
-					<View style ={{flexDirection:'row-reverse', flex:1, alignItems:'center', height:100}}>
+					<View style ={{flexDirection:'row-reverse', flex:1, alignItems:'center', height:80}}>
 						<TouchableHighlight
 							onPress={() => this.onCancelEdit()}>
 							<Image source={require('../../images/icons8-cancel-50.png')} style={{marginRight:100}}/>
@@ -78,26 +78,26 @@ class CustomerEdit extends Component {
 						<View style ={{flex:1, alignItems:'center' }}>
 							<CustomerProperty
 								reference = 'customerNumber'
-								marginTop = {10}
+								marginTop = {0}
 								placeHolder = 'Telephone Number'
 								parent ={this}
 								valueFn = {this.getTelephoneNumber}
 								ref={this.phone}/>
 							<CustomerProperty
 								reference = 'customerName'
-								marginTop = {20}
+								marginTop = "1%"
 								placeHolder = 'Name'
 								parent ={this}
 								valueFn = {this.getName}
 								ref={this.name}/>
 							<CustomerProperty
 								reference = 'customerAddress'
-								marginTop = {20}
+								marginTop = "1%"
 								placeHolder = 'Address'
 								parent ={this}
 								valueFn = {this.getAddress}
 								ref={this.address}/>
-							<View style ={[{marginTop:20, flexDirection:'row',alignItems:'center'}]}>
+							<View style ={[{marginTop:"1%", flexDirection:'row',alignItems:'center'}]}>
 								<ModalDropdown
 									style ={{width:250}}
 									textStyle={styles.dropdownText}
@@ -110,7 +110,7 @@ class CustomerEdit extends Component {
 								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
 							</View>
 							<View style={styles.submit}>
-								<View style={{justifyContent:'center', height:100, width:'30%', alignItems:'center'}}>
+								<View style={{justifyContent:'center', height:90, width:'30%', alignItems:'center'}}>
 									<TouchableHighlight underlayColor = '#c0c0c0'
 														onPress={() => this.onEdit()}>
 										<Text style={ [ {paddingTop:30, paddingBottom:30, width:300 }, styles.buttonText]}>{this.getSubmitText()}</Text>
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
 	submit: {
 		backgroundColor:"#2858a7",
 		borderRadius:20,
-		marginTop:40,
+		marginTop:"1%",
 
 	},
 	inputContainer:{

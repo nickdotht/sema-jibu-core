@@ -58,7 +58,7 @@ class SettingsButton extends Component {
 	render() {
 		return (
 			<View style={[styles.submit, {marginLeft:30}, this.getOpacity()] }>
-				<View style={[{ justifyContent: 'center', height: 70, alignItems: 'center'}] }>
+				<View style={[{ justifyContent: 'center', height: 60, alignItems: 'center'}] }>
 					{this.showEnabled()}
 				</View>
 			</View>
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
 	submit: {
 		backgroundColor:"#2858a7",
 		borderRadius:20,
-		marginTop:20,
+		marginTop:"1%",
 
 	},
 	inputContainer:{
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
 	},
 	buttonText:{
 		fontWeight:'bold',
-		fontSize:28,
+		fontSize:24,
 		color:'white',
 		textAlign:'center',
 		// paddingTop:10,

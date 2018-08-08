@@ -29,7 +29,7 @@ export default CustomerBarButton;
 const styles = StyleSheet.create({
 
 	Button: {
-		flex: .05,
+		flex: .09,
 		// alignSelf:'center',
 		// height:70,
 		marginLeft:15
