@@ -269,7 +269,7 @@ class PosStorage {
 		this.pendingCustomers.push( key );
 
 		let keyArray = [
-			[key, this.stringify(customer) ],								// Array of customer keys
+			[key, this.stringify(customer) ],								// Customer keys
 			[pendingCustomersKey, this.stringify(this.pendingCustomers)]	// Array pending customer
 		];
 		AsyncStorage.multiSet( keyArray).then( error => {

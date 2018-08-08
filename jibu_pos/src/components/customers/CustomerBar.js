@@ -19,6 +19,8 @@ import CustomerBarButton from './CustomerBarButton';
 import * as OrderActions from "../../actions/OrderActions";
 import Events from "react-native-simple-events";
 
+const anonymousId = "9999999-9999-9999-9999-9999999";
+
 class SelectedCustomerDetails extends React.Component {
 	render() {
 		return (
@@ -96,7 +98,7 @@ class CustomerBar extends Component {
 					image = {require('../../images/customer-edit.png')}
 					enabled = {this.state.editFunction &&
 						this.props.selectedCustomer.hasOwnProperty('name') &&
-						this.props.selectedCustomer.salesChannel !== 'anonymous' }
+						this.props.selectedCustomer.customerId !== anonymousId }
 				/>
 
 				<CustomerBarButton
@@ -105,7 +107,7 @@ class CustomerBar extends Component {
 					image = {require('../../images/customer-delete.png')}
 					enabled = {this.state.deleteFunction &&
 						this.props.selectedCustomer.hasOwnProperty('name') &&
-						this.props.selectedCustomer.salesChannel !== 'anonymous' }
+						this.props.selectedCustomer.customerId !== anonymousId }
 				/>
 
 				<TextInput
@@ -131,7 +133,7 @@ class CustomerBar extends Component {
 	onDelete = ()=>{
 		if(this.state.deleteFunction &&
 			this.props.selectedCustomer.hasOwnProperty('name') &&
-			this.props.selectedCustomer.salesChannel !== 'anonymous') {
+			this.props.selectedCustomer.customerId !== anonymousId) {
 
 			console.log("CustomerBar:onDelete");
 			let alertMessage = "Delete  customer " + this.props.selectedCustomer.name;
@@ -156,7 +158,7 @@ class CustomerBar extends Component {
 	onEdit = ()=>{
 		if(this.state.editFunction &&
 			this.props.selectedCustomer.hasOwnProperty('name') &&
-			this.props.selectedCustomer.salesChannel !== 'anonymous') {
+			this.props.selectedCustomer.customerId !== anonymousId) {
 
 			console.log("CustomerBar:onEdit");
 			this.props.toolbarActions.ShowScreen("editCustomer");

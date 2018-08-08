@@ -311,6 +311,17 @@ class OrderPaymentScreen extends Component {
 		receipt.total = priceTotal;
 		receipt.cogs = cogsTotal;
 		PosStorage.addSale(receipt);
+
+		// Update dueAmount if required
+		if( receipt.amountLoan > 0 ){
+			this.props.selectedCustomer.dueAmount += receipt.amountLoan;
+			PosStorage.updateCustomer(
+				this.props.selectedCustomer,
+				this.props.selectedCustomer.phoneNumber,
+				this.props.selectedCustomer.name,
+				this.props.selectedCustomer.address,
+				this.props.selectedCustomer.salesChannelId);
+		}
 	}
 }
 
