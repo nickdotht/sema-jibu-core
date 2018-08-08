@@ -8,6 +8,8 @@ import * as OrderActions from "../../actions/OrderActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
 import PosStorage from '../../database/PosStorage'
 
+const anonymousId = "9999999-9999-9999-9999-9999999";
+
 class PaymentDescription extends Component {
 	render() {
 		return (
@@ -110,19 +112,13 @@ class OrderPaymentScreen extends Component {
 						checkBoxLabel = {'Cash'}
 						value = {this.props.payment.cash.toString()}
 						valueChange = {this.valuePaymentChange} />
-					<PaymentMethod
-						parent = {this}
-						type = {"credit"}
-						checkBox = {this.state.isCredit}
-						checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
-						checkBoxLabel = {'credit'}
-						value = {this.props.payment.credit} />
+					{this.getCreditComponent()}
 					<PaymentMethod
 						parent = {this}
 						type = {"mobile"}
 						checkBox = {this.state.isMobile}
 						checkBoxChange = {this.checkBoxChangeMobile.bind(this)}
-						checkBoxLabel = {'mobile'}
+						checkBoxLabel = {'Mobile'}
 						value = {this.props.payment.mobile.toString()}
 						valueChange = {this.valuePaymentChange}/>
 					<PaymentDescription title = "Sale Amount Due:" total={this.calculateOrderDue()}/>
@@ -147,6 +143,21 @@ class OrderPaymentScreen extends Component {
 			</KeyboardAwareScrollView>
 
 		);
+	}
+	getCreditComponent(){
+		if( this.props.selectedCustomer.customerId != anonymousId ){
+			return (
+				<PaymentMethod
+					parent = {this}
+					type = {"credit"}
+					checkBox = {this.state.isCredit}
+					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
+					checkBoxLabel = {'Credit'}
+					value = {this.props.payment.credit} />
+			)
+		}else{
+			return null;
+		}
 	}
 	calculateOrderDue(){
 		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product)) }, 0);
