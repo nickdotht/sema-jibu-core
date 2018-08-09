@@ -285,7 +285,8 @@ router.get('/', function(req, res) {
 		else {
 			semaLog.info("Site-id: " + req.query['site-id']);
 			if (req.query.hasOwnProperty("updated-date")) {
-				let updatedDate = new Date(req.query["updated-date"]);
+				let updatedDate = getUTCDate( new Date(req.query["updated-date"]));
+
 				if (!isNaN(updatedDate)) {
 					getCustomers( sqlUpdatedDate,
 						[req.query["site-id"], updatedDate], res);
@@ -296,8 +297,8 @@ router.get('/', function(req, res) {
 				}
 			}
 			else if (req.query.hasOwnProperty("begin-date") && req.query.hasOwnProperty("end-date")) {
-				let beginDate = new Date(req.query["begin-date"]);
-				let endDate = new Date(req.query["end-date"]);
+				let beginDate = getUTCDate( new Date(req.query["begin-date"]));
+				let endDate = getUTCDate( new Date(req.query["end-date"]));
 				if (!isNaN(beginDate) && !isNaN(endDate)) {
 					getCustomers( sqlBeginEndDate,
 						[req.query["site-id"], beginDate, endDate], res);
@@ -308,7 +309,8 @@ router.get('/', function(req, res) {
 				}
 			}
 			else if (req.query.hasOwnProperty("begin-date")) {
-				let beginDate = new Date(req.query["begin-date"]);
+				let beginDate = getUTCDate( new Date(req.query["begin-date"]));
+				semaLog.info("GET Customers - beginDate: " + beginDate.toISOString() );
 				if (!isNaN(beginDate)) {
 					getCustomers( sqlBeginDateOnly,
 						[req.query["site-id"], beginDate], res);
@@ -319,7 +321,7 @@ router.get('/', function(req, res) {
 				}
 			}
 			else if (req.query.hasOwnProperty("end-date")) {
-				let endDate = new Date(req.query["end-date"]);
+				let endDate = getUTCDate( new Date(req.query["end-date"]));
 				if (!isNaN(endDate)) {
 					getCustomers( sqlEndDateOnly,
 						[req.query["site-id"], endDate], res);
@@ -378,7 +380,11 @@ const getCustomers = (query, params, res ) => {
 
 		})
 	});
-}
+};
 
+const getUTCDate = (date) => {
+	return  new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+		date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
 
+};
 module.exports = router;

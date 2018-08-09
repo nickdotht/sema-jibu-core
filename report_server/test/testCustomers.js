@@ -185,7 +185,9 @@ describe('Testing Customers API', function () {
 				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
 					let url = "/sema/site/customers?site-id=%d&begin-date=%s";
 					kiosk.should.have.property('name').eql('UnitTestCustomers');
-					url = sprintf(url, kiosk.id, new Date("2018-2-1"));
+					let testDate = new Date( Date.UTC(2018, 1, 1));	// Note: Month is 0 based
+					let testDateStr = testDate.toISOString();
+					url = sprintf(url, kiosk.id, testDateStr );
 					chai.request(server)
 						.get(url)
 						.set('Authorization', token)
@@ -328,7 +330,10 @@ describe('Testing Customers API', function () {
 				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
 					let url = "/sema/site/customers?site-id=%d&begin-date=%s&end-date=%s";
 					kiosk.should.have.property('name').eql('UnitTestCustomers');
-					url = sprintf(url, kiosk.id, new Date("2018-2-1"), new Date("2018-4-1"));
+					let beginDate = (new Date( Date.UTC(2018, 1, 1))).toISOString();	// Note: Month is 0 based
+					let endDate = (new Date( Date.UTC(2018, 3, 1))).toISOString();	// Note: Month is 0 based
+
+					url = sprintf(url, kiosk.id, beginDate, endDate);
 					chai.request(server)
 						.get(url)
 						.set('Authorization', token)
