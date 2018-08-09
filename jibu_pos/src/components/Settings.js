@@ -264,15 +264,7 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 				{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
 				{
 					text: 'Yes', onPress: () => {
-						PosStorage.clearDataOnly();
-						this.props.settingsActions.setSettings(PosStorage.getSettings());
-						this.props.customerActions.setCustomers(PosStorage.getCustomers());
-						const saveConnected = Synchronization.isConnected;
-						Synchronization.initialize(
-							PosStorage.getLastCustomerSync(),
-							PosStorage.getLastProductSync(),
-							PosStorage.getLastSalesSync());
-						Synchronization.setConnected(saveConnected);
+						this._clearDataAndSync();
 						this.closeHandler();
 
 					}
@@ -285,6 +277,18 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 	enableClearAll(){
 		return true;
 	}
+	_clearDataAndSync(){
+		PosStorage.clearDataOnly();
+		this.props.settingsActions.setSettings(PosStorage.getSettings());
+		this.props.customerActions.setCustomers(PosStorage.getCustomers());
+		const saveConnected = Synchronization.isConnected;
+		Synchronization.initialize(
+			PosStorage.getLastCustomerSync(),
+			PosStorage.getLastProductSync(),
+			PosStorage.getLastSalesSync());
+		Synchronization.setConnected(saveConnected);
+
+	};
 
 	onConnection() {
 		this.setState({animating: true});
@@ -359,6 +363,12 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 	}
 
 	saveSettings( token, siteId) {
+		// Check to see if the site has changed
+		let currentSettings = PosStorage.getSettings();
+		if( currentSettings.siteId != siteId){
+			// New site - clear all data
+			this._clearDataAndSync();
+		}
 		PosStorage.saveSettings(this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,

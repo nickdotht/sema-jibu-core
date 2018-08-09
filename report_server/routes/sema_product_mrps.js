@@ -20,7 +20,7 @@ router.get('/', function(req, res) {
 			let params = [req.query["site-id"]];
 			let query = sqlQuery;
 			if (req.query.hasOwnProperty("updated-date")) {
-				params = [req.query["site-id"], new Date( req.query["updated-date"]), ]
+				params = [req.query["site-id"], getUTCDate(new Date( req.query["updated-date"]))];
 				query = sqlQueryDate;
 			}
 
@@ -44,5 +44,11 @@ router.get('/', function(req, res) {
 		}
 	});
 });
+
+const getUTCDate = (date) => {
+	return  new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+		date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+
+};
 
 module.exports = router;

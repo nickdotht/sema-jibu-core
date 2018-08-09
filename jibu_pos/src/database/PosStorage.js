@@ -152,7 +152,8 @@ class PosStorage {
 
 
 	clearDataOnly(){
-		// Clear all data - leave config alone
+		// Clear all data - leave config alone. Note that customerTypesKey, salesChannelsKey and productMrpsKey
+		// are NOT cleared
 		this.customers = [];
 		this.customersKeys = [];
 		this.pendingCustomers = [];
@@ -161,9 +162,6 @@ class PosStorage {
 
 		this.products = [];
 		this.productsKeys = [];
-		this.salesChannels = [];
-		this.customerTypes = [];
-		this.productMrpDict = {};
 
 		let firstSyncDate = new Date('November 7, 1973');
 		this.lastCustomerSync = firstSyncDate;
