@@ -209,6 +209,7 @@ class PosStorage {
 			phoneNumber:phone,
 			address:address,
 			siteId:siteId,
+			dueAmount:0,
 			salesChannelId:salesChannelId,
 			customerTypeId:customerTypeId,
 			createdDate:createdDate,
@@ -698,6 +699,15 @@ class PosStorage {
 	}
 	getCustomerTypes(){
 		return this.customerTypes;
+	}
+	getCustomerTypeByName( name ){
+		for( let i = 0; i < this.customerTypes.length; i++ ){
+			if( this.customerTypes[i].name === name ){
+				return this.customerTypes[i];
+			}
+		}
+		return null;
+
 	}
 	saveCustomerTypes( customerTypesArray  ){
 		this.customerTypes = customerTypesArray;

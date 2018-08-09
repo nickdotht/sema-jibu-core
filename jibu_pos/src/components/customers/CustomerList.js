@@ -77,9 +77,9 @@ class CustomerList extends Component {
 			data = this.props.customers.slice();
 			data = this.filterItems( data );
 			data.sort((a, b) => {
-				if( a.customerId == anonymousId){
+				if( this._isAnonymousCustomer(a )){
 					return -1;		//anonymous walk-up client always is at the top
-				}else if( b.customerId == anonymousId) {
+				}else if( this._isAnonymousCustomer(b )) {
 					return 1;
 				}
 				return (a.name < b.name ? -1 : 1)
@@ -149,7 +149,7 @@ class CustomerList extends Component {
 		try {
 			let salesChannel = this._getSalesChannelName(item.salesChannelId, salesChannels);
 
-			if (item.customerId === anonymousId ) {
+			if ( this._isAnonymousCustomer(item) ) {
 				return true;	// Anonymous client is always shown
 			}
 			if (this.props.filter === "all" ||
@@ -179,6 +179,10 @@ class CustomerList extends Component {
 			}
 		}
 		return "walkup";
+	}
+
+	_isAnonymousCustomer( customer ){
+		return PosStorage.getCustomerTypeByName("anonymous").id == customer.customerTypeId ? true : false;
 	}
 	onPressItemName = (item) =>{
 		console.log("_onPressItemName");

@@ -98,7 +98,7 @@ class CustomerBar extends Component {
 					image = {require('../../images/customer-edit.png')}
 					enabled = {this.state.editFunction &&
 						this.props.selectedCustomer.hasOwnProperty('name') &&
-						this.props.selectedCustomer.customerId !== anonymousId }
+						! this._isAnonymousCustomer(this.props.selectedCustomer)}
 				/>
 
 				<CustomerBarButton
@@ -107,7 +107,7 @@ class CustomerBar extends Component {
 					image = {require('../../images/customer-delete.png')}
 					enabled = {this.state.deleteFunction &&
 						this.props.selectedCustomer.hasOwnProperty('name') &&
-						this.props.selectedCustomer.customerId !== anonymousId }
+						! this._isAnonymousCustomer(this.props.selectedCustomer)}
 				/>
 
 				<TextInput
@@ -133,7 +133,7 @@ class CustomerBar extends Component {
 	onDelete = ()=>{
 		if(this.state.deleteFunction &&
 			this.props.selectedCustomer.hasOwnProperty('name') &&
-			this.props.selectedCustomer.customerId !== anonymousId) {
+			! this._isAnonymousCustomer(this.props.selectedCustomer)) {
 
 			console.log("CustomerBar:onDelete");
 			let alertMessage = "Delete  customer " + this.props.selectedCustomer.name;
@@ -158,7 +158,7 @@ class CustomerBar extends Component {
 	onEdit = ()=>{
 		if(this.state.editFunction &&
 			this.props.selectedCustomer.hasOwnProperty('name') &&
-			this.props.selectedCustomer.customerId !== anonymousId) {
+			! this._isAnonymousCustomer(this.props.selectedCustomer)) {
 
 			console.log("CustomerBar:onEdit");
 			this.props.toolbarActions.ShowScreen("editCustomer");
@@ -195,7 +195,13 @@ class CustomerBar extends Component {
 		}
 	};
 
-
+	_isAnonymousCustomer( customer ){
+		const customerType = PosStorage.getCustomerTypeByName("anonymous");
+		if( customerType &&  customerType.id == customer.customerTypeId ){
+			return true;
+		}
+		return false;
+	}
 }
 
 function mapStateToProps(state, props) {

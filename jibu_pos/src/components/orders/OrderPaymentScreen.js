@@ -145,7 +145,7 @@ class OrderPaymentScreen extends Component {
 		);
 	}
 	getCreditComponent(){
-		if( this.props.selectedCustomer.customerId != anonymousId ){
+		if( ! this._isAnonymousCustomer(this.props.selectedCustomer) ){
 			return (
 				<PaymentMethod
 					parent = {this}
@@ -159,6 +159,10 @@ class OrderPaymentScreen extends Component {
 			return null;
 		}
 	}
+	_isAnonymousCustomer( customer ){
+		return PosStorage.getCustomerTypeByName("anonymous").id == customer.customerTypeId ? true : false;
+	}
+
 	calculateOrderDue(){
 		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product)) }, 0);
 	}
