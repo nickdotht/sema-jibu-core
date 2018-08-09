@@ -229,6 +229,7 @@ class CustomerEdit extends Component {
 				this.props.settings.siteId,
 				salesChannelId,
 				PosStorage.getCustomerTypes()[0].id);	// Note. Jibu uses just one 'generic' customer type
+			this.props.customerActions.setCustomers(PosStorage.getCustomers());
 			this.props.customerActions.CustomerSelected(newCustomer);
 		}
 

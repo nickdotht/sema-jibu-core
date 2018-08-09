@@ -54,6 +54,9 @@ class Synchronization {
 		PosStorage.setLastSalesSync( this.lastSalesSync );
 	}
 	doSynchronize( ){
+		if( true ){
+			return;
+		}
 		if( this.isConnected ) {
 			this.synchronize();
 		}else{

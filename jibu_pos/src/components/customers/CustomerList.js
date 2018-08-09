@@ -74,18 +74,16 @@ class CustomerList extends Component {
 		this.salesChannels = PosStorage.getSalesChannelsForDisplay();
 		let data = [];
 		if (this.props.customers.length > 0) {
-			if (this.props.customers.length > 1) {
-				data = this.props.customers.slice();
-				data = this.filterItems( data );
-				data.sort((a, b) => {
-					if( a.customerId == anonymousId){
-						return -1;		//anonymous walk-up client always is at the top
-					}else if( b.customerId == anonymousId) {
-						return 1;
-					}
-					return (a.name < b.name ? -1 : 1)
-				});
-			}
+			data = this.props.customers.slice();
+			data = this.filterItems( data );
+			data.sort((a, b) => {
+				if( a.customerId == anonymousId){
+					return -1;		//anonymous walk-up client always is at the top
+				}else if( b.customerId == anonymousId) {
+					return 1;
+				}
+				return (a.name < b.name ? -1 : 1)
+			});
 		}
 		return data;
 	};
