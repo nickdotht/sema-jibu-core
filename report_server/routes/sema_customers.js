@@ -310,6 +310,7 @@ router.get('/', function(req, res) {
 			}
 			else if (req.query.hasOwnProperty("begin-date")) {
 				let beginDate = getUTCDate( new Date(req.query["begin-date"]));
+				semaLog.info("GET Customers - beginDate: " + beginDate.toISOString() );
 				if (!isNaN(beginDate)) {
 					getCustomers( sqlBeginDateOnly,
 						[req.query["site-id"], beginDate], res);
