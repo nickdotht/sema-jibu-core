@@ -65,7 +65,7 @@ router.put('/:id', async (req, res) => {
 				customer.updateClass(req.body );
 
 
-				let customerParams = [ customer.updatedDate, customer.name, customer.salesChannelId,
+				let customerParams = [ getUTCDate(customer.updatedDate), customer.name, customer.salesChannelId,
 				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber ];
 
 				// Active is set via a 'bit;
@@ -228,7 +228,7 @@ router.post('/', async (req, res) => {
 			"due_amount, address_line1, gps_coordinates, phone_number ) " +
 			"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-			let postSqlParams = [customer.customerId, customer.createdDate, customer.updatedDate,
+			let postSqlParams = [customer.customerId, getUTCDate(customer.createdDate), getUTCDate(customer.updatedDate),
 				customer.name, customer.customerTypeId, customer.salesChannelId, customer.siteId,
 				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber ];
 

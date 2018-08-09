@@ -16,7 +16,7 @@ var sqlQuery = "SELECT * FROM product WHERE active = b'1'";
 router.get('/', function(req, res) {
 	semaLog.info('GET products - Enter');
 	if (req.query.hasOwnProperty("updated-date")) {
-		getProducts(sqlQueryDate, [new Date( req.query["updated-date"])], res);
+		getProducts(sqlQueryDate, [getUTCDate(new Date( req.query["updated-date"]))], res);
 	}
 	else {
 		getProducts(sqlQuery, [], res);
@@ -57,6 +57,11 @@ const getProducts = (query, params, res ) => {
 
 	})
 }
+const getUTCDate = (date) => {
+	return  new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(),
+		date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+
+};
 
 
 module.exports = router;
