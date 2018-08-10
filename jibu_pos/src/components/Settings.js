@@ -337,11 +337,11 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 					}
 				})
 				.catch(result => {
-					console.log("Failed- status " + result.status + " " + result.response);
+					console.log("Failed- status " + result.status + " " + result.response.message);
 					this.setState({animating: false});
 					Alert.alert(
 						"Network Connection",
-						result.response.message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+						result.response.message + ". (" + result.status + ")", [{ text: 'OK', style: 'cancel' },], { cancelable: true }
 					);
 				})
 		} catch (error) {

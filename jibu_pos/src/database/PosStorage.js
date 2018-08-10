@@ -27,6 +27,7 @@ const salesChannelsKey = '@Sema:SalesChannelsKey';
 const customerTypesKey = '@Sema:CustomerTypesKey';
 const productMrpsKey = '@Sema:ProductMrpsKey';
 
+const syncIntervalKey = '@Sema:SyncIntervalKey';
 
 
 class PosStorage {
@@ -68,6 +69,8 @@ class PosStorage {
 		this.customerTypes = [];
 		this.productMrpDict = {};
 
+		this.syncInterval = {interval: 60*1000};
+
 	}
 
 	initialize( forceNew ) {
@@ -92,7 +95,8 @@ class PosStorage {
 						    [tokenExpirationKey, this.stringify(this.tokenExpiration)],
 							[salesChannelsKey, this.stringify(this.salesChannels)],
 							[customerTypesKey, this.stringify(this.customerTypes)],
-							[productMrpsKey, this.stringify(this.productMrpDict)]];
+							[productMrpsKey, this.stringify(this.productMrpDict)],
+							[syncIntervalKey, this.stringify(this.syncInterval)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
 							console.log( "PosStorage:initialize: Error: " + error );
 							resolve(false)})
@@ -104,7 +108,7 @@ class PosStorage {
 							lastSalesSyncKey,lastProductsSyncKey,
 							pendingCustomersKey, pendingSalesKey,
 							settingsKey, tokenExpirationKey, salesChannelsKey,
-							customerTypesKey, productMrpsKey];
+							customerTypesKey, productMrpsKey, syncIntervalKey];
 						AsyncStorage.multiGet(keyArray ).then( function(results){
 							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
@@ -123,6 +127,7 @@ class PosStorage {
 							this.salesChannels = this.parseJson(results[10][1]);		// array of sales channels
 							this.customerTypes = this.parseJson(results[11][1]);		// array of customer types
 							this.productMrpDict = this.parseJson(results[12][1]);		// products MRP dictionary
+							this.syncInterval = this.parseJson(results[13][1]);		// SyncInterval
 							this.loadCustomersFromKeys()
 								.then(()=>{
 									this.loadProductsFromKeys()
@@ -319,7 +324,7 @@ class PosStorage {
 					}
 					if( localCustomer &&  remoteCustomer.updatedDate > new Date(localCustomer.updatedDate) ){
 						// remoteCustomer is the latest
-						console.log("PostStorage - mergeCustomers. Remote customer " + remoteCustomer.name + " is later:")
+						console.log("PostStorage - mergeCustomers. Remote customer " + remoteCustomer.name + " is later:");
 						webCustomersToUpdate.push( remoteCustomer );
 						this.pendingCustomers.splice(pendingIndex, 1);
 						isPendingModified = true;
@@ -343,7 +348,7 @@ class PosStorage {
 		remoteCustomers.forEach( function(customer){
 			let customerKey = this.makeCustomerKey(customer);
 			let keyIndex = this.customersKeys.indexOf(customerKey);
-			if( keyIndex == -1 ){
+			if( keyIndex === -1 ){
 				isNewCustomers = true;
 				this.customersKeys.push(customerKey );
 				this.customers.push(customer);
@@ -397,7 +402,7 @@ class PosStorage {
 		console.log("PostStorage:removePendingCustomer" );
 		const index = this.pendingCustomers.indexOf(customerKey);
 		if (index > -1) {
-			let deletedItems = this.pendingCustomers.splice(index, 1);
+			this.pendingCustomers.splice(index, 1);
 			let keyArray = [[pendingCustomersKey, this.stringify(this.pendingCustomers)]];
 			AsyncStorage.multiSet( keyArray).then( error => {
 				if( error ) {
@@ -414,7 +419,7 @@ class PosStorage {
 			this.getKey( customerKey )
 				.then( customer => {
 					resolve( this.parseJson(customer)) } )
-				.catch( error =>{
+				.catch(() =>{
 
 				 	resolve(null)});
 		})
@@ -528,7 +533,7 @@ class PosStorage {
 		console.log("PostStorage:removePendingSale" );
 		const index = this.pendingSales.indexOf(saleKey);
 		if (index > -1) {
-			let deletedItems = this.pendingSales.splice(index, 1);
+			this.pendingSales.splice(index, 1);
 			let keyArray = [[pendingSalesKey, this.stringify(this.pendingSales)]];
 			AsyncStorage.multiSet( keyArray).then( error => {
 				if( error ) {
@@ -582,7 +587,7 @@ class PosStorage {
 		remoteProducts.forEach( function(product){
 			let productKey = this.makeProductKey(product);
 			let keyIndex = this.productsKeys.indexOf(productKey);
-			if( keyIndex == -1 && product.active ){
+			if( keyIndex === -1 && product.active ){
 				isNewProducts = true;
 				this.productsKeys.push(productKey );
 				this.products.push(product);
@@ -729,6 +734,16 @@ class PosStorage {
 
 	getProductMrpKeyFromIds( productId, salesChannelId ){
 		return ""+ productId + "-" +  salesChannelId;
+	}
+
+	getGetSyncInterval(){
+		if( this.syncInterval == null ){
+			this.syncInterval = {interval: 60 *1000 };
+		}
+		return this.syncInterval.interval;
+	}
+	setGetSyncInterval( intervalInMinutes) {
+		this.setKey(syncIntervalKey, JSON.stringify({interval: intervalInMinutes * 60 *1000 }));
 	}
 
 	stringify( jsObject){
