@@ -69,7 +69,11 @@ class Communications {
 							let result = -1;
 							for( let i = 0; i < responseJson.kiosks.length; i++){
 								if( responseJson.kiosks[i].name === siteName ){
-									result = responseJson.kiosks[i].id;
+									if(responseJson.kiosks[i].hasOwnProperty("active") && ! responseJson.kiosks[i].active ){
+										result = -2;
+									}else{
+										result = responseJson.kiosks[i].id;
+									}
 									break;
 								}
 							}

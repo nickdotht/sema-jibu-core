@@ -7,6 +7,7 @@
 class Kiosk {
 	constructor(kiosk) {
 		this.id = kiosk.id;
+		this.active = kiosk["active"][0] === 1 ? true : false;
 		this.api_key = kiosk.api_key;
 		this.name = kiosk.name;
 		this.region_id = kiosk.region_id;
@@ -15,6 +16,7 @@ class Kiosk {
 	classToPlain(){
 		return {
 			id:this.id,
+			active:this.active,
 			api_key:this.api_key,
 			name:this.name,
 			region_id:this.region_id,

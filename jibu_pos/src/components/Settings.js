@@ -307,6 +307,8 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 							.then(siteId => {
 								if (siteId === -1) {
 									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' does not exist";
+								}else if (siteId === -2) {
+									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' is not active";
 								} else {
 
 									this.saveSettings(result.response.token, siteId);
@@ -322,7 +324,7 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 									"Network Connection",
 									message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
 								);
-								if (siteId !== -1) {
+								if (siteId !== -1 && siteId !== -2) {
 									this.closeHandler();
 								}
 							});
