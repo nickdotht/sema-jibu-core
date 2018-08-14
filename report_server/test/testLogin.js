@@ -34,7 +34,7 @@ describe('Testing Login', function () {
 		it('should get /sema/login', function testLoginNoAuth(done) {
 			chai.request(server)
 				.post('/sema/login')
-				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
+				.send({ usernameOrEmail:'unittest' , password:'testpassword' })
 				.end(function(err, res) {
 					res.should.have.status(200);	// Correct Auth!
 					res.body.should.have.property('version').eql('0.0.1.1');
