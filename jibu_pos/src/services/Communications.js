@@ -38,14 +38,18 @@ class Communications {
 			fetch(this._url + 'sema/login', options)
 				.then((response) => {
 					console.log( response.status);
-					response.json()
-						.then((responseJson) => {
-							resolve({status:response.status, response:responseJson});
-						})
-						.catch( (error )=>{
-							console.log(error + " INNER " + JSON.stringify(error));
-							reject({status:response.status, response:error});
-						})
+					if( response.status == 200 ) {
+						response.json()
+							.then((responseJson) => {
+								resolve({ status: response.status, response: responseJson });
+							})
+							.catch((error) => {
+								console.log(error + " INNER " + JSON.stringify(error));
+								reject({ status: response.status, response: error });
+							})
+					}else{
+						reject({ status: response.status, response: {message:"Cannot connect to the Sema service"} });
+					}
 				})
 				.catch((error) => {
 					console.log(error + " OUTER " + JSON.stringify(error));
@@ -65,7 +69,11 @@ class Communications {
 							let result = -1;
 							for( let i = 0; i < responseJson.kiosks.length; i++){
 								if( responseJson.kiosks[i].name === siteName ){
-									result = responseJson.kiosks[i].id;
+									if(responseJson.kiosks[i].hasOwnProperty("active") && ! responseJson.kiosks[i].active ){
+										result = -2;
+									}else{
+										result = responseJson.kiosks[i].id;
+									}
 									break;
 								}
 							}

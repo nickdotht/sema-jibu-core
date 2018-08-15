@@ -11,7 +11,6 @@ class Synchronization {
 		this.lastSalesSync = lastSalesSync;
 		this.intervalId = null;
 		this.firstSyncId = null;
-		this.syncInterval = 60*1000;
 		this.isConnected = false;
 	}
 	setConnected( isConnected ){
@@ -37,9 +36,11 @@ class Synchronization {
 			console.log("Synchronizing...");
 			that.doSynchronize( );
 		}, timeoutX);
+		let syncInterval = PosStorage.getGetSyncInterval();
+		console.log("Synchronization interval (ms)" + syncInterval);
 		this.intervalId = setInterval( ()=>{
 			that.doSynchronize();
-		}, this.syncInterval);
+		}, syncInterval);
 	}
 	updateLastCustomerSync(){
 		this.lastCustomerSync = new Date();
@@ -68,26 +69,29 @@ class Synchronization {
 					let lastProductSync = this.lastProductSync;
 					const promiseSalesChannels = this.synchronizeSalesChannels();
 					const promiseCustomerTypes = this.synchronizeCustomerTypes();
-					const promiseCustomers = this.synchronizeCustomers()
-						.then( customerSync =>{
-							syncResult.customers = customerSync;
-						});
-					const promiseProducts = this.synchronizeProducts()
-						.then( productSync =>{
-							syncResult.products = productSync;
-						});
-					const promiseSales= this.synchronizeSales()
-						.then( saleSync =>{
-							syncResult.sales = saleSync;
-						});
-					const promiseProductMrps= this.synchronizeProductMrps(lastProductSync)
-						.then( productMrpSync =>{
-							syncResult.productMrps = productMrpSync;
-						});
+					Promise.all([promiseSalesChannels, promiseCustomerTypes])
+						.then( () => {
+							const promiseCustomers = this.synchronizeCustomers()
+								.then(customerSync => {
+									syncResult.customers = customerSync;
+								});
+							const promiseProducts = this.synchronizeProducts()
+								.then(productSync => {
+									syncResult.products = productSync;
+								});
+							const promiseSales = this.synchronizeSales()
+								.then(saleSync => {
+									syncResult.sales = saleSync;
+								});
+							const promiseProductMrps = this.synchronizeProductMrps(lastProductSync)
+								.then(productMrpSync => {
+									syncResult.productMrps = productMrpSync;
+								});
 
-					Promise.all([promiseSalesChannels, promiseCustomerTypes, promiseCustomers, promiseProducts, promiseSales, promiseProductMrps])
-						.then( values =>{
-							resolve(syncResult);
+							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps])
+								.then(values => {
+									resolve(syncResult);
+								});
 						});
 				}).catch(error => {
 					syncResult.error = error.message;

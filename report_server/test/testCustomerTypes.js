@@ -23,7 +23,7 @@ describe('Testing Customer Types', function () {
 		it('should get all customer types', function testCustomerTypes(done) {
 			chai.request(server)
 				.post('/sema/login')
-				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
+				.send({ usernameOrEmail:'unittest' , password:'testpassword' })
 				.end(function(err, res) {
 					res.should.have.status(200);
 					res.body.should.have.property('token');

@@ -24,7 +24,7 @@ describe('Testing Kiosks', function () {
 		it('should get /sema/kiosks', function testKiosks(done) {
 			chai.request(server)
 				.post('/sema/login')
-				.send({ usernameOrEmail:'administrator' , password:'dloHaiti' })
+				.send({ usernameOrEmail:'unittest' , password:'testpassword' })
 				.end(function(err, res) {
 					res.should.have.status(200);
 					res.body.should.have.property('token');
@@ -41,6 +41,7 @@ describe('Testing Kiosks', function () {
 							res.body.should.have.property('kiosks');
 							expect(res.body.kiosks).to.be.an('array');
 							res.body.kiosks[site_index].should.have.property('name').eql('UnitTestCustomers');
+							res.body.kiosks[site_index].should.have.property('active').eql(true);
 							done(err);
 						});
 				});

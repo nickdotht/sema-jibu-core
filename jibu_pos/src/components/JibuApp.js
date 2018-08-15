@@ -40,8 +40,9 @@ class JibuApp extends Component {
 		this.posStorage = PosStorage;
 	}
 	componentDidMount() {
-		console.log("JibuApp - Mounted");
+		console.log("JibuApp - componentDidMount enter");
 		this.posStorage.initialize( false ).then( (isInitialized) => {
+			console.log("JibuApp - componentDidMount - Storage initialized");
 
 			let settings = this.posStorage.getSettings();
 			this.props.settingsActions.setSettings( settings );
@@ -50,9 +51,6 @@ class JibuApp extends Component {
 			Communications.initialize( settings.semaUrl, settings.site, settings.user, settings.password);
 			Communications.setToken( settings.token );
 			Communications.setSiteId(settings.siteId);
-
-			console.log( "PosStorage - " + JSON.stringify(PosStorage));
-			console.log( "Communications - " + JSON.stringify(Communications));
 
 			// let timeout = 200;
 			if (isInitialized ) {
