@@ -48,7 +48,34 @@ const getSalesChannels = (connection ) => {
 	})
 };
 
+const sqlCustomerTypes= 'SELECT customer_type.id,  customer_type.name FROM customer_type';
+
+const getCustomerTypes = (connection ) => {
+	return new Promise((resolve, reject) => {
+		connection.query(sqlCustomerTypes, (err, sqlResult ) => {
+			if( err ){
+				reject(err);
+			}else {
+				try {
+					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+						let customerTypes = sqlResult.map(row => {
+							return { name: row.name, id: row.id };
+						});
+						resolve(customerTypes);
+
+					} else {
+						resolve([]);
+					}
+				}catch( err ){
+					reject(err);
+				}
+			}
+		});
+	})
+};
+
 module.exports = {
 	getMostRecentReceipt,
-	getSalesChannels
+	getSalesChannels,
+	getCustomerTypes
 };

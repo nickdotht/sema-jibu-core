@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import 'App.css';
-import SemaSummaryPanel1 from "./WaterQuality/SemaSummaryPanel1";
 import WaterVolumeChannelAndIncomeChart from "./WaterQuality/WaterVolumeChannelAndIncomeChart";
-import SeamaWaterChlorineChart from "./WaterQuality/SeamaWaterChlorineChart";
-import SeamaWaterTdsChart from "./WaterQuality/SeamaWaterTdsChart";
+import WaterVolumeChannelChart from "./WaterQuality/WaterVolumeChannelChart"
 import 'css/SemaVolume.css';
-import SeamaWaterQualityNavigation from "./WaterQuality/SeamaWaterQualityNavigation";
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 import {connect} from "react-redux";
@@ -13,7 +10,6 @@ import {bindActionCreators} from "redux";
 import * as volumeActions from 'actions/VolumeActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router'
-import SemaSummaryPanel2 from "./WaterQuality/SemaSummaryPanel2";
 
 class SemaVolume extends Component {
 
@@ -35,38 +31,23 @@ class SemaVolume extends Component {
             <div className="WaterVolumeContainer">
                 <div className = "WaterVolumeChannelAndIncome">
 					<div className= "WaterQualityMainChartItem">
-						<WaterVolumeChannelAndIncomeChart chartData={this.props.volume.production}/>
+						<WaterVolumeChannelAndIncomeChart chartData={this.props.volume}/>
 					</div>
                 </div>
-                <div className = "WaterVolumeGroupAndType">
-					xxxxx
-					<br/>
-					YYYY
-					<br/>
-					YYYY
-					<br/>
-					YYYY
-					xxxxx
-					<br/>
-					YYYY
-					<br/>
-					YYYY
-					<br/>
-					YYYY
-					xxxxx
-					<br/>
-					YYYY
-					<br/>
-					YYYY
-					<br/>
-					YYYY
-					xxxxx
-					<br/>
-					YYYY
-					<br/>
-					YYYY
-					<br/>
-					YYYY
+                <div className = "WaterVolumeChannelAndCustomerType">
+					<div className = "WaterVolumeChannel">
+						<WaterVolumeChannelChart  chartData={this.props.volume}/>
+					</div>
+					<div className="WaterVolumeCustomerType">
+						xxxxx
+						<br/>
+						YYYY
+						<br/>
+						BBBBBBBBBBB
+						<br/>
+						YYYY
+						YYYY
+					</div>
 				</div>
             </div>
         );

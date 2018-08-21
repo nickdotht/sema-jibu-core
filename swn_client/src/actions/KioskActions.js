@@ -13,7 +13,7 @@ function selectKiosk(kiosk) {
 
 function fetchKiosks() {
 	return (dispatch) => {
-		return axiosService('/sema/kiosks')
+		axiosService('/sema/kiosks')
 			.then(response => {
 				if(response.status === 200){
 					dispatch(receiveKiosks(response.data))
