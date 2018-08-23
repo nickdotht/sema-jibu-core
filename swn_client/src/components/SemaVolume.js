@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import 'App.css';
 import WaterVolumeChannelAndIncomeChart from "./WaterQuality/WaterVolumeChannelAndIncomeChart";
 import WaterVolumeChannelChart from "./WaterQuality/WaterVolumeChannelChart"
+import WaterVolumeChannelAndTypeChart from "./WaterQuality/WaterVolumeChannelAndTypeChart"
 import 'css/SemaVolume.css';
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
@@ -37,14 +38,7 @@ class SemaVolume extends Component {
 						<WaterVolumeChannelChart  chartData={this.props.volume}/>
 					</div>
 					<div className="WaterVolumeCustomerType">
-						xxxxx
-						<br/>
-						YYYY
-						<br/>
-						BBBBBBBBBBB
-						<br/>
-						YYYY
-						YYYY
+						<WaterVolumeChannelAndTypeChart  chartData={this.props.volume}/>
 					</div>
 				</div>
             </div>

@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { authActions } from '../actions';
+
 import { proxy as baseURL } from '../../package.json';
 
 const axiosOptions = {
@@ -54,6 +56,19 @@ axiosService.interceptors.request.use(config => {
 
 	return config;
 }, err => Promise.reject(err));
+
+axiosService.interceptors.response.use(response => {
+	return response
+}, error => {
+	if( error.response.status == 401){
+		console.log("401 received, redirect to login page");
+		window.dispatchEvent(new CustomEvent("tokenExpired", {
+			detail: { name: "John" }} ));
+		// authActions.logout();
+	}else{
+		return Promise.reject( error );
+	}
+});
 
 
 // Our custom middleware to always update our axios headers with the latest

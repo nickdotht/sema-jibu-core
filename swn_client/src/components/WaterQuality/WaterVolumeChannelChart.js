@@ -73,16 +73,5 @@ class WaterVolumeChannelChart extends Component {
 		}
 		return title;
 	}
-	getBackgroundColor (index ){
-    	switch( index ){
-			case 0:
-				return "rgba(99,132,255,0.2)";
-			case 1:
-				return "rgba(99,255,132,0.2)";
-			default:
-				return "rgba(0,0,255,0.2)";
-
-		}
-	}
 }
 export default WaterVolumeChannelChart;

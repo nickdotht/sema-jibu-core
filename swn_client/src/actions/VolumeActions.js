@@ -32,21 +32,33 @@ function fetchVolume(params) {
 const fetchVolumeData = ( params) => {
 	return new Promise (async(resolve, reject ) => {
 		let result = initializeVolume();
-		result.volumeInfo.volumeByChannel = await fetchVolumeItem(params, "sales-channel", {});
-		result.volumeInfo.volumeByChannelAndIncome.push( await fetchVolumeItem(params, "sales-channel", {incomeGT:8 }));
-		result.volumeInfo.volumeByChannelAndIncome.push( await fetchVolumeItem(params, "sales-channel", {incomeLT:8,incomeGT:5 }));
-		result.volumeInfo.volumeByChannelAndIncome.push( await fetchVolumeItem(params, "sales-channel", {incomeLT:5,incomeGT:2 }));
-		result.volumeInfo.volumeByChannelAndIncome.push( await fetchVolumeItem(params, "sales-channel", {incomeLT:2}));
+		try {
+			result.volumeInfo.volumeByChannel = await fetchVolumeItem(params, "sales-channel", {});
+			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {incomeGT: 8}));
+			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {
+				incomeLT: 8,
+				incomeGT: 5
+			}));
+			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {
+				incomeLT: 5,
+				incomeGT: 2
+			}));
+			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {incomeLT: 2}));
 
-		let  types = await fetchCustomerTypes();
-		if( types ){
-			for( let index = 0; index < types.customerTypes.length; index++){
-				result.volumeInfo.volumeByChannelAndType.push( await fetchVolumeItem(params, "sales-channel", {customerType:types.customerTypes[index].id}));
+			let types = await fetchCustomerTypes();
+			if (types) {
+				for (let index = 0; index < types.customerTypes.length; index++) {
+					const volumeInfo = await fetchVolumeItem(params, "sales-channel", {customerType: types.customerTypes[index].id});
+					volumeInfo.customerTypeName = types.customerTypes[index].name;
+					result.volumeInfo.volumeByChannelAndType.push(volumeInfo);
+				}
 			}
-		}
-		console.log("foo")
+			resolve(result);
+		}catch( error ){
+			console.log("fetchVolumeData - Failed ");
+			resolve(result);
 
-		resolve(result);
+		}
 	});
 }
 
@@ -73,9 +85,8 @@ function fetchVolumeItem( params, type, options ) {
 					reject(initializeVolume())
 				}
 			})
-			.catch(function(){
-				// This means the service isn't running.
-				reject(initializeVolume())
+			.catch(function(error){
+				reject( error)
 			});
 	});
 }
@@ -91,8 +102,8 @@ function fetchCustomerTypes(  ) {
 					reject(null)
 				}
 			})
-			.catch(function(){
-				reject(null)
+			.catch(function(error){
+				reject(error)
 			});
 	});
 }

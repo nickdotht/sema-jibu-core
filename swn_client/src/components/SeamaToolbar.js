@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+// import ReactDOM from 'react-dom';
 import { Navbar, Label, Nav,NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
 import {connect} from "react-redux";
@@ -41,8 +42,15 @@ class SeamaToolbar extends Component {
 		this.state = {
 			title: "--Kiosks--"
 		};
-	}
 
+	}
+	componentDidMount() {
+		window.addEventListener('tokenExpired', function(event){
+			console.log("tokenExpired" + event.detail);
+			this.props.authActions.logout();
+		}.bind(this));
+
+	}
 	handleSelect(eventKey){
 		console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
 
