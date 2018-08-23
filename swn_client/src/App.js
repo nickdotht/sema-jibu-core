@@ -56,12 +56,22 @@ class App extends Component {
 	render() {
 		return (
 			<Router history={ history }>
-				{this.props.auth.currentUser ?
+				{this.userIsValid() ?
 					<SemaContainer /> :
 					<SemaLogin />
 				}
 			</Router>
 		);
+	}
+	userIsValid(){
+		if( this.props.auth.currentUser ){
+			let now = Date.now()/1000;
+			if( now < this.props.auth.currentUser.exp ){
+				console.log("Token is valid - Proceed to home page");
+				return true;
+			}
+		}
+		return false;
 	}
 }
 

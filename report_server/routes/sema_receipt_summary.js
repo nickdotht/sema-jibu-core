@@ -48,7 +48,7 @@ router.get('/', async( request, response ) => {
 			}
 		}
 
-		// Check for income qualifiers
+		// Check for income and customerType qualifiers
 		__pool.getConnection(async (err, connection) => {
 			try {
 				if (endDate == null) {
@@ -60,10 +60,10 @@ router.get('/', async( request, response ) => {
 				let sqlQualifier = "";
 				if( request.query.hasOwnProperty("income-lt") && request.query.hasOwnProperty("income-gt") ){
 					sqlQualifier = " AND income_level BETWEEN ? AND ? ";
-					params.push( request.query["income-lt"]);
 					params.push( request.query["income-gt"]);
-					receiptSummary.addIncomeLT( request.query["income-lt"]);
+					params.push( request.query["income-lt"]);
 					receiptSummary.addIncomeGT( request.query["income-gt"]);
+					receiptSummary.addIncomeLT( request.query["income-lt"]);
 				}else if( request.query.hasOwnProperty("income-lt") ){
 					sqlQualifier = " AND income_level < ? ";
 					params.push( request.query["income-lt"]);
@@ -72,6 +72,11 @@ router.get('/', async( request, response ) => {
 					sqlQualifier = " AND income_level > ? ";
 					params.push( request.query["income-gt"]);
 					receiptSummary.addIncomeGT( request.query["income-gt"]);
+				}
+				if( request.query.hasOwnProperty("customer-type") ){
+					sqlQualifier = sqlQualifier + " AND customer_type_id = ? ";
+					params.push( request.query["customer-type"]);
+					receiptSummary.addCustomerType( request.query["customer-type"]);
 				}
 				if (request.query.type == "sales-channel") {
 					const salesChannels = await getSalesChannels(connection);

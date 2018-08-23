@@ -14,6 +14,10 @@ class ReceiptSummary {
 		this.incomeLessThan = value;
 	}
 
+	addCustomerType( value ){
+		this.customerType = value;
+
+	}
 	addData( data ){
 		this.volume.data.push( data );
 	}

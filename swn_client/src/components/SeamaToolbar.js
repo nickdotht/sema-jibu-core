@@ -48,7 +48,7 @@ class SeamaToolbar extends Component {
 
 		this.setState({title: this.props.kiosk.kiosks[eventKey].name});
 
-		let kioskParams = {siteId:this.props.kiosk.kiosks[eventKey].id};
+		let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
 		const previousKioskID = this.props.kiosk.selectedKiosk ?
 			this.props.kiosk.selectedKiosk.kioskID :
 			null;
