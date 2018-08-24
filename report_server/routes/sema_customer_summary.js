@@ -52,6 +52,8 @@ router.get('/', async( request, response ) => {
 				const customerSummary = new CustomerSummary( beginDate, endDate);
 				let params = [request.query["site-id"], beginDate, endDate];
 				let sqlQualifier = "";
+
+				// Check for income qualifiers
 				if( request.query.hasOwnProperty("income-lt") && request.query.hasOwnProperty("income-gt") ){
 					sqlQualifier = " AND income_level BETWEEN ? AND ? ";
 					params.push( request.query["income-gt"]);
@@ -72,6 +74,29 @@ router.get('/', async( request, response ) => {
 					params.push( request.query["gender"]);
 					customerSummary.addGender( request.query["gender"]);
 				}
+
+				// Check for distance qualifiers
+				if( request.query.hasOwnProperty("distance-lt") && request.query.hasOwnProperty("distance-gt") ){
+					sqlQualifier = " AND distance BETWEEN ? AND ? ";
+					params.push( request.query["distance-gt"]);
+					params.push( request.query["distance-lt"]);
+					customerSummary.addDistanceGT( request.query["distance-gt"]);
+					customerSummary.addDistanceLT( request.query["distance-lt"]);
+				}else if( request.query.hasOwnProperty("distance-lt") ){
+					sqlQualifier = " AND distance < ? ";
+					params.push( request.query["distance-lt"]);
+					customerSummary.addDistanceLT( request.query["distance-lt"]);
+				}else if( request.query.hasOwnProperty("distance-gt") ){
+					sqlQualifier = " AND distance > ? ";
+					params.push( request.query["distance-gt"]);
+					customerSummary.addDistanceGT( request.query["distance-gt"]);
+				}
+				if( request.query.hasOwnProperty("gender") ){
+					sqlQualifier = sqlQualifier + " AND gender = ? ";
+					params.push( request.query["gender"]);
+					customerSummary.addGender( request.query["gender"]);
+				}
+
 				await getCustomerSummary(connection, sqlQualifier, params, customerSummary);
 
 				semaLog.info("sema_customer_summary exit");

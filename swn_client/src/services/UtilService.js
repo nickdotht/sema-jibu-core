@@ -1,5 +1,3 @@
-import jwt from 'jsonwebtoken';
-import { axiosService } from 'services';
 
 const colors = [
 	"rgb(253,179,8)",

@@ -48,9 +48,9 @@ class SeamaSidebar extends Component {
                     {<img src={require('images/swn-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
                 </div>
                 <ListGroup>
-                    <CustomComponent1><i className="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}/>
+                    <CustomComponent1><i className="glyphicon glyphicon-tint" style={{paddingRight:"15px"}}/>
                         <Link to='/'>Volumes</Link></CustomComponent1>
-                    <CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
+                    <CustomComponent1><i className="glyphicon glyphicon-user" style={{paddingRight:"15px"}}/>
                         <Link to='/Demographics'>Demographics</Link></CustomComponent1>
                     {/*<CustomComponent1><i className="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>*/}
                         {/*<Link to='/DistributionMap'>Distribution Map</Link></CustomComponent1>*/}

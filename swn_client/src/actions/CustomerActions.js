@@ -13,6 +13,7 @@ function initializeCustomer() {
 		customerInfo: {
 			allCustomers:{},
 			customersByIncome:[],
+			customersByDistance:[],
 			customersByGender:[]
 		}
 	}
@@ -34,14 +35,16 @@ const fetchCustomerData = ( params) => {
 	return new Promise (async(resolve, reject ) => {
 		let result = initializeCustomer();
 		try {
-			let tick = 7;	// Approximate no of API calls - determined empirically
+			let tick = 10;	// Approximate no of API calls - determined empirically
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 
 			let tickPct = 100/tick;		// Percentage increase per api call
 
+			// All customers for the time period
 			result.customerInfo.allCustomers = await fetchCustomerItem(params,  {});
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:tickPct+10}} ));
 
+			// Customers by income
 			result.customerInfo.customersByIncome.push(await fetchCustomerItem(params, {incomeGT: 8}));
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*2)+10}} ));
 
@@ -60,11 +63,25 @@ const fetchCustomerData = ( params) => {
 			result.customerInfo.customersByIncome.push(await fetchCustomerItem(params, {incomeLT: 2}));
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*5)+10}} ));
 
+			// Customers by gender
 			result.customerInfo.customersByGender.push(await fetchCustomerItem(params, {gender: 'M'}));
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*6)+10}} ));
 
 			result.customerInfo.customersByGender.push(await fetchCustomerItem(params, {gender: 'F'}));
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*7)+10}} ));
+
+			// Customers by distance
+			result.customerInfo.customersByDistance.push(await fetchCustomerItem(params, {distanceGT: 500}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*8)+10}} ));
+
+			result.customerInfo.customersByDistance.push(await fetchCustomerItem(params, {
+				distanceLT: 500,
+				distanceGT: 100
+			}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*9)+10}} ));
+
+			result.customerInfo.customersByDistance.push(await fetchCustomerItem(params, {distanceLT: 100}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*10)+10}} ));
 
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 			resolve(result);
@@ -90,6 +107,14 @@ function fetchCustomerItem( params, options ) {
 		if(options.hasOwnProperty("gender") ){
 			url = url + "&gender=" + options.gender;
 		}
+
+		if(options.hasOwnProperty("distanceLT") ){
+			url = url + "&distance-lt=" + options.distanceLT;
+		}
+		if(options.hasOwnProperty("distanceGT") ){
+			url = url + "&distance-gt=" + options.distanceGT;
+		}
+
 		axiosService
 			.get(url)
 			.then(response => {

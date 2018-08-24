@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import 'App.css';
-import WaterVolumeChannelAndIncomeChart from "./WaterQuality/WaterVolumeChannelAndIncomeChart";
-import WaterVolumeChannelChart from "./WaterQuality/WaterVolumeChannelChart"
-import WaterVolumeChannelAndTypeChart from "./WaterQuality/WaterVolumeChannelAndTypeChart"
+import WaterVolumeChannelAndIncomeChart from "./WaterVolume/WaterVolumeChannelAndIncomeChart";
+import WaterVolumeChannelChart from "./WaterVolume/WaterVolumeChannelChart"
+import WaterVolumeChannelAndTypeChart from "./WaterVolume/WaterVolumeChannelAndTypeChart"
 import 'css/SemaVolume.css';
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";

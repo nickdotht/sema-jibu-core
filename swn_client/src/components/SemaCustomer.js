@@ -12,6 +12,7 @@ import { withRouter } from 'react-router'
 import CustomerSummaryPanel from "./Demographics/CustomerSummaryPanel";
 import CustomersByIncomeLevelChart from "./Demographics/CustomersByIncomeLevelChart";
 import CustomersByGenderChart from "./Demographics/CustomersByGenderChart";
+import CustomersByDistanceChart from "./Demographics/CustomersByDistanceChart";
 
 class SemaCustomer extends Component {
 
@@ -48,9 +49,7 @@ class SemaCustomer extends Component {
 						</div>
 					</div>
 					<div className = "CustomerSummaryRow2Col2">
-						bbb
-						<br/>
-						bbb
+						<CustomersByDistanceChart  chartData={this.props.customer}/>
 					</div>
                 </div>
                 <div className = "CustomerSummaryRow3">

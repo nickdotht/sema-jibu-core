@@ -40,7 +40,7 @@ class SeamaToolbar extends Component {
 		this.logOut = this.logOut.bind(this);
 
 		this.state = {
-			title: "--Kiosks--"
+			title: "--Regions--"
 		};
 
 	}
@@ -111,7 +111,7 @@ class SeamaToolbar extends Component {
 						Version {this.props.Version}
 					</Label>
 					<Label style={LabelStyleLeft}>
-						Kiosk
+						Region
 					</Label>
 					<Nav >
 						<NavDropdown title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >
