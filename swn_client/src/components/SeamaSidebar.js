@@ -51,7 +51,7 @@ class SeamaSidebar extends Component {
                     <CustomComponent1><i className="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}/>
                         <Link to='/'>Volumes</Link></CustomComponent1>
                     <CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
-                        <Link to='/Sales'>Demographics</Link></CustomComponent1>
+                        <Link to='/Demographics'>Demographics</Link></CustomComponent1>
                     {/*<CustomComponent1><i className="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>*/}
                         {/*<Link to='/DistributionMap'>Distribution Map</Link></CustomComponent1>*/}
                     {/*<CustomComponent1><i className="glyphicon glyphicon-time" style={{paddingRight:"15px"}}/>*/}

@@ -1,6 +1,18 @@
 import jwt from 'jsonwebtoken';
 import { axiosService } from 'services';
 
+const colors = [
+	"rgb(253,179,8)",
+	"rgb(138,54,14)",
+	"rgb(228,103,32)",
+	"rgb(95,159,55)",
+];
+
+const colors2 = [
+	"rgb(95,161,55)",
+	"rgb(75,135,203)",
+	"rgb(160,160,160)",
+];
 
 const getBackgroundColorForChannel = channelName => {
 	switch( channelName.toLowerCase() ){
@@ -19,6 +31,20 @@ const getBackgroundColorForChannel = channelName => {
 	}
 };
 
+// Simple color picker to pick a color by index
+const getBackgroundColorByIndex = index =>{
+	const pickIndex =  index % colors.length;
+	return colors[pickIndex];
+};
+
+// Simple color picker to pick a color by index
+const getBackgroundColorByIndex2 = index =>{
+	const pickIndex =  index % colors2.length;
+	return colors2[pickIndex];
+};
+
 export const utilService = {
-	getBackgroundColorForChannel
+	getBackgroundColorForChannel,
+	getBackgroundColorByIndex,
+	getBackgroundColorByIndex2
 };

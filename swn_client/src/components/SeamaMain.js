@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch } from 'react-router-dom';
 import SemaVolume from "./SemaVolume";
-import SemaSales from "./SemaSales";
+import SemaCustomer from "./SemaCustomer";
 import {
 	PrivateRoute,
 	SemaNotFound
@@ -11,7 +11,7 @@ const Main = (props) => (
     <main>
         <Switch>
             <PrivateRoute exact path='/' component={SemaVolume}/>
-            <PrivateRoute path='/Sales' component={SemaSales}/>
+            <PrivateRoute path='/Demographics' component={SemaCustomer}/>
             {/*<PrivateRoute path='/DistributionMap' component={SeamaDistributionMap}/>*/}
             {/*<PrivateRoute path='/DeliverySchedule' component={SeamaDeliverySchedule}/>*/}
             {/*<PrivateRoute path='/InventoryManagement' component={SeamaInventoryManagement}/>*/}

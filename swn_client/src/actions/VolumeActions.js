@@ -33,26 +33,45 @@ const fetchVolumeData = ( params) => {
 	return new Promise (async(resolve, reject ) => {
 		let result = initializeVolume();
 		try {
+			let tick = 10;
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
+			let types = await fetchCustomerTypes();
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:10}} ));
+			if( types ){
+				tick = 5 + types.customerTypes.length + 1; // approximate number of api calls
+			}
+			let tickPct = 100/tick;		// Percentage increase per api call
+
 			result.volumeInfo.volumeByChannel = await fetchVolumeItem(params, "sales-channel", {});
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:tickPct+10}} ));
+
 			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {incomeGT: 8}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*2)+10}} ));
+
 			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {
 				incomeLT: 8,
 				incomeGT: 5
 			}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*3)+10}} ));
+
 			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {
 				incomeLT: 5,
 				incomeGT: 2
 			}));
-			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {incomeLT: 2}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*4)+10}} ));
 
-			let types = await fetchCustomerTypes();
+			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {incomeLT: 2}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*5)+10}} ));
+
 			if (types) {
 				for (let index = 0; index < types.customerTypes.length; index++) {
 					const volumeInfo = await fetchVolumeItem(params, "sales-channel", {customerType: types.customerTypes[index].id});
 					volumeInfo.customerTypeName = types.customerTypes[index].name;
 					result.volumeInfo.volumeByChannelAndType.push(volumeInfo);
+					window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*(5+index+1))+10}} ));
 				}
 			}
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 			resolve(result);
 		}catch( error ){
 			console.log("fetchVolumeData - Failed ");

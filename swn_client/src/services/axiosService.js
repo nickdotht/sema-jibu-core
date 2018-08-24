@@ -63,7 +63,7 @@ axiosService.interceptors.response.use(response => {
 	if( error.response.status == 401){
 		console.log("401 received, redirect to login page");
 		window.dispatchEvent(new CustomEvent("tokenExpired", {
-			detail: { name: "John" }} ));
+			detail: {}} ));
 		// authActions.logout();
 	}else{
 		return Promise.reject( error );

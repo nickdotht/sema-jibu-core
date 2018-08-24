@@ -7,7 +7,7 @@ import {bindActionCreators} from "redux";
 import {
 	kioskActions,
 	volumeActions,
-	salesActions,
+	customerActions,
 	authActions,
 	healthCheckActions
 } from 'actions';
@@ -44,13 +44,21 @@ class SeamaToolbar extends Component {
 		};
 
 	}
+
 	componentDidMount() {
-		window.addEventListener('tokenExpired', function(event){
-			console.log("tokenExpired" + event.detail);
-			this.props.authActions.logout();
-		}.bind(this));
+		window.addEventListener('tokenExpired', this.handleExpiredEvent.bind(this));
 
 	}
+	handleExpiredEvent( event ){
+		console.log("tokenExpired");
+		this.props.authActions.logout();
+
+	}
+	componentWillUnmount(){
+		window.removeEventListener('tokenExpired', this.handleExpiredEvent );
+	}
+
+
 	handleSelect(eventKey){
 		console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
 
@@ -64,13 +72,13 @@ class SeamaToolbar extends Component {
 		if(kioskParams.kioskID !== previousKioskID) {
 			this.props.kioskActions.selectKiosk(kioskParams);
 			this.props.volume.loaded = false;
-			this.props.sales.loaded = false;
+			this.props.customer.loaded = false;
 			switch (this.props.location.pathname) {
 				case "/":
 					this.props.volumeActions.fetchVolume(kioskParams);
 					break;
-				case "/Sales":
-					this.props.salesActions.fetchSales(kioskParams);
+				case "/Demographics":
+					this.props.customerActions.fetchCustomer(kioskParams);
 					break;
 				default:
 					console.log("Not implemented:", this.props.location.pathname);
@@ -137,7 +145,7 @@ function mapStateToProps(state) {
 		healthCheck: state.healthCheck,
 		kiosk:state.kiosk,
 		volume:state.volume,
-		sales:state.sales
+		customer:state.customer
 	};
 }
 
@@ -147,7 +155,7 @@ function mapDispatchToProps(dispatch) {
 		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
 		kioskActions: bindActionCreators(kioskActions, dispatch),
 		volumeActions: bindActionCreators(volumeActions, dispatch),
-		salesActions: bindActionCreators(salesActions, dispatch)
+		customerActions: bindActionCreators(customerActions, dispatch)
 	};
 }
 

@@ -11,6 +11,7 @@ import {bindActionCreators} from "redux";
 import * as volumeActions from 'actions/VolumeActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router'
+import LoadProgress from "./LoadProgress";
 
 class SemaVolume extends Component {
 
@@ -30,6 +31,9 @@ class SemaVolume extends Component {
     showWaterOperations( ){
         return (
             <div className="WaterVolumeContainer">
+				<div className = "WaterVolumeProgress" style={{width:"100%", height:'100%'}}>
+					<LoadProgress/>
+				</div>
                 <div className = "WaterVolumeChannelAndIncome">
 					<WaterVolumeChannelAndIncomeChart chartData={this.props.volume}/>
                 </div>
