@@ -35,12 +35,14 @@ class SeamaToolbar extends Component {
 	constructor(props, context) {
 		super(props, context);
 		console.log("SeamaToolbar-constructor");
-		this.handleSelect = this.handleSelect.bind(this);
-		this.buildMenuItems = this.buildMenuItems.bind(this);
+		this.handleSelectKiosk = this.handleSelectKiosk.bind(this);
+		this.handleSelectDate = this.handleSelectDate.bind(this);
+		this.buildKioskMenuItems = this.buildKioskMenuItems.bind(this);
+		this.buildDateMenuItems = this.buildDateMenuItems.bind(this);
 		this.logOut = this.logOut.bind(this);
 
 		this.state = {
-			title: "--Regions--"
+			kiosks: "--Regions--"
 		};
 
 	}
@@ -59,10 +61,10 @@ class SeamaToolbar extends Component {
 	}
 
 
-	handleSelect(eventKey){
+	handleSelectKiosk(eventKey){
 		console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
 
-		this.setState({title: this.props.kiosk.kiosks[eventKey].name});
+		this.setState({kiosks: this.props.kiosk.kiosks[eventKey].name});
 
 		let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
 		const previousKioskID = this.props.kiosk.selectedKiosk ?
@@ -86,7 +88,11 @@ class SeamaToolbar extends Component {
 		}
 	};
 
-	buildMenuItems(){
+	handleSelectDate(eventKey){
+		console.log(JSON.stringify(eventKey));
+	}
+
+	buildKioskMenuItems(){
 		let menuItems = [];
 		if( this.props.kiosk.kiosks){
 			let keys = Object.keys(this.props.kiosk.kiosks);
@@ -97,6 +103,16 @@ class SeamaToolbar extends Component {
 		}
 		return menuItems;
 	}
+
+	buildDateMenuItems(){
+		let menuItems = [];
+		menuItems.push(<MenuItem eventKey={1} key={1} style={menuStyle}>{"Year to date"}</MenuItem>);
+		menuItems.push(<MenuItem eventKey={2} key={2} style={menuStyle}>{"This month"}</MenuItem>);
+		menuItems.push(<MenuItem eventKey={3} key={3} style={menuStyle}>{"Last Year"}</MenuItem>);
+		menuItems.push(<MenuItem eventKey={4} key={4} style={menuStyle}>{"All"}</MenuItem>);
+		return menuItems;
+	}
+
 	logOut (){
 		console.log("logout");
 		this.props.authActions.logout();
@@ -111,13 +127,22 @@ class SeamaToolbar extends Component {
 						Version {this.props.Version}
 					</Label>
 					<Label style={LabelStyleLeft}>
-						Region
+						Region:
 					</Label>
 					<Nav >
-						<NavDropdown title={this.state.title} onSelect={this.handleSelect} id="basic-nav-dropdown" >
-							{this.buildMenuItems()}
+						<NavDropdown title={this.state.kiosks} onSelect={this.handleSelectKiosk} id="basic-nav-dropdown" >
+							{this.buildKioskMenuItems()}
 						</NavDropdown>
 					</Nav>
+					<Label style={LabelStyleLeft}>
+						Date Range:
+					</Label>
+					<Nav >
+						<NavDropdown title="Year to Date" onSelect={this.handleSelectDate} id="basic-nav-dropdown2" >
+							{this.buildDateMenuItems()}
+						</NavDropdown>
+					</Nav>
+
 					<Label style={LabelStyleRight}> Server: {this.showServer()}</Label>
 					<Label onClick={this.logOut} href="#" style={LabelStyleRight}>
 						<a href="/">Logout</a>
