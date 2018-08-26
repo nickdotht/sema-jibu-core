@@ -15,7 +15,11 @@ import { withRouter } from 'react-router'
 
 const menuStyle = {};
 
-
+const dateMenu = {
+	1: {key:1, title:"Year to date"},
+	2: {key:2, title:"This month"},
+	3: {key:3, title:"all"}
+};
 const LabelStyleLeft = {
 	float:"left",
 	background:"none",
@@ -40,7 +44,8 @@ class SeamaToolbar extends Component {
 		this.buildKioskMenuItems = this.buildKioskMenuItems.bind(this);
 		this.buildDateMenuItems = this.buildDateMenuItems.bind(this);
 		this.logOut = this.logOut.bind(this);
-
+		this.dateSelector = dateMenu[1];
+		this.dateKey = 1;
 		this.state = {
 			kiosks: "--Regions--"
 		};
@@ -90,6 +95,10 @@ class SeamaToolbar extends Component {
 
 	handleSelectDate(eventKey){
 		console.log(JSON.stringify(eventKey));
+		if( this.dateKey != eventKey){
+			this.dateKey = eventKey
+			this.dateSelector = dateMenu[eventKey];
+		}
 	}
 
 	buildKioskMenuItems(){
@@ -106,10 +115,9 @@ class SeamaToolbar extends Component {
 
 	buildDateMenuItems(){
 		let menuItems = [];
-		menuItems.push(<MenuItem eventKey={1} key={1} style={menuStyle}>{"Year to date"}</MenuItem>);
-		menuItems.push(<MenuItem eventKey={2} key={2} style={menuStyle}>{"This month"}</MenuItem>);
-		menuItems.push(<MenuItem eventKey={3} key={3} style={menuStyle}>{"Last Year"}</MenuItem>);
-		menuItems.push(<MenuItem eventKey={4} key={4} style={menuStyle}>{"All"}</MenuItem>);
+		menuItems.push(<MenuItem eventKey={dateMenu[1].key} key={dateMenu[1].key} style={menuStyle}>{dateMenu[1].title}</MenuItem>);
+		menuItems.push(<MenuItem eventKey={dateMenu[2].key} key={dateMenu[2].key} style={menuStyle}>{dateMenu[2].title}</MenuItem>);
+		menuItems.push(<MenuItem eventKey={dateMenu[3].key} key={dateMenu[3].key} style={menuStyle}>{dateMenu[3].title}</MenuItem>);
 		return menuItems;
 	}
 

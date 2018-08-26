@@ -130,7 +130,7 @@ function fetchCustomerTypes(  ) {
 const updateVolume = volumeData => {
 	return {
 		loaded:true,
-		volume: volumeData
+		volumeInfo: volumeData.volumeInfo
 	}
 };
 

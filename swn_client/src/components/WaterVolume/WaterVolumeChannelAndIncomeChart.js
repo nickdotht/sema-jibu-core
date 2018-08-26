@@ -62,10 +62,10 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 	getVolumeData(){
 		let data = {labels:[], datasets:[]}
 		if( this.props.chartData.loaded ) {
-    		if( this.props.chartData.volume.volumeInfo.hasOwnProperty('volumeByChannel')){
-				if( this.props.chartData.volume.volumeInfo.volumeByChannelAndIncome.length > 0 ) {
+    		if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel')){
+				if( this.props.chartData.volumeInfo.volumeByChannelAndIncome.length > 0 ) {
 					// Create the bars
-					this.props.chartData.volume.volumeInfo.volumeByChannelAndIncome.forEach(channelAndIncome => {
+					this.props.chartData.volumeInfo.volumeByChannelAndIncome.forEach(channelAndIncome => {
 						if (channelAndIncome.hasOwnProperty("incomeLessThan") && channelAndIncome.hasOwnProperty("incomeGreaterThan")) {
 							let label = "$" + channelAndIncome.incomeGreaterThan + "<$" + channelAndIncome.incomeLessThan + " per day";
 							data.labels.push(label);
@@ -77,11 +77,11 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 					});
 
 					// Create the labels
-					this.props.chartData.volume.volumeInfo.volumeByChannelAndIncome[0].volume.data.forEach(salesChannel => {
+					this.props.chartData.volumeInfo.volumeByChannelAndIncome[0].volume.data.forEach(salesChannel => {
 						data.datasets.push( {label: salesChannel.salesChannel, data:[], stack: 1, backgroundColor:utilService.getBackgroundColorForChannel( salesChannel.salesChannel ), id: salesChannel.salesChannel});
 					});
 					// add the data
-					this.props.chartData.volume.volumeInfo.volumeByChannelAndIncome.forEach(channelAndIncome => {
+					this.props.chartData.volumeInfo.volumeByChannelAndIncome.forEach(channelAndIncome => {
 						channelAndIncome.volume.data.forEach( dataPt =>{
 							this.addData( data.datasets, dataPt );
 						});

@@ -42,19 +42,19 @@ class WaterVolumeChannelAndTypeChart extends Component {
 	getVolumeData(){
 		let data = {labels:[], datasets:[]}
 		if( this.props.chartData.loaded ) {
-			if( this.props.chartData.volume.volumeInfo.hasOwnProperty('volumeByChannel')){
-				if( this.props.chartData.volume.volumeInfo.volumeByChannelAndType.length > 0 ) {
+			if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel')){
+				if( this.props.chartData.volumeInfo.volumeByChannelAndType.length > 0 ) {
 					// Create the bars
-					this.props.chartData.volume.volumeInfo.volumeByChannelAndType.forEach(channelAndType => {
+					this.props.chartData.volumeInfo.volumeByChannelAndType.forEach(channelAndType => {
 						data.labels.push(channelAndType.customerTypeName);
 					});
 
 					// Create the labels
-					this.props.chartData.volume.volumeInfo.volumeByChannelAndType[0].volume.data.forEach(salesChannel => {
+					this.props.chartData.volumeInfo.volumeByChannelAndType[0].volume.data.forEach(salesChannel => {
 						data.datasets.push( {label: salesChannel.salesChannel, data:[], stack: 1, backgroundColor:utilService.getBackgroundColorForChannel( salesChannel.salesChannel ), id: salesChannel.salesChannel});
 					});
 					// add the data
-					this.props.chartData.volume.volumeInfo.volumeByChannelAndType.forEach(channelAndType => {
+					this.props.chartData.volumeInfo.volumeByChannelAndType.forEach(channelAndType => {
 						channelAndType.volume.data.forEach( dataPt =>{
 							this.addData( data.datasets, dataPt );
 						});

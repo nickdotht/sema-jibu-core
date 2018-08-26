@@ -42,11 +42,11 @@ class WaterVolumeChannelChart extends Component {
 	getVolumeData(){
 		let data = {labels:[], datasets:[]}
 		if( this.props.chartData.loaded ) {
-    		if( this.props.chartData.volume.volumeInfo.hasOwnProperty('volumeByChannel')){
+    		if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel')){
 
 				data.datasets.push( {label: "Volume by Sales Channel", backgroundColor:[], data:[]});
 
-				this.props.chartData.volume.volumeInfo.volumeByChannel.volume.data.forEach(salesChannel => {
+				this.props.chartData.volumeInfo.volumeByChannel.volume.data.forEach(salesChannel => {
 					data.labels.push(salesChannel.salesChannel);
 					data.datasets[0].backgroundColor.push( utilService.getBackgroundColorForChannel( salesChannel.salesChannel ) );
 					data.datasets[0].data.push(salesChannel.volume );
@@ -61,8 +61,8 @@ class WaterVolumeChannelChart extends Component {
 		let title =  "Volume By Sales Channel";
 		let total = 0;
 		if (this.props.chartData.loaded) {
-			if (this.props.chartData.volume.volumeInfo.hasOwnProperty('volumeByChannel')) {
-				this.props.chartData.volume.volumeInfo.volumeByChannel.volume.data.forEach( (channel) =>{
+			if (this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel')) {
+				this.props.chartData.volumeInfo.volumeByChannel.volume.data.forEach( (channel) =>{
 					total += channel.volume;
 				} );
 			}
