@@ -24,7 +24,7 @@ class OrderCheckout extends Component {
 		}
 	};
 	getOpacity = ()=>{
-		if( this.props.products.length == 0 ){
+		if( this.props.products.length == 0 || this.props.flow.page != 'products'){
 			return {opacity:.3};
 		}else{
 			return {opacity:1};
@@ -33,7 +33,8 @@ class OrderCheckout extends Component {
 }
 
 function mapStateToProps(state, props) {
-	return {products: state.orderReducer.products};
+	return {products: state.orderReducer.products,
+		    flow: state.orderReducer.flow };
 }
 function mapDispatchToProps(dispatch) {
 	return {orderActions: bindActionCreators(OrderActions,dispatch)};
