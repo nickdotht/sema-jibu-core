@@ -158,7 +158,10 @@ class CustomerList extends Component {
 				(this.props.filter === "credit" && item.dueAmount > 0)) {
 				if (this.state.searchString.length >= 2) {
 					const filterString = this.state.searchString.toLowerCase();
-					if (item.name.toLowerCase().startsWith(filterString) ||
+					const name = item.name.toLowerCase();
+					const names = name.split(' ');
+					if (name.startsWith(filterString) ||
+						(names.length > 1 && names[names.length-1].startsWith(filterString)) ||
 						item.phoneNumber.startsWith(filterString)) {
 						return true;
 					} else {

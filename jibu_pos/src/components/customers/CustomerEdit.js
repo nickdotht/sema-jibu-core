@@ -107,7 +107,10 @@ class CustomerEdit extends Component {
 									defaultValue = {this.getDefaultValue()}
 									defaultIndex = {this.getDefaultIndex()}
 									options={this.channelOptions}/>
-								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+								<TouchableHighlight underlayColor = '#c0c0c0'
+													onPress={() => this.onShowChannel()}>
+									<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+								</TouchableHighlight>
 							</View>
 							<View style={styles.submit}>
 								<View style={{justifyContent:'center', height:90, width:'30%', alignItems:'center'}}>
@@ -235,6 +238,10 @@ class CustomerEdit extends Component {
 
 		this.setState( {isEditInProgress:true} );
 	};
+	onShowChannel(){
+		this.customerChannel.current.show();
+	}
+
 
 	_textIsEmpty(txt){
 		if( txt === null || txt .length === 0 ){
