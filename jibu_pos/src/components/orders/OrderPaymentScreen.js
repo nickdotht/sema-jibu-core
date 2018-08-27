@@ -215,7 +215,14 @@ class OrderPaymentScreen extends Component {
 
 	};
 	valuePaymentChange=(textValue)=>{
-		let cashValue = parseInt( textValue);
+		let numericString = "";
+		if( textValue.length > 0 )
+			for (var i = 0; i < textValue.length; i++) {
+				if ('0123456789'.indexOf(textValue.charAt(i)) !== -1) {
+					numericString = numericString + textValue.charAt(i);
+				}
+			}
+		let cashValue = parseInt( numericString);
 		if( isNaN(cashValue)){
 			cashValue = 0;
 		}
