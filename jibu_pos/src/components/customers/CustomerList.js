@@ -58,6 +58,7 @@ class CustomerList extends Component {
 					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
 							onPress={() => this.onPressItem(item)}
+							onLongPress = {() => this.onPressItemName(item)}
 							onShowUnderlay={separators.highlight}
 							onHideUnderlay={separators.unhighlight}>
 							{this.getRow(item, index, separators)}
@@ -109,10 +110,7 @@ class CustomerList extends Component {
 			return (
 				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row', height:50, alignItems:'center'}]}>
 					<View style={{flex: 2}}>
-						<TouchableHighlight
-							onPress={() => this.onPressItemName(item)}>
-							<Text style={[styles.baseItem, styles.leftMargin]}>{item.name}</Text>
-						</TouchableHighlight>
+						<Text style={[styles.baseItem, styles.leftMargin]}>{item.name}</Text>
 					</View>
 					<View style={{flex: 1.5}}>
 						<Text style={[styles.baseItem]}>{item.phoneNumber}</Text>
