@@ -738,7 +738,7 @@ class PosStorage {
 
 	getGetSyncInterval(){
 		if( this.syncInterval == null ){
-			this.syncInterval = {interval: 60 *1000 };
+			this.syncInterval = {interval: 2*60 *1000 };	// Default to 2 minutes
 		}
 		return this.syncInterval.interval;
 	}

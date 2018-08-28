@@ -50,6 +50,7 @@ class PaymentMethod extends Component{
 					<TextInput
 						underlineColorAndroid='transparent'
 						onChangeText={this.props.valueChange}
+						keyboardType = 'numeric'
 						value = {this.props.value}
 						style={[styles.cashInput]}/>
 				);
@@ -63,6 +64,7 @@ class PaymentMethod extends Component{
 					<TextInput
 					underlineColorAndroid='transparent'
 					onChangeText={this.props.valueChange}
+					keyboardType = 'numeric'
 					value = {this.props.value}
 					style={[styles.cashInput]}/>
 				);
@@ -153,11 +155,15 @@ class OrderPaymentScreen extends Component {
 					checkBox = {this.state.isCredit}
 					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
 					checkBoxLabel = {'Credit'}
-					value = {this.props.payment.credit} />
+					value = {this._roundToFloat(this.props.payment.credit)} />
 			)
 		}else{
 			return null;
 		}
+	}
+	_roundToFloat( value ){
+		return parseFloat(value.toFixed(2));
+
 	}
 	_isAnonymousCustomer( customer ){
 		return PosStorage.getCustomerTypeByName("anonymous").id == customer.customerTypeId ? true : false;
@@ -171,7 +177,7 @@ class OrderPaymentScreen extends Component {
 	}
 
 	calculateTotalDue(){
-		return this.calculateOrderDue() + this.calculateAmountDue();
+		return this._roundToFloat((this.calculateOrderDue() + this.calculateAmountDue()));
 	}
 
 	onCompleteOrder = ()=>{
@@ -215,14 +221,7 @@ class OrderPaymentScreen extends Component {
 
 	};
 	valuePaymentChange=(textValue)=>{
-		let numericString = "";
-		if( textValue.length > 0 )
-			for (var i = 0; i < textValue.length; i++) {
-				if ('0123456789'.indexOf(textValue.charAt(i)) !== -1) {
-					numericString = numericString + textValue.charAt(i);
-				}
-			}
-		let cashValue = parseInt( numericString);
+		let cashValue = parseFloat( textValue);
 		if( isNaN(cashValue)){
 			cashValue = 0;
 		}
