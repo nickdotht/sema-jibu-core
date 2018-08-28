@@ -56,12 +56,20 @@ class SelectedCustomerDetails extends React.Component {
 class CustomerBar extends Component {
 	constructor(props) {
 		super(props);
-
-		this.state = {
-			addFunction: true,
-			orderFunction: true,
-			editFunction: true,
-			deleteFunction: true
+		if( this.props.showView.showCustomers){
+			this.state = {
+				addFunction: true,
+				orderFunction: true,
+				editFunction: true,
+				deleteFunction: true
+			}
+		}else{
+			this.state = {
+				addFunction: false,
+				orderFunction: true,
+				editFunction: false,
+				deleteFunction: false
+			}
 		}
 	}
 	componentDidMount() {
