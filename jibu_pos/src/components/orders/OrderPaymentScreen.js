@@ -162,13 +162,24 @@ class OrderPaymentScreen extends Component {
 		}
 	}
 	_formatCurrency( value ){
+		let currency = "USD";
+		if( this.props.products.length > 0 ){
+			if( this.props.products[0].product.priceCurrency.length === 3 ){
+				currency = this.props.products[0].product.priceCurrency;
+			}
+		}
 		value =  parseFloat(value.toFixed(2));
-		var formatter = new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: 'UGX',
-			minimumFractionDigits: 2,
-		});
-		return formatter.format( value );
+		try {
+			var formatter = new Intl.NumberFormat('en-US', {
+				style: 'currency',
+				currency: currency,
+				minimumFractionDigits: 2,
+			});
+			return formatter.format(value);
+		}catch( error ){
+			console.log( "_formatCurrency - error " + error.message);
+			return value;
+		}
 	}
 	_roundToDecimal( value ){
 		return parseFloat(value.toFixed(2));
