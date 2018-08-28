@@ -10,7 +10,7 @@ class OrderTotal extends Component {
 		return (
 			<View style = {styles.container}>
 				<Text style={[{flex: 2}, styles.totalText]}>Order Total</Text>
-				<Text style={[{flex: 3}, styles.totalText]}>{this.getAmount()}</Text>
+				<Text style={[{flex: 3}, styles.totalText]}>{this.getAmount().toFixed(2)}</Text>
 
 			</View>
 		);
