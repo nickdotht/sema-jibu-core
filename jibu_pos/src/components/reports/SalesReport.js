@@ -116,14 +116,20 @@ class SalesReport extends Component {
 						<Text style={[styles.totalItem, {flex:.9}]}>Total Liters </Text>
 						<Text style={[styles.totalItem, {flex:.6}]}>{this.props.salesData.totalLiters}</Text>
 						<Text style={[styles.totalItem, {flex:.7}]}>Total Sales </Text>
-						<Text style={[styles.totalItem, {flex:.5}]}>{this.props.salesData.totalSales}</Text>
+						<Text style={[styles.totalItem, {flex:.5}]}>{this.getTotalSales()}</Text>
 					</View>
 				</View>
 
 			</View>
 		);
 	}
-
+	getTotalSales (){
+		if( this.props.salesData.totalSales ){
+			return this.props.salesData.totalSales.toFixed(2);
+		}else{
+			return 0;
+		}
+	}
 	getRow = (item)=>{
 		console.log("SalesReport - getRow");
 		return (
@@ -144,7 +150,7 @@ class SalesReport extends Component {
 					<Text style={[styles.rowItem]}>{item.pricePerSku}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.rowItem]}>{item.totalSales}</Text>
+					<Text style={[styles.rowItem]}>{item.totalSales.toFixed(2)}</Text>
 				</View>
 			</View>
 		);
