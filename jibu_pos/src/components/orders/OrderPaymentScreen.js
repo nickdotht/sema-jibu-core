@@ -87,7 +87,7 @@ class OrderPaymentScreen extends Component {
 	}
 	componentDidMount() {
 		console.log("OrderPaymentScreen = Mounted");
-		this.updatePayment(0);
+		this.updatePayment(0, this.calculateOrderDue().toString());
 
 	}
 
@@ -112,7 +112,7 @@ class OrderPaymentScreen extends Component {
 						checkBox = {this.state.isCash}
 						checkBoxChange = {this.checkBoxChangeCash.bind(this)}
 						checkBoxLabel = {'Cash'}
-						value = {this.props.payment.cash.toString()}
+						value = {this.props.payment.cashToDisplay}
 						valueChange = {this.valuePaymentChange} />
 					{this.getCreditComponent()}
 					<PaymentMethod
@@ -121,11 +121,11 @@ class OrderPaymentScreen extends Component {
 						checkBox = {this.state.isMobile}
 						checkBoxChange = {this.checkBoxChangeMobile.bind(this)}
 						checkBoxLabel = {'Mobile'}
-						value = {this.props.payment.mobile.toString()}
+						value = {this.props.payment.mobileToDisplay}
 						valueChange = {this.valuePaymentChange}/>
-					<PaymentDescription title = "Sale Amount Due:" total={this.calculateOrderDue()}/>
-					<PaymentDescription title = "Previous Amount Due:" total={this.calculateAmountDue()}/>
-					<PaymentDescription title = "Total Amount Due:" total={this.calculateTotalDue()}/>
+					<PaymentDescription title = "Sale Amount Due:" total={this._formatCurrency( this.calculateOrderDue())}/>
+					<PaymentDescription title = "Previous Amount Due:" total={this._formatCurrency( this.calculateAmountDue())}/>
+					<PaymentDescription title = "Total Amount Due:" total={this._formatCurrency( this.calculateTotalDue())}/>
 					<View style={styles.completeOrder}>
 						<View style={{justifyContent:'center', height:80}}>
 							<TouchableHighlight underlayColor = '#c0c0c0'
@@ -155,13 +155,22 @@ class OrderPaymentScreen extends Component {
 					checkBox = {this.state.isCredit}
 					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
 					checkBoxLabel = {'Credit'}
-					value = {this._roundToFloat(this.props.payment.credit)} />
+					value = {this._formatCurrency(this.props.payment.credit)} />
 			)
 		}else{
 			return null;
 		}
 	}
-	_roundToFloat( value ){
+	_formatCurrency( value ){
+		value =  parseFloat(value.toFixed(2));
+		var formatter = new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'UGX',
+			minimumFractionDigits: 2,
+		});
+		return formatter.format( value );
+	}
+	_roundToDecimal( value ){
 		return parseFloat(value.toFixed(2));
 
 	}
@@ -177,7 +186,7 @@ class OrderPaymentScreen extends Component {
 	}
 
 	calculateTotalDue(){
-		return this._roundToFloat((this.calculateOrderDue() + this.calculateAmountDue()));
+		return this._roundToDecimal((this.calculateOrderDue() + this.calculateAmountDue()));
 	}
 
 	onCompleteOrder = ()=>{
@@ -217,39 +226,46 @@ class OrderPaymentScreen extends Component {
 
 	checkBoxChangeCash=()=>{
 		this.setState({isCash:!this.state.isCash} );
-		this.setState({isMobile:!this.state.isMobile},function(){this.updatePayment(0)});
+		this.setState({isMobile:!this.state.isMobile},function(){this.updatePayment(0, this.calculateOrderDue().toString())});
 
 	};
 	valuePaymentChange=(textValue)=>{
-		let cashValue = parseFloat( textValue);
-		if( isNaN(cashValue)){
-			cashValue = 0;
+		if(! textValue.endsWith('.')) {
+			let cashValue = parseFloat(textValue);
+			if (isNaN(cashValue)) {
+				cashValue = 0;
+			}
+			if (cashValue > this.calculateOrderDue()) {
+				cashValue = this.calculateOrderDue();
+			}
+			let credit = this._roundToDecimal(this.calculateOrderDue() - cashValue);
+			this.updatePayment(credit,textValue );
+		}else{
+			this.updatePayment(this.calculateOrderDue() - parseFloat(textValue), textValue );
 		}
-		if( cashValue > this.calculateOrderDue()){
-			cashValue = this.calculateOrderDue();
-		}
-		this.updatePayment( this.calculateOrderDue() - cashValue);
 	};
 
 
 	checkBoxChangeCredit=()=>{
-		this.setState({isCredit:!this.state.isCredit},function(){this.updatePayment(0)} );
+		this.setState({isCredit:!this.state.isCredit},function(){this.updatePayment(0, this.calculateOrderDue().toString())} );
 	};
 
 	checkBoxChangeMobile=()=> {
-		this.setState({isMobile:!this.state.isMobile} , function(){this.updatePayment(0)});
+		this.setState({isMobile:!this.state.isMobile} , function(){this.updatePayment(0, this.calculateOrderDue().toString())});
 		this.setState({isCash:!this.state.isCash} );
 	};
 
-	updatePayment=( credit)=> {
+	updatePayment=( credit, textToDisplay)=> {
 		let payment = {
 			cash: this.calculateOrderDue()-credit,
+			cashToDisplay: textToDisplay,
 			credit: credit,
 			mobile: 0
 		};
 		if (this.state.isMobile) {
 			payment = {
 				mobile: this.calculateOrderDue()-credit,
+				mobileToDisplay: textToDisplay,
 				credit: credit,
 				cash: 0
 			};
@@ -313,7 +329,7 @@ class OrderPaymentScreen extends Component {
 		let cogsTotal = 0;
 		receipt.products = this.props.products.map( product => {
 			let receiptLineItem = {};
-			receiptLineItem.priceTotal = this.getItemPrice( product.product ) * product.quantity;	// TODO Pricing is incorrect
+			receiptLineItem.priceTotal = this.getItemPrice( product.product ) * product.quantity;
 			receiptLineItem.quantity = product.quantity;
 			receiptLineItem.productId = product.product.productId;
 			receiptLineItem.cogsTotal = this.getItemCogs( product.product ) * product.quantity;
