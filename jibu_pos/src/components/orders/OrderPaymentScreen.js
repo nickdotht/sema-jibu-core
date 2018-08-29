@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, CheckBox, Text, Image, TouchableHighlight, TextInput, StyleSheet, Modal } from "react-native";
+import { View, CheckBox, Text, Image, TouchableHighlight, TextInput, StyleSheet, Modal, Alert } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {connect} from "react-redux";
@@ -77,7 +77,7 @@ class PaymentMethod extends Component{
 class OrderPaymentScreen extends Component {
 	constructor(props) {
 		super(props);
-
+		this.saleSuccess = false;
 		this.state = {
 			isCash: true,
 			isCredit: false,
@@ -286,16 +286,35 @@ class OrderPaymentScreen extends Component {
 
 	closeHandler= ()=>{
 		this.setState( {isCompleteOrderVisible:false} );
-		this.props.customerBarActions.ShowHideCustomers(1);
+		if( this.saleSuccess) {
+			this.props.customerBarActions.ShowHideCustomers(1);
+		}else{
+			Alert.alert(
+				"Invalid payment amount. ",
+				'The amount paid cannot exceed to cost of goods and customer credit',
+				[
+					{ text: 'OK', onPress: () => console.log('OK Pressed') },
+				],
+				{ cancelable: false }
+			);
+
+		}
 	};
 
 	ShowCompleteOrder = () =>{
 		let that = this;
 		if( this.state.isCompleteOrderVisible ) {
-			this.formatAndSaveSale()
-			setTimeout(() => {
-				that.closeHandler()
-			}, 500);
+			if( this.formatAndSaveSale() ) {
+				this.saleSuccess = true;
+				setTimeout(() => {
+					that.closeHandler()
+				}, 500);
+			}else{
+				this.saleSuccess = false;
+				setTimeout(() => {
+					that.closeHandler()
+				}, 1);
+			}
 		}
 		return (
 			<View style={{
@@ -358,6 +377,29 @@ class OrderPaymentScreen extends Component {
 		});
 		receipt.total = priceTotal;
 		receipt.cogs = cogsTotal;
+
+		// Check loan payoff
+		let payoff = 0;
+		try{
+			if( this.props.payment.hasOwnProperty("cashToDisplay")){
+				payoff = parseFloat(this.props.payment.cashToDisplay);
+			}else if( this.props.payment.hasOwnProperty("mobileToDisplay")){
+				payoff = parseFloat(this.props.payment.mobileToDisplay);
+			}
+			if( payoff > priceTotal ){
+				// User is paying of loan amount
+				payoff -= priceTotal;
+				if( payoff > this.props.selectedCustomer.dueAmount){
+					// Overpayment... this is an error
+					return false;
+				}
+			}else{
+				payoff = 0;
+			}
+		}catch(err){
+
+		}
+
 		PosStorage.addSale(receipt);
 
 		// Update dueAmount if required
@@ -369,7 +411,17 @@ class OrderPaymentScreen extends Component {
 				this.props.selectedCustomer.name,
 				this.props.selectedCustomer.address,
 				this.props.selectedCustomer.salesChannelId);
+		}else if( payoff > 0 ){
+			this.props.selectedCustomer.dueAmount -= payoff;
+			PosStorage.updateCustomer(
+				this.props.selectedCustomer,
+				this.props.selectedCustomer.phoneNumber,
+				this.props.selectedCustomer.name,
+				this.props.selectedCustomer.address,
+				this.props.selectedCustomer.salesChannelId);
+
 		}
+		return true;
 	}
 }
 

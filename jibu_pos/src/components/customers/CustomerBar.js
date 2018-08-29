@@ -117,7 +117,23 @@ class CustomerBar extends Component {
 						this.props.selectedCustomer.hasOwnProperty('name') &&
 						! this._isAnonymousCustomer(this.props.selectedCustomer)}
 				/>
+				{this.showSearchTool()}
+				<View style = {{flexDirection:'row-reverse',flex:1,alignItems:'center'}}>
+					<SelectedCustomerDetails selectedCustomer = {this.props.selectedCustomer}/>
+				</View>
+			</View>
+		);
+	}
 
+	onTextChange = (searchText) =>{
+		console.log( searchText );
+		this.props.customerActions.SearchCustomers( searchText);
+		console.log( "onTextChange ---" + this.props.customers.length);
+
+	};
+	showSearchTool(){
+		if( this.props.showView.showCustomers ){
+			return (
 				<TextInput
 					// Adding hint in Text Input using Place holder.
 					placeholder="Search by Name or Telephone"
@@ -127,16 +143,13 @@ class CustomerBar extends Component {
 					onChangeText = {this.onTextChange}
 					value={this.props.searchString}
 					style={ [styles.SearchInput]}/>
-				<SelectedCustomerDetails selectedCustomer = {this.props.selectedCustomer}/>
-			</View>
-		);
-	}
-	onTextChange = (searchText) =>{
-		console.log( searchText );
-		this.props.customerActions.SearchCustomers( searchText);
-		console.log( "onTextChange ---" + this.props.customers.length);
 
-	};
+			);
+		}else{
+			return null;
+		}
+	}
+
 
 	onDelete = ()=>{
 		if(this.state.deleteFunction &&
