@@ -114,6 +114,12 @@ function fetchCustomerItem( params, options ) {
 		if(options.hasOwnProperty("distanceGT") ){
 			url = url + "&distance-gt=" + options.distanceGT;
 		}
+		if( params.hasOwnProperty("startDate") ){
+			url = url + "&begin-date=" + params.startDate.toISOString();
+		}
+		if( params.hasOwnProperty("endDate") ){
+			url = url + "&end-date=" + params.endDate.toISOString();
+		}
 
 		axiosService
 			.get(url)

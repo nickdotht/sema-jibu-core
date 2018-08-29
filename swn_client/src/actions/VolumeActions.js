@@ -95,6 +95,12 @@ function fetchVolumeItem( params, type, options ) {
 		if(options.hasOwnProperty("customerType") ){
 			url = url + "&customer-type=" + options.customerType;
 		}
+		if( params.hasOwnProperty("startDate") ){
+			url = url + "&begin-date=" + params.startDate.toISOString();
+		}
+		if( params.hasOwnProperty("endDate") ){
+			url = url + "&end-date=" + params.endDate.toISOString();
+		}
 		axiosService
 			.get(url)
 			.then(response => {

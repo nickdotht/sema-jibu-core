@@ -15,11 +15,29 @@ import { withRouter } from 'react-router'
 
 const menuStyle = {};
 
-const dateMenu = {
-	1: {key:1, title:"Year to date"},
-	2: {key:2, title:"This month"},
-	3: {key:3, title:"all"}
+const setYTD = (toolbar)=>{
+	toolbar.endDate = new Date(Date.now());
+	toolbar.startDate = new Date( toolbar.endDate.getFullYear(), 0, 1 );
+
 };
+
+const setThisMonth = (toolbar)=>{
+	toolbar.endDate = new Date(Date.now());
+	toolbar.startDate = new Date( toolbar.endDate.getFullYear(), toolbar.endDate.getMonth(), 1 );
+};
+
+const setAll = (toolbar)=>{
+	toolbar.startDate = new Date(1973, 0, 1);
+	toolbar.endDate =new Date(Date.now());
+};
+
+const dateMenu = {
+	1: {key:1, title:"Year to date", setStartEndDate:setYTD},
+	2: {key:2, title:"This month", setStartEndDate:setThisMonth},
+	3: {key:3, title:"all", setStartEndDate:setAll}
+};
+
+
 const LabelStyleLeft = {
 	float:"left",
 	background:"none",
@@ -46,6 +64,7 @@ class SeamaToolbar extends Component {
 		this.logOut = this.logOut.bind(this);
 		this.dateSelector = dateMenu[1];
 		this.dateKey = 1;
+		this.dateSelector.setStartEndDate( this );
 		this.state = {
 			kiosks: "--Regions--"
 		};
@@ -78,18 +97,7 @@ class SeamaToolbar extends Component {
 
 		if(kioskParams.kioskID !== previousKioskID) {
 			this.props.kioskActions.selectKiosk(kioskParams);
-			this.props.volume.loaded = false;
-			this.props.customer.loaded = false;
-			switch (this.props.location.pathname) {
-				case "/":
-					this.props.volumeActions.fetchVolume(kioskParams);
-					break;
-				case "/Demographics":
-					this.props.customerActions.fetchCustomer(kioskParams);
-					break;
-				default:
-					console.log("Not implemented:", this.props.location.pathname);
-			}
+			this.loadActivePage(kioskParams );
 		}
 	};
 
@@ -98,9 +106,38 @@ class SeamaToolbar extends Component {
 		if( this.dateKey != eventKey){
 			this.dateKey = eventKey
 			this.dateSelector = dateMenu[eventKey];
+			this.dateSelector.setStartEndDate( this );
+			this.loadActivePage(null );
 		}
 	}
 
+	loadActivePage(kioskParams ){
+		let params = {};
+		if( kioskParams === null ){
+			if( this.props.kiosk.selectedKiosk === null ){
+				return;	// TODO - Shouldn't get here
+			}
+			params.kioskID = this.props.kiosk.selectedKiosk.kioskID;
+		}else{
+			params.kioskID = kioskParams.kioskID;
+		}
+		params.startDate = this.startDate;
+		params.endDate = this.endDate;
+		console.log("--------------------PARAMS "+ JSON.stringify(params));
+		this.props.volume.loaded = false;
+		this.props.customer.loaded = false;
+		switch (this.props.location.pathname) {
+			case "/":
+				this.props.volumeActions.fetchVolume(params);
+				break;
+			case "/Demographics":
+				this.props.customerActions.fetchCustomer(params);
+				break;
+			default:
+				console.log("Not implemented:", this.props.location.pathname);
+		}
+
+	}
 	buildKioskMenuItems(){
 		let menuItems = [];
 		if( this.props.kiosk.kiosks){
