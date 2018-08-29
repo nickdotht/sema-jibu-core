@@ -145,22 +145,34 @@ class CustomerBar extends Component {
 
 			console.log("CustomerBar:onDelete");
 			let alertMessage = "Delete  customer " + this.props.selectedCustomer.name;
-			Alert.alert(
-				alertMessage,
-				'Are you sure you want to delete this customer?',
-				[
-					{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-					{
-						text: 'OK', onPress: () => {
-							PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
-							this.props.customerActions.CustomerSelected({});		// Clear selected customer
-							this.props.customerActions.setCustomers(PosStorage.getCustomers());
+			if (this.props.selectedCustomer.dueAmount === 0) {
+				Alert.alert(
+					alertMessage,
+					'Are you sure you want to delete this customer?',
+					[
+						{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+						{
+							text: 'OK', onPress: () => {
+								PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
+								this.props.customerActions.CustomerSelected({});		// Clear selected customer
+								this.props.customerActions.setCustomers(PosStorage.getCustomers());
 
-						}
-					},
-				],
-				{ cancelable: false }
-			);
+							}
+						},
+					],
+					{ cancelable: false }
+				);
+			}else{
+				Alert.alert(
+					"Customer '" + this.props.selectedCustomer.name + "' has an outstanding credit and cannot be deleted",
+					'',
+					[
+						{ text: 'OK', onPress: () => console.log('OK Pressed') },
+					],
+					{ cancelable: true }
+				);
+
+			}
 		}
 	};
 	onEdit = ()=>{

@@ -114,7 +114,7 @@ class SalesReport extends Component {
 					<View style = {{flex: 1, flexDirection: 'row'}}>
 						<Text style={[styles.totalItem, {flex:1.7}]}> </Text>
 						<Text style={[styles.totalItem, {flex:.9}]}>Total Liters </Text>
-						<Text style={[styles.totalItem, {flex:.6}]}>{this.props.salesData.totalLiters}</Text>
+						<Text style={[styles.totalItem, {flex:.6}]}>{this.getTotalLiters()}</Text>
 						<Text style={[styles.totalItem, {flex:.7}]}>Total Sales </Text>
 						<Text style={[styles.totalItem, {flex:.5}]}>{this.getTotalSales()}</Text>
 					</View>
@@ -130,6 +130,15 @@ class SalesReport extends Component {
 			return 0;
 		}
 	}
+
+	getTotalLiters(){
+		if( this.props.salesData.totalLiters ){
+			return this.props.salesData.totalLiters.toFixed(2);
+		}else{
+			return 0;
+		}
+
+	}
 	getRow = (item)=>{
 		console.log("SalesReport - getRow");
 		return (
@@ -144,7 +153,7 @@ class SalesReport extends Component {
 					<Text style={[styles.rowItem]}>{item.litersPerSku}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.rowItem]}>{item.totalLiters}</Text>
+					<Text style={[styles.rowItem]}>{item.totalLiters.toFixed(2)}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
 					<Text style={[styles.rowItem]}>{item.pricePerSku}</Text>
