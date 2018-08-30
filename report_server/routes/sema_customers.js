@@ -26,19 +26,19 @@ const sqlBeginEndDate = "SELECT * " +
 	"AND created_at BETWEEN ? AND ?";
 const sqlUpdatedDate = "SELECT * " +
 	"FROM customer_account " +
-	"WHERE kiosk_id = ? AND active = b'1'" +
+	"WHERE kiosk_id = ? " +
 	"AND updated_at > ?";
 
 const sqlDeleteCustomers = "DELETE FROM customer_account WHERE id = ?";
 const sqlGetCustomerById = "SELECT * FROM customer_account WHERE id = ?";
 
 const sqlInsertCustomer = "INSERT INTO customer_account " +
-	"(id, created_at, updated_at, name, customer_type_id, sales_channel_id, kiosk_id, " +
+	"(id, created_at, name, customer_type_id, sales_channel_id, kiosk_id, " +
 	"due_amount, address_line1, gps_coordinates, phone_number ) " +
-	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 const sqlUpdateCustomers = 	"UPDATE customer_account " +
-	"SET updated_at = ?, name = ?, sales_channel_id = ?, " +
+	"SET name = ?, sales_channel_id = ?, " +
 		"due_amount = ?, address_line1 = ?, gps_coordinates = ?, " +
 		"phone_number = ?, active = ? " +
 	"WHERE id = ?";
@@ -64,8 +64,8 @@ router.put('/:id', async (req, res) => {
 				customer.databaseToClass(result[0]);
 				customer.updateClass(req.body );
 
-
-				let customerParams = [ getUTCDate(customer.updatedDate), customer.name, customer.salesChannelId,
+				// Note - Don't set the updated date... JIRA XXXX
+				let customerParams = [ customer.name, customer.salesChannelId,
 				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber ];
 
 				// Active is set via a 'bit;
@@ -228,7 +228,7 @@ router.post('/', async (req, res) => {
 			"due_amount, address_line1, gps_coordinates, phone_number ) " +
 			"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-			let postSqlParams = [customer.customerId, getUTCDate(customer.createdDate), getUTCDate(customer.updatedDate),
+			let postSqlParams = [customer.customerId, getUTCDate(customer.createdDate),
 				customer.name, customer.customerTypeId, customer.salesChannelId, customer.siteId,
 				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber ];
 
