@@ -237,7 +237,7 @@ class OrderPaymentScreen extends Component {
 
 	checkBoxChangeCash=()=>{
 		this.setState({isCash:!this.state.isCash} );
-		this.setState({isMobile:!this.state.isMobile},function(){this.updatePayment(0, this.calculateOrderDue().toString())});
+		this.setState({isMobile:!this.state.isMobile},function(){this.updatePayment(0, this.calculateOrderDue().toFixed(2))});
 
 	};
 	valuePaymentChange=(textValue)=>{
@@ -258,11 +258,11 @@ class OrderPaymentScreen extends Component {
 
 
 	checkBoxChangeCredit=()=>{
-		this.setState({isCredit:!this.state.isCredit},function(){this.updatePayment(0, this.calculateOrderDue().toString())} );
+		this.setState({isCredit:!this.state.isCredit},function(){this.updatePayment(0, this.calculateOrderDue().toFixed(2))} );
 	};
 
 	checkBoxChangeMobile=()=> {
-		this.setState({isMobile:!this.state.isMobile} , function(){this.updatePayment(0, this.calculateOrderDue().toString())});
+		this.setState({isMobile:!this.state.isMobile} , function(){this.updatePayment(0, this.calculateOrderDue().toFixed(2))});
 		this.setState({isCash:!this.state.isCash} );
 	};
 

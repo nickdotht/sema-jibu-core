@@ -1,6 +1,8 @@
 import PosStorage from "../database/PosStorage";
+import { REMOVE_PRODUCT } from "./OrderActions";
 
 export const SALES_REPORT_FROM_ORDERS = 'SALES_REPORT_FROM_ORDERS';
+export const REPORT_TYPE = 'REPORT_TYPE';
 
 
 export function GetSalesReportData( beginDate, endDate ) {
@@ -18,6 +20,12 @@ export function GetSalesReportData( beginDate, endDate ) {
 		}
 
 }
+
+export function setReportType( reportType ) {
+	console.log("setReportType - action");
+	return (dispatch) => { dispatch({type: REPORT_TYPE, data:reportType}); }
+}
+
 
 const getSalesData = (beginDate, endDate) =>{
 	return new Promise((resolve, reject) => {
@@ -67,6 +75,8 @@ const getSalesData = (beginDate, endDate) =>{
 					if( totalLiters === 0 ){
 						totalLiters = "N/A";
 					}
+					salesItems = salesItems.concat(salesItems);
+					salesItems = salesItems.concat(salesItems);
 					resolve({totalLiters: totalLiters, totalSales: totalSales, salesItems:salesItems});
 
 				}

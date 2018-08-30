@@ -3,85 +3,8 @@ import { Text, View, StyleSheet, FlatList, Image, TouchableHighlight } from 'rea
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as reportActions from "../../actions/ReportActions";
+import DateFilter from "./DateFilter";
 
-const dayInMilliseconds =  24*60*60*1000;
-
-class DateFilter extends Component {
-	constructor(props) {
-		super(props);
-		let currentDate = new Date();
-		this.state = {currentDate :new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() )};
-		this.maxDate = new Date( this.state.currentDate.getTime() + dayInMilliseconds );
-		this.minDate = new Date( this.maxDate.getTime() - 30 * dayInMilliseconds );
-		this.props.parent.setFilterRange( this.state.currentDate, new Date( this.state.currentDate.getTime() + dayInMilliseconds) );
-		console.log( "DateFilter - maxDate = " + this.maxDate.toString());
-		console.log( "DateFilter - minDate = " + this.minDate.toString());
-
-
-	}
-	render() {
-		return (
-			<View style={styles.filterContainer}>
-				<View style={styles.filterItemContainer}>
-					<Text style={{fontSize:20}}>Daily Data</Text>
-				</View>
-				<View style={styles.filterItemContainer}>
-					{this.getPreviousButton()}
-				</View>
-				<View style={styles.filterItemContainer}>
-					<Text style={{fontSize:20}}>{this.state.currentDate.toDateString()}</Text>
-				</View>
-				<View style={styles.filterItemContainer}>
-					{this.getNextButton()}
-				</View>
-			</View>
-		)
-	}
-	getPreviousButton(){
-		const prevDate = new Date( this.state.currentDate.getTime() - dayInMilliseconds );
-		if( prevDate > this.minDate){
-			return (
-				<TouchableHighlight onPress={() => this.onPreviousDay()}>
-					<Image source={require('../../images/left-arrow.png')} style={styles.filterImage}/>
-				</TouchableHighlight>
-			)
-		}else{
-			return (
-				<Image source={require('../../images/left-arrow.png')} style={[styles.filterImage, {opacity:.4 }]}/>
-			);
-		}
-	}
-	getNextButton(){
-		const nextDate = new Date( this.state.currentDate.getTime() + dayInMilliseconds );
-		if( nextDate < this.maxDate){
-			return (
-				<TouchableHighlight onPress={() => this.onNextDay()}>
-					<Image source={require('../../images/right-arrow.png')} style={styles.filterImage}/>
-				</TouchableHighlight>
-			)
-		}else{
-			return (
-				<Image source={require('../../images/right-arrow.png')} style={[styles.filterImage, {opacity:.4 }]}/>
-			);
-		}
-	}
-
-
-	onPreviousDay(){
-		this.setState({currentDate:new Date(this.state.currentDate.getTime() - dayInMilliseconds) }, () => this.update());
-	}
-	onNextDay(){
-		this.setState({currentDate:new Date(this.state.currentDate.getTime() + dayInMilliseconds) }, () => this.update());
-	}
-
-	update(){
-		const beginDate = this.state.currentDate;
-		const endDate = new Date( beginDate.getTime() + dayInMilliseconds );
-		this.props.parent.setFilterRange( this.state.currentDate, new Date( this.state.currentDate.getTime() + dayInMilliseconds) );
-		this.props.parent.updateReport();
-		console.log( "Filter-From " + beginDate.toDateString() + " to " + endDate.toDateString());
-	}
-}
 class SalesReport extends Component {
 	constructor(props) {
 		super(props);
@@ -93,35 +16,50 @@ class SalesReport extends Component {
 		this.props.reportActions.GetSalesReportData( this.beginDate, this.endDate);
 	}
 	render() {
-		return (
-			<View style ={{flex:1}}>
-				<DateFilter parent = {this}/>
-				<View style = {{flex:.7, backgroundColor:'white', marginLeft:30, marginRight:30, marginTop:40, }}>
-					<FlatList
-						data={this.props.salesData.salesItems}
-						ListHeaderComponent = {this.showHeader}
-						// extraData={this.state.refresh}
-						renderItem={({item, index, separators}) => (
-							<View >
-								{this.getRow(item, index, separators)}
+		if( this.props.reportType === "sales") {
+			return (
+				<View style={{ flex: 1 }}>
+					<DateFilter parent={this}/>
+					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 40, }}>
+						<View style = {styles.titleText}>
+							<View style = {styles.leftHeader}>
+								<Text style = {styles.titleItem}>Sales</Text>
 							</View>
-						)}
-						keyExtractor={item => item.sku}
-						initialNumToRender={50}
-					/>
-				</View>
-				<View style = {{flex:.3, backgroundColor:'white', marginLeft:30, marginRight:30, marginBottom:100, }}>
-					<View style = {{flex: 1, flexDirection: 'row'}}>
-						<Text style={[styles.totalItem, {flex:1.7}]}> </Text>
-						<Text style={[styles.totalItem, {flex:.9}]}>Total Liters </Text>
-						<Text style={[styles.totalItem, {flex:.6}]}>{this.getTotalLiters()}</Text>
-						<Text style={[styles.totalItem, {flex:.7}]}>Total Sales </Text>
-						<Text style={[styles.totalItem, {flex:.5}]}>{this.getTotalSales()}</Text>
+						</View>
+						<FlatList
+							data={this.props.salesData.salesItems}
+							ListHeaderComponent={this.showHeader}
+							// extraData={this.state.refresh}
+							renderItem={({ item, index, separators }) => (
+								<View>
+									{this.getRow(item, index, separators)}
+								</View>
+							)}
+							keyExtractor={item => item.sku}
+							initialNumToRender={50}
+						/>
 					</View>
-				</View>
+					<View style={{
+						flex: .3,
+						backgroundColor: 'white',
+						marginLeft: 10,
+						marginRight: 10,
+						marginBottom: 100,
+					}}>
+						<View style={{ flex: 1, flexDirection: 'row' }}>
+							<Text style={[styles.totalItem, { flex: 1.7 }]}> </Text>
+							<Text style={[styles.totalItem, { flex: .9 }]}>Total Liters </Text>
+							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalLiters()}</Text>
+							<Text style={[styles.totalItem, { flex: .7 }]}>Total Sales </Text>
+							<Text style={[styles.totalItem, { flex: .5 }]}>{this.getTotalSales()}</Text>
+						</View>
+					</View>
 
-			</View>
-		);
+				</View>
+			);
+		}else{
+			return null;
+		}
 	}
 	getTotalSales (){
 		if( this.props.salesData.totalSales ){
@@ -198,8 +136,8 @@ class SalesReport extends Component {
 }
 
 function mapStateToProps(state, props) {
-	return {
-		salesData: state.reportReducer.salesData
+	return { salesData: state.reportReducer.salesData,
+			 reportType: state.reportReducer.reportType
 	};
 }
 
@@ -237,21 +175,22 @@ const styles = StyleSheet.create({
 		fontSize:18,
 		paddingLeft:10,
 	},
-	filterContainer:{
-		flex: .15,
+	titleItem:{
+		fontWeight:"bold",
+		fontSize:24
+	},
+	titleText: {
 		backgroundColor: 'white',
-		marginLeft: 30,
-		marginTop: 20,
+		height: 56,
 		flexDirection:'row',
-		width:500
+
 	},
-	filterItemContainer:{
-		justifyContent:"center",
-		paddingLeft:20
+
+	leftHeader: {
+		flexDirection:'row',
+		flex:1,
+		alignItems:'center'
+
 	},
-	filterImage:{
-		width: 30,
-		height: 30
-	}
 
 });

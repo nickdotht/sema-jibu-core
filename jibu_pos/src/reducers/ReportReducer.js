@@ -1,7 +1,7 @@
 
-import { SALES_REPORT_FROM_ORDERS } from "../actions/ReportActions"
+import { SALES_REPORT_FROM_ORDERS, REPORT_TYPE } from "../actions/ReportActions"
 
-let initialState = {salesData:[]};
+let initialState = {salesData:[], reportType:"sales"};
 
 const reportReducer = (state = initialState, action) => {
 	console.log("reportReducer: " +action.type);
@@ -12,6 +12,10 @@ const reportReducer = (state = initialState, action) => {
 			newState.salesData = action.data.salesData ;
 			return newState;
 
+		case REPORT_TYPE:
+			newState = {...state};
+			newState.reportType = action.data ;
+			return newState;
 
 		default:
 			return state;
