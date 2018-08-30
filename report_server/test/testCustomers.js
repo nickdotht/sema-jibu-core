@@ -270,7 +270,7 @@ describe('Testing Customers API', function () {
 	});
 
 	describe('GET /sema/site/customers - Updated after 2018-3-1', function() {
-		it('Should return 3 customers updated after 2018-3-1', (done) => {
+		it('Should return 4 customers updated after 2018-3-1', (done) => {
 			authenticate(server).then(function(token) {
 				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
 					let url = "/sema/site/customers?site-id=%d&updated-date=%s";
@@ -282,11 +282,10 @@ describe('Testing Customers API', function () {
 						.end(function(err, res) {
 							res.should.have.status(200);
 							expect(res.body.customers).to.be.an('array');
-							expect(res.body.customers.length).to.be.equal(3);
+							expect(res.body.customers.length).to.be.equal(4);
 							res.body.customers[0].should.have.property("customerId");
-							res.body.customers[0].should.have.property("name").eql("TestCustomer 4");
+							res.body.customers[0].should.have.property("name").eql("TestCustomer 1");
 							res.body.customers[0].should.have.property("dueAmount").eql(0);
-							res.body.customers[0].should.have.property("updatedDate").eql("2018-04-01T07:00:00.000Z");
 							done(err);
 						});
 				});
@@ -295,7 +294,7 @@ describe('Testing Customers API', function () {
 	});
 
 	describe('GET /sema/site/customers - Updated Date: 2018-4-28', function() {
-		it('Should return info on 1 customers updated after 2018-4-28', (done) => {
+		it('Should return info on 2 customers updated after 2018-4-28', (done) => {
 			authenticate(server).then(function(token) {
 				findKioskId.findKioskId(server, token, 'UnitTestCustomers').then(function(kiosk) {
 					let url = "/sema/site/customers?site-id=%d&updated-date=%s";
@@ -307,14 +306,13 @@ describe('Testing Customers API', function () {
 						.end(function(err, res) {
 							res.should.have.status(200);
 							expect(res.body.customers).to.be.an('array');
-							expect(res.body.customers.length).to.be.equal(1);
-							expect(res.body.customers[0].active).to.be.equal(true);
-							expect(res.body.customers[0].name).to.be.equal("TestCustomer 6");
-							expect(res.body.customers[0].createdDate).to.be.equal("2018-05-01T07:00:00.000Z");
-							expect(res.body.customers[0].updatedDate).to.be.equal("2018-05-01T07:00:00.000Z");
-							expect(res.body.customers[0].dueAmount).to.be.equal(0);
-							expect(res.body.customers[0].address).to.be.equal("test_address");
-							expect(res.body.customers[0].gpsCoordinates).to.be.equal("gps");
+							expect(res.body.customers.length).to.be.equal(2);
+							expect(res.body.customers[1].active).to.be.equal(true);
+							expect(res.body.customers[1].name).to.be.equal("TestCustomer 6");
+							expect(res.body.customers[1].createdDate).to.be.equal("2018-05-01T07:00:00.000Z");
+							expect(res.body.customers[1].dueAmount).to.be.equal(0);
+							expect(res.body.customers[1].address).to.be.equal("test_address");
+							expect(res.body.customers[1].gpsCoordinates).to.be.equal("gps");
 
 
 							done(err);
