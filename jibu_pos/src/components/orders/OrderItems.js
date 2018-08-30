@@ -80,7 +80,7 @@ class OrderItems extends Component {
 					<Text style={[styles.baseItem]}>{item.quantity}</Text>
 				</View>
 				<View style={ [ {flex: 1}]}>
-					<Text style={[styles.baseItem]}>{(item.quantity * this.getItemPrice( item.product))}</Text>
+					<Text style={[styles.baseItem]}>{(item.quantity * this.getItemPrice( item.product)).toFixed(2)}</Text>
 				</View>
 			</View>
 		);

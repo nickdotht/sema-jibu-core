@@ -35,9 +35,7 @@ class Toolbar extends Component {
 					<TouchableHighlight onPress={() => this.onSettings()}>
 						<Image source={require('../images/gear-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
 					</TouchableHighlight>
-					<TouchableHighlight onPress={() => this.onLogout()}>
-						<Text style = {[styles.text_style,{marginRight:20}]}>Logout</Text>
-					</TouchableHighlight>
+					{this.getLogoutUI()}
 					<Text style = {[styles.text_style,{marginRight:20} ]}>{this.props.settings.user}</Text>
 					<TouchableHighlight onPress={() => this.onShowRemoteReport()}>
 						{this.getReportOrMainImage()}
@@ -46,6 +44,19 @@ class Toolbar extends Component {
 			</View>
         );
     }
+
+    getLogoutUI(){
+		if( this.props.showScreen.screenToShow !== "settings" ){
+			return(
+				<TouchableHighlight onPress={() => this.onLogout()}>
+					<Text style = {[styles.text_style,{marginRight:20}]}>Logout</Text>
+				</TouchableHighlight>
+
+			)
+		}else{
+			return null;
+		}
+	}
     getNetworkState  = () =>{
     	return this.props.network.isNWConnected ? "ONLINE" : "OFFLINE";
 	};

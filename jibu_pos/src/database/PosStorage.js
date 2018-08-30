@@ -349,13 +349,37 @@ class PosStorage {
 			let customerKey = this.makeCustomerKey(customer);
 			let keyIndex = this.customersKeys.indexOf(customerKey);
 			if( keyIndex === -1 ){
-				isNewCustomers = true;
-				this.customersKeys.push(customerKey );
-				this.customers.push(customer);
-				this.setKey( customerKey,this.stringify(customer));
+				if( customer.active ) {
+					isNewCustomers = true;
+					this.customersKeys.push(customerKey);
+					this.customers.push(customer);
+					this.setKey(customerKey, this.stringify(customer));
+				}
 			}else{
-				this.setKey( customerKey,this.stringify(customer));		// Just update the existing customer
-				this.setLocalCustomer(customer)
+				if( customer.active ) {
+					this.setKey(customerKey, this.stringify(customer));		// Just update the existing customer
+					this.setLocalCustomer(customer);
+				}else{
+					// Remove an inactivated customer
+					let index = this.getLocalCustomerIndex( customer.customerId);
+					if (index > -1) {
+						this.customers.splice(index, 1);
+						index = this.customersKeys.indexOf(customerKey);
+						if (index > -1) {
+							this.customersKeys.splice(index, 1);
+						}
+						let keyArray = [
+							[customersKey,  this.stringify(this.customersKeys)],			// Array of customer keys
+							[customerKey, this.stringify(customer) ],						// The customer being deleted
+						];
+						AsyncStorage.multiSet( keyArray).then( error => {
+							if( error ) {
+								console.log("PosStorage:mergeRemoteCustomers: Error: " + error);
+							}
+						});
+					}
+
+				}
 			}
 		}.bind(this));
 		if( isNewCustomers ){
@@ -370,6 +394,14 @@ class PosStorage {
 			}
 		}
 		return null;
+	}
+	getLocalCustomerIndex( customerId ){
+		for( let index = 0; index < this.customers.length; index++ ){
+			if(this.customers[index].customerId ===  customerId){
+				return index;
+			}
+		}
+		return -1;
 	}
 
 	setLocalCustomer( customer ){
@@ -738,7 +770,7 @@ class PosStorage {
 
 	getGetSyncInterval(){
 		if( this.syncInterval == null ){
-			this.syncInterval = {interval: 60 *1000 };
+			this.syncInterval = {interval: 2*60 *1000 };	// Default to 2 minutes
 		}
 		return this.syncInterval.interval;
 	}

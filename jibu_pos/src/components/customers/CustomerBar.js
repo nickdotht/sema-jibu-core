@@ -56,12 +56,20 @@ class SelectedCustomerDetails extends React.Component {
 class CustomerBar extends Component {
 	constructor(props) {
 		super(props);
-
-		this.state = {
-			addFunction: true,
-			orderFunction: true,
-			editFunction: true,
-			deleteFunction: true
+		if( this.props.showView.showCustomers){
+			this.state = {
+				addFunction: true,
+				orderFunction: true,
+				editFunction: true,
+				deleteFunction: true
+			}
+		}else{
+			this.state = {
+				addFunction: false,
+				orderFunction: true,
+				editFunction: false,
+				deleteFunction: false
+			}
 		}
 	}
 	componentDidMount() {
@@ -109,7 +117,23 @@ class CustomerBar extends Component {
 						this.props.selectedCustomer.hasOwnProperty('name') &&
 						! this._isAnonymousCustomer(this.props.selectedCustomer)}
 				/>
+				{this.showSearchTool()}
+				<View style = {{flexDirection:'row-reverse',flex:1,alignItems:'center'}}>
+					<SelectedCustomerDetails selectedCustomer = {this.props.selectedCustomer}/>
+				</View>
+			</View>
+		);
+	}
 
+	onTextChange = (searchText) =>{
+		console.log( searchText );
+		this.props.customerActions.SearchCustomers( searchText);
+		console.log( "onTextChange ---" + this.props.customers.length);
+
+	};
+	showSearchTool(){
+		if( this.props.showView.showCustomers ){
+			return (
 				<TextInput
 					// Adding hint in Text Input using Place holder.
 					placeholder="Search by Name or Telephone"
@@ -119,16 +143,13 @@ class CustomerBar extends Component {
 					onChangeText = {this.onTextChange}
 					value={this.props.searchString}
 					style={ [styles.SearchInput]}/>
-				<SelectedCustomerDetails selectedCustomer = {this.props.selectedCustomer}/>
-			</View>
-		);
-	}
-	onTextChange = (searchText) =>{
-		console.log( searchText );
-		this.props.customerActions.SearchCustomers( searchText);
-		console.log( "onTextChange ---" + this.props.customers.length);
 
-	};
+			);
+		}else{
+			return null;
+		}
+	}
+
 
 	onDelete = ()=>{
 		if(this.state.deleteFunction &&
@@ -137,22 +158,34 @@ class CustomerBar extends Component {
 
 			console.log("CustomerBar:onDelete");
 			let alertMessage = "Delete  customer " + this.props.selectedCustomer.name;
-			Alert.alert(
-				alertMessage,
-				'Are you sure you want to delete this customer?',
-				[
-					{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-					{
-						text: 'OK', onPress: () => {
-							PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
-							this.props.customerActions.CustomerSelected({});		// Clear selected customer
-							this.props.customerActions.setCustomers(PosStorage.getCustomers());
+			if (this.props.selectedCustomer.dueAmount === 0) {
+				Alert.alert(
+					alertMessage,
+					'Are you sure you want to delete this customer?',
+					[
+						{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+						{
+							text: 'OK', onPress: () => {
+								PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
+								this.props.customerActions.CustomerSelected({});		// Clear selected customer
+								this.props.customerActions.setCustomers(PosStorage.getCustomers());
 
-						}
-					},
-				],
-				{ cancelable: false }
-			);
+							}
+						},
+					],
+					{ cancelable: false }
+				);
+			}else{
+				Alert.alert(
+					"Customer '" + this.props.selectedCustomer.name + "' has an outstanding credit and cannot be deleted",
+					'',
+					[
+						{ text: 'OK', onPress: () => console.log('OK Pressed') },
+					],
+					{ cancelable: true }
+				);
+
+			}
 		}
 	};
 	onEdit = ()=>{

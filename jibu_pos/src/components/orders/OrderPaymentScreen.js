@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, CheckBox, Text, Image, TouchableHighlight, TextInput, StyleSheet, Modal } from "react-native";
+import { View, CheckBox, Text, Image, TouchableHighlight, TextInput, StyleSheet, Modal, Alert } from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import {connect} from "react-redux";
@@ -50,6 +50,7 @@ class PaymentMethod extends Component{
 					<TextInput
 						underlineColorAndroid='transparent'
 						onChangeText={this.props.valueChange}
+						keyboardType = 'numeric'
 						value = {this.props.value}
 						style={[styles.cashInput]}/>
 				);
@@ -63,6 +64,7 @@ class PaymentMethod extends Component{
 					<TextInput
 					underlineColorAndroid='transparent'
 					onChangeText={this.props.valueChange}
+					keyboardType = 'numeric'
 					value = {this.props.value}
 					style={[styles.cashInput]}/>
 				);
@@ -75,7 +77,7 @@ class PaymentMethod extends Component{
 class OrderPaymentScreen extends Component {
 	constructor(props) {
 		super(props);
-
+		this.saleSuccess = false;
 		this.state = {
 			isCash: true,
 			isCredit: false,
@@ -85,7 +87,7 @@ class OrderPaymentScreen extends Component {
 	}
 	componentDidMount() {
 		console.log("OrderPaymentScreen = Mounted");
-		this.updatePayment(0);
+		this.updatePayment(0, this.calculateOrderDue().toString());
 
 	}
 
@@ -110,7 +112,7 @@ class OrderPaymentScreen extends Component {
 						checkBox = {this.state.isCash}
 						checkBoxChange = {this.checkBoxChangeCash.bind(this)}
 						checkBoxLabel = {'Cash'}
-						value = {this.props.payment.cash.toString()}
+						value = {this.props.payment.cashToDisplay}
 						valueChange = {this.valuePaymentChange} />
 					{this.getCreditComponent()}
 					<PaymentMethod
@@ -119,11 +121,11 @@ class OrderPaymentScreen extends Component {
 						checkBox = {this.state.isMobile}
 						checkBoxChange = {this.checkBoxChangeMobile.bind(this)}
 						checkBoxLabel = {'Mobile'}
-						value = {this.props.payment.mobile.toString()}
+						value = {this.props.payment.mobileToDisplay}
 						valueChange = {this.valuePaymentChange}/>
-					<PaymentDescription title = "Sale Amount Due:" total={this.calculateOrderDue()}/>
-					<PaymentDescription title = "Previous Amount Due:" total={this.calculateAmountDue()}/>
-					<PaymentDescription title = "Total Amount Due:" total={this.calculateTotalDue()}/>
+					<PaymentDescription title = "Sale Amount Due:" total={this._formatCurrency( this.calculateOrderDue())}/>
+					<PaymentDescription title = "Previous Amount Due:" total={this._formatCurrency( this.calculateAmountDue())}/>
+					<PaymentDescription title = "Total Amount Due:" total={this._formatCurrency( this.calculateTotalDue())}/>
 					<View style={styles.completeOrder}>
 						<View style={{justifyContent:'center', height:80}}>
 							<TouchableHighlight underlayColor = '#c0c0c0'
@@ -153,11 +155,35 @@ class OrderPaymentScreen extends Component {
 					checkBox = {this.state.isCredit}
 					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
 					checkBoxLabel = {'Credit'}
-					value = {this.props.payment.credit} />
+					value = {this._formatCurrency(this.props.payment.credit)} />
 			)
 		}else{
 			return null;
 		}
+	}
+	_formatCurrency( value ){
+		let currency = "USD";
+		if( this.props.products.length > 0 ){
+			if( this.props.products[0].product.priceCurrency.length === 3 ){
+				currency = this.props.products[0].product.priceCurrency;
+			}
+		}
+		value =  parseFloat(value.toFixed(2));
+		try {
+			var formatter = new Intl.NumberFormat('en-US', {
+				style: 'currency',
+				currency: currency,
+				minimumFractionDigits: 2,
+			});
+			return formatter.format(value);
+		}catch( error ){
+			console.log( "_formatCurrency - error " + error.message);
+			return value;
+		}
+	}
+	_roundToDecimal( value ){
+		return parseFloat(value.toFixed(2));
+
 	}
 	_isAnonymousCustomer( customer ){
 		return PosStorage.getCustomerTypeByName("anonymous").id == customer.customerTypeId ? true : false;
@@ -171,7 +197,7 @@ class OrderPaymentScreen extends Component {
 	}
 
 	calculateTotalDue(){
-		return this.calculateOrderDue() + this.calculateAmountDue();
+		return this._roundToDecimal((this.calculateOrderDue() + this.calculateAmountDue()));
 	}
 
 	onCompleteOrder = ()=>{
@@ -211,39 +237,46 @@ class OrderPaymentScreen extends Component {
 
 	checkBoxChangeCash=()=>{
 		this.setState({isCash:!this.state.isCash} );
-		this.setState({isMobile:!this.state.isMobile},function(){this.updatePayment(0)});
+		this.setState({isMobile:!this.state.isMobile},function(){this.updatePayment(0, this.calculateOrderDue().toString())});
 
 	};
 	valuePaymentChange=(textValue)=>{
-		let cashValue = parseInt( textValue);
-		if( isNaN(cashValue)){
-			cashValue = 0;
+		if(! textValue.endsWith('.')) {
+			let cashValue = parseFloat(textValue);
+			if (isNaN(cashValue)) {
+				cashValue = 0;
+			}
+			if (cashValue > this.calculateOrderDue()) {
+				cashValue = this.calculateOrderDue();
+			}
+			let credit = this._roundToDecimal(this.calculateOrderDue() - cashValue);
+			this.updatePayment(credit,textValue );
+		}else{
+			this.updatePayment(this.calculateOrderDue() - parseFloat(textValue), textValue );
 		}
-		if( cashValue > this.calculateOrderDue()){
-			cashValue = this.calculateOrderDue();
-		}
-		this.updatePayment( this.calculateOrderDue() - cashValue);
 	};
 
 
 	checkBoxChangeCredit=()=>{
-		this.setState({isCredit:!this.state.isCredit},function(){this.updatePayment(0)} );
+		this.setState({isCredit:!this.state.isCredit},function(){this.updatePayment(0, this.calculateOrderDue().toString())} );
 	};
 
 	checkBoxChangeMobile=()=> {
-		this.setState({isMobile:!this.state.isMobile} , function(){this.updatePayment(0)});
+		this.setState({isMobile:!this.state.isMobile} , function(){this.updatePayment(0, this.calculateOrderDue().toString())});
 		this.setState({isCash:!this.state.isCash} );
 	};
 
-	updatePayment=( credit)=> {
+	updatePayment=( credit, textToDisplay)=> {
 		let payment = {
 			cash: this.calculateOrderDue()-credit,
+			cashToDisplay: textToDisplay,
 			credit: credit,
 			mobile: 0
 		};
 		if (this.state.isMobile) {
 			payment = {
 				mobile: this.calculateOrderDue()-credit,
+				mobileToDisplay: textToDisplay,
 				credit: credit,
 				cash: 0
 			};
@@ -253,16 +286,35 @@ class OrderPaymentScreen extends Component {
 
 	closeHandler= ()=>{
 		this.setState( {isCompleteOrderVisible:false} );
-		this.props.customerBarActions.ShowHideCustomers(1);
+		if( this.saleSuccess) {
+			this.props.customerBarActions.ShowHideCustomers(1);
+		}else{
+			Alert.alert(
+				"Invalid payment amount. ",
+				'The amount paid cannot exceed to cost of goods and customer credit',
+				[
+					{ text: 'OK', onPress: () => console.log('OK Pressed') },
+				],
+				{ cancelable: false }
+			);
+
+		}
 	};
 
 	ShowCompleteOrder = () =>{
 		let that = this;
 		if( this.state.isCompleteOrderVisible ) {
-			this.formatAndSaveSale()
-			setTimeout(() => {
-				that.closeHandler()
-			}, 500);
+			if( this.formatAndSaveSale() ) {
+				this.saleSuccess = true;
+				setTimeout(() => {
+					that.closeHandler()
+				}, 500);
+			}else{
+				this.saleSuccess = false;
+				setTimeout(() => {
+					that.closeHandler()
+				}, 1);
+			}
 		}
 		return (
 			<View style={{
@@ -307,7 +359,7 @@ class OrderPaymentScreen extends Component {
 		let cogsTotal = 0;
 		receipt.products = this.props.products.map( product => {
 			let receiptLineItem = {};
-			receiptLineItem.priceTotal = this.getItemPrice( product.product ) * product.quantity;	// TODO Pricing is incorrect
+			receiptLineItem.priceTotal = this.getItemPrice( product.product ) * product.quantity;
 			receiptLineItem.quantity = product.quantity;
 			receiptLineItem.productId = product.product.productId;
 			receiptLineItem.cogsTotal = this.getItemCogs( product.product ) * product.quantity;
@@ -325,6 +377,29 @@ class OrderPaymentScreen extends Component {
 		});
 		receipt.total = priceTotal;
 		receipt.cogs = cogsTotal;
+
+		// Check loan payoff
+		let payoff = 0;
+		try{
+			if( this.props.payment.hasOwnProperty("cashToDisplay")){
+				payoff = parseFloat(this.props.payment.cashToDisplay);
+			}else if( this.props.payment.hasOwnProperty("mobileToDisplay")){
+				payoff = parseFloat(this.props.payment.mobileToDisplay);
+			}
+			if( payoff > priceTotal ){
+				// User is paying of loan amount
+				payoff -= priceTotal;
+				if( payoff > this.props.selectedCustomer.dueAmount){
+					// Overpayment... this is an error
+					return false;
+				}
+			}else{
+				payoff = 0;
+			}
+		}catch(err){
+
+		}
+
 		PosStorage.addSale(receipt);
 
 		// Update dueAmount if required
@@ -336,7 +411,17 @@ class OrderPaymentScreen extends Component {
 				this.props.selectedCustomer.name,
 				this.props.selectedCustomer.address,
 				this.props.selectedCustomer.salesChannelId);
+		}else if( payoff > 0 ){
+			this.props.selectedCustomer.dueAmount -= payoff;
+			PosStorage.updateCustomer(
+				this.props.selectedCustomer,
+				this.props.selectedCustomer.phoneNumber,
+				this.props.selectedCustomer.name,
+				this.props.selectedCustomer.address,
+				this.props.selectedCustomer.salesChannelId);
+
 		}
+		return true;
 	}
 }
 

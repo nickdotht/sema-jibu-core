@@ -1,10 +1,11 @@
 import React, {Component}  from "react";
-import { View, Text, FlatList, TouchableHighlight, StyleSheet } from "react-native";
+import { View, Text, FlatList, TouchableHighlight, StyleSheet, UIManager, Alert } from "react-native";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import * as CustomerActions from '../../actions/CustomerActions';
 import Events from 'react-native-simple-events';
 import PosStorage from "../../database/PosStorage";
+import * as ToolbarActions from "../../actions/ToolBarActions";
 
 const anonymousId = "9999999-9999-9999-9999-9999999";
 
@@ -58,6 +59,7 @@ class CustomerList extends Component {
 					renderItem={({item, index, separators}) => (
 						<TouchableHighlight
 							onPress={() => this.onPressItem(item)}
+							onLongPress = {(event) => this.onLongPressItem(item, event)}
 							onShowUnderlay={separators.highlight}
 							onHideUnderlay={separators.unhighlight}>
 							{this.getRow(item, index, separators)}
@@ -109,10 +111,7 @@ class CustomerList extends Component {
 			return (
 				<View style={[this.getRowBackground(index, isSelected), {flex: 1, flexDirection: 'row', height:50, alignItems:'center'}]}>
 					<View style={{flex: 2}}>
-						<TouchableHighlight
-							onPress={() => this.onPressItemName(item)}>
-							<Text style={[styles.baseItem, styles.leftMargin]}>{item.name}</Text>
-						</TouchableHighlight>
+						<Text style={[styles.baseItem, styles.leftMargin]}>{item.name}</Text>
 					</View>
 					<View style={{flex: 1.5}}>
 						<Text style={[styles.baseItem]}>{item.phoneNumber}</Text>
@@ -158,7 +157,10 @@ class CustomerList extends Component {
 				(this.props.filter === "credit" && item.dueAmount > 0)) {
 				if (this.state.searchString.length >= 2) {
 					const filterString = this.state.searchString.toLowerCase();
-					if (item.name.toLowerCase().startsWith(filterString) ||
+					const name = item.name.toLowerCase();
+					const names = name.split(' ');
+					if (name.startsWith(filterString) ||
+						(names.length > 1 && names[names.length-1].startsWith(filterString)) ||
 						item.phoneNumber.startsWith(filterString)) {
 						return true;
 					} else {
@@ -184,15 +186,70 @@ class CustomerList extends Component {
 	_isAnonymousCustomer( customer ){
 		return PosStorage.getCustomerTypeByName("anonymous").id == customer.customerTypeId ? true : false;
 	}
-	onPressItemName = (item) =>{
+	onLongPressItem = (item, event) =>{
 		console.log("_onPressItemName");
-		this.props.CustomerSelected(item);
 		this.setState({refresh: !this.state.refresh});
+		let actions = ["Edit", "Delete" ];
+		this.props.customerActions.CustomerSelected(item);
+		if(! this._isAnonymousCustomer( item )) {
+			if (event && event.target) {
+				UIManager.showPopupMenu(
+					event.target,
+					actions,
+					this.onPopupError,
+					this.onPopupEvent.bind(this)
+				)
+
+			}
+		}
 	};
+	onPopupEvent(eventName, index) {
+		if (eventName !== 'itemSelected') return;
+		if (index === 0){
+			this.props.toolbarActions.ShowScreen("editCustomer");
+		}else if (index === 1) {
+			this.deleteCustomer();
+		}
+	}
+	deleteCustomer(){
+		let alertMessage = "Delete  customer " + this.props.selectedCustomer.name;
+		if (this.props.selectedCustomer.dueAmount === 0) {
+			Alert.alert(
+				alertMessage,
+				'Are you sure you want to delete this customer?',
+				[
+					{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+					{
+						text: 'OK', onPress: () => {
+							PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
+							this.props.customerActions.CustomerSelected({});		// Clear selected customer
+							this.props.customerActions.setCustomers(PosStorage.getCustomers());
+
+						}
+					},
+				],
+				{ cancelable: false }
+			);
+		}else{
+			Alert.alert(
+				"Customer '" + this.props.selectedCustomer.name + "' has an outstanding credit and cannot be deleted",
+				'',
+				[
+					{ text: 'OK', onPress: () => console.log('OK Pressed') },
+				],
+				{ cancelable: true }
+			);
+
+		}
+	}
+
+	onPopupError(){
+		console.log("onPopupError");
+	}
 
 	onPressItem = (item) =>{
 		console.log("_onPressItem");
-		this.props.CustomerSelected(item);
+		this.props.customerActions.CustomerSelected(item);
 		// this.setState({ selectedCustomer:item });
 		this.setState({refresh: !this.state.refresh});
 		Events.trigger('onOrder', {customer: item});
@@ -258,7 +315,8 @@ function mapStateToProps(state, props) {
 }
 
 function mapDispatchToProps(dispatch) {
-	return bindActionCreators(CustomerActions, dispatch);
+	return {customerActions:bindActionCreators(CustomerActions, dispatch),
+			toolbarActions:bindActionCreators(ToolbarActions, dispatch)};
 }
 
 

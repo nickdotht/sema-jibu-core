@@ -28,6 +28,7 @@ class CustomerProperty extends Component {
 					underlineColorAndroid='transparent'
 					placeholder = {this.props.placeHolder}
 					value = {this.state.propertyText}
+					keyboardType = {this.props.kbType}
 					onChangeText = {this.onChangeText}/>
 			</View>
 		);
@@ -81,6 +82,7 @@ class CustomerEdit extends Component {
 								marginTop = {0}
 								placeHolder = 'Telephone Number'
 								parent ={this}
+								kbType = "phone-pad"
 								valueFn = {this.getTelephoneNumber}
 								ref={this.phone}/>
 							<CustomerProperty
@@ -88,6 +90,7 @@ class CustomerEdit extends Component {
 								marginTop = "1%"
 								placeHolder = 'Name'
 								parent ={this}
+								kbType = "default"
 								valueFn = {this.getName}
 								ref={this.name}/>
 							<CustomerProperty
@@ -95,6 +98,7 @@ class CustomerEdit extends Component {
 								marginTop = "1%"
 								placeHolder = 'Address'
 								parent ={this}
+								kbType = "default"
 								valueFn = {this.getAddress}
 								ref={this.address}/>
 							<View style ={[{marginTop:"1%", flexDirection:'row',alignItems:'center'}]}>
@@ -107,7 +111,10 @@ class CustomerEdit extends Component {
 									defaultValue = {this.getDefaultValue()}
 									defaultIndex = {this.getDefaultIndex()}
 									options={this.channelOptions}/>
-								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+								<TouchableHighlight underlayColor = '#c0c0c0'
+													onPress={() => this.onShowChannel()}>
+									<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+								</TouchableHighlight>
 							</View>
 							<View style={styles.submit}>
 								<View style={{justifyContent:'center', height:90, width:'30%', alignItems:'center'}}>
@@ -161,7 +168,7 @@ class CustomerEdit extends Component {
 				}
 			}
 		}
-		return "Customer Channel";
+		return "Customer Type";
 	}
 
 	getDefaultIndex(){
@@ -235,6 +242,10 @@ class CustomerEdit extends Component {
 
 		this.setState( {isEditInProgress:true} );
 	};
+	onShowChannel(){
+		this.customerChannel.current.show();
+	}
+
 
 	_textIsEmpty(txt){
 		if( txt === null || txt .length === 0 ){
