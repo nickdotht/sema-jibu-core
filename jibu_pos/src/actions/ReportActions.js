@@ -75,8 +75,8 @@ const getSalesData = (beginDate, endDate) =>{
 					if( totalLiters === 0 ){
 						totalLiters = "N/A";
 					}
-					salesItems = salesItems.concat(salesItems);
-					salesItems = salesItems.concat(salesItems);
+					// salesItems = salesItems.concat(salesItems);
+					// salesItems = salesItems.concat(salesItems);
 					resolve({totalLiters: totalLiters, totalSales: totalSales, salesItems:salesItems});
 
 				}

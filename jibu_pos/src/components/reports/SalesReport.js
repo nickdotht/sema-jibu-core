@@ -44,7 +44,7 @@ class SalesReport extends Component {
 						backgroundColor: 'white',
 						marginLeft: 10,
 						marginRight: 10,
-						marginBottom: 100,
+						marginBottom: 10,
 					}}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<Text style={[styles.totalItem, { flex: 1.7 }]}> </Text>
