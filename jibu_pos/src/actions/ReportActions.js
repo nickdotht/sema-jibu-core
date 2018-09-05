@@ -86,11 +86,11 @@ const getSalesData = (beginDate, endDate) =>{
 	});
 };
 
-export function GetInventoryReportData( beginDate, endDate ) {
+export function GetInventoryReportData( beginDate, endDate, products ) {
 	console.log("GetInventoryReportData - action");
 
 	return (dispatch) => {
-		getInventoryData(beginDate, endDate)
+		getInventoryData(beginDate, endDate, products)
 			.then( inventoryData =>{
 				dispatch({type: INVENTORY_REPORT, data:{inventoryData:inventoryData}})
 			})
@@ -102,9 +102,11 @@ export function GetInventoryReportData( beginDate, endDate ) {
 
 }
 
-const getInventoryData = (beginDate, endDate) =>{
+const getInventoryData = (beginDate, endDate, products) =>{
 	return new Promise((resolve, reject) => {
-		let inventory = {currentMeter:110, productSkus:[]};
+		let inventory = {currentMeter:110, currentProductSkus:[], previousMeter:120, previousProductSkus:[]};
+		inventory.currentProductSkus = products.map( product =>{ return {sku:product.sku, inventory:null }});
+		inventory.previousProductSkus = products.map( product =>{ return {sku:product.sku, inventory:null }});
 		resolve(inventory);
 	});
 };

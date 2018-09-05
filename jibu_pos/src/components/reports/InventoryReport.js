@@ -81,7 +81,7 @@ class InventoryReport extends Component {
 	componentDidMount() {
 		console.log("InventoryReport - componentDidMount");
 		this.props.reportActions.GetSalesReportData(this.beginDate, this.endDate);
-		this.props.reportActions.GetInventoryReportData(this.beginDate, this.endDate);
+		this.props.reportActions.GetInventoryReportData(this.beginDate, this.endDate, this.props.products);
 	}
 
 	render() {
@@ -102,7 +102,6 @@ class InventoryReport extends Component {
 							data={this.props.salesData.salesItems}
 							extraData={this.state.refresh}
 							ListHeaderComponent={this.showHeader}
-							// extraData={this.state.refresh}
 							renderItem={({ item, index, separators }) => (
 								<View>
 									{this.getRow(item, index, separators)}
@@ -143,7 +142,7 @@ class InventoryReport extends Component {
 
 						<View style={[{ flex: 1, flexDirection: 'row', alignItems:"center", marginTop:5 }]}>
 							<Text style={[styles.totalItem, { flex: .83 }]}> </Text>
-							<Text style={[styles.rowItem, { flex: .33 }]}>65000</Text>
+							<Text style={[styles.rowItem, { flex: .33 }]}>{this.getInventoryMeterForDisplay(false)}</Text>
 							{this.getCurrentMeter()}
 							{/*<Text style={[styles.rowItem, { flex: .33 }]}>65001 </Text>*/}
 							<Text style={[styles.rowItem, { flex: .33 }]}>65002</Text>
@@ -205,7 +204,7 @@ class InventoryReport extends Component {
 				<View style ={[{width:20}]}/>
 
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItem]}>{item.totalLiters.toFixed(2)}</Text>
+					<Text style={[styles.rowItem]}>{this.getInventorySkuForDisplay(false, item)}</Text>
 				</View>
 				{this.getCurrentInventory(item)}
 				<View style={[{ flex: .7 }]}>
@@ -282,13 +281,22 @@ class InventoryReport extends Component {
 					style={styles.currentInventory}
 					onPress= {() => this.displayEditCurrentSku( item.sku)}
 					underlayColor='#18376A'>
-					<Text style={[styles.currentInventoryText]}>{item.pricePerSku}</Text>
+					<Text style={[styles.currentInventoryText]}>{ this.getInventorySkuForDisplay(true, item)}</Text>
 				</TouchableHighlight>
 			</View>
-			// <View style={[{ flex: .7, backgroundColor:'pink'}]}>
-			// 	<Text style={[styles.rowItem]}>{item.pricePerSku}</Text>
-			// </View>
 		);
+	}
+	getInventorySkuForDisplay(currentPrev, item ){
+		let inventoryArray = (currentPrev) ? this.props.inventoryData.currentProductSkus : this.props.inventoryData.previousProductSkus;
+		for( let index = 0; index < inventoryArray.length; index ++ ){
+			if( inventoryArray[index].sku === item.sku ){
+				if( !isNaN(inventoryArray[index].inventory)){
+					return inventoryArray[index].inventory;
+				}
+				break;
+			}
+		}
+		return "-";		// No data
 	}
 	displayEditCurrentSku(sku){
 		this.setState({currentSkuEdit:sku});
@@ -301,11 +309,21 @@ class InventoryReport extends Component {
 					style={styles.currentInventory}
 					onPress={() => {this.displayCurrentMeter()}}
 					underlayColor='#18376A'>
-					<Text style={[styles.currentInventoryText]}>{this.props.inventoryData.currentMeter}</Text>
+					<Text style={[styles.currentInventoryText]}>{this.getInventoryMeterForDisplay(true)}</Text>
 				</TouchableHighlight>
 			</View>
 		);
 	}
+
+	getInventoryMeterForDisplay(currentPrev ){
+		let meter = (currentPrev) ? this.props.inventoryData.currentMeter : this.props.inventoryData.previousMeter;
+		if( !isNaN(meter)){
+			return meter;
+		}else{
+			return "-";		// No data
+		}
+	}
+
 	displayCurrentMeter(){
 		this.setState({currentMeterVisible:true});
 
@@ -326,6 +344,7 @@ function mapStateToProps(state, props) {
 	return {
 		salesData: state.reportReducer.salesData,
 		inventoryData: state.reportReducer.inventoryData,
+		products: state.productReducer.products,
 		reportType: state.reportReducer.reportType
 	};
 }
