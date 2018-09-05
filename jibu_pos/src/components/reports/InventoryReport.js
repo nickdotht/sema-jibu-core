@@ -56,7 +56,7 @@ class InventoryEdit extends Component {
 	};
 	isVisible(){
 		if(this.props.type === "sku"){
-			return this.props.skuToShow === this.props.title;
+			return this.props.skuToShow === this.props.sku;
 		}else if(this.props.type === "currentMeter" ){
 			return this.props.visible;
 		}else{
@@ -124,13 +124,13 @@ class InventoryReport extends Component {
 							<Text style={[styles.totalItem, { flex: .5 }]}>Total Sales </Text>
 							<Text style={[styles.totalItem, { flex: 1.0 }]}>{this.getTotalLiters()}</Text>
 							<Text style={[styles.totalItem, { flex: .8 }]}>Total Inventory </Text>
-							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalSales()}</Text>
+							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalInventory()}</Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15 }}>
 							<Text style={[styles.totalItem, { flex: 1.7 }]}> </Text>
 							<Text style={[styles.totalItem, { flex: .4}]}>Output</Text>
 							<Text style={[styles.totalItem, { flex: 1.0 }]}>(Sales + Inventory)</Text>
-							<Text style={[styles.totalItem, { flex: .5 }]}>1000L </Text>
+							<Text style={[styles.totalItem, { flex: .5 }]}>{this.getOutput()} </Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15, alignItems:"center" }}>
 							<Text style={[styles.totalItem, { flex: .50 }]}> </Text>
@@ -144,13 +144,12 @@ class InventoryReport extends Component {
 							<Text style={[styles.totalItem, { flex: .83 }]}> </Text>
 							<Text style={[styles.rowItem, { flex: .33 }]}>{this.getInventoryMeterForDisplay(false)}</Text>
 							{this.getCurrentMeter()}
-							{/*<Text style={[styles.rowItem, { flex: .33 }]}>65001 </Text>*/}
-							<Text style={[styles.rowItem, { flex: .33 }]}>65002</Text>
+							<Text style={[styles.rowItem, { flex: .33 }]}>{this.getTotalProduction()}</Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15, marginBottom:10 }}>
 							<Text style={[styles.totalItem, { flex: .66 }]}> </Text>
 							<Text style={[styles.totalItem, { flex: .33 }]}>Wastage: </Text>
-							<Text style={[styles.totalItem, { flex: .33 }]}>5001 </Text>
+							<Text style={[styles.totalItem, { flex: .33 }]}>{this.getWastage()} %</Text>
 						</View>
 						<InventoryEdit
 							type = "currentMeter"
@@ -172,7 +171,7 @@ class InventoryReport extends Component {
 		if (this.props.salesData.totalSales) {
 			return this.props.salesData.totalSales.toFixed(2);
 		} else {
-			return 0;
+			return '-';
 		}
 	}
 
@@ -190,7 +189,7 @@ class InventoryReport extends Component {
 		return (
 			<View style={[{ flex: 1, flexDirection: 'row', alignItems: 'center' }, styles.rowBackground]}>
 				<View style={[{ flex: 1 }]}>
-					<Text style={[styles.rowItem, styles.leftMargin]}>{item.sku}</Text>
+					<Text style={[styles.rowItem, styles.leftMargin]}>{item.description}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
 					<Text style={[styles.rowItem]}>{item.quantity}</Text>
@@ -208,12 +207,13 @@ class InventoryReport extends Component {
 				</View>
 				{this.getCurrentInventory(item)}
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItem]}>{item.totalSales.toFixed(2)}</Text>
+					<Text style={[styles.rowItem]}>{this.getTotalForSkuDisplay(item)}</Text>
 				</View>
 				<InventoryEdit
 					type = "sku"
 					skuToShow = {this.state.currentSkuEdit}
-					title = {item.sku}
+					sku = {item.sku}
+					title = {item.description}
 					cancelMethod = {this.onCancelEditCurrentSku.bind(this)}
 					okMethod = {this.onOkEditCurrentSku.bind(this)}>
 				</InventoryEdit>
@@ -279,7 +279,7 @@ class InventoryReport extends Component {
 			<View style={[{ flex: .7}]}>
 				<TouchableHighlight
 					style={styles.currentInventory}
-					onPress= {() => this.displayEditCurrentSku( item.sku)}
+					onPress= {() => this.displayEditCurrentSku( item.sku )}
 					underlayColor='#18376A'>
 					<Text style={[styles.currentInventoryText]}>{ this.getInventorySkuForDisplay(true, item)}</Text>
 				</TouchableHighlight>
@@ -290,7 +290,7 @@ class InventoryReport extends Component {
 		let inventoryArray = (currentPrev) ? this.props.inventoryData.currentProductSkus : this.props.inventoryData.previousProductSkus;
 		for( let index = 0; index < inventoryArray.length; index ++ ){
 			if( inventoryArray[index].sku === item.sku ){
-				if( !isNaN(inventoryArray[index].inventory)){
+				if( inventoryArray[index].inventory != null && !isNaN(inventoryArray[index].inventory)){
 					return inventoryArray[index].inventory;
 				}
 				break;
@@ -298,10 +298,53 @@ class InventoryReport extends Component {
 		}
 		return "-";		// No data
 	}
-	displayEditCurrentSku(sku){
+
+	getTotalForSkuDisplay( item ) {
+		let current = this.getInventorySkuForDisplay(true, item);
+		if (current == '-') return '-';
+		let previous = this.getInventorySkuForDisplay(false, item);
+		if (previous == '-') return '-';
+		return ((current - previous) * item.litersPerSku).toFixed(2);
+	}
+
+	getTotalInventory(){
+		let result = 0;
+		let valid = false;
+		for( let index = 0; index < this.props.salesData.salesItems.length; index++){
+			let inventoryItem = this.getTotalForSkuDisplay( this.props.salesData.salesItems[index ]);
+			if( inventoryItem != '-'){
+				valid = true;
+				result += parseFloat(inventoryItem);
+			}
+		}
+		if( valid ){
+			return result.toFixed(2);
+		}else{
+			return '-';
+		}
+	}
+	getOutput(){
+		let sales = 0;
+		let inventory = 0;
+		let totalSales = this.getTotalLiters();
+		let getTotalInventory = this.getTotalInventory();
+		if(totalSales == '-' && getTotalInventory == '-' ){
+			return '-';
+		}
+		if( totalSales != '-'){
+			sales = parseFloat(totalSales);
+		}
+		if( getTotalInventory != '-'){
+			inventory = parseFloat(getTotalInventory);
+		}
+		return (sales + inventory).toFixed(2);
+	}
+
+	displayEditCurrentSku(sku ){
 		this.setState({currentSkuEdit:sku});
 		this.setState({refresh: !this.state.refresh});
 	}
+
 	getCurrentMeter( value ){
 		return (
 			<View style={[{ flex: .33}]}>
@@ -317,13 +360,32 @@ class InventoryReport extends Component {
 
 	getInventoryMeterForDisplay(currentPrev ){
 		let meter = (currentPrev) ? this.props.inventoryData.currentMeter : this.props.inventoryData.previousMeter;
-		if( !isNaN(meter)){
-			return meter;
+		if( meter != null && !isNaN(meter)){
+			return meter.toFixed(2);
 		}else{
 			return "-";		// No data
 		}
 	}
+	getTotalProduction(){
+		let current = this.getInventoryMeterForDisplay(true);
+		let previous = this.getInventoryMeterForDisplay(false);
+		if( current == '-' || previous == '-'){
+			return '-'
+		}else{
+			return (parseFloat(current) - parseFloat(previous)).toFixed(2);
+		}
+	}
+	getWastage(){
+		let totalProduction = this.getTotalProduction();
+		let output = this.getOutput();
+		if( totalProduction == '-' || output == '-'){
+			return '-'
+		}else{
+			return ((parseFloat(totalProduction) - parseFloat(output))/parseFloat(totalProduction) *100).toFixed(2);
+		}
 
+
+	}
 	displayCurrentMeter(){
 		this.setState({currentMeterVisible:true});
 

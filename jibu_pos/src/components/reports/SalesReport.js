@@ -82,7 +82,7 @@ class SalesReport extends Component {
 		return (
 			<View style={[{flex: 1, flexDirection: 'row',  alignItems:'center'},styles.rowBackground]}>
 				<View style={ [{flex: 1}]}>
-					<Text style={[styles.rowItem,styles.leftMargin]}>{item.sku}</Text>
+					<Text style={[styles.rowItem,styles.leftMargin]}>{item.description}</Text>
 				</View>
 				<View style={[ {flex: .7}]}>
 					<Text style={[styles.rowItem]}>{item.quantity}</Text>

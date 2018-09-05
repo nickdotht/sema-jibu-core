@@ -49,7 +49,8 @@ const getSalesData = (beginDate, endDate) =>{
 						}
 					}else{
 						mapProduct = {
-							sku: product.description,
+							sku: product.sku,
+							description:product.description,
 							quantity: product.quantity,
 							pricePerSku: product.priceTotal/product.quantity,
 							totalSales: product.priceTotal,
@@ -105,8 +106,28 @@ export function GetInventoryReportData( beginDate, endDate, products ) {
 const getInventoryData = (beginDate, endDate, products) =>{
 	return new Promise((resolve, reject) => {
 		let inventory = {currentMeter:110, currentProductSkus:[], previousMeter:120, previousProductSkus:[]};
-		inventory.currentProductSkus = products.map( product =>{ return {sku:product.sku, inventory:null }});
-		inventory.previousProductSkus = products.map( product =>{ return {sku:product.sku, inventory:null }});
+		inventory.currentProductSkus = products.map( product =>{
+			if(product.sku === "sku1" ){
+				return {sku:product.sku, inventory:12 };
+
+			}else if(product.sku === "sku3" ){
+				return {sku:product.sku, inventory:9 };
+			}else {
+				return { sku: product.sku, inventory: null };
+			}
+		});
+
+		inventory.previousProductSkus = products.map( product =>{
+			if(product.sku === "sku1" ){
+				return {sku:product.sku, inventory:8 };
+
+			}else if(product.sku === "sku3" ){
+				return {sku:product.sku, inventory:11 };
+			}else {
+				return { sku: product.sku, inventory: null };
+			}
+		});
+
 		resolve(inventory);
 	});
 };
