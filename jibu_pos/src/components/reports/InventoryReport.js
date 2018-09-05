@@ -1,15 +1,67 @@
 import React, { Component } from 'react';
-import { Text, View, StyleSheet, TouchableHighlight, FlatList} from 'react-native';
+import { Text, View, StyleSheet, TouchableHighlight, FlatList, Modal, TextInput} from 'react-native';
 import { bindActionCreators } from "redux";
 import * as reportActions from "../../actions/ReportActions";
 import { connect } from "react-redux";
 import DateFilter from "./DateFilter";
+
+class InventoryEdit extends Component {
+	constructor(props) {
+		super(props);
+	}
+	render() {
+		console.log("InventoryEdit---------------------------------------------" + this.props.item.sku);
+		return (
+			<Modal visible = {this.props.skuToShow === this.props.item.sku}
+				   backdropColor={'red'}
+				   transparent ={true}
+				   onRequestClose ={this.closeCurrentSkuHandler.bind(this)}>
+				<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+
+					<View style={[styles.editInventory]}>
+						<View style={{flexDirection:'row',alignItems: 'center', justifyContent:'center'}}>
+							<Text style={{fontSize:18, fontWeight:'bold', flex:.7, paddingLeft:20}}>{this.props.item.sku}</Text>
+							<TextInput
+								style={ [styles.inventoryInput, {flex:.5, paddingRight:40, marginRight:20 }]}
+								underlineColorAndroid='transparent'
+								placeholder = "Current Inventory">
+							</TextInput>
+						</View>
+						<View style={{flexDirection:'row',  justifyContent:'center', paddingTop:20}}>
+							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3}}>
+								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.okMethod()}>
+									<Text style={styles.buttonText}>Ok</Text>
+								</TouchableHighlight>
+							</View>
+							<View style={{flex:.1,backgroundColor:'white'}}>
+							</View>
+							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3 }}>
+								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.cancelMethod()}>
+									<Text style={styles.buttonText}>Cancel</Text>
+								</TouchableHighlight>
+							</View>
+						</View>
+					</View>
+				</View>
+			</Modal>
+		);
+
+	}
+	closeCurrentSkuHandler(){
+		this.props.cancelMethod();
+	};
+
+}
 
 class InventoryReport extends Component {
 	constructor(props) {
 		super(props);
 		this.beginDate = null;
 		this.endDate = null;
+		this.state = {
+			currentSkuEdit:"",
+			refresh: false,
+		};
 	}
 
 	componentDidMount() {
@@ -33,6 +85,7 @@ class InventoryReport extends Component {
 						</View>
 						<FlatList
 							data={this.props.salesData.salesItems}
+							extraData={this.state.refresh}
 							ListHeaderComponent={this.showHeader}
 							// extraData={this.state.refresh}
 							renderItem={({ item, index, separators }) => (
@@ -44,36 +97,6 @@ class InventoryReport extends Component {
 							initialNumToRender={50}
 						/>
 
-						{/*<View style = {styles.titleContent}>*/}
-							{/*<View style = {styles.leftContent}>*/}
-								{/*<FlatList*/}
-									{/*data={this.props.salesData.salesItems}*/}
-									{/*ListHeaderComponent={this.showSalesHeader}*/}
-									{/*// extraData={this.state.refresh}*/}
-									{/*renderItem={({ item, index, separators }) => (*/}
-										{/*<View>*/}
-											{/*{this.getSalesRow(item, index, separators)}*/}
-										{/*</View>*/}
-									{/*)}*/}
-									{/*keyExtractor={item => item.sku}*/}
-									{/*initialNumToRender={50}*/}
-								{/*/>*/}
-							{/*</View>*/}
-							{/*<View style = {styles.rightContent}>*/}
-								{/*<FlatList*/}
-									{/*data={this.props.salesData.salesItems}*/}
-									{/*ListHeaderComponent={this.showInventoryHeader}*/}
-									{/*// extraData={this.state.refresh}*/}
-									{/*renderItem={({ item, index, separators }) => (*/}
-										{/*<View>*/}
-											{/*{this.getInventoryRow(item, index, separators)}*/}
-										{/*</View>*/}
-									{/*)}*/}
-									{/*keyExtractor={item => item.sku}*/}
-									{/*initialNumToRender={50}*/}
-								{/*/>*/}
-							{/*</View>*/}
-						{/*</View>*/}
 					</View>
 					<View style={{
 						flex: .3,
@@ -83,11 +106,11 @@ class InventoryReport extends Component {
 						marginBottom: 10,
 					}}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
-							<Text style={[styles.totalItem, { flex: 1.7 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .9 }]}>Total Liters </Text>
-							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalLiters()}</Text>
-							<Text style={[styles.totalItem, { flex: .7 }]}>Total Inventory </Text>
-							<Text style={[styles.totalItem, { flex: .5 }]}>{this.getTotalSales()}</Text>
+							<Text style={[styles.totalItem, { flex: 1.5 }]}> </Text>
+							<Text style={[styles.totalItem, { flex: .5 }]}>Total Sales </Text>
+							<Text style={[styles.totalItem, { flex: 1.0 }]}>{this.getTotalLiters()}</Text>
+							<Text style={[styles.totalItem, { flex: .8 }]}>Total Inventory </Text>
+							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalSales()}</Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15 }}>
 							<Text style={[styles.totalItem, { flex: 1.7 }]}> </Text>
@@ -116,6 +139,7 @@ class InventoryReport extends Component {
 							<Text style={[styles.totalItem, { flex: .33 }]}>5001 </Text>
 						</View>
 					</View>
+
 				</View>
 			);
 		} else {
@@ -165,29 +189,61 @@ class InventoryReport extends Component {
 				<View style={[{ flex: .7 }]}>
 					<Text style={[styles.rowItem]}>{item.totalSales.toFixed(2)}</Text>
 				</View>
+				<InventoryEdit
+					skuToShow = {this.state.currentSkuEdit}
+					item = {item}
+					cancelMethod = {this.onCancelEditCurrentSku.bind(this)}
+					okMethod = {this.onOkEditCurrentSku.bind(this)}>
+				</InventoryEdit>
+				{/*<Modal visible = {this.state.isEditCurrentSku}*/}
+					   {/*backdropColor={'red'}*/}
+					   {/*transparent ={true}*/}
+					   {/*onRequestClose ={this.closeCurrentSkuHandler.bind(this)}>*/}
+					{/*{this.showEditCurrentSku(item.sku)}*/}
+				{/*</Modal>*/}
+
 			</View>
 		);
 	};
 
-	// getSalesRow = (item) => {
-	// 	console.log("SalesReport - getRow");
+	onCancelEditCurrentSku(){
+		this.setState({currentSkuEdit:""});
+		this.setState({refresh: !this.state.refresh});
+	}
+
+	onOkEditCurrentSku(){
+		this.setState({currentSkuEdit:""});
+		this.setState({refresh: !this.state.refresh});
+	}
+
+	// showEditCurrentSku( sku ){
 	// 	return (
-	// 		<View style={[{ flex: 1, flexDirection: 'row', alignItems: 'center' }, styles.rowBackground]}>
-	// 			<View style={[{ flex: 1 }]}>
-	// 				<Text style={[styles.rowItem, styles.leftMargin]}>{item.sku}</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.rowItem]}>{item.quantity}</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.rowItem]}>{item.litersPerSku}</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.rowItem]}>{item.totalLiters.toFixed(2)}</Text>
+	// 		<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+  //
+	// 			<View style={[styles.editInventory]}>
+	// 				<View style={{flexDirection:'row',}}>
+	// 					<Text style={{fontSize:24, fontWeight:'bold'}}>{sku}</Text>
+	// 					<TextInput placeholder = "Current Inventory"></TextInput>
+	// 				</View>
+	// 				<View style={{flexDirection:'row',  justifyContent:'flex-start'}}>
+	// 					<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3}}>
+	// 						<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.onOkEditCurrentSku()}>
+	// 							<Text style={styles.buttonText}>Ok</Text>
+	// 						</TouchableHighlight>
+	// 					</View>
+	// 					<View style={{backgroundColor:"#2858a7", borderRadius:10,flex:.3 }}>
+	// 						<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.onCancelEditCurrentSku()}>
+	// 							<Text style={styles.buttonText}>Cancel</Text>
+	// 						</TouchableHighlight>
+	// 					</View>
+	// 				</View>
 	// 			</View>
 	// 		</View>
 	// 	);
 	// };
+
+
+
 	showHeader = () => {
 		return (
 			<View
@@ -218,55 +274,6 @@ class InventoryReport extends Component {
 		);
 	};
 
-	// showSalesHeader = () => {
-	// 	return (
-	// 		<View
-	// 			style={[{ flex: 1, flexDirection: 'row', height: 50, alignItems: 'center' }, styles.headerBackground]}>
-	// 			<View style={[{ flex: 1 }]}>
-	// 				<Text style={[styles.headerItem, styles.leftMargin]}>SKU</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.headerItem]}>Quantity</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.headerItem]}>Liters/SKU</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.headerItem]}>Total Liters</Text>
-	// 			</View>
-	// 		</View>
-	// 	);
-	// };
-
-	// showInventoryHeader = () => {
-	// 	return (
-	// 		<View style={[{ flex: 1, flexDirection: 'row', height: 50, alignItems: 'center' }, styles.headerBackground]}>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.headerItem]}>Previous</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.headerItem]}>Current</Text>
-	// 			</View>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.headerItem]}>Total Liters</Text>
-	// 			</View>
-	// 		</View>
-	// 	);
-	// };
-	// getInventoryRow = (item) => {
-	// 	console.log("SalesReport - getRow");
-	// 	return (
-	// 		<View style={[{ flex: 1, flexDirection: 'row', alignItems: 'center' }, styles.rowBackground]}>
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.rowItem]}>{item.totalLiters.toFixed(2)}</Text>
-	// 			</View>
-	// 			{this.getCurrentInventory(item)}
-	// 			<View style={[{ flex: .7 }]}>
-	// 				<Text style={[styles.rowItem]}>{item.totalSales.toFixed(2)}</Text>
-	// 			</View>
-	// 		</View>
-	// 	);
-	// };
 
 	setFilterRange(beginDate, endDate) {
 		this.beginDate = beginDate;
@@ -280,9 +287,9 @@ class InventoryReport extends Component {
 	getCurrentInventory( item ){
 		return (
 			<View style={[{ flex: .7}]}>
-			<TouchableHighlight
+				<TouchableHighlight
 					style={styles.currentInventory}
-					onPress={() => {}}
+					onPress= {() => this.displayEditCurrentSku( item.sku)}
 					underlayColor='#18376A'>
 					<Text style={[styles.currentInventoryText]}>{item.pricePerSku}</Text>
 				</TouchableHighlight>
@@ -292,7 +299,10 @@ class InventoryReport extends Component {
 			// </View>
 		);
 	}
-
+	displayEditCurrentSku(sku){
+		this.setState({currentSkuEdit:sku});
+		this.setState({refresh: !this.state.refresh});
+	}
 	getCurrentMeter( value ){
 		return (
 			<View style={[{ flex: .33}]}>
@@ -412,5 +422,29 @@ const styles = StyleSheet.create({
 		fontWeight:"bold",
 		fontSize:24,
 	},
-
+	editInventory: {
+		height:300,
+		width:500,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor:'white',
+		borderColor:"#2858a7",
+		borderWidth:5,
+		borderRadius:10
+	},
+	buttonText:{
+		fontWeight:'bold',
+		fontSize:28,
+		color:'white',
+		textAlign:'center',
+		// width:180
+	},
+	inventoryInput : {
+		textAlign: 'left',
+		height: 50,
+		width: 100,
+		borderWidth: 2,
+		fontSize: 20,
+		borderColor: '#404040',
+	}
 });
