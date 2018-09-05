@@ -2,6 +2,7 @@ import PosStorage from "../database/PosStorage";
 import { REMOVE_PRODUCT } from "./OrderActions";
 
 export const SALES_REPORT_FROM_ORDERS = 'SALES_REPORT_FROM_ORDERS';
+export const INVENTORY_REPORT = 'INVENTORY_REPORT';
 export const REPORT_TYPE = 'REPORT_TYPE';
 
 
@@ -82,5 +83,28 @@ const getSalesData = (beginDate, endDate) =>{
 				}
 			});
 		}
+	});
+};
+
+export function GetInventoryReportData( beginDate, endDate ) {
+	console.log("GetInventoryReportData - action");
+
+	return (dispatch) => {
+		getInventoryData(beginDate, endDate)
+			.then( inventoryData =>{
+				dispatch({type: INVENTORY_REPORT, data:{inventoryData:inventoryData}})
+			})
+			.catch((error) => {
+				console.log( "GetInventoryReportData - Error " + error.message);
+				dispatch({type: INVENTORY_REPORT, data:{inventoryData:[]}})
+			});
+	}
+
+}
+
+const getInventoryData = (beginDate, endDate) =>{
+	return new Promise((resolve, reject) => {
+		let inventory = {currentMeter:110, productSkus:[]};
+		resolve(inventory);
 	});
 };

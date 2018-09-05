@@ -81,6 +81,7 @@ class InventoryReport extends Component {
 	componentDidMount() {
 		console.log("InventoryReport - componentDidMount");
 		this.props.reportActions.GetSalesReportData(this.beginDate, this.endDate);
+		this.props.reportActions.GetInventoryReportData(this.beginDate, this.endDate);
 	}
 
 	render() {
@@ -143,7 +144,7 @@ class InventoryReport extends Component {
 						<View style={[{ flex: 1, flexDirection: 'row', alignItems:"center", marginTop:5 }]}>
 							<Text style={[styles.totalItem, { flex: .83 }]}> </Text>
 							<Text style={[styles.rowItem, { flex: .33 }]}>65000</Text>
-							{this.getCurrentMeter(100)}
+							{this.getCurrentMeter()}
 							{/*<Text style={[styles.rowItem, { flex: .33 }]}>65001 </Text>*/}
 							<Text style={[styles.rowItem, { flex: .33 }]}>65002</Text>
 						</View>
@@ -156,8 +157,8 @@ class InventoryReport extends Component {
 							type = "currentMeter"
 							visible = {this.state.currentMeterVisible}
 							title = "Current Meter"
-							cancelMethod = {this.onCancelEditCurrentSku.bind(this)}
-							okMethod = {this.onOkEditCurrentSku.bind(this)}>
+							cancelMethod = {this.onCancelCurrentMeter.bind(this)}
+							okMethod = {this.onOkCurrentMeter.bind(this)}>
 						</InventoryEdit>
 					</View>
 
@@ -217,13 +218,6 @@ class InventoryReport extends Component {
 					cancelMethod = {this.onCancelEditCurrentSku.bind(this)}
 					okMethod = {this.onOkEditCurrentSku.bind(this)}>
 				</InventoryEdit>
-				{/*<Modal visible = {this.state.isEditCurrentSku}*/}
-					   {/*backdropColor={'red'}*/}
-					   {/*transparent ={true}*/}
-					   {/*onRequestClose ={this.closeCurrentSkuHandler.bind(this)}>*/}
-					{/*{this.showEditCurrentSku(item.sku)}*/}
-				{/*</Modal>*/}
-
 			</View>
 		);
 	};
@@ -305,22 +299,33 @@ class InventoryReport extends Component {
 			<View style={[{ flex: .33}]}>
 				<TouchableHighlight
 					style={styles.currentInventory}
-					onPress={() => {}}
+					onPress={() => {this.displayCurrentMeter()}}
 					underlayColor='#18376A'>
-					<Text style={[styles.currentInventoryText]}>{value}</Text>
+					<Text style={[styles.currentInventoryText]}>{this.props.inventoryData.currentMeter}</Text>
 				</TouchableHighlight>
 			</View>
-			// <View style={[{ flex: .7, backgroundColor:'pink'}]}>
-			// 	<Text style={[styles.rowItem]}>{item.pricePerSku}</Text>
-			// </View>
 		);
+	}
+	displayCurrentMeter(){
+		this.setState({currentMeterVisible:true});
+
+	}
+	onCancelCurrentMeter(){
+		this.setState({currentMeterVisible:false});
+
+	}
+	onOkCurrentMeter(){
+		this.setState({currentMeterVisible:false});
+
 	}
 
 }
 
 
 function mapStateToProps(state, props) {
-	return { salesData: state.reportReducer.salesData,
+	return {
+		salesData: state.reportReducer.salesData,
+		inventoryData: state.reportReducer.inventoryData,
 		reportType: state.reportReducer.reportType
 	};
 }
