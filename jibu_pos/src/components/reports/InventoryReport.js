@@ -10,24 +10,28 @@ class InventoryEdit extends Component {
 		super(props);
 	}
 	render() {
-		console.log("InventoryEdit---------------------------------------------" + this.props.item.sku);
 		return (
-			<Modal visible = {this.props.skuToShow === this.props.item.sku}
-				   backdropColor={'red'}
+			<Modal visible = {this.isVisible()}
 				   transparent ={true}
 				   onRequestClose ={this.closeCurrentSkuHandler.bind(this)}>
-				<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+				<View style={{ justifyContent: 'center', alignItems: 'center' }}>
 
 					<View style={[styles.editInventory]}>
-						<View style={{flexDirection:'row',alignItems: 'center', justifyContent:'center'}}>
-							<Text style={{fontSize:18, fontWeight:'bold', flex:.7, paddingLeft:20}}>{this.props.item.sku}</Text>
+						<View style={{marginTop:5}}>
+							<Text style={{fontSize:28, fontWeight:'bold'}}>Inventory</Text>
+						</View>
+						<View style={{flexDirection:'row',alignItems: 'center', justifyContent:'center', marginTop:20}}>
+							<Text style={{fontSize:18, fontWeight:'bold', flex:.7, paddingLeft:20}}>{this.props.title}</Text>
 							<TextInput
 								style={ [styles.inventoryInput, {flex:.5, paddingRight:40, marginRight:20 }]}
 								underlineColorAndroid='transparent'
-								placeholder = "Current Inventory">
+								onSubmitEditing = {() => this.props.okMethod()}
+								keyboardType = 'numeric'
+								placeholder = "Current Value">
+
 							</TextInput>
 						</View>
-						<View style={{flexDirection:'row',  justifyContent:'center', paddingTop:20}}>
+						<View style={{flexDirection:'row',  justifyContent:'center', marginTop:20}}>
 							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3}}>
 								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.okMethod()}>
 									<Text style={styles.buttonText}>Ok</Text>
@@ -50,7 +54,16 @@ class InventoryEdit extends Component {
 	closeCurrentSkuHandler(){
 		this.props.cancelMethod();
 	};
+	isVisible(){
+		if(this.props.type === "sku"){
+			return this.props.skuToShow === this.props.title;
+		}else if(this.props.type === "currentMeter" ){
+			return this.props.visible;
+		}else{
+			return false;
+		}
 
+	}
 }
 
 class InventoryReport extends Component {
@@ -61,6 +74,7 @@ class InventoryReport extends Component {
 		this.state = {
 			currentSkuEdit:"",
 			refresh: false,
+			currentMeterVisible:false
 		};
 	}
 
@@ -138,6 +152,13 @@ class InventoryReport extends Component {
 							<Text style={[styles.totalItem, { flex: .33 }]}>Wastage: </Text>
 							<Text style={[styles.totalItem, { flex: .33 }]}>5001 </Text>
 						</View>
+						<InventoryEdit
+							type = "currentMeter"
+							visible = {this.state.currentMeterVisible}
+							title = "Current Meter"
+							cancelMethod = {this.onCancelEditCurrentSku.bind(this)}
+							okMethod = {this.onOkEditCurrentSku.bind(this)}>
+						</InventoryEdit>
 					</View>
 
 				</View>
@@ -190,8 +211,9 @@ class InventoryReport extends Component {
 					<Text style={[styles.rowItem]}>{item.totalSales.toFixed(2)}</Text>
 				</View>
 				<InventoryEdit
+					type = "sku"
 					skuToShow = {this.state.currentSkuEdit}
-					item = {item}
+					title = {item.sku}
 					cancelMethod = {this.onCancelEditCurrentSku.bind(this)}
 					okMethod = {this.onOkEditCurrentSku.bind(this)}>
 				</InventoryEdit>
@@ -216,31 +238,6 @@ class InventoryReport extends Component {
 		this.setState({refresh: !this.state.refresh});
 	}
 
-	// showEditCurrentSku( sku ){
-	// 	return (
-	// 		<View style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-  //
-	// 			<View style={[styles.editInventory]}>
-	// 				<View style={{flexDirection:'row',}}>
-	// 					<Text style={{fontSize:24, fontWeight:'bold'}}>{sku}</Text>
-	// 					<TextInput placeholder = "Current Inventory"></TextInput>
-	// 				</View>
-	// 				<View style={{flexDirection:'row',  justifyContent:'flex-start'}}>
-	// 					<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3}}>
-	// 						<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.onOkEditCurrentSku()}>
-	// 							<Text style={styles.buttonText}>Ok</Text>
-	// 						</TouchableHighlight>
-	// 					</View>
-	// 					<View style={{backgroundColor:"#2858a7", borderRadius:10,flex:.3 }}>
-	// 						<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.onCancelEditCurrentSku()}>
-	// 							<Text style={styles.buttonText}>Cancel</Text>
-	// 						</TouchableHighlight>
-	// 					</View>
-	// 				</View>
-	// 			</View>
-	// 		</View>
-	// 	);
-	// };
 
 
 
@@ -425,7 +422,7 @@ const styles = StyleSheet.create({
 	editInventory: {
 		height:300,
 		width:500,
-		justifyContent: 'center',
+		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		backgroundColor:'white',
 		borderColor:"#2858a7",
