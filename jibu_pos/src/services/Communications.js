@@ -48,7 +48,13 @@ class Communications {
 								reject({ status: response.status, response: error });
 							})
 					}else{
-						reject({ status: response.status, response: {message:"Cannot connect to the Sema service"} });
+						let reason = "";
+						if(response.status === 401){
+							reason = "- Invalid credentials "
+						}else if( response.status === 404 ){
+							reason = "- Service URL not found "
+						}
+						reject({ status: response.status, response: {message:"Cannot connect to the Sema service. " + reason} });
 					}
 				})
 				.catch((error) => {

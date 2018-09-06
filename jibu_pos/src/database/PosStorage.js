@@ -29,6 +29,7 @@ const productMrpsKey = '@Sema:ProductMrpsKey';
 
 const syncIntervalKey = '@Sema:SyncIntervalKey';
 
+const inventoryItemKey = '@Sema:InventoryItemKey';
 
 class PosStorage {
 	constructor() {
@@ -69,7 +70,7 @@ class PosStorage {
 		this.customerTypes = [];
 		this.productMrpDict = {};
 
-		this.syncInterval = {interval: 60*1000};
+		this.syncInterval = {interval: 2*60*1000};
 
 	}
 
@@ -776,6 +777,23 @@ class PosStorage {
 	}
 	setGetSyncInterval( intervalInMinutes) {
 		this.setKey(syncIntervalKey, JSON.stringify({interval: intervalInMinutes * 60 *1000 }));
+	}
+
+	// Return inventory item for the date
+	getInventoryItem( inventoryDate ){
+		console.log("PosStorage:getInventoryItem" );
+		let inventoryKey = this._makeInventoryKey(inventoryDate);
+		return new Promise((resolve) => {
+			this.getKey(inventoryKey )
+				.then( inventoryItem => {
+					resolve( this.parseJson(inventoryItem));
+				})
+				.catch(err => resolve(null));
+
+		});
+	}
+	_makeInventoryKey( date ){
+		return inventoryItemKey + date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
 	}
 
 	stringify( jsObject){

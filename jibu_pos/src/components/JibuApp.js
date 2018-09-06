@@ -29,7 +29,7 @@ import Communications from "../services/Communications";
 import Events from "react-native-simple-events";
 import * as ToolbarActions from "../actions/ToolBarActions";
 
-console.ignoredYellowBox = ['Warning: isMounted'];
+console.ignoredYellowBox = ['Warning: isMounted','Setting a timer'];
 
 class JibuApp extends Component {
 	constructor(props) {

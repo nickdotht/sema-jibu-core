@@ -20,7 +20,7 @@ class SalesReport extends Component {
 			return (
 				<View style={{ flex: 1 }}>
 					<DateFilter parent={this}/>
-					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 40, }}>
+					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 10, }}>
 						<View style = {styles.titleText}>
 							<View style = {styles.leftHeader}>
 								<Text style = {styles.titleItem}>Sales</Text>
@@ -82,22 +82,22 @@ class SalesReport extends Component {
 		return (
 			<View style={[{flex: 1, flexDirection: 'row',  alignItems:'center'},styles.rowBackground]}>
 				<View style={ [{flex: 1}]}>
-					<Text style={[styles.rowItem,styles.leftMargin]}>{item.description}</Text>
+					<Text numberOfLines={1}  style={[styles.rowItem,styles.leftMargin]}>{item.description}</Text>
+				</View>
+				<View style={[ {flex: .5, }]}>
+					<Text style={[styles.rowItemCenter]}>{item.quantity}</Text>
 				</View>
 				<View style={[ {flex: .7}]}>
-					<Text style={[styles.rowItem]}>{item.quantity}</Text>
+					<Text style={[styles.rowItemCenter]}>{item.litersPerSku} L</Text>
 				</View>
-				<View style={ [ {flex: .7}]}>
-					<Text style={[styles.rowItem]}>{item.litersPerSku}</Text>
+				<View style={[{flex: .7}]}>
+					<Text style={[styles.rowItemCenter]}>{item.totalLiters.toFixed(2)} L</Text>
 				</View>
-				<View style={ [{flex: .7}]}>
-					<Text style={[styles.rowItem]}>{item.totalLiters.toFixed(2)}</Text>
-				</View>
-				<View style={ [{flex: .7}]}>
-					<Text style={[styles.rowItem]}>{item.pricePerSku}</Text>
+				<View style={[{flex: .7}]}>
+					<Text style={[styles.rowItemCenter]}>{item.pricePerSku}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.rowItem]}>{item.totalSales.toFixed(2)}</Text>
+					<Text style={[styles.rowItemCenter]}>{item.totalSales.toFixed(2)}</Text>
 				</View>
 			</View>
 		);
@@ -108,20 +108,20 @@ class SalesReport extends Component {
 				<View style={ [{flex: 1}]}>
 					<Text style={[styles.headerItem,styles.leftMargin]}>SKU</Text>
 				</View>
-				<View style={[ {flex: .7}]}>
-					<Text style={[styles.headerItem]}>Quantity</Text>
+				<View style={[ {flex: .5}]}>
+					<Text style={[styles.headerItemCenter]}>Quantity</Text>
 				</View>
 				<View style={ [ {flex: .7}]}>
-					<Text style={[styles.headerItem]}>Liters/SKU</Text>
+					<Text style={[styles.headerItemCenter]}>Liters/SKU</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.headerItem]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.headerItem]}>Price/SKU</Text>
+					<Text style={[styles.headerItemCenter]}>Price/SKU</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.headerItem]}>Total Sales</Text>
+					<Text style={[styles.headerItemCenter]}>Total Sales</Text>
 				</View>
 			</View>
 		);
@@ -152,7 +152,12 @@ const styles = StyleSheet.create({
 
 	headerItem:{
 		fontWeight:"bold",
-		fontSize:18
+		fontSize:18,
+	},
+	headerItemCenter:{
+		fontWeight:"bold",
+		fontSize:18,
+		textAlign:'center'
 	},
 	rowItem:{
 		fontSize:16,
@@ -163,6 +168,17 @@ const styles = StyleSheet.create({
 		borderBottomWidth:1,
 		borderRightWidth:1
 	},
+	rowItemCenter:{
+		fontSize:16,
+		paddingLeft:10,
+		borderLeftWidth:1,
+		borderColor:'black',
+		borderTopWidth:1,
+		borderBottomWidth:1,
+		borderRightWidth:1,
+		textAlign:'center'
+	},
+
 	rowBackground:{
 		backgroundColor:'white'
 	},
@@ -177,11 +193,11 @@ const styles = StyleSheet.create({
 	},
 	titleItem:{
 		fontWeight:"bold",
-		fontSize:24
+		fontSize:20
 	},
 	titleText: {
 		backgroundColor: 'white',
-		height: 56,
+		height: 36,
 		flexDirection:'row',
 
 	},

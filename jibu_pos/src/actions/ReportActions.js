@@ -105,6 +105,11 @@ export function GetInventoryReportData( beginDate, endDate, products ) {
 
 const getInventoryData = (beginDate, endDate, products) =>{
 	return new Promise((resolve, reject) => {
+		PosStorage.getInventoryItem(beginDate)
+			.then(result => {
+				console.log(JSON.stringify(result));
+			});
+
 		let inventory = {currentMeter:110, currentProductSkus:[], previousMeter:120, previousProductSkus:[]};
 		inventory.currentProductSkus = products.map( product =>{
 			if(product.sku === "sku1" ){

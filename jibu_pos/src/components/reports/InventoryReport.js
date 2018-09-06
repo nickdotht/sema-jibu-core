@@ -65,12 +65,16 @@ class InventoryEdit extends Component {
 
 	}
 }
+const dayInMilliseconds =  24*60*60*1000;
 
 class InventoryReport extends Component {
 	constructor(props) {
 		super(props);
-		this.beginDate = null;
-		this.endDate = null;
+
+		let currentDate = new Date();
+		this.beginDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() );
+		this.endDate = new Date( this.beginDate.getTime() + dayInMilliseconds) ;
+
 		this.state = {
 			currentSkuEdit:"",
 			refresh: false,
@@ -89,7 +93,7 @@ class InventoryReport extends Component {
 			return (
 				<View style={{ flex: 1 }}>
 					<DateFilter parent={this}/>
-					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 40, }}>
+					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 10, }}>
 						<View style = {styles.titleText}>
 							<View style = {styles.leftHeader}>
 								<Text style = {styles.titleItem}>Sales</Text>
@@ -113,7 +117,7 @@ class InventoryReport extends Component {
 
 					</View>
 					<View style={{
-						flex: .3,
+						flex: .5,
 						backgroundColor: 'white',
 						marginLeft: 10,
 						marginRight: 10,
@@ -137,14 +141,14 @@ class InventoryReport extends Component {
 							<Text style={[styles.production, { flex: .33}]}>Production</Text>
 							<Text style={[styles.totalItem, { flex: .33 }]}>Previous Meter</Text>
 							<Text style={[styles.totalItem, { flex: .33 }]}>Current Meter </Text>
-							<Text style={[styles.totalItem, { flex: .33 }]}>Total Production </Text>
+							<Text style={[styles.totalItem, { flex: .40 }]}>Total Production </Text>
 						</View>
 
 						<View style={[{ flex: 1, flexDirection: 'row', alignItems:"center", marginTop:5 }]}>
 							<Text style={[styles.totalItem, { flex: .83 }]}> </Text>
-							<Text style={[styles.rowItem, { flex: .33 }]}>{this.getInventoryMeterForDisplay(false)}</Text>
+							<Text style={[styles.rowItemCenter, { flex: .33 }]}>{this.getInventoryMeterForDisplay(false)}</Text>
 							{this.getCurrentMeter()}
-							<Text style={[styles.rowItem, { flex: .33 }]}>{this.getTotalProduction()}</Text>
+							<Text style={[styles.rowItemCenter, { flex: .40 }]}>{this.getTotalProduction()}</Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15, marginBottom:10 }}>
 							<Text style={[styles.totalItem, { flex: .66 }]}> </Text>
@@ -177,9 +181,9 @@ class InventoryReport extends Component {
 
 	getTotalLiters() {
 		if (this.props.salesData.totalLiters) {
-			return this.props.salesData.totalLiters.toFixed(2);
+			return this.props.salesData.totalLiters.toFixed(2) + ' L';
 		} else {
-			return 0;
+			return '-';
 		}
 
 	}
@@ -189,25 +193,25 @@ class InventoryReport extends Component {
 		return (
 			<View style={[{ flex: 1, flexDirection: 'row', alignItems: 'center' }, styles.rowBackground]}>
 				<View style={[{ flex: 1 }]}>
-					<Text style={[styles.rowItem, styles.leftMargin]}>{item.description}</Text>
+					<Text numberOfLines={1}  style={[styles.rowItem, styles.leftMargin]}>{item.description}</Text>
+				</View>
+				<View style={[{ flex: .5 }]}>
+					<Text style={[styles.rowItemCenter]}>{item.quantity}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItem]}>{item.quantity}</Text>
+					<Text style={[styles.rowItemCenter]}>{item.litersPerSku} L</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItem]}>{item.litersPerSku}</Text>
-				</View>
-				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItem]}>{item.totalLiters.toFixed(2)}</Text>
+					<Text style={[styles.rowItemCenter]}>{item.totalLiters.toFixed(2)} L</Text>
 				</View>
 				<View style ={[{width:20}]}/>
 
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItem]}>{this.getInventorySkuForDisplay(false, item)}</Text>
+					<Text style={[styles.rowItemCenter]}>{this.getInventorySkuForDisplay(false, item)}</Text>
 				</View>
 				{this.getCurrentInventory(item)}
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItem]}>{this.getTotalForSkuDisplay(item)}</Text>
+					<Text style={[styles.rowItemCenter]}>{this.getTotalForSkuDisplay(item)}</Text>
 				</View>
 				<InventoryEdit
 					type = "sku"
@@ -241,24 +245,24 @@ class InventoryReport extends Component {
 				<View style={[{ flex: 1 }]}>
 					<Text style={[styles.headerItem, styles.leftMargin]}>SKU</Text>
 				</View>
-				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItem]}>Quantity</Text>
+				<View style={[{ flex: .5 }]}>
+					<Text style={[styles.headerItemCenter]}>Quantity</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItem]}>Liters/SKU</Text>
+					<Text style={[styles.headerItemCenter]}>Liters/SKU</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItem]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
 				</View>
 				<View style ={[{width:20}]}/>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItem]}>Previous</Text>
+					<Text style={[styles.headerItemCenter]}>Previous</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItem]}>Current</Text>
+					<Text style={[styles.headerItemCenter]}>Current</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItem]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
 				</View>
 			</View>
 		);
@@ -304,24 +308,30 @@ class InventoryReport extends Component {
 		if (current == '-') return '-';
 		let previous = this.getInventorySkuForDisplay(false, item);
 		if (previous == '-') return '-';
-		return ((current - previous) * item.litersPerSku).toFixed(2);
+		return ((current - previous) * item.litersPerSku).toFixed(2) + ' L';
 	}
 
 	getTotalInventory(){
-		let result = 0;
-		let valid = false;
-		for( let index = 0; index < this.props.salesData.salesItems.length; index++){
-			let inventoryItem = this.getTotalForSkuDisplay( this.props.salesData.salesItems[index ]);
-			if( inventoryItem != '-'){
-				valid = true;
-				result += parseFloat(inventoryItem);
+		try {
+			let result = 0;
+			let valid = false;
+			for (let index = 0; index < this.props.salesData.salesItems.length; index++) {
+				let inventoryItem = this.getTotalForSkuDisplay(this.props.salesData.salesItems[index]);
+				if (inventoryItem != '-') {
+					valid = true;
+					result += parseFloat(inventoryItem);
+				}
 			}
+			if (valid) {
+				return result.toFixed(2) + ' L';
+			} else {
+				return '-';
+			}
+		}catch( error ){
+			console.log(JSON.stringify(this.props.salesData));
+			console.log("getTotalInventory " + error.message);
 		}
-		if( valid ){
-			return result.toFixed(2);
-		}else{
-			return '-';
-		}
+		return '-';
 	}
 	getOutput(){
 		let sales = 0;
@@ -337,7 +347,7 @@ class InventoryReport extends Component {
 		if( getTotalInventory != '-'){
 			inventory = parseFloat(getTotalInventory);
 		}
-		return (sales + inventory).toFixed(2);
+		return (sales + inventory).toFixed(2) + ' L';
 	}
 
 	displayEditCurrentSku(sku ){
@@ -361,7 +371,7 @@ class InventoryReport extends Component {
 	getInventoryMeterForDisplay(currentPrev ){
 		let meter = (currentPrev) ? this.props.inventoryData.currentMeter : this.props.inventoryData.previousMeter;
 		if( meter != null && !isNaN(meter)){
-			return meter.toFixed(2);
+			return meter.toFixed(2) + ' L';
 		}else{
 			return "-";		// No data
 		}
@@ -372,7 +382,7 @@ class InventoryReport extends Component {
 		if( current == '-' || previous == '-'){
 			return '-'
 		}else{
-			return (parseFloat(current) - parseFloat(previous)).toFixed(2);
+			return (parseFloat(current) - parseFloat(previous)).toFixed(2) + ' L';
 		}
 	}
 	getWastage(){
@@ -423,6 +433,12 @@ const styles = StyleSheet.create({
 		fontWeight:"bold",
 		fontSize:18
 	},
+	headerItemCenter:{
+		fontWeight:"bold",
+		fontSize:18,
+		textAlign:'center'
+	},
+
 	rowItem:{
 		fontSize:16,
 		paddingLeft:10,
@@ -430,7 +446,17 @@ const styles = StyleSheet.create({
 		borderColor:'black',
 		borderTopWidth:1,
 		borderBottomWidth:1,
-		borderRightWidth:1
+		borderRightWidth:1,
+	},
+	rowItemCenter:{
+		fontSize:16,
+		paddingLeft:10,
+		borderLeftWidth:1,
+		borderColor:'black',
+		borderTopWidth:1,
+		borderBottomWidth:1,
+		borderRightWidth:1,
+		textAlign:'center'
 	},
 	rowBackground:{
 		backgroundColor:'white'
@@ -446,11 +472,11 @@ const styles = StyleSheet.create({
 	},
 	titleItem:{
 		fontWeight:"bold",
-		fontSize:24
+		fontSize:20
 	},
 	titleText: {
 		backgroundColor: 'white',
-		height: 56,
+		height: 25,
 		flexDirection:'row',
 
 	},
