@@ -4,6 +4,7 @@ import { REMOVE_PRODUCT } from "./OrderActions";
 export const SALES_REPORT_FROM_ORDERS = 'SALES_REPORT_FROM_ORDERS';
 export const INVENTORY_REPORT = 'INVENTORY_REPORT';
 export const REPORT_TYPE = 'REPORT_TYPE';
+export const REPORT_FILTER = 'REPORT_FILTER';
 
 
 export function GetSalesReportData( beginDate, endDate ) {
@@ -27,6 +28,10 @@ export function setReportType( reportType ) {
 	return (dispatch) => { dispatch({type: REPORT_TYPE, data:reportType}); }
 }
 
+export function setReportFilter( startDate, endDate ){
+	console.log("setReportFilter - action");
+	return (dispatch) => { dispatch({type: REPORT_FILTER, data:{startDate:startDate, endDate:endDate}}); }
+}
 
 const getSalesData = (beginDate, endDate) =>{
 	return new Promise((resolve, reject) => {
@@ -105,11 +110,56 @@ export function GetInventoryReportData( beginDate, endDate, products ) {
 
 const getInventoryData = (beginDate, endDate, products) =>{
 	return new Promise((resolve, reject) => {
-		PosStorage.getInventoryItem(beginDate)
-			.then(result => {
-				console.log(JSON.stringify(result));
+		getSalesData(beginDate, endDate)
+			.then( salesData =>{
+				getInventoryItem(beginDate, products)
+					.then(inventorySettings => {
+						let inventoryData = createInventory( salesData, inventorySettings, products);
+						resolve( inventoryData)
+					})
+					.catch((error) => {
+						reject( error);
+					});
+			})
+			.catch((error) => {
+				reject( error);
 			});
+	});
+};
+const createInventory = (salesData, inventorySettings, products ) =>{
+	let salesAndProducts = {...salesData};
+	salesAndProducts.salesItems = salesData.salesItems.slice();
+	let emptyProducts = [];
+	for( let index = 0; index < products.length; index++ ){
+		if( isNotIncluded( products[index], salesAndProducts.salesItems)){
+			emptyProducts.push(
+				{
+					sku: products[index].sku,
+					description:products[index].description,
+					quantity: 0,
+					totalSales: 0,
+					totalLiters:0,
+					litersPerSku:products[index].unitPerProduct
+				});
+		}
+	}
+	salesAndProducts.salesItems = salesAndProducts.salesItems.concat( emptyProducts );
+	let inventoryData = {salesAndProducts:salesAndProducts, inventory:inventorySettings};
 
+	return inventoryData;
+};
+
+const isNotIncluded = ( product, salesAndProducts) =>{
+	for( let index =0; index < salesAndProducts.length; index++){
+		if( salesAndProducts[index].sku == product.sku){
+			return false;
+		}
+	}
+	return true;
+};
+
+const getInventoryItem = (beginDate, products) => {
+	return new Promise((resolve, reject) => {
 		let inventory = {currentMeter:110, currentProductSkus:[], previousMeter:120, previousProductSkus:[]};
 		inventory.currentProductSkus = products.map( product =>{
 			if(product.sku === "sku1" ){
@@ -134,5 +184,13 @@ const getInventoryData = (beginDate, endDate, products) =>{
 		});
 
 		resolve(inventory);
+
 	});
+};
+
+export const initializeSalesData = () => {
+	return {totalLiters: null, totalSales: null, salesItems:[]};
+};
+export const initializeInventoryData = () =>{
+	return {salesAndProducts:initializeSalesData(), inventory:{currentMeter:null, currentProductSkus:[], previousMeter:null, previousProductSkus:[]}}
 };

@@ -8,26 +8,26 @@ import DateFilter from "./DateFilter";
 class SalesReport extends Component {
 	constructor(props) {
 		super(props);
-		this.beginDate = null;
+		this.startDate = null;
 		this.endDate = null;
 	}
 	componentDidMount() {
 		console.log("SalesReport - componentDidMount");
-		this.props.reportActions.GetSalesReportData( this.beginDate, this.endDate);
+		// this.props.reportActions.GetSalesReportData( this.startDate, this.endDate);
 	}
 	render() {
 		if( this.props.reportType === "sales") {
 			return (
 				<View style={{ flex: 1 }}>
-					<DateFilter parent={this}/>
+					<DateFilter/>
 					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 10, }}>
 						<View style = {styles.titleText}>
 							<View style = {styles.leftHeader}>
-								<Text style = {styles.titleItem}>Sales</Text>
+								<Text style = {styles.titleItem}>Sales </Text>
 							</View>
 						</View>
 						<FlatList
-							data={this.props.salesData.salesItems}
+							data={this.getSalesData()}
 							ListHeaderComponent={this.showHeader}
 							// extraData={this.state.refresh}
 							renderItem={({ item, index, separators }) => (
@@ -59,6 +59,21 @@ class SalesReport extends Component {
 			);
 		}else{
 			return null;
+		}
+	}
+	getSalesData(){
+		if( this.props.dateFilter.hasOwnProperty("startDate") && this.props.dateFilter.hasOwnProperty("endDate") ){
+			if( this.props.dateFilter.startDate == this.startDate && this.props.dateFilter.endDate == this.endDate){
+				return this.props.salesData.salesItems;
+			}else{
+				// Get new data
+				this.startDate = this.props.dateFilter.startDate;
+				this.endDate = this.props.dateFilter.endDate;
+				this.updateReport();
+				return this.props.salesData.salesItems;
+			}
+		}else{
+			return this.props.salesData.salesItems;
 		}
 	}
 	getTotalSales (){
@@ -126,17 +141,15 @@ class SalesReport extends Component {
 			</View>
 		);
 	};
-	setFilterRange( beginDate, endDate ) {
-		this.beginDate = beginDate;
-		this.endDate = endDate;
-	}
+
 	updateReport(){
-		this.props.reportActions.GetSalesReportData( this.beginDate, this.endDate);
+		this.props.reportActions.GetSalesReportData( this.startDate, this.endDate);
 	}
 }
 
 function mapStateToProps(state, props) {
 	return { salesData: state.reportReducer.salesData,
+			 dateFilter: state.reportReducer.dateFilter,
 			 reportType: state.reportReducer.reportType
 	};
 }

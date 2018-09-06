@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import { Text, View, Image, TouchableHighlight, StyleSheet } from 'react-native';
+import { bindActionCreators } from "redux";
+import * as reportActions from "../../actions/ReportActions";
+import { connect } from "react-redux";
 
 const dayInMilliseconds =  24*60*60*1000;
 
-export default class DateFilter extends Component {
+class DateFilter extends Component {
 	constructor(props) {
 		super(props);
 		let currentDate = new Date();
 		this.state = {currentDate :new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() )};
 		this.maxDate = new Date( this.state.currentDate.getTime() + dayInMilliseconds );
 		this.minDate = new Date( this.maxDate.getTime() - 30 * dayInMilliseconds );
-		this.props.parent.setFilterRange( this.state.currentDate, new Date( this.state.currentDate.getTime() + dayInMilliseconds) );
 		console.log( "DateFilter - maxDate = " + this.maxDate.toString());
 		console.log( "DateFilter - minDate = " + this.minDate.toString());
+		this.props.reportActions.setReportFilter( this.state.currentDate, new Date( this.state.currentDate.getTime() + dayInMilliseconds));
 
 
 	}
@@ -74,11 +77,23 @@ export default class DateFilter extends Component {
 	update(){
 		const beginDate = this.state.currentDate;
 		const endDate = new Date( beginDate.getTime() + dayInMilliseconds );
-		this.props.parent.setFilterRange( this.state.currentDate, new Date( this.state.currentDate.getTime() + dayInMilliseconds) );
-		this.props.parent.updateReport();
+		this.props.reportActions.setReportFilter( beginDate, endDate );
 		console.log( "Filter-From " + beginDate.toDateString() + " to " + endDate.toDateString());
 	}
 }
+
+function mapStateToProps(state, props) {
+	return { dateFilter: state.reportReducer.dateFilter };
+}
+
+function mapDispatchToProps(dispatch) {
+	return {reportActions:bindActionCreators(reportActions, dispatch) };
+}
+
+//Connect everything
+export default connect(mapStateToProps, mapDispatchToProps)(DateFilter);
+
+
 const styles = StyleSheet.create({
 
 	filterContainer:{

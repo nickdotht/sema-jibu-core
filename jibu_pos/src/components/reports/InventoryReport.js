@@ -72,8 +72,8 @@ class InventoryReport extends Component {
 		super(props);
 
 		let currentDate = new Date();
-		this.beginDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() );
-		this.endDate = new Date( this.beginDate.getTime() + dayInMilliseconds) ;
+		this.startDate = null;
+		this.endDate = null;
 
 		this.state = {
 			currentSkuEdit:"",
@@ -84,15 +84,13 @@ class InventoryReport extends Component {
 
 	componentDidMount() {
 		console.log("InventoryReport - componentDidMount");
-		this.props.reportActions.GetSalesReportData(this.beginDate, this.endDate);
-		this.props.reportActions.GetInventoryReportData(this.beginDate, this.endDate, this.props.products);
 	}
 
 	render() {
 		if (this.props.reportType === "inventory") {
 			return (
 				<View style={{ flex: 1 }}>
-					<DateFilter parent={this}/>
+					<DateFilter/>
 					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 10, }}>
 						<View style = {styles.titleText}>
 							<View style = {styles.leftHeader}>
@@ -103,7 +101,7 @@ class InventoryReport extends Component {
 							</View>
 						</View>
 						<FlatList
-							data={this.props.salesData.salesItems}
+							data={this.getInventoryData()}
 							extraData={this.state.refresh}
 							ListHeaderComponent={this.showHeader}
 							renderItem={({ item, index, separators }) => (
@@ -170,18 +168,33 @@ class InventoryReport extends Component {
 			return null;
 		}
 	}
+	getInventoryData(){
+		if( this.props.dateFilter.hasOwnProperty("startDate") && this.props.dateFilter.hasOwnProperty("endDate") ){
+			if( this.props.dateFilter.startDate == this.startDate && this.props.dateFilter.endDate == this.endDate){
+				return this.props.inventoryData.salesAndProducts.salesItems
+			}else{
+				// Get new data
+				this.startDate = this.props.dateFilter.startDate;
+				this.endDate = this.props.dateFilter.endDate;
+				this.updateReport();
+				return this.props.inventoryData.salesAndProducts.salesItems;
+			}
+		}else{
+			return this.props.salesData.salesItems;
+		}
+	}
 
 	getTotalSales() {
-		if (this.props.salesData.totalSales) {
-			return this.props.salesData.totalSales.toFixed(2);
+		if (this.props.inventoryData.salesAndProducts.totalSales) {
+			return this.props.inventoryData.salesAndProducts.totalSales.toFixed(2);
 		} else {
 			return '-';
 		}
 	}
 
 	getTotalLiters() {
-		if (this.props.salesData.totalLiters) {
-			return this.props.salesData.totalLiters.toFixed(2) + ' L';
+		if (this.props.inventoryData.salesAndProducts.totalLiters) {
+			return this.props.inventoryData.salesAndProducts.totalLiters.toFixed(2) + ' L';
 		} else {
 			return '-';
 		}
@@ -269,13 +282,8 @@ class InventoryReport extends Component {
 	};
 
 
-	setFilterRange(beginDate, endDate) {
-		this.beginDate = beginDate;
-		this.endDate = endDate;
-	}
-
 	updateReport() {
-		this.props.reportActions.GetSalesReportData(this.beginDate, this.endDate);
+		this.props.reportActions.GetInventoryReportData(this.startDate, this.endDate, this.props.products);
 	}
 
 	getCurrentInventory( item ){
@@ -291,7 +299,7 @@ class InventoryReport extends Component {
 		);
 	}
 	getInventorySkuForDisplay(currentPrev, item ){
-		let inventoryArray = (currentPrev) ? this.props.inventoryData.currentProductSkus : this.props.inventoryData.previousProductSkus;
+		let inventoryArray = (currentPrev) ? this.props.inventoryData.inventory.currentProductSkus : this.props.inventoryData.inventory.previousProductSkus;
 		for( let index = 0; index < inventoryArray.length; index ++ ){
 			if( inventoryArray[index].sku === item.sku ){
 				if( inventoryArray[index].inventory != null && !isNaN(inventoryArray[index].inventory)){
@@ -315,8 +323,8 @@ class InventoryReport extends Component {
 		try {
 			let result = 0;
 			let valid = false;
-			for (let index = 0; index < this.props.salesData.salesItems.length; index++) {
-				let inventoryItem = this.getTotalForSkuDisplay(this.props.salesData.salesItems[index]);
+			for (let index = 0; index < this.props.inventoryData.salesAndProducts.salesItems.length; index++) {
+				let inventoryItem = this.getTotalForSkuDisplay(this.props.inventoryData.salesAndProducts.salesItems[index]);
 				if (inventoryItem != '-') {
 					valid = true;
 					result += parseFloat(inventoryItem);
@@ -328,7 +336,7 @@ class InventoryReport extends Component {
 				return '-';
 			}
 		}catch( error ){
-			console.log(JSON.stringify(this.props.salesData));
+			console.log(JSON.stringify(this.props.inventoryData));
 			console.log("getTotalInventory " + error.message);
 		}
 		return '-';
@@ -369,7 +377,7 @@ class InventoryReport extends Component {
 	}
 
 	getInventoryMeterForDisplay(currentPrev ){
-		let meter = (currentPrev) ? this.props.inventoryData.currentMeter : this.props.inventoryData.previousMeter;
+		let meter = (currentPrev) ? this.props.inventoryData.inventory.currentMeter : this.props.inventoryData.inventory.previousMeter;
 		if( meter != null && !isNaN(meter)){
 			return meter.toFixed(2) + ' L';
 		}else{
@@ -414,9 +422,9 @@ class InventoryReport extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		salesData: state.reportReducer.salesData,
 		inventoryData: state.reportReducer.inventoryData,
 		products: state.productReducer.products,
+		dateFilter: state.reportReducer.dateFilter,
 		reportType: state.reportReducer.reportType
 	};
 }

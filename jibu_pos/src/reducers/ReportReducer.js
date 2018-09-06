@@ -1,7 +1,7 @@
 
-import { SALES_REPORT_FROM_ORDERS, REPORT_TYPE, INVENTORY_REPORT } from "../actions/ReportActions"
+import { SALES_REPORT_FROM_ORDERS, REPORT_TYPE, INVENTORY_REPORT, REPORT_FILTER, initializeSalesData, initializeInventoryData } from "../actions/ReportActions"
 
-let initialState = {salesData:{salesItems:[]}, reportType:"sales", inventoryData:{currentMeter:110, productSkus:[]}};
+let initialState = {salesData:initializeSalesData(), reportType:"sales", inventoryData:initializeInventoryData(),dateFilter:{}};
 
 const reportReducer = (state = initialState, action) => {
 	console.log("reportReducer: " +action.type);
@@ -15,6 +15,11 @@ const reportReducer = (state = initialState, action) => {
 		case INVENTORY_REPORT:
 			newState = {...state};
 			newState.inventoryData = action.data.inventoryData ;
+			return newState;
+
+		case REPORT_FILTER:
+			newState = {...state};
+			newState.dateFilter = action.data;
 			return newState;
 
 		case REPORT_TYPE:
