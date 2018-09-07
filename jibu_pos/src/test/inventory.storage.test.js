@@ -25,10 +25,20 @@ test('Test inventory storage', () => {
 						.then( isInitialized => {
 							expect(posStorage.getInventoryKeys().length).toBe(1);
 							// New Date should add
+							inventory1.name1 = "value4";
 							posStorage.addOrUpdateInventoryItem(inventory1, new Date("September 5, 2018"));
 							expect(posStorage.getInventoryKeys().length).toBe(2);
-
-							console.log(JSON.stringify(storageCache));
+							return posStorage.getInventoryItem(new Date("September 5, 2018"))
+								.then( (item) => {
+									console.log("-----" + JSON.stringify(item.name1));
+									expect(item.name1).toBe("value4");
+									return posStorage.getInventoryItem(new Date("September 6, 2018"))
+										.then( (item) => {
+											console.log("-----" + JSON.stringify(item.name1));
+											expect(item.name1).toBe("value3");
+											console.log(JSON.stringify(storageCache));
+										});
+								} );
 						});
 				});
 

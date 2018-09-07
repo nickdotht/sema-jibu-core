@@ -4,11 +4,21 @@ import { bindActionCreators } from "redux";
 import * as reportActions from "../../actions/ReportActions";
 import { connect } from "react-redux";
 import DateFilter from "./DateFilter";
+import PosStorage from "../../database/PosStorage";
 
 class InventoryEdit extends Component {
 	constructor(props) {
 		super(props);
+		this.state = {inventoryQuantity:this.props.quantity};
+		this.quantityInput = React.createRef();
 	}
+	componentWillUpdate(){
+		this.state.inventoryQuantity = this.props.quantity;
+		// if( this.quantityInput.current ) {
+		// 	this.quantityInput.current.refs.quantityInput.focus();
+		// }
+	}
+
 	render() {
 		return (
 			<Modal visible = {this.isVisible()}
@@ -23,17 +33,22 @@ class InventoryEdit extends Component {
 						<View style={{flexDirection:'row',alignItems: 'center', justifyContent:'center', marginTop:20}}>
 							<Text style={{fontSize:18, fontWeight:'bold', flex:.7, paddingLeft:20}}>{this.props.title}</Text>
 							<TextInput
+								reference = 'quantityInput'
 								style={ [styles.inventoryInput, {flex:.5, paddingRight:40, marginRight:20 }]}
 								underlineColorAndroid='transparent'
-								onSubmitEditing = {() => this.props.okMethod()}
+								onSubmitEditing = {() => this.props.okMethod(this.props.sku, this.state.inventoryQuantity)}
 								keyboardType = 'numeric'
+								onChangeText = {this.onChangeText.bind(this)}
+								value = {this.state.inventoryQuantity}
+								ref = {this.quantityInput}
+								autoFocus = {true}
 								placeholder = "Current Value">
 
 							</TextInput>
 						</View>
 						<View style={{flexDirection:'row',  justifyContent:'center', marginTop:20}}>
 							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3}}>
-								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.okMethod()}>
+								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.okMethod( this.props.sku, this.state.inventoryQuantity)}>
 									<Text style={styles.buttonText}>Ok</Text>
 								</TouchableHighlight>
 							</View>
@@ -62,8 +77,11 @@ class InventoryEdit extends Component {
 		}else{
 			return false;
 		}
-
 	}
+	onChangeText = (text )=>{
+		this.setState({inventoryQuantity :text});
+	}
+
 }
 const dayInMilliseconds =  24*60*60*1000;
 
@@ -156,6 +174,7 @@ class InventoryReport extends Component {
 						<InventoryEdit
 							type = "currentMeter"
 							visible = {this.state.currentMeterVisible}
+							sku={""}
 							title = "Current Meter"
 							cancelMethod = {this.onCancelCurrentMeter.bind(this)}
 							okMethod = {this.onOkCurrentMeter.bind(this)}>
@@ -180,7 +199,7 @@ class InventoryReport extends Component {
 				return this.props.inventoryData.salesAndProducts.salesItems;
 			}
 		}else{
-			return this.props.salesData.salesItems;
+			return this.props.inventoryData.salesAndProducts.salesItems;
 		}
 	}
 
@@ -231,21 +250,41 @@ class InventoryReport extends Component {
 					skuToShow = {this.state.currentSkuEdit}
 					sku = {item.sku}
 					title = {item.description}
+					quantity = {this.getInventorySkuForEdit(true, item)}
 					cancelMethod = {this.onCancelEditCurrentSku.bind(this)}
 					okMethod = {this.onOkEditCurrentSku.bind(this)}>
 				</InventoryEdit>
 			</View>
 		);
 	};
-
+	getInventorySkuForEdit(currentPrev, item){
+		let value = this.getInventorySkuForDisplay(currentPrev, item);
+		if( value == '-') return "";
+		else return value.toFixed(0);
+	}
 	onCancelEditCurrentSku(){
 		this.setState({currentSkuEdit:""});
 		this.setState({refresh: !this.state.refresh});
 	}
 
-	onOkEditCurrentSku(){
+	onOkEditCurrentSku( sku, newQuantity ){
 		this.setState({currentSkuEdit:""});
-		this.setState({refresh: !this.state.refresh});
+		let update = null;
+		if( newQuantity.trim().length > 0 ){
+			update = parseInt(newQuantity);
+		}
+		if( !isNaN(update)) {
+			for (let index = 0; index < this.props.inventoryData.inventory.currentProductSkus.length; index++) {
+				if (this.props.inventoryData.inventory.currentProductSkus[index].sku === sku) {
+					this.props.inventoryData.inventory.currentProductSkus[index].inventory = update;
+					PosStorage.addOrUpdateInventoryItem(this.props.inventoryData.inventory, this.props.inventoryData.inventory.date);
+					break;
+				}
+			}
+			this.setState({ refresh: !this.state.refresh });
+		}else{
+			// TODO - Show alert
+		}
 	}
 
 
@@ -412,8 +451,19 @@ class InventoryReport extends Component {
 		this.setState({currentMeterVisible:false});
 
 	}
-	onOkCurrentMeter(){
+	onOkCurrentMeter( sku, newQuantity){
 		this.setState({currentMeterVisible:false});
+		let update = null;
+		if( newQuantity.trim().length > 0 ){
+			update = parseInt(newQuantity);
+		}
+		if( !isNaN(update)) {
+			this.props.inventoryData.inventory.currentMeter = update;
+			PosStorage.addOrUpdateInventoryItem(this.props.inventoryData.inventory, this.props.inventoryData.inventory.date);
+			this.setState({ refresh: !this.state.refresh });
+		}else{
+			// TODO - Show alert
+		}
 
 	}
 

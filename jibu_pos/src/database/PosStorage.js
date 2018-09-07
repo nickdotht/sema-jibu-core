@@ -789,6 +789,10 @@ class PosStorage {
 	}
 	addOrUpdateInventoryItem( inventory, inventoryDate){
 		console.log("PosStorage: getInventoryItem" );
+		if( typeof inventoryDate == 'string' ){
+			inventoryDate = new Date( inventoryDate);
+		}
+
 		return new Promise((resolve, reject) => {
 			let inventoryKey = this._makeInventoryKey(inventoryDate);
 			let existing = this._getInventoryItemKey( inventoryDate );
@@ -835,6 +839,22 @@ class PosStorage {
 		});
 	}
 
+	getInventoryItem( inventoryDate){
+		return new Promise((resolve) => {
+			let key = this._getInventoryItemKey( inventoryDate );
+			if( key != null){
+				this.getKey(key )
+					.then( item => {
+						resolve( this.parseJson(item));
+					})
+					.catch(err => resolve(null));
+
+			}else{
+				resolve( null );
+			}
+		});
+
+	}
 	// Return existing inventory item key or null
 	_getInventoryItemKey( inventoryDate ){
 		console.log("PosStorage:getInventoryItem" );
@@ -847,6 +867,7 @@ class PosStorage {
 		return null;
 	}
 	_makeInventoryKey( date ){
+		console.log( "PosStorage._makeInventoryKey" + date );
 		return inventoryItemKey + date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
 	}
 

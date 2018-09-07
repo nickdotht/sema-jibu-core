@@ -21,9 +21,12 @@ export default class MockStorage {
 
 	removeItem = jest.fn((key) => {
 		return new Promise((resolve, reject) => {
-			return this.storageCache.hasOwnProperty(key)
-				? resolve(delete this.storageCache[key])
-				: reject('No such key!');
+			if(this.storageCache.hasOwnProperty(key)){
+				delete this.storageCache[key];
+				return resolve(null);
+			}else {
+				return reject('No such key!');
+			}
 		});
 	});
 

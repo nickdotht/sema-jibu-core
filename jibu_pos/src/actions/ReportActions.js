@@ -159,38 +159,34 @@ const isNotIncluded = ( product, salesAndProducts) =>{
 };
 
 const getInventoryItem = (beginDate, products) => {
-	return new Promise((resolve, reject) => {
-		let inventory = {currentMeter:110, currentProductSkus:[], previousMeter:120, previousProductSkus:[]};
-		inventory.currentProductSkus = products.map( product =>{
-			if(product.sku === "sku1" ){
-				return {sku:product.sku, inventory:12 };
-
-			}else if(product.sku === "sku3" ){
-				return {sku:product.sku, inventory:9 };
-			}else {
-				return { sku: product.sku, inventory: null };
-			}
+	return new Promise((resolve ) => {
+		const promiseToday = PosStorage.getInventoryItem(beginDate);
+		const yesterday = new Date( beginDate.getTime() - 24 * 60 *60 *1000);
+		const promiseYesterday = PosStorage.getInventoryItem( yesterday);
+		Promise.all([promiseToday, promiseYesterday])
+			.then(inventoryResults => {
+				if( inventoryResults[0] != null ){
+					if( inventoryResults[1]){
+						inventoryResults[0].previousProductSkus = inventoryResults[1].currentProductSkus;
+						inventoryResults[0].previousMeter = inventoryResults[1].currentMeter;
+					}
+					resolve(inventoryResults[0])
+				}else{
+					let newInventory = initializeInventory();
+					newInventory.date = beginDate;
+					newInventory.currentProductSkus = products.map( product => {return {sku:product.sku, quantity:null }});
+					newInventory.previousProductSkus = products.map( product => {return {sku:product.sku, quantity:null }});
+					resolve(newInventory);
+				}
 		});
-
-		inventory.previousProductSkus = products.map( product =>{
-			if(product.sku === "sku1" ){
-				return {sku:product.sku, inventory:8 };
-
-			}else if(product.sku === "sku3" ){
-				return {sku:product.sku, inventory:11 };
-			}else {
-				return { sku: product.sku, inventory: null };
-			}
-		});
-
-		resolve(inventory);
-
 	});
 };
-
+const initializeInventory = () =>{
+	return {date:null, currentMeter:null, currentProductSkus:[], previousMeter:null, previousProductSkus:[]}
+}
 export const initializeSalesData = () => {
 	return {totalLiters: null, totalSales: null, salesItems:[]};
 };
 export const initializeInventoryData = () =>{
-	return {salesAndProducts:initializeSalesData(), inventory:{currentMeter:null, currentProductSkus:[], previousMeter:null, previousProductSkus:[]}}
+	return {salesAndProducts:initializeSalesData(), inventory:initializeInventory()}
 };

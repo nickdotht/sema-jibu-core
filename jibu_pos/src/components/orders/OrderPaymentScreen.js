@@ -17,7 +17,7 @@ class PaymentDescription extends Component {
 				<View style={ [{flex: 3}]}>
 					<Text style={[styles.totalTitle]}>{this.props.title}</Text>
 				</View>
-				<View style={[ {flex: 1}]}>
+				<View style={[ {flex: 2}]}>
 					<Text style={[styles.totalValue]}>{this.props.total}</Text>
 				</View>
 			</View>
@@ -154,7 +154,7 @@ class OrderPaymentScreen extends Component {
 					type = {"credit"}
 					checkBox = {this.state.isCredit}
 					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
-					checkBoxLabel = {'Credit'}
+					checkBoxLabel = {'Loan'}
 					value = {this._formatCurrency(this.props.payment.credit)} />
 			)
 		}else{
