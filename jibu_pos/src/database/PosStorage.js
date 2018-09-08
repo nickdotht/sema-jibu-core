@@ -289,15 +289,18 @@ class PosStorage {
 		});
 
 	}
-	addRemoteCustomers(customerArray ){
+	addRemoteCustomers(customerArray ) {
 		console.log("PosStorage:addCustomers: No existing customers no need to merge....");
-		this.customers = customerArray;
-		const keyValueArray = customerArray.map( (customer) => {
-			return [ this.makeCustomerKey(customer), this.stringify(customer)];
-		});
-		const keyArray = customerArray.map( (customer) => {
-			return this.makeCustomerKey(customer);
-		});
+		this.customers = [];
+		let keyValueArray = [];
+		let keyArray = [];
+		for (let index = 0; index < customerArray.length; index++){
+			if (customerArray[index].active) {
+				keyValueArray.push( [ this.makeCustomerKey(customerArray[index]), this.stringify(customerArray[index]) ] );
+				keyArray.push(this.makeCustomerKey(customerArray[index]));
+				this.customers.push( customerArray[index] );
+			}
+		}
 		this.customersKeys  = keyArray;
 		keyValueArray.push([ customersKey, this.stringify(keyArray) ] );
 		AsyncStorage.multiSet(keyValueArray ).then( error => {
