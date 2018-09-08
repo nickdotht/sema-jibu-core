@@ -175,7 +175,7 @@ class CustomerBar extends Component {
 				<CustomerBarButton
 					title = "Pay Loan"
 					handler = {this.onPayoff.bind(this)}
-					image = {require('../../images/customer-cancel-order.png')}
+					image = {require('../../images/customer-pay-balance.png')}
 					enabled = {this.state.deleteFunction &&
 					this.props.selectedCustomer.hasOwnProperty('name') &&
 					! this._isAnonymousCustomer(this.props.selectedCustomer) &&

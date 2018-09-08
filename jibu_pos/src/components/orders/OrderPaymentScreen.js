@@ -44,7 +44,7 @@ class PaymentMethod extends Component{
 		);
 	}
 	showTextInput (){
-		if( this.props.parent.state.isCredit) {
+		if( this.props.parent.state.isCredit || this.props.parent.isPayoffOnly()) {
 			if (this.props.type === 'cash' && this.props.parent.state.isCash) {
 				return (
 					<TextInput
@@ -119,7 +119,7 @@ class OrderPaymentScreen extends Component {
 						checkBoxLabel = {'Mobile'}
 						value = {this.props.payment.mobileToDisplay}
 						valueChange = {this.valuePaymentChange}/>
-					<PaymentDescription title = "Sale Amount Due:" total={this._formatCurrency( this.calculateOrderDue())}/>
+					{this.getSaleAmount()}
 					<PaymentDescription title = "Previous Amount Due:" total={this._formatCurrency( this.calculateAmountDue())}/>
 					<PaymentDescription title = "Total Amount Due:" total={this._formatCurrency( this.calculateTotalDue())}/>
 					<View style={styles.completeOrder}>
@@ -142,6 +142,17 @@ class OrderPaymentScreen extends Component {
 
 		);
 	}
+	getSaleAmount(){
+		if( !this.isPayoffOnly() ){
+			return (
+				<PaymentDescription title = "Sale Amount Due:" total={this._formatCurrency( this.calculateOrderDue())}/>
+			);
+		}else{
+			return null;
+		}
+	};
+
+
 	getCancelButton(){
 		if( ! this.isPayoffOnly()){
 			return(
@@ -198,14 +209,30 @@ class OrderPaymentScreen extends Component {
 	}
 
 	calculateOrderDue(){
-		return this.props.products.reduce( (total, item) => { return(total + item.quantity * this.getItemPrice(item.product)) }, 0);
+		if( this.isPayoffOnly()){
+			// If this is a loan payoff then the loan payment is negative the loan amount due
+			return this.calculateAmountDue();
+		}else {
+			return this.props.products.reduce((total, item) => {
+				return (total + item.quantity * this.getItemPrice(item.product))
+			}, 0);
+		}
 	}
 	calculateAmountDue(){
 		return this.props.selectedCustomer.dueAmount;
 	}
 
 	calculateTotalDue(){
-		return this._roundToDecimal((this.calculateOrderDue() + this.calculateAmountDue()));
+		if( this.isPayoffOnly()){
+			let paymentAmount = this.props.payment.cash;
+			if( this.props.payment.hasOwnProperty("mobileToDisplay")){
+				paymentAmount = this.props.payment.mobile;
+			}
+			return this._roundToDecimal((this.calculateAmountDue() - paymentAmount));
+
+		}else{
+			return this._roundToDecimal((this.calculateOrderDue() + this.calculateAmountDue()));
+		}
 	}
 
 	onCompleteOrder = ()=>{
@@ -299,7 +326,7 @@ class OrderPaymentScreen extends Component {
 		}else{
 			Alert.alert(
 				"Invalid payment amount. ",
-				'The amount paid cannot exceed to cost of goods and customer credit',
+				'The amount paid cannot exceed to cost of goods and customer amount due',
 				[
 					{ text: 'OK', onPress: () => console.log('OK Pressed') },
 				],
@@ -339,101 +366,116 @@ class OrderPaymentScreen extends Component {
 		);
 	};
 
-	formatAndSaveSale = () =>{
-		// Assumes that there is at least one product
-		let receiptDate = new Date(Date.now());
-		let receipt = {
-			id:receiptDate.toISOString(),
-			createdDate: receiptDate,
-			currencyCode:this.props.products[0].product.priceCurrency,
-			customerId:this.props.selectedCustomer.customerId,
-			amountCash: this.props.payment.cash,
-			amountLoan:this.props.payment.credit,
-			amountMobile:this.props.payment.mobile,
-			siteId: this.props.selectedCustomer.siteId,
-			paymentType:"",		// NOT sure what this is
-			salesChannelId: this.props.selectedCustomer.salesChannelId,
-			customerTypeId: this.props.selectedCustomer.customerTypeId,
-			products:[]
-		};
-		if( ! receipt.siteId ){
-			// This fixes issues with the pseudo walkup customer
-			receipt.siteId = PosStorage.getSettings().siteId;
-		}
-
-
-
+	formatAndSaveSale = () => {
+		let receipt = null;
 		let priceTotal = 0;
-		let cogsTotal = 0;
-		receipt.products = this.props.products.map( product => {
-			let receiptLineItem = {};
-			receiptLineItem.priceTotal = this.getItemPrice( product.product ) * product.quantity;
-			receiptLineItem.quantity = product.quantity;
-			receiptLineItem.productId = product.product.productId;
-			receiptLineItem.cogsTotal = this.getItemCogs( product.product ) * product.quantity;
-			// The items below are used for reporting...
-			receiptLineItem.sku = product.product.sku;
-			receiptLineItem.description = product.product.description;
-			if( product.product.unitMeasure == "liters"){
-				receiptLineItem.litersPerSku = product.product.unitPerProduct;
-			}else{
-				receiptLineItem.litersPerSku = "N/A";
-			}
-			priceTotal += receiptLineItem.priceTotal;
-			cogsTotal += receiptLineItem.cogsTotal;
-			return receiptLineItem;
-		});
-		receipt.total = priceTotal;
-		receipt.cogs = cogsTotal;
+		if (!this.isPayoffOnly()) {
 
+			// Assumes that there is at least one product
+			let receiptDate = new Date(Date.now());
+			receipt = {
+				id: receiptDate.toISOString(),
+				createdDate: receiptDate,
+				currencyCode: this.props.products[0].product.priceCurrency,
+				customerId: this.props.selectedCustomer.customerId,
+				amountCash: this.props.payment.cash,
+				amountLoan: this.props.payment.credit,
+				amountMobile: this.props.payment.mobile,
+				siteId: this.props.selectedCustomer.siteId,
+				paymentType: "",		// NOT sure what this is
+				salesChannelId: this.props.selectedCustomer.salesChannelId,
+				customerTypeId: this.props.selectedCustomer.customerTypeId,
+				products: []
+			};
+			if (!receipt.siteId) {
+				// This fixes issues with the pseudo walkup customer
+				receipt.siteId = PosStorage.getSettings().siteId;
+			}
+
+
+			let cogsTotal = 0;
+			receipt.products = this.props.products.map(product => {
+				let receiptLineItem = {};
+				receiptLineItem.priceTotal = this.getItemPrice(product.product) * product.quantity;
+				receiptLineItem.quantity = product.quantity;
+				receiptLineItem.productId = product.product.productId;
+				receiptLineItem.cogsTotal = this.getItemCogs(product.product) * product.quantity;
+				// The items below are used for reporting...
+				receiptLineItem.sku = product.product.sku;
+				receiptLineItem.description = product.product.description;
+				if (product.product.unitMeasure == "liters") {
+					receiptLineItem.litersPerSku = product.product.unitPerProduct;
+				} else {
+					receiptLineItem.litersPerSku = "N/A";
+				}
+				priceTotal += receiptLineItem.priceTotal;
+				cogsTotal += receiptLineItem.cogsTotal;
+				return receiptLineItem;
+			});
+			receipt.total = priceTotal;
+			receipt.cogs = cogsTotal;
+		}
 		// Check loan payoff
 		let payoff = 0;
-		try{
-			if( this.props.payment.hasOwnProperty("cashToDisplay")){
+		try {
+			if (this.props.payment.hasOwnProperty("cashToDisplay")) {
 				payoff = parseFloat(this.props.payment.cashToDisplay);
-			}else if( this.props.payment.hasOwnProperty("mobileToDisplay")){
+			} else if (this.props.payment.hasOwnProperty("mobileToDisplay")) {
 				payoff = parseFloat(this.props.payment.mobileToDisplay);
 			}
-			if( payoff > priceTotal ){
+			if (payoff > priceTotal) {
 				// User is paying of loan amount
 				payoff -= priceTotal;
-				if( payoff > this.props.selectedCustomer.dueAmount){
+				if (payoff > this.props.selectedCustomer.dueAmount) {
 					// Overpayment... this is an error
 					return false;
 				}
-			}else{
+			} else {
 				payoff = 0;
 			}
-		}catch(err){
-
+		} catch (err) {
+			console.log("formatAndSaveSale " + err.message);
 		}
+		if (receipt != null){
+			PosStorage.addSale(receipt);
 
-		PosStorage.addSale(receipt);
+			// Update dueAmount if required
+			if (receipt.amountLoan > 0) {
+				this.props.selectedCustomer.dueAmount += receipt.amountLoan;
+				PosStorage.updateCustomer(
+					this.props.selectedCustomer,
+					this.props.selectedCustomer.phoneNumber,
+					this.props.selectedCustomer.name,
+					this.props.selectedCustomer.address,
+					this.props.selectedCustomer.salesChannelId);
+			} else if (payoff > 0) {
+				this.props.selectedCustomer.dueAmount -= payoff;
+				PosStorage.updateCustomer(
+					this.props.selectedCustomer,
+					this.props.selectedCustomer.phoneNumber,
+					this.props.selectedCustomer.name,
+					this.props.selectedCustomer.address,
+					this.props.selectedCustomer.salesChannelId);
 
-		// Update dueAmount if required
-		if( receipt.amountLoan > 0 ){
-			this.props.selectedCustomer.dueAmount += receipt.amountLoan;
-			PosStorage.updateCustomer(
-				this.props.selectedCustomer,
-				this.props.selectedCustomer.phoneNumber,
-				this.props.selectedCustomer.name,
-				this.props.selectedCustomer.address,
-				this.props.selectedCustomer.salesChannelId);
-		}else if( payoff > 0 ){
-			this.props.selectedCustomer.dueAmount -= payoff;
-			PosStorage.updateCustomer(
-				this.props.selectedCustomer,
-				this.props.selectedCustomer.phoneNumber,
-				this.props.selectedCustomer.name,
-				this.props.selectedCustomer.address,
-				this.props.selectedCustomer.salesChannelId);
+			}
+		}else {
+			if (payoff > 0) {
+				this.props.selectedCustomer.dueAmount -= payoff;
+				PosStorage.updateCustomer(
+					this.props.selectedCustomer,
+					this.props.selectedCustomer.phoneNumber,
+					this.props.selectedCustomer.name,
+					this.props.selectedCustomer.address,
+					this.props.selectedCustomer.salesChannelId);
 
+			}
 		}
 		return true;
-	}
+	};
+
 	isPayoffOnly(){
 		return this.props.products.length === 0;
-	}
+	};
 }
 
 
