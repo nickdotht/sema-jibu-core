@@ -99,11 +99,7 @@ class OrderPaymentScreen extends Component {
 				contentContainerStyle={styles.container}
 				scrollEnabled={false}>
 				<View style ={{justifyContent:'flex-end', flexDirection:"row", right:100, top:10}}>
-					<TouchableHighlight
-						onPress={() => this.onCancelOrder()}>
-						<Image source={require('../../images/icons8-cancel-50.png')}/>
-					</TouchableHighlight>
-					{/*<Image source={require('../../images/icons8-cancel-50.png')} />;*/}
+					{this.getCancelButton()}
 				</View>
 				<View style={{flex:1, marginTop:0, marginBottom:50, marginLeft:100, marginRight:100}}>
 					<PaymentMethod
@@ -146,8 +142,20 @@ class OrderPaymentScreen extends Component {
 
 		);
 	}
+	getCancelButton(){
+		if( ! this.isPayoffOnly()){
+			return(
+				<TouchableHighlight
+					onPress={() => this.onCancelOrder()}>
+					<Image source={require('../../images/icons8-cancel-50.png')}/>
+				</TouchableHighlight>
+			);
+		}else{
+			return null;
+		}
+	}
 	getCreditComponent(){
-		if( ! this._isAnonymousCustomer(this.props.selectedCustomer) ){
+		if( ! this._isAnonymousCustomer(this.props.selectedCustomer) && !this.isPayoffOnly() ){
 			return (
 				<PaymentMethod
 					parent = {this}
@@ -422,6 +430,9 @@ class OrderPaymentScreen extends Component {
 
 		}
 		return true;
+	}
+	isPayoffOnly(){
+		return this.props.products.length === 0;
 	}
 }
 

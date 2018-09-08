@@ -176,6 +176,10 @@ const getInventoryItem = (beginDate, products) => {
 					newInventory.date = beginDate;
 					newInventory.currentProductSkus = products.map( product => {return {sku:product.sku, quantity:null }});
 					newInventory.previousProductSkus = products.map( product => {return {sku:product.sku, quantity:null }});
+					if( inventoryResults[1] ){
+						newInventory.previousProductSkus = inventoryResults[1].currentProductSkus;
+						newInventory.previousMeter = inventoryResults[1].currentMeter;
+					}
 					resolve(newInventory);
 				}
 		});
