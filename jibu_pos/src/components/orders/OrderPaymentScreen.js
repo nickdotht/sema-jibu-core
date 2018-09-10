@@ -182,9 +182,9 @@ class OrderPaymentScreen extends Component {
 	}
 	_formatCurrency( value ){
 		let currency = "USD";
-		if( this.props.products.length > 0 ){
-			if( this.props.products[0].product.priceCurrency.length === 3 ){
-				currency = this.props.products[0].product.priceCurrency;
+		if( PosStorage.getProducts().length > 0 ){
+			if( PosStorage.getProducts()[0].priceCurrency.length === 3 ){
+				currency = PosStorage.getProducts()[0].priceCurrency;
 			}
 		}
 		value =  parseFloat(value.toFixed(2));
