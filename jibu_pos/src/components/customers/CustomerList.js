@@ -120,7 +120,7 @@ class CustomerList extends Component {
 						<Text style={[styles.baseItem]}>{item.address}</Text>
 					</View>
 					<View style={{flex: .75}}>
-						<Text style={[styles.baseItem]}>{item.dueAmount}</Text>
+						<Text style={[styles.baseItem]}>{item.dueAmount.toFixed(2)}</Text>
 					</View>
 					<View style={{flex: 1}}>
 						<Text style={[styles.baseItem]}>{this.getCustomerSalesChannel(item)}</Text>
@@ -269,7 +269,7 @@ class CustomerList extends Component {
 					<Text style={[styles.headerItem]}>Address</Text>
 				</View>
 				<View style={ [{flex: .75}]}>
-					<Text style={[styles.headerItem]}>Credit</Text>
+					<Text style={[styles.headerItem]}>Loan Due</Text>
 				</View>
 				<View style={ [{flex: 1}]}>
 					<Text style={[styles.headerItem]}>Customer Type</Text>

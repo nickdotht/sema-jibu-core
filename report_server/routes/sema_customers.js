@@ -34,8 +34,8 @@ const sqlGetCustomerById = "SELECT * FROM customer_account WHERE id = ?";
 
 const sqlInsertCustomer = "INSERT INTO customer_account " +
 	"(id, created_at, name, customer_type_id, sales_channel_id, kiosk_id, " +
-	"due_amount, address_line1, gps_coordinates, phone_number ) " +
-	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	"due_amount, address_line1, gps_coordinates, phone_number, active ) " +
+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 const sqlUpdateCustomers = 	"UPDATE customer_account " +
 	"SET name = ?, sales_channel_id = ?, " +
@@ -224,48 +224,38 @@ router.post('/', async (req, res) => {
 			let customer = new Customer();
 			customer.requestToClass(req);
 
-			"(id, created_at, updated_at, name, customer_type_id, sales_channel_id, kiosk_id,  " +
-			"due_amount, address_line1, gps_coordinates, phone_number ) " +
-			"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
 			let postSqlParams = [customer.customerId, getUTCDate(customer.createdDate),
 				customer.name, customer.customerTypeId, customer.salesChannelId, customer.siteId,
-				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber ];
+				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber, 1 ];
 
-			insertCustomers(customer, sqlInsertCustomer, postSqlParams, res)
-				.then(result =>{})
-				.catch(error =>{})
+			insertCustomers(customer, sqlInsertCustomer, postSqlParams, res);
 		}
 	});
 
 });
 
 const insertCustomers = (customer, query, params, res ) => {
-	return new Promise((resolve, reject) => {
-		__pool.getConnection((err, connection) => {
-			connection.query(query, params, function(err, result) {
-				connection.release();
-				if (err) {
+	__pool.getConnection((err, connection) => {
+		connection.query(query, params, function(err, result) {
+			connection.release();
+			if (err) {
+				semaLog.error('customers - failed', { err });
+				res.status(500).send(err.message);
+			}
+			else {
+				semaLog.info('CREATE customer - succeeded');
+
+				try {
+					res.json(customer.classToPlain());
+				} catch (err) {
 					semaLog.error('customers - failed', { err });
 					res.status(500).send(err.message);
-					reject(err);
 				}
-				else {
-					semaLog.info('CREATE customer - succeeded');
 
-					try {
-						resolve(res.json(customer.classToPlain()));
-					} catch (err) {
-						semaLog.error('customers - failed', { err });
-						res.status(500).send(err.message);
-						reject(err);
-					}
+			}
+		});
 
-				}
-			});
-
-		})
-	});
+	})
 };
 
 

@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Dimensions } from "react-native";
+import { View, Dimensions, Animated } from "react-native";
 import ProductList from "./ProductList";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -15,6 +15,9 @@ class OrderResellerScreen extends Component {
 		// Since there is no way to dynamilcally determine view width until the layout is complete, use
 		// this to set width. (Note this will break if view layout changes
 		this.viewWidth = 1/1.6 * width;
+		this.state =  {
+			fadeAnim: new Animated.Value(-this.viewWidth),  // Initial value for sliding in from left
+		}
 	}
 
 	componentDidMount() {
@@ -22,12 +25,21 @@ class OrderResellerScreen extends Component {
 			console.log("OrderWalkupScreen-Focused");
 			this.props.orderActions.SetOrderChannel("reseller");
 		});
+		Animated.timing(                  // Animate over time
+			this.state.fadeAnim,            // The animated value to drive
+			{
+				toValue: 0,                   // Animate to opacity: 1 (opaque)
+				duration: 250,
+				useNativeDriver: true,
+			}
+		).start();
 	}
 	render() {
+		let { fadeAnim } = this.state;
 		return (
-			<View style = {{flex:1, backgroundColor:'#ABC1DE'}}>
+			<Animated.View style = {{flex:1, backgroundColor:'#ABC1DE', transform:[{translateX:fadeAnim}]}}>
 				<ProductList filter='reseller' viewWidth ={this.viewWidth} />
-			</View>
+			</Animated.View>
 		);
 	}
 }

@@ -43,7 +43,7 @@ class Toolbar extends Component {
 				</View>
 			</View>
         );
-    }
+    };
 
     getLogoutUI(){
 		if( this.props.showScreen.screenToShow !== "settings" ){
@@ -56,7 +56,8 @@ class Toolbar extends Component {
 		}else{
 			return null;
 		}
-	}
+	};
+
     getNetworkState  = () =>{
     	return this.props.network.isNWConnected ? "ONLINE" : "OFFLINE";
 	};
@@ -74,10 +75,10 @@ class Toolbar extends Component {
 				<Image source={require('../images/home-icon.png')} resizeMode ='stretch' style={[styles.iconSize, {marginRight:20} ]}/>
 			)
 		}
-	}
+	};
 	onShowRemoteReport = () =>{
         console.log("onShowRemoteReport");
-        if(this.props.showScreen.screenToShow != "settings" ){
+        if(this.props.showScreen.screenToShow !== "settings" ){
 			if( this.props.showScreen.screenToShow === "main") {
 				this.props.toolbarActions.ShowScreen("report");
 			}else{

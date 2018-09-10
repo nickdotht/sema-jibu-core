@@ -29,6 +29,8 @@ const productMrpsKey = '@Sema:ProductMrpsKey';
 
 const syncIntervalKey = '@Sema:SyncIntervalKey';
 
+const inventoriesKey = '@Sema:inventoriesKey';
+const inventoryItemKey = '@Sema:InventoryItemKey';
 
 class PosStorage {
 	constructor() {
@@ -69,8 +71,8 @@ class PosStorage {
 		this.customerTypes = [];
 		this.productMrpDict = {};
 
-		this.syncInterval = {interval: 60*1000};
-
+		this.syncInterval = {interval: 2*60*1000};
+		this.inventoriesKeys = [];	// 30 days of inventories
 	}
 
 	initialize( forceNew ) {
@@ -96,7 +98,8 @@ class PosStorage {
 							[salesChannelsKey, this.stringify(this.salesChannels)],
 							[customerTypesKey, this.stringify(this.customerTypes)],
 							[productMrpsKey, this.stringify(this.productMrpDict)],
-							[syncIntervalKey, this.stringify(this.syncInterval)]];
+							[syncIntervalKey, this.stringify(this.syncInterval)],
+							[inventoriesKey, this.stringify(this.inventoriesKeys)]];
 						AsyncStorage.multiSet(keyArray ).then( error =>{
 							console.log( "PosStorage:initialize: Error: " + error );
 							resolve(false)})
@@ -108,7 +111,7 @@ class PosStorage {
 							lastSalesSyncKey,lastProductsSyncKey,
 							pendingCustomersKey, pendingSalesKey,
 							settingsKey, tokenExpirationKey, salesChannelsKey,
-							customerTypesKey, productMrpsKey, syncIntervalKey];
+							customerTypesKey, productMrpsKey, syncIntervalKey, inventoriesKey];
 						AsyncStorage.multiGet(keyArray ).then( function(results){
 							console.log( "PosStorage Multi-Key" + results.length );
 							for( let i = 0; i < results.length; i++ ){
@@ -128,6 +131,7 @@ class PosStorage {
 							this.customerTypes = this.parseJson(results[11][1]);		// array of customer types
 							this.productMrpDict = this.parseJson(results[12][1]);		// products MRP dictionary
 							this.syncInterval = this.parseJson(results[13][1]);		// SyncInterval
+							this.inventoriesKeys =  this.parseJson(results[14][1]); //inventoriesKey
 							this.loadCustomersFromKeys()
 								.then(()=>{
 									this.loadProductsFromKeys()
@@ -172,6 +176,7 @@ class PosStorage {
 		this.lastCustomerSync = firstSyncDate;
 		this.lastSalesSync = firstSyncDate;
 		this.lastProductsSync = firstSyncDate;
+		this.inventoriesKeys = [];
 		let keyArray = [
 			[customersKey,  this.stringify(this.customersKeys)],
 			[productsKey,  this.stringify(this.productsKeys)],
@@ -183,7 +188,8 @@ class PosStorage {
 			[lastProductsSyncKey,this.lastProductsSync.toISOString()],
 			[customerTypesKey,this.stringify(this.customerTypes)],
 			[salesChannelsKey,this.stringify(this.salesChannels)],
-			[productMrpsKey, this.stringify(this.productMrpDict)]];
+			[productMrpsKey, this.stringify(this.productMrpDict)],
+			[inventoriesKey, this.stringify(this.inventoriesKeys)]];
 
 		AsyncStorage.multiSet( keyArray).then( error => {
 			if( error ) {
@@ -283,15 +289,18 @@ class PosStorage {
 		});
 
 	}
-	addRemoteCustomers(customerArray ){
+	addRemoteCustomers(customerArray ) {
 		console.log("PosStorage:addCustomers: No existing customers no need to merge....");
-		this.customers = customerArray;
-		const keyValueArray = customerArray.map( (customer) => {
-			return [ this.makeCustomerKey(customer), this.stringify(customer)];
-		});
-		const keyArray = customerArray.map( (customer) => {
-			return this.makeCustomerKey(customer);
-		});
+		this.customers = [];
+		let keyValueArray = [];
+		let keyArray = [];
+		for (let index = 0; index < customerArray.length; index++){
+			if (customerArray[index].active) {
+				keyValueArray.push( [ this.makeCustomerKey(customerArray[index]), this.stringify(customerArray[index]) ] );
+				keyArray.push(this.makeCustomerKey(customerArray[index]));
+				this.customers.push( customerArray[index] );
+			}
+		}
 		this.customersKeys  = keyArray;
 		keyValueArray.push([ customersKey, this.stringify(keyArray) ] );
 		AsyncStorage.multiSet(keyValueArray ).then( error => {
@@ -776,6 +785,93 @@ class PosStorage {
 	}
 	setGetSyncInterval( intervalInMinutes) {
 		this.setKey(syncIntervalKey, JSON.stringify({interval: intervalInMinutes * 60 *1000 }));
+	}
+
+	getInventoryKeys(){
+		return this.inventoriesKeys;
+	}
+	addOrUpdateInventoryItem( inventory, inventoryDate){
+		console.log("PosStorage: getInventoryItem" );
+		if( typeof inventoryDate == 'string' ){
+			inventoryDate = new Date( inventoryDate);
+		}
+
+		return new Promise((resolve, reject) => {
+			let inventoryKey = this._makeInventoryKey(inventoryDate);
+			let existing = this._getInventoryItemKey( inventoryDate );
+			if( existing != null ){
+				this.setKey(inventoryKey, this.stringify(inventory)).then( error => {
+					if (error) {
+						reject(error);
+					} else {
+						resolve(true);
+					}
+				});
+			}else{
+				this.inventoriesKeys.push({inventoryDate:inventoryDate, inventoryKey:inventoryKey});
+
+				if( this.inventoriesKeys.length > 1 ){
+					// When adding an item, purge the top one if it is older than 32 days
+					let oldest = this.inventoriesKeys[0];
+					let firstDate = new Date( oldest.inventoryDate);
+					firstDate = new Date( firstDate.getTime() + 32 * 24 *60 *60 * 1000);
+					const now = new Date();
+					if( firstDate < now ){
+						// Older than 32 days remove it
+						this.inventoriesKeys.shift();
+						AsyncStorage.removeItem(oldest.inventoryKey).then( error => {
+							if (error) {
+								console.log("error removing " + oldest.inventoryKey);
+							} else {
+								console.log("Removed " + oldest.inventoryKey)
+							}
+						});
+					}
+				}
+				let keyArray = [
+					[ inventoryKey, this.stringify(inventory)],
+					[ inventoriesKey, this.stringify(this.inventoriesKeys)]];			// Array of date/time inventory keys
+					AsyncStorage.multiSet(keyArray ).then( error =>{
+						if( error ){
+							reject(error);
+						}else{
+							resolve(true);
+						}
+					});
+			}
+		});
+	}
+
+	getInventoryItem( inventoryDate){
+		return new Promise((resolve) => {
+			let key = this._getInventoryItemKey( inventoryDate );
+			if( key != null){
+				this.getKey(key )
+					.then( item => {
+						resolve( this.parseJson(item));
+					})
+					.catch(err => resolve(null));
+
+			}else{
+				resolve( null );
+			}
+		});
+
+	}
+	// Return existing inventory item key or null
+	_getInventoryItemKey( inventoryDate ){
+		console.log("PosStorage:getInventoryItem" );
+		let inventoryKey = this._makeInventoryKey(inventoryDate);
+		for( let index = 0; index < this.inventoriesKeys.length; index++){
+			if( this.inventoriesKeys[index].inventoryKey == inventoryKey){
+				return inventoryKey;
+			}
+		}
+		return null;
+	}
+	_makeInventoryKey( date ){
+		console.log( "PosStorage._makeInventoryKey" + date );
+		return inventoryItemKey + date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
 	}
 
 	stringify( jsObject){

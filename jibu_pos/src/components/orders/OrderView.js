@@ -44,6 +44,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(OrderView);
 const styles = StyleSheet.create({
 	orderView: {
 		flex:1,
-		backgroundColor:"pink",
+		backgroundColor:"#ABC1DE",
 		flexDirection:'row'}
 });

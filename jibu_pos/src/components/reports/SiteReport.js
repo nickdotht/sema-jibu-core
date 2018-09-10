@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { Text, View, StyleSheet, TouchableHighlight} from 'react-native';
 import * as colors from '../../styles/sema_colors';
 import SalesReport from './SalesReport';
-
+import InventoryReport from './InventoryReport';
+import Sidebar from './Sidebar';
 
 export default class SiteReport extends Component {
 	render() {
@@ -15,34 +16,13 @@ export default class SiteReport extends Component {
 	}
 }
 
-class Sidebar extends Component {
-	render() {
-		return (
-			<View style ={{flex:1,backgroundColor:colors.COLOR_REPORT_SIDEBAR_BACKGROUND}}>
-				<TouchableHighlight onPress={() => this.onSales()}>
-					<Text style ={[styles.menuText, {color:'#3C93FC'}]}>Sales</Text>
-				</TouchableHighlight>
-				{/*<TouchableHighlight onPress={() => this.onInventory()}>*/}
-					{/*<Text style ={[styles.menuText, ]}>Inventory</Text>*/}
-				{/*</TouchableHighlight>*/}
-			</View>
-		);
-	}
-
-	onSales = () =>{
-
-	};
-	onInventory = () =>{
-
-	};
-}
 
 class Report extends Component {
 	render() {
 		return (
 			<View style ={{flex:4,backgroundColor:colors.COLOR_REPORT__BACKGROUND}}>
 				<SalesReport/>
-				{/*<InventoryReport/>*/}
+				<InventoryReport/>
 			</View>
 		);
 	}
@@ -50,12 +30,6 @@ class Report extends Component {
 
 
 
-class InventoryReport extends Component {
-	// TODO Implement this
-	render() {
-		return null;
-	}
-}
 
 const styles = StyleSheet.create({
 

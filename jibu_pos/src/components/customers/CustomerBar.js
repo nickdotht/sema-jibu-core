@@ -88,37 +88,15 @@ class CustomerBar extends Component {
 		return (
 
 			<View style={{ flexDirection:'row', height:100, backgroundColor:'white',  alignItems:'center'}}>
-				<CustomerBarButton
-					title = "Add"
-					handler = {this.onAdd.bind(this)}
-					image = {require('../../images/customer-add.png')}
-					enabled = {this.state.addFunction}
-				/>
-				<CustomerBarButton
-					title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
-					handler = {this.onOrder.bind(this)}
-					image = {this.props.showView.showNewOrder ? require('../../images/customer-cancel-order.png') : require('../../images/customer-order.png')}
-					enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('name')}
-				/>
-				<CustomerBarButton
-					title = "Edit"
-					handler = {this.onEdit.bind(this)}
-					image = {require('../../images/customer-edit.png')}
-					enabled = {this.state.editFunction &&
-						this.props.selectedCustomer.hasOwnProperty('name') &&
-						! this._isAnonymousCustomer(this.props.selectedCustomer)}
-				/>
-
-				<CustomerBarButton
-					title = "Delete"
-					handler = {this.onDelete.bind(this)}
-					image = {require('../../images/customer-delete.png')}
-					enabled = {this.state.deleteFunction &&
-						this.props.selectedCustomer.hasOwnProperty('name') &&
-						! this._isAnonymousCustomer(this.props.selectedCustomer)}
-				/>
-				{this.showSearchTool()}
-				<View style = {{flexDirection:'row-reverse',flex:1,alignItems:'center'}}>
+				<View style = {[styles.leftToolbar]}>
+					{this.showAddButton()}
+					{this.showOrderCancelOrderButton()}
+					{this.showEditButton()}
+					{this.showDeleteButton()}
+					{this.showPayoffButton()}
+					{this.showSearchTool()}
+				</View>
+				<View style = {[styles.rightToolbar]}>
 					<SelectedCustomerDetails selectedCustomer = {this.props.selectedCustomer}/>
 				</View>
 			</View>
@@ -131,6 +109,84 @@ class CustomerBar extends Component {
 		console.log( "onTextChange ---" + this.props.customers.length);
 
 	};
+
+	showOrderCancelOrderButton(){
+		return (
+			<CustomerBarButton
+				title = {this.props.showView.showNewOrder ? 'Cancel' : 'Order'}
+				handler = {this.onOrder.bind(this)}
+				image = {this.props.showView.showNewOrder ? require('../../images/customer-back-order.png') : require('../../images/customer-order.png')}
+				enabled = {this.state.orderFunction && this.props.selectedCustomer.hasOwnProperty('name')}
+			/>
+		);
+	}
+	showAddButton(){
+		if( this.props.showView.showCustomers ){
+			return (
+				<CustomerBarButton
+					title = "Add"
+					handler = {this.onAdd.bind(this)}
+					image = {require('../../images/customer-add.png')}
+					enabled = {this.state.addFunction}
+				/>
+			);
+		}else{
+			return null;
+		}
+	}
+
+	showEditButton(){
+		if( this.props.showView.showCustomers ){
+			return (
+				<CustomerBarButton
+					title = "Edit"
+					handler = {this.onEdit.bind(this)}
+					image = {require('../../images/customer-edit.png')}
+					enabled = {this.state.editFunction &&
+					this.props.selectedCustomer.hasOwnProperty('name') &&
+					! this._isAnonymousCustomer(this.props.selectedCustomer)}
+				/>
+			);
+		}else{
+			return null;
+		}
+	}
+
+	showDeleteButton(){
+		if( this.props.showView.showCustomers ){
+			return (
+				<CustomerBarButton
+				title = "Delete"
+				handler = {this.onDelete.bind(this)}
+				image = {require('../../images/customer-delete.png')}
+				enabled = {this.state.deleteFunction &&
+				this.props.selectedCustomer.hasOwnProperty('name') &&
+				! this._isAnonymousCustomer(this.props.selectedCustomer)}
+				/>
+			);
+		}else{
+			return null;
+		}
+	}
+
+	showPayoffButton(){
+		if( this.props.showView.showCustomers ){
+			return (
+				<CustomerBarButton
+					title = "Pay Loan"
+					handler = {this.onPayoff.bind(this)}
+					image = {require('../../images/customer-pay-balance.png')}
+					enabled = {this.state.deleteFunction &&
+					this.props.selectedCustomer.hasOwnProperty('name') &&
+					! this._isAnonymousCustomer(this.props.selectedCustomer) &&
+					this.props.selectedCustomer.dueAmount > 0}
+				/>
+			);
+		}else{
+			return null;
+		}
+	}
+
 	showSearchTool(){
 		if( this.props.showView.showCustomers ){
 			return (
@@ -143,7 +199,6 @@ class CustomerBar extends Component {
 					onChangeText = {this.onTextChange}
 					value={this.props.searchString}
 					style={ [styles.SearchInput]}/>
-
 			);
 		}else{
 			return null;
@@ -212,6 +267,7 @@ class CustomerBar extends Component {
 				this.props.orderActions.ClearOrder();
 				this.props.orderActions.SetOrderFlow('products');
 			} else {
+				this.props.orderActions.ClearOrder();
 				this.props.customerBarActions.ShowHideCustomers(1);
 				this.setState({ 'addFunction': true });
 				this.setState({ 'editFunction': true })
@@ -226,6 +282,11 @@ class CustomerBar extends Component {
 			console.log("CustomerBar:onAdd");
 			this.props.toolbarActions.ShowScreen("newCustomer");
 		}
+	};
+
+	onPayoff = ()=>{
+		this.props.customerBarActions.ShowHideCustomers(0);
+		this.props.orderActions.SetOrderFlow('payment');
 	};
 
 	_isAnonymousCustomer( customer ){
@@ -265,7 +326,7 @@ const styles = StyleSheet.create({
 		borderColor: '#404040',
 		borderRadius: 10,
 		backgroundColor: "#FFFFFF",
-		flex:.3,
+		flex:.5,
 		alignSelf:'center',
 		marginLeft:30
 	},
@@ -276,7 +337,7 @@ const styles = StyleSheet.create({
 		marginLeft:30
 	},
 	commandBarContainer :{
-		flex: .45,
+		flex: 1,
 		backgroundColor:'#ABC1DE',
 		height:80,
 		alignSelf:'center',
@@ -288,6 +349,19 @@ const styles = StyleSheet.create({
 		alignSelf:'center',
 		flex:.5,
 		color:'black'
-	}
+	},
+	leftToolbar: {
+		flexDirection:'row',
+		flex:.66,
+		alignItems:'center'
+
+	},
+	rightToolbar: {
+		flexDirection:'row-reverse',
+		flex:.34,
+		alignItems:'center'
+
+	},
+
 });
 

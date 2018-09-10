@@ -70,7 +70,8 @@ class Synchronization {
 					const promiseSalesChannels = this.synchronizeSalesChannels();
 					const promiseCustomerTypes = this.synchronizeCustomerTypes();
 					Promise.all([promiseSalesChannels, promiseCustomerTypes])
-						.then( () => {
+						.then( (values) => {
+							console.log("synchronize - SalesChannels and Customer Types: " + values);
 							const promiseCustomers = this.synchronizeCustomers()
 								.then(customerSync => {
 									syncResult.customers = customerSync;
@@ -193,30 +194,38 @@ class Synchronization {
 	}
 
 	synchronizeSalesChannels(){
-		console.log("Synchronization:synchronizeSalesChannels - Begin");
-		Communications.getSalesChannels()
-			.then(salesChannels => {
-				if (salesChannels.hasOwnProperty("salesChannels")) {
-					console.log("Synchronization:synchronizeSalesChannels. No of sales channels: " + salesChannels.salesChannels.length);
-					PosStorage.saveSalesChannels(salesChannels.salesChannels);
-				}
-			})
-			.catch(error => {
-				console.log("Synchronization.getSalesChannels - error " + error);
-			});
+		return new Promise((resolve ) => {
+			console.log("Synchronization:synchronizeSalesChannels - Begin");
+			Communications.getSalesChannels()
+				.then(salesChannels => {
+					if (salesChannels.hasOwnProperty("salesChannels")) {
+						console.log("Synchronization:synchronizeSalesChannels. No of sales channels: " + salesChannels.salesChannels.length);
+						PosStorage.saveSalesChannels(salesChannels.salesChannels);
+					}
+					resolve( salesChannels);
+				})
+				.catch(error => {
+					console.log("Synchronization.getSalesChannels - error " + error);
+					resolve( null);
+				});
+		});
 	}
 	synchronizeCustomerTypes(){
-		console.log("Synchronization:synchronizeCustomerTypes - Begin");
-		Communications.getCustomerTypes()
-			.then(customerTypes => {
-				if (customerTypes.hasOwnProperty("customerTypes")) {
-					console.log("Synchronization:synchronizeCustomerTypes. No of customer types: " + customerTypes.customerTypes.length);
-					PosStorage.saveCustomerTypes(customerTypes.customerTypes);
-				}
-			})
-			.catch(error => {
-				console.log("Synchronization.getCustomerTypes - error " + error);
-			});
+		return new Promise((resolve ) => {
+			console.log("Synchronization:synchronizeCustomerTypes - Begin");
+			Communications.getCustomerTypes()
+				.then(customerTypes => {
+					if (customerTypes.hasOwnProperty("customerTypes")) {
+						console.log("Synchronization:synchronizeCustomerTypes. No of customer types: " + customerTypes.customerTypes.length);
+						PosStorage.saveCustomerTypes(customerTypes.customerTypes);
+					}
+					resolve( customerTypes);
+				})
+				.catch(error => {
+					console.log("Synchronization.getCustomerTypes - error " + error);
+					resolve( null);
+				});
+		});
 	}
 
 	synchronizeSales(){

@@ -6,17 +6,10 @@ class CustomerBarButton extends React.Component {
 	render() {
 		return (
 			<View style={styles.Button}>
-				<TouchableHighlight onPress={this.props.handler} disabled ={!this.props.enabled}>
+				<TouchableHighlight onPress={this.props.handler} disabled ={!this.props.enabled} underlayColor = '#c0c0c0'>
 					<Image source={this.props.image}  resizeMode ='stretch'
 						   style={[styles.iconSize, {marginLeft:15}, this.getOpacity(this.props.enabled)]}/>
 				</TouchableHighlight>
-
-				{/*<Button*/}
-					{/*onPress={this.props.handler}*/}
-					{/*title={this.props.title}*/}
-					{/*color='#2858a7'*/}
-					{/*disabled = {!this.props.enabled}*/}
-				{/*/>*/}
 			</View>
 		);
 	}
@@ -29,7 +22,7 @@ export default CustomerBarButton;
 const styles = StyleSheet.create({
 
 	Button: {
-		flex: .09,
+		flex: .15,
 		// alignSelf:'center',
 		// height:70,
 		marginLeft:15
