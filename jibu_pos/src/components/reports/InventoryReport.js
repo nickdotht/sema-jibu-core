@@ -176,6 +176,7 @@ class InventoryReport extends Component {
 							visible = {this.state.currentMeterVisible}
 							sku={""}
 							title = "Current Meter"
+							quantity = {this.getInventoryCurrentMeterForEdit()}
 							cancelMethod = {this.onCancelCurrentMeter.bind(this)}
 							okMethod = {this.onOkCurrentMeter.bind(this)}>
 						</InventoryEdit>
@@ -187,6 +188,12 @@ class InventoryReport extends Component {
 			return null;
 		}
 	}
+	getInventoryCurrentMeterForEdit(){
+		let value = this.props.inventoryData.inventory.currentMeter;
+		if( value == null) return "";
+		else return value.toFixed(2);
+	}
+
 	getInventoryData(){
 		if( this.props.dateFilter.hasOwnProperty("startDate") && this.props.dateFilter.hasOwnProperty("endDate") ){
 			if( this.props.dateFilter.startDate == this.startDate && this.props.dateFilter.endDate == this.endDate){
@@ -260,7 +267,7 @@ class InventoryReport extends Component {
 	getInventorySkuForEdit(currentPrev, item){
 		let value = this.getInventorySkuForDisplay(currentPrev, item);
 		if( value == '-') return "";
-		else return value.toFixed(0);
+		else return value.toFixed(2);
 	}
 	onCancelEditCurrentSku(){
 		this.setState({currentSkuEdit:""});
