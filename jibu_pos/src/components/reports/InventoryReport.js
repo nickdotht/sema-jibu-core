@@ -143,7 +143,7 @@ class InventoryReport extends Component {
 							<Text style={[styles.totalItem, { flex: 1.5 }]}> </Text>
 							<Text style={[styles.totalItem, { flex: .5 }]}>Total Sales </Text>
 							<Text style={[styles.totalItem, { flex: 1.0 }]}>{this.getTotalLiters()}</Text>
-							<Text style={[styles.totalItem, { flex: .8 }]}>Total Inventory </Text>
+							<Text style={[styles.totalItem, { flex: .8 }]}>Delta Inventory </Text>
 							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalInventory()}</Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15 }}>
@@ -169,7 +169,7 @@ class InventoryReport extends Component {
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15, marginBottom:10 }}>
 							<Text style={[styles.totalItem, { flex: .66 }]}> </Text>
 							<Text style={[styles.totalItem, { flex: .33 }]}>Wastage: </Text>
-							<Text style={[styles.totalItem, { flex: .33 }]}>{this.getWastage()} %</Text>
+							<Text style={[styles.totalItem, { flex: .33 }]}>{this.getWastage()}</Text>
 						</View>
 						<InventoryEdit
 							type = "currentMeter"
@@ -311,7 +311,7 @@ class InventoryReport extends Component {
 					<Text style={[styles.headerItemCenter]}>Liters/SKU</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>Delta Liters</Text>
 				</View>
 				<View style ={[{width:20}]}/>
 				<View style={[{ flex: .7 }]}>
@@ -443,9 +443,17 @@ class InventoryReport extends Component {
 		let totalProduction = this.getTotalProduction();
 		let output = this.getOutput();
 		if( totalProduction == '-' || output == '-'){
-			return '-'
+			return 'N/A'
 		}else{
-			return ((parseFloat(totalProduction) - parseFloat(output))/parseFloat(totalProduction) *100).toFixed(2);
+			if( parseFloat(totalProduction)  == 0 ){
+				return 'N/A'
+			}
+			let wastage = ((parseFloat(totalProduction) - parseFloat(output))/parseFloat(totalProduction) *100);
+			if( isNaN( wastage)){
+				return 'N/A'
+			}else{
+				return wastage.toFixed(2) + ' %';
+			}
 		}
 
 
@@ -462,7 +470,7 @@ class InventoryReport extends Component {
 		this.setState({currentMeterVisible:false});
 		let update = null;
 		if( newQuantity.trim().length > 0 ){
-			update = parseInt(newQuantity);
+			update = parseFloat(newQuantity);
 		}
 		if( !isNaN(update)) {
 			this.props.inventoryData.inventory.currentMeter = update;

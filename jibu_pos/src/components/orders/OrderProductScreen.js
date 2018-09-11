@@ -19,9 +19,8 @@ export const OrderProductScreen = createBottomTabNavigator({
 			tabBarLabel: 'Walkup',
 			tabBarVisible: false,
 			tabBarOnPress: (scene, jumpToIndex) => {
-				let parent = scene.navigation.dangerouslyGetParent();
 				let output = "Walkup-Tab " + scene.navigation.state.routeName;
-				console.log(this);
+				console.log(output);
 			},
 		},
 

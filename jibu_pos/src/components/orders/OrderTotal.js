@@ -4,13 +4,14 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as OrderActions from "../../actions/OrderActions";
 import PosStorage from "../../database/PosStorage";
+import * as Utilities from "../../services/Utilities";
 
 class OrderTotal extends Component {
 	render() {
 		return (
 			<View style = {styles.container}>
 				<Text style={[{flex: 2}, styles.totalText]}>Order Total</Text>
-				<Text style={[{flex: 3}, styles.totalText]}>{this.getAmount().toFixed(2)}</Text>
+				<Text style={[{flex: 3}, styles.totalText]}>{Utilities.formatCurrency(this.getAmount())}</Text>
 
 			</View>
 		);

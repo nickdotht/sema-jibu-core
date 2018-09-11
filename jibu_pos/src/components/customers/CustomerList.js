@@ -272,7 +272,7 @@ class CustomerList extends Component {
 					<Text style={[styles.headerItem]}>Loan Due</Text>
 				</View>
 				<View style={ [{flex: 1}]}>
-					<Text style={[styles.headerItem]}>Customer Type</Text>
+					<Text style={[styles.headerItem]}>Channel</Text>
 				</View>
 			</View>
 		);
