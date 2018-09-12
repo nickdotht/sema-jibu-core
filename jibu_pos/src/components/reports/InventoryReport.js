@@ -141,7 +141,7 @@ class InventoryReport extends Component {
 					}}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<Text style={[styles.totalItem, { flex: 1.5 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .5 }]}>Total Sales </Text>
+							<Text style={[styles.totalItem, { flex: .7 }]}>Total Sales</Text>
 							<Text style={[styles.totalItem, { flex: 1.0 }]}>{this.getTotalLiters()}</Text>
 							<Text style={[styles.totalItem, { flex: .8 }]}>Delta Inventory </Text>
 							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalInventory()}</Text>

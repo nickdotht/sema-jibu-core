@@ -49,6 +49,7 @@ const getSalesData = (beginDate, endDate) =>{
 					if (mapProduct) {
 						mapProduct.quantity += product.quantity;
 						mapProduct.totalSales += product.priceTotal;
+						mapProduct.pricePerSku = mapProduct.totalSales/mapProduct.quantity;
 						if (mapProduct.litersPerSku != "N/A"){
 							mapProduct.totalLiters += mapProduct.litersPerSku * product.quantity;
 						}
