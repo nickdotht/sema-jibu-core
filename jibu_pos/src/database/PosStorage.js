@@ -267,12 +267,13 @@ class PosStorage {
 			});
 		}
 	}
-	updateCustomer( customer, phone, name, address, salesChannelId){
+	updateCustomer( customer, phone, name, address, salesChannelId, customerTypeId){
 		let key = this.makeCustomerKey(customer);
 		customer.name = name;
 		customer.phoneNumber = phone;
 		customer.address = address;
 		customer.salesChannelId = salesChannelId;
+		customer.customerTypeId = customerTypeId;
 		customer.updatedDate = new Date();
 		customer.syncAction = "update";
 
@@ -741,6 +742,21 @@ class PosStorage {
 		}
 		return null;
 	}
+	getCustomerTypesForDisplay(){
+		let customerTypesForDisplay = [];
+		this.customerTypes.forEach( customerType =>{
+			if( customerType.name !== "anonymous") {
+				customerTypesForDisplay.push({
+					id: customerType.id,
+					name: customerType.name,
+					displayName: customerType.name.charAt(0).toUpperCase() + customerType.name.slice(1)
+				});
+			}
+		})
+		return customerTypesForDisplay;
+	}
+
+
 	getCustomerTypes(){
 		return this.customerTypes;
 	}

@@ -106,6 +106,9 @@ class Customer {
 		if (requestCustomer.hasOwnProperty("salesChannelId")) {
 			this._salesChannelId = requestCustomer.salesChannelId;
 		}
+		if (requestCustomer.hasOwnProperty("customerTypeId")) {
+			this._customerTypeId = requestCustomer.customerTypeId;
+		}
 		if (requestCustomer.hasOwnProperty("dueAmount")) {
 			this._dueAmount = requestCustomer.dueAmount;
 		}

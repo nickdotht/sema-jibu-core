@@ -46,10 +46,16 @@ class CustomerEdit extends Component {
 		this.name = React.createRef();
 		this.address = React.createRef();
 		this.customerChannel = React.createRef();
+		this.customerType = React.createRef();
 		this.salesChannels = PosStorage.getSalesChannelsForDisplay();
 		this.channelOptions = this.salesChannels.map( channel =>{
 			return channel.displayName;
 		});
+		this.customerTypes = PosStorage.getCustomerTypesForDisplay();
+		this.customerTypeOptions = this.customerTypes.map( customerType =>{
+			return customerType.displayName;
+		});
+
 	}
 	componentDidMount() {
 		console.log("CustomerEdit = Mounted");
@@ -108,11 +114,25 @@ class CustomerEdit extends Component {
 									dropdownTextStyle = {[styles.dropdownText, {width:250}]}
 									dropdownStyle ={{borderColor: 'black', borderWidth:2}}
 									ref = {this.customerChannel}
-									defaultValue = {this.getDefaultValue()}
-									defaultIndex = {this.getDefaultIndex()}
+									defaultValue = {this.getDefaultChannelValue()}
+									defaultIndex = {this.getDefaultChannelIndex()}
 									options={this.channelOptions}/>
 								<TouchableHighlight underlayColor = '#c0c0c0'
 													onPress={() => this.onShowChannel()}>
+									<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+								</TouchableHighlight>
+								<View style ={{width:50}}/>
+								<ModalDropdown
+									style ={{width:250}}
+									textStyle={styles.dropdownText}
+									dropdownTextStyle = {[styles.dropdownText, {width:250}]}
+									dropdownStyle ={{borderColor: 'black', borderWidth:2}}
+									ref = {this.customerType}
+									defaultValue = {this.getDefaultTypeValue()}
+									defaultIndex = {this.getDefaultTypeIndex()}
+									options={this.customerTypeOptions}/>
+								<TouchableHighlight underlayColor = '#c0c0c0'
+													onPress={() => this.onShowCustomerType()}>
 									<Text style={{fontSize:40}}>{"\u2B07"}</Text>
 								</TouchableHighlight>
 							</View>
@@ -160,7 +180,7 @@ class CustomerEdit extends Component {
 		}
 
 	}
-	getDefaultValue(){
+	getDefaultChannelValue(){
 		if( this.props.isEdit ){
 			for( let i = 0; i < this.salesChannels.length; i++ ){
 				if( this.salesChannels[i].id == this.props.selectedCustomer.salesChannelId ){
@@ -168,10 +188,21 @@ class CustomerEdit extends Component {
 				}
 			}
 		}
+		return "Sales Channel";
+	}
+
+	getDefaultTypeValue(){
+		if( this.props.isEdit ){
+			for( let i = 0; i < this.customerTypes.length; i++ ){
+				if( this.customerTypes[i].id == this.props.selectedCustomer.customerTypeId ){
+					return this.customerTypes[i].displayName;
+				}
+			}
+		}
 		return "Customer Type";
 	}
 
-	getDefaultIndex(){
+	getDefaultChannelIndex(){
 		if( this.props.isEdit ){
 			const salesChannels = PosStorage.getSalesChannels();
 			for( let i = 0; i < salesChannels.length; i++ ){
@@ -181,8 +212,20 @@ class CustomerEdit extends Component {
 			}
 		}
 		return -1;
-
 	}
+
+	getDefaultTypeIndex(){
+		if( this.props.isEdit ){
+			const customerTypes = PosStorage.getCustomerTypes();
+			for( let i = 0; i < customerTypes.length; i++ ){
+				if( customerTypes[i].id == this.props.selectedCustomer.customerTypeId ){
+					return i;
+				}
+			}
+		}
+		return -1;
+	}
+
 	getHeaderText(){
 		return this.props.isEdit ? "Edit Customer" : "New Customer";
 	}
@@ -202,6 +245,7 @@ class CustomerEdit extends Component {
 
 	onEdit(){
 		let salesChannelId = -1;
+		let customerTypeId = -1;
 		if( this._textIsEmpty( this.phone.current.state.propertyText) ){
 			this.phone.current.refs.customerNumber.focus();
 			return;
@@ -221,13 +265,21 @@ class CustomerEdit extends Component {
 		}else{
 			salesChannelId = this.salesChannels[this.customerChannel.current.state.selectedIndex].id;
 		}
+		if( this.customerType.current.state.selectedIndex === -1){
+			this.customerType.current.show();
+			return;
+
+		}else{
+			customerTypeId = this.customerTypes[this.customerType.current.state.selectedIndex].id;
+		}
 		if( this.props.isEdit ){
 			PosStorage.updateCustomer(
 				this.props.selectedCustomer,
 				this.phone.current.state.propertyText,
 				this.name.current.state.propertyText,
 				this.address.current.state.propertyText,
-				salesChannelId);
+				salesChannelId,
+				customerTypeId);
 		}else{
 			let newCustomer = PosStorage.createCustomer(
 				this.phone.current.state.propertyText,
@@ -235,7 +287,7 @@ class CustomerEdit extends Component {
 				this.address.current.state.propertyText,
 				this.props.settings.siteId,
 				salesChannelId,
-				PosStorage.getCustomerTypeByName("generic").id);	// Note. Jibu uses just one 'generic' customer type
+				customerTypeId );
 			this.props.customerActions.setCustomers(PosStorage.getCustomers());
 			this.props.customerActions.CustomerSelected(newCustomer);
 		}
@@ -244,6 +296,9 @@ class CustomerEdit extends Component {
 	};
 	onShowChannel(){
 		this.customerChannel.current.show();
+	}
+	onShowCustomerType(){
+		this.customerType.current.show();
 	}
 
 
