@@ -141,9 +141,9 @@ class InventoryReport extends Component {
 					}}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<Text style={[styles.totalItem, { flex: 1.5 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .5 }]}>Total Sales </Text>
+							<Text style={[styles.totalItem, { flex: .7 }]}>Total Sales</Text>
 							<Text style={[styles.totalItem, { flex: 1.0 }]}>{this.getTotalLiters()}</Text>
-							<Text style={[styles.totalItem, { flex: .8 }]}>Total Inventory </Text>
+							<Text style={[styles.totalItem, { flex: .8 }]}>Delta Inventory </Text>
 							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalInventory()}</Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15 }}>
@@ -169,13 +169,14 @@ class InventoryReport extends Component {
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15, marginBottom:10 }}>
 							<Text style={[styles.totalItem, { flex: .66 }]}> </Text>
 							<Text style={[styles.totalItem, { flex: .33 }]}>Wastage: </Text>
-							<Text style={[styles.totalItem, { flex: .33 }]}>{this.getWastage()} %</Text>
+							<Text style={[styles.totalItem, { flex: .33 }]}>{this.getWastage()}</Text>
 						</View>
 						<InventoryEdit
 							type = "currentMeter"
 							visible = {this.state.currentMeterVisible}
 							sku={""}
 							title = "Current Meter"
+							quantity = {this.getInventoryCurrentMeterForEdit()}
 							cancelMethod = {this.onCancelCurrentMeter.bind(this)}
 							okMethod = {this.onOkCurrentMeter.bind(this)}>
 						</InventoryEdit>
@@ -187,6 +188,12 @@ class InventoryReport extends Component {
 			return null;
 		}
 	}
+	getInventoryCurrentMeterForEdit(){
+		let value = this.props.inventoryData.inventory.currentMeter;
+		if( value == null) return "";
+		else return value.toFixed(2);
+	}
+
 	getInventoryData(){
 		if( this.props.dateFilter.hasOwnProperty("startDate") && this.props.dateFilter.hasOwnProperty("endDate") ){
 			if( this.props.dateFilter.startDate == this.startDate && this.props.dateFilter.endDate == this.endDate){
@@ -260,7 +267,7 @@ class InventoryReport extends Component {
 	getInventorySkuForEdit(currentPrev, item){
 		let value = this.getInventorySkuForDisplay(currentPrev, item);
 		if( value == '-') return "";
-		else return value.toFixed(0);
+		else return value.toFixed(2);
 	}
 	onCancelEditCurrentSku(){
 		this.setState({currentSkuEdit:""});
@@ -314,7 +321,7 @@ class InventoryReport extends Component {
 					<Text style={[styles.headerItemCenter]}>Current</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>Delta Liters</Text>
 				</View>
 			</View>
 		);
@@ -436,9 +443,17 @@ class InventoryReport extends Component {
 		let totalProduction = this.getTotalProduction();
 		let output = this.getOutput();
 		if( totalProduction == '-' || output == '-'){
-			return '-'
+			return 'N/A'
 		}else{
-			return ((parseFloat(totalProduction) - parseFloat(output))/parseFloat(totalProduction) *100).toFixed(2);
+			if( parseFloat(totalProduction)  == 0 ){
+				return 'N/A'
+			}
+			let wastage = ((parseFloat(totalProduction) - parseFloat(output))/parseFloat(totalProduction) *100);
+			if( isNaN( wastage)){
+				return 'N/A'
+			}else{
+				return wastage.toFixed(2) + ' %';
+			}
 		}
 
 
@@ -455,7 +470,7 @@ class InventoryReport extends Component {
 		this.setState({currentMeterVisible:false});
 		let update = null;
 		if( newQuantity.trim().length > 0 ){
-			update = parseInt(newQuantity);
+			update = parseFloat(newQuantity);
 		}
 		if( !isNaN(update)) {
 			this.props.inventoryData.inventory.currentMeter = update;

@@ -38,7 +38,7 @@ const sqlInsertCustomer = "INSERT INTO customer_account " +
 	"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 const sqlUpdateCustomers = 	"UPDATE customer_account " +
-	"SET name = ?, sales_channel_id = ?, " +
+	"SET name = ?, sales_channel_id = ?, customer_type_id = ?," +
 		"due_amount = ?, address_line1 = ?, gps_coordinates = ?, " +
 		"phone_number = ?, active = ? " +
 	"WHERE id = ?";
@@ -65,7 +65,7 @@ router.put('/:id', async (req, res) => {
 				customer.updateClass(req.body );
 
 				// Note - Don't set the updated date... JIRA XXXX
-				let customerParams = [ customer.name, customer.salesChannelId,
+				let customerParams = [ customer.name, customer.salesChannelId, customer.customerTypeId,
 				customer.dueAmount, customer.address, customer.gpsCoordinates, customer.phoneNumber ];
 
 				// Active is set via a 'bit;

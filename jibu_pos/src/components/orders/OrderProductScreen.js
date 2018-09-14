@@ -17,10 +17,10 @@ export const OrderProductScreen = createBottomTabNavigator({
 		screen: OrderWalkupScreen,
 		navigationOptions: {
 			tabBarLabel: 'Walkup',
+			tabBarVisible: false,
 			tabBarOnPress: (scene, jumpToIndex) => {
-				let parent = scene.navigation.dangerouslyGetParent();
 				let output = "Walkup-Tab " + scene.navigation.state.routeName;
-				console.log(this);
+				console.log(output);
 			},
 		},
 
@@ -30,6 +30,7 @@ export const OrderProductScreen = createBottomTabNavigator({
 		screen: OrderResellerScreen,
 		navigationOptions: {
 			tabBarLabel: 'Reseller',
+			tabBarVisible: false,
 			tabBarOnPress: (scene, jumpToIndex) => {
 				let output = "Reseller-Tab " + scene.navigation.state.routeName;
 				console.log(output);

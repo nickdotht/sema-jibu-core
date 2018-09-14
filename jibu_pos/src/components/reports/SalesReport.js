@@ -4,6 +4,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import * as reportActions from "../../actions/ReportActions";
 import DateFilter from "./DateFilter";
+import * as Utilities from "../../services/Utilities";
 
 class SalesReport extends Component {
 	constructor(props) {
@@ -47,11 +48,11 @@ class SalesReport extends Component {
 						marginBottom: 10,
 					}}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
-							<Text style={[styles.totalItem, { flex: 1.7 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .9 }]}>Total Liters </Text>
+							<Text style={[styles.totalItem, { flex: 1.5 }]}> </Text>
+							<Text style={[styles.totalItem, { flex: .7 }]}>Total Liters </Text>
 							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalLiters()}</Text>
 							<Text style={[styles.totalItem, { flex: .7 }]}>Total Sales </Text>
-							<Text style={[styles.totalItem, { flex: .5 }]}>{this.getTotalSales()}</Text>
+							<Text style={[styles.totalItem, { flex: .9 }]}>{Utilities.formatCurrency(this.getTotalSales())}</Text>
 						</View>
 					</View>
 
@@ -78,7 +79,7 @@ class SalesReport extends Component {
 	}
 	getTotalSales (){
 		if( this.props.salesData.totalSales ){
-			return this.props.salesData.totalSales.toFixed(2);
+			return this.props.salesData.totalSales;
 		}else{
 			return 0;
 		}
@@ -109,7 +110,7 @@ class SalesReport extends Component {
 					<Text style={[styles.rowItemCenter]}>{item.totalLiters.toFixed(2)} L</Text>
 				</View>
 				<View style={[{flex: .7}]}>
-					<Text style={[styles.rowItemCenter]}>{item.pricePerSku}</Text>
+					<Text style={[styles.rowItemCenter]}>{item.pricePerSku.toFixed(2)}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
 					<Text style={[styles.rowItemCenter]}>{item.totalSales.toFixed(2)}</Text>

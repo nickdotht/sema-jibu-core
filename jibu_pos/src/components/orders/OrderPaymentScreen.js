@@ -6,9 +6,9 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as OrderActions from "../../actions/OrderActions";
 import * as CustomerBarActions from "../../actions/CustomerBarActions";
-import PosStorage from '../../database/PosStorage'
+import PosStorage from '../../database/PosStorage';
 
-const anonymousId = "9999999-9999-9999-9999-9999999";
+import * as Utilities from "../../services/Utilities";
 
 class PaymentDescription extends Component {
 	render() {
@@ -120,8 +120,8 @@ class OrderPaymentScreen extends Component {
 						value = {this.props.payment.mobileToDisplay}
 						valueChange = {this.valuePaymentChange}/>
 					{this.getSaleAmount()}
-					<PaymentDescription title = "Previous Amount Due:" total={this._formatCurrency( this.calculateAmountDue())}/>
-					<PaymentDescription title = "Total Amount Due:" total={this._formatCurrency( this.calculateTotalDue())}/>
+					<PaymentDescription title = "Previous Amount Due:" total={Utilities.formatCurrency( this.calculateAmountDue())}/>
+					<PaymentDescription title = "Total Amount Due:" total={Utilities.formatCurrency( this.calculateTotalDue())}/>
 					<View style={styles.completeOrder}>
 						<View style={{justifyContent:'center', height:80}}>
 							<TouchableHighlight underlayColor = '#c0c0c0'
@@ -145,7 +145,7 @@ class OrderPaymentScreen extends Component {
 	getSaleAmount(){
 		if( !this.isPayoffOnly() ){
 			return (
-				<PaymentDescription title = "Sale Amount Due:" total={this._formatCurrency( this.calculateOrderDue())}/>
+				<PaymentDescription title = "Sale Amount Due:" total={Utilities.formatCurrency( this.calculateOrderDue())}/>
 			);
 		}else{
 			return null;
@@ -174,30 +174,10 @@ class OrderPaymentScreen extends Component {
 					checkBox = {this.state.isCredit}
 					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
 					checkBoxLabel = {'Loan'}
-					value = {this._formatCurrency(this.props.payment.credit)} />
+					value = {Utilities.formatCurrency(this.props.payment.credit)} />
 			)
 		}else{
 			return null;
-		}
-	}
-	_formatCurrency( value ){
-		let currency = "USD";
-		if( PosStorage.getProducts().length > 0 ){
-			if( PosStorage.getProducts()[0].priceCurrency.length === 3 ){
-				currency = PosStorage.getProducts()[0].priceCurrency;
-			}
-		}
-		value =  parseFloat(value.toFixed(2));
-		try {
-			var formatter = new Intl.NumberFormat('en-US', {
-				style: 'currency',
-				currency: currency,
-				minimumFractionDigits: 2,
-			});
-			return formatter.format(value);
-		}catch( error ){
-			console.log( "_formatCurrency - error " + error.message);
-			return value;
 		}
 	}
 	_roundToDecimal( value ){
