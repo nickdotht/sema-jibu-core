@@ -311,7 +311,7 @@ class InventoryReport extends Component {
 					<Text style={[styles.headerItemCenter]}>Liters/SKU</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Delta Liters</Text>
+					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
 				</View>
 				<View style ={[{width:20}]}/>
 				<View style={[{ flex: .7 }]}>
@@ -321,7 +321,7 @@ class InventoryReport extends Component {
 					<Text style={[styles.headerItemCenter]}>Current</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>Delta Liters</Text>
 				</View>
 			</View>
 		);
