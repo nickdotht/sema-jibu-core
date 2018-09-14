@@ -8,6 +8,7 @@ import customer from './CustomerReducer';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer } from 'redux-persist';
+import dateFilter from './DateFilterReducer';
 
 const rootPersistConfig = {
 	key: 'root',
@@ -37,7 +38,8 @@ const rootReducer = combineReducers({
 	auth,
 	kiosk: persistReducer(kioskPersistConfig, kiosk),
 	volume,
-	customer
+	customer,
+	dateFilter
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

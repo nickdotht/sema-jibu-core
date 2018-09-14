@@ -9,55 +9,13 @@ import {
 	volumeActions,
 	customerActions,
 	authActions,
-	healthCheckActions
+	healthCheckActions,
+	dateFilterActions
 } from 'actions';
 import { withRouter } from 'react-router'
+import SemaDateFilter from "./SemaDateFilter";
 
 const menuStyle = {};
-
-const setYTD = (toolbar)=>{
-	toolbar.endDate = new Date(Date.now());
-	toolbar.startDate = new Date( toolbar.endDate.getFullYear(), 0, 1 );
-
-};
-
-const setYTDDisplay = (toolbar)=>{
-	toolbar.setState( {displayDate: formatYTDDisplay( toolbar.startDate, toolbar.endDate)});
-
-};
-const formatYTDDisplay = (startDate, endDate) => {
-	var locale = "en-us";
-	return startDate.toLocaleString(locale, {month: "short"}) + " - " +
-		endDate.toLocaleString(locale, {month: "short"}) + " " +
-		startDate.getFullYear().toString();
-}
-
-const setThisMonth = (toolbar)=>{
-	toolbar.endDate = new Date(Date.now());
-	toolbar.startDate = new Date( toolbar.endDate.getFullYear(), toolbar.endDate.getMonth(), 1 );
-};
-const setThisMonthDisplay = (toolbar)=>{
-	var locale = "en-us";
-	var month = toolbar.startDate.toLocaleString(locale, {month: "short"});
-
-	toolbar.setState( {displayDate: month + ", " + toolbar.startDate.getFullYear().toString()});
-
-};
-
-const setAll = (toolbar)=>{
-	toolbar.startDate = new Date(1973, 0, 1);
-	toolbar.endDate =new Date(Date.now());
-};
-const setAllDisplay = (toolbar)=>{
-	toolbar.setState( {displayDate: "All Dates"});
-
-};
-
-const dateMenu = {
-	1: {key:1, title:"Year to date", setStartEndDate:setYTD, setDisplayDate:setYTDDisplay},
-	2: {key:2, title:"This month", setStartEndDate:setThisMonth, setDisplayDate:setThisMonthDisplay},
-	3: {key:3, title:"all", setStartEndDate:setAll, setDisplayDate:setAllDisplay}
-};
 
 
 const LabelStyleLeft = {
@@ -75,27 +33,21 @@ const LabelStyleRight = {
 	fontWeight: "normal"
 };
 
+
 class SeamaToolbar extends Component {
 	constructor(props, context) {
 		super(props, context);
 		console.log("SeamaToolbar-constructor");
 
 		this.handleSelectKiosk = this.handleSelectKiosk.bind(this);
-		this.handleSelectDate = this.handleSelectDate.bind(this);
 		this.buildKioskMenuItems = this.buildKioskMenuItems.bind(this);
-		this.buildDateMenuItems = this.buildDateMenuItems.bind(this);
 		this.logOut = this.logOut.bind(this);
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
-		this.dateSelector = dateMenu[1];
-		this.dateKey = 1;
-		this.dateSelector.setStartEndDate( this );
 		this.state = {
 			kiosks: "--Regions--",
-			displayDate: formatYTDDisplay( this.startDate, this.endDate )
 		};
-		// this.dateSelector.setDisplayDate(this);
-
+		console.log("foo");
 	}
 
 	componentDidMount() {
@@ -128,16 +80,6 @@ class SeamaToolbar extends Component {
 		}
 	};
 
-	handleSelectDate(eventKey){
-		console.log(JSON.stringify(eventKey));
-		if( this.dateKey != eventKey){
-			this.dateKey = eventKey
-			this.dateSelector = dateMenu[eventKey];
-			this.dateSelector.setStartEndDate( this );
-			this.dateSelector.setDisplayDate(this);
-			this.loadActivePage(null );
-		}
-	}
 
 	loadActivePage(kioskParams ){
 		let params = {};
@@ -178,13 +120,6 @@ class SeamaToolbar extends Component {
 		return menuItems;
 	}
 
-	buildDateMenuItems(){
-		let menuItems = [];
-		menuItems.push(<MenuItem eventKey={dateMenu[1].key} key={dateMenu[1].key} style={menuStyle}>{dateMenu[1].title}</MenuItem>);
-		menuItems.push(<MenuItem eventKey={dateMenu[2].key} key={dateMenu[2].key} style={menuStyle}>{dateMenu[2].title}</MenuItem>);
-		menuItems.push(<MenuItem eventKey={dateMenu[3].key} key={dateMenu[3].key} style={menuStyle}>{dateMenu[3].title}</MenuItem>);
-		return menuItems;
-	}
 
 	logOut (){
 		console.log("logout");
@@ -194,6 +129,7 @@ class SeamaToolbar extends Component {
 	render() {
 		return (
 			<div className="SeamaNavToolbar" >
+				{this.updateData()}
 				<Navbar bsStyle="inverse" style={{marginBottom:"0px",
 					borderRadius: 0}}>
 					<Label style={LabelStyleLeft}>
@@ -210,11 +146,7 @@ class SeamaToolbar extends Component {
 					<Label style={LabelStyleLeft}>
 						Date Range:
 					</Label>
-					<Nav >
-						<NavDropdown title={this.state.displayDate} onSelect={this.handleSelectDate} id="basic-nav-dropdown2" >
-							{this.buildDateMenuItems()}
-						</NavDropdown>
-					</Nav>
+					<SemaDateFilter/>
 
 					<Label style={LabelStyleRight}> Server: {this.showServer()}</Label>
 					<Label onClick={this.logOut} href="#" style={LabelStyleRight}>
@@ -234,6 +166,17 @@ class SeamaToolbar extends Component {
 		}
 		return this.props.healthCheck.server;
 	}
+
+	updateData(){
+		console.log("SemaToolbar - updateData: ", this.props.dateFilter.startDate, "-", this.props.dateFilter.endDate );
+		console.log("ccc");
+		if( this.startDate != this.props.dateFilter.startDate ||
+			this.endDate != this.props.dateFilter.endDate ){
+			this.startDate = this.props.dateFilter.startDate;
+			this.endDate = this.props.dateFilter.endDate;
+			this.loadActivePage(null );
+		}
+	}
 }
 
 function mapStateToProps(state) {
@@ -243,7 +186,8 @@ function mapStateToProps(state) {
 		healthCheck: state.healthCheck,
 		kiosk:state.kiosk,
 		volume:state.volume,
-		customer:state.customer
+		customer:state.customer,
+		dateFilter:state.dateFilter
 	};
 }
 
