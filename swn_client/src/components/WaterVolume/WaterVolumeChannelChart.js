@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import {Doughnut} from 'react-chartjs-2';
 import { utilService } from 'services';
+import 'css/SemaChart.css';
 
 class WaterVolumeChannelChart extends Component {
     render() {
         return (
-			<div style={{backgroundColor:'rgb(40,89,167'}}>
+			<div className = "ChartContainer" >
         		<div className = "chart" style={{backgroundColor:'white', margin:"2px"}}>
 					<Doughnut
 						data = {this.getVolumeData()}

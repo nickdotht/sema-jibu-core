@@ -48,12 +48,12 @@ class CustomersByDistanceChart extends Component {
 				let index = 0;
 				this.props.chartData.customerInfo.customersByDistance.forEach(distance => {
 					if (distance.hasOwnProperty("distanceLessThan") && distance.hasOwnProperty("distanceGreaterThan")) {
-						let label = "" + distance.distanceGreaterThan + " - " + distance.distanceLessThan ;
+						let label = "" + distance.distanceGreaterThan + " - " + distance.distanceLessThan + " M" ;
 						data.labels.push(label);
 					} else if (distance.hasOwnProperty("distanceLessThan")) {
-						data.labels.push("<" + distance.distanceLessThan );
+						data.labels.push("<" + distance.distanceLessThan + " M" );
 					} else if (distance.hasOwnProperty("distanceGreaterThan")) {
-						data.labels.push(">" + distance.distanceGreaterThan);
+						data.labels.push(">" + distance.distanceGreaterThan + " M");
 					}
 
 					data.datasets[0].backgroundColor.push( utilService.getBackgroundColorByIndex( index ) );

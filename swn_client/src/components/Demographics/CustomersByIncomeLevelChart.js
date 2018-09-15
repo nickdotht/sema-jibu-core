@@ -46,15 +46,19 @@ class CustomersByIncomeLevelChart extends Component {
 
 				data.datasets.push( {label: "Customers By Income Levelx", backgroundColor:[], data:[]});
 				let index = 0;
+				let label = "";
+				let totalCustomers = this.props.chartData.customerInfo.customersByIncome.reduce( (total, customer) => { return(total + customer.customerCount)}, 0);
+
 				this.props.chartData.customerInfo.customersByIncome.forEach(income => {
 					if (income.hasOwnProperty("incomeLessThan") && income.hasOwnProperty("incomeGreaterThan")) {
-						let label = "$" + income.incomeGreaterThan + "<$" + income.incomeLessThan + " per day";
-						data.labels.push(label);
+						label = "$" + income.incomeGreaterThan + "<$" + income.incomeLessThan + " per day";
 					} else if (income.hasOwnProperty("incomeLessThan")) {
-						data.labels.push("$" + income.incomeLessThan + "< per day");
+						label = "$" + income.incomeLessThan + "< per day";
 					} else if (income.hasOwnProperty("incomeGreaterThan")) {
-						data.labels.push("$" + income.incomeGreaterThan + "> per day");
+						label = "$" + income.incomeGreaterThan + "> per day";
 					}
+					let percentage = ((income.customerCount * 100)/totalCustomers).toFixed(0);
+					data.labels.push(label + ' (' + percentage + '%)');
 
 					data.datasets[0].backgroundColor.push( utilService.getBackgroundColorByIndex( index ) );
 					data.datasets[0].data.push(income.customerCount );
