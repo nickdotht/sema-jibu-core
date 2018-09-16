@@ -9,7 +9,7 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 
     renderContent(){
 		if( this.props.chartData.loaded ) {
-			return (<div style={{backgroundColor:'rgb(40,89,167'}}>
+			return (<div className = "ChartContainer" >
 					<div className="chart" style={{backgroundColor:'white', margin:"2px"}}>
 						<HorizontalBar
 							data={this.getVolumeData()}

@@ -52,7 +52,7 @@ class SemaCustomer extends Component {
 						<CustomersByDistanceChart  chartData={this.props.customer}/>
 					</div>
                 </div>
-                <div className = "CustomerSummaryRow3">
+                <div className = "CustomerSummaryRow3" style={{marginTop:'10px'}}>
 					<div className = "CustomerSummaryRow3Col1">
 						<CustomersByIncomeLevelChart  chartData={this.props.customer}/>
 					</div>

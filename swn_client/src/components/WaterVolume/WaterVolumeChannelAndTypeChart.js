@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import {HorizontalBar} from 'react-chartjs-2';
 import { utilService } from 'services';
+import 'css/SemaChart.css';
 
 class WaterVolumeChannelAndTypeChart extends Component {
     render() {
         return (
-			<div style={{backgroundColor:'rgb(40,89,167'}}>
+			<div className = "ChartContainer" >
         		<div className = "chart" style={{backgroundColor:'white', margin:"2px"}}>
 					<HorizontalBar
 						data = {this.getVolumeData()}

@@ -5,7 +5,7 @@ import { utilService } from 'services';
 class CustomersByIncomeLevelChart extends Component {
     render() {
         return (
-			<div style={{backgroundColor:'rgb(40,89,167'}}>
+			<div className = "ChartContainer" >
         		<div className = "chart" style={{backgroundColor:'white', margin:"2px"}}>
 					<Pie
 						data = {this.getCustomerData()}

@@ -168,10 +168,12 @@ class SeamaToolbar extends Component {
 	}
 
 	updateData(){
-		console.log("SemaToolbar - updateData: ", this.props.dateFilter.startDate, "-", this.props.dateFilter.endDate );
+		console.log("SemaToolbar - updateData - New Range: ", this.props.dateFilter.startDate, "-", this.props.dateFilter.endDate );
+		console.log("SemaToolbar - updateData - Old Range: ", this.startDate, "-", this.endDate );
 		console.log("ccc");
 		if( this.startDate != this.props.dateFilter.startDate ||
 			this.endDate != this.props.dateFilter.endDate ){
+			console.log("_______________________");
 			this.startDate = this.props.dateFilter.startDate;
 			this.endDate = this.props.dateFilter.endDate;
 			this.loadActivePage(null );

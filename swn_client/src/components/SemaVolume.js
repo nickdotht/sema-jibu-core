@@ -37,7 +37,7 @@ class SemaVolume extends Component {
                 <div className = "WaterVolumeChannelAndIncome">
 					<WaterVolumeChannelAndIncomeChart chartData={this.props.volume}/>
                 </div>
-                <div className = "WaterVolumeChannelAndCustomerType">
+                <div className = "WaterVolumeChannelAndCustomerType" style={{marginTop:'10px'}}>
 					<div className = "WaterVolumeChannel">
 						<WaterVolumeChannelChart  chartData={this.props.volume}/>
 					</div>
