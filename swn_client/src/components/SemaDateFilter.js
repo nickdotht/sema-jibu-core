@@ -9,11 +9,19 @@ import { withRouter } from 'react-router'
 const menuStyle = {};
 
 
-const ImageStyle = {
+const ImageStyleEnabled = {
 	width:"30px",
 	height:"30px",
 	verticalAlign: "middle",
 	marginTop:"10px",
+	opacity:'1.0'
+};
+const ImageStyleDisabled = {
+	width:"30px",
+	height:"30px",
+	verticalAlign: "middle",
+	marginTop:"10px",
+	opacity:'.3'
 };
 
 class SemaDateFilter extends Component {
@@ -50,12 +58,27 @@ class SemaDateFilter extends Component {
 	};
 	setYTDDisplay(){
 		this.setState( {displayDate: this.formatYTDDisplay( this.startDate, this.endDate)});
+		// Update enables
+		let nextDate = new Date( this.startDate);
+		nextDate.setFullYear(nextDate.getFullYear() + 1);
+		this.setState({nextEnable:(nextDate < this.maxDate) ? true :false})
+		let prevDate = new Date( this.startDate);
+		prevDate.setFullYear(prevDate.getFullYear() - 1);
+		this.setState({prevEnable:(prevDate >= this.minDate) ? true :false})
 
 	};
 	yearIncrement(){
+		this.startDate = new Date( this.startDate.getFullYear()+1, 0, 1 );
+		this.endDate = new Date( this.startDate.getFullYear(), 12, 0 );
+		this.setYTDDisplay();
+		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
 
 	}
 	yearDecrement(){
+		this.startDate = new Date( this.startDate.getFullYear()-1, 0, 1 );
+		this.endDate = new Date( this.startDate.getFullYear(), 12, 0 );
+		this.setYTDDisplay();
+		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
 
 	}
 	setThisMonth(){
@@ -68,17 +91,24 @@ class SemaDateFilter extends Component {
 		let locale = "en-us";
 		const month = this.startDate.toLocaleString(locale, {month: "short"});
 		this.setState( {displayDate: month + ", " + this.startDate.getFullYear().toString()});
+		// Update enables
+		let nextDate = new Date( this.startDate);
+		nextDate.setMonth(nextDate.getMonth() + 1);
+		this.setState({nextEnable:(nextDate < this.maxDate) ? true :false})
+		let prevDate = new Date( this.startDate);
+		prevDate.setMonth(prevDate.getMonth() - 1);
+		this.setState({prevEnable:(prevDate >= this.minDate) ? true :false})
 
 	};
 	monthIncrement() {
 		this.startDate = new Date( this.startDate.setMonth(this.startDate.getMonth() + 1));
-		this.endDate = new Date( this.endDate.setMonth(this.endDate.getMonth() + 1));
+		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
 		this.setThisMonthDisplay();
 		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
 	}
 	monthDecrement(){
 		this.startDate = new Date( this.startDate.setMonth(this.startDate.getMonth()-1));
-		this.endDate = new Date( this.endDate.setMonth(this.endDate.getMonth()-1));
+		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
 		this.setThisMonthDisplay();
 		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
 	}
@@ -91,6 +121,8 @@ class SemaDateFilter extends Component {
 	setAllDisplay(){
 		console.log("foo");
 		this.setState( {displayDate: "All Dates"});
+		this.setState({nextEnable:false})
+		this.setState({prevEnable:false})
 
 	};
 
@@ -109,11 +141,16 @@ class SemaDateFilter extends Component {
 
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
+		this.minDate = new Date( 2017, 0, 1 );		// Min date allowed
+		this.maxDate = this.endDate;
+
 		this.dateSelector = this.dateMenu[1];
 		this.dateKey = 1;
 		this.dateSelector.setStartEndDate( this );
 		this.state = {
-			displayDate: this.formatYTDDisplay( this.startDate, this.endDate )
+			displayDate: this.formatYTDDisplay( this.startDate, this.endDate ),
+			nextEnable:false,
+			prevEnable:true
 		};
 
 	}
@@ -127,7 +164,7 @@ class SemaDateFilter extends Component {
 			<div>
 				<Nav>
 					<div>
-						{<img src={require('images/left-arrow.png')} alt="logo" style={ImageStyle} onClick={() => this.leftArrowClick()} />}
+						{<img src={require('images/left-arrow.png')} alt="logo" style={this.getImageStyle(true)} onClick={() => this.leftArrowClick()} />}
 					</div>
 				</Nav>
 				<Nav>
@@ -138,7 +175,7 @@ class SemaDateFilter extends Component {
 				</Nav>
 				<Nav>
 					<div>
-						{<img src={require('images/right-arrow.png')} alt="logo" style={ImageStyle} onClick={() => this.rightArrowClick()} />}
+						{<img src={require('images/right-arrow.png')} alt="logo" style={this.getImageStyle(false)} onClick={() => this.rightArrowClick()} />}
 					</div>
 				</Nav>
 			</div>
@@ -164,13 +201,25 @@ class SemaDateFilter extends Component {
 
 
 	leftArrowClick(){
-		console.log("Decrement Date range")
-		this.dateSelector.decrementStartEndDate( );
+		if( this.state.prevEnable) {
+			this.dateSelector.decrementStartEndDate();
+		}
 	}
 	rightArrowClick(){
-		console.log("Increment Date range")
-		this.dateSelector.incrementStartEndDate(  );
+		if( this.state.nextEnable) {
+			this.dateSelector.incrementStartEndDate();
+		}
 	}
+	getImageStyle( prev){
+		if( prev ) {
+			return (this.state.prevEnable) ? ImageStyleEnabled : ImageStyleDisabled
+		}else{
+			return (this.state.nextEnable) ? ImageStyleEnabled : ImageStyleDisabled
+
+		}
+	}
+
+
 
 }
 
