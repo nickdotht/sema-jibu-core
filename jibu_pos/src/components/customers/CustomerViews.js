@@ -113,7 +113,7 @@ export const CustomerViews = createBottomTabNavigator({
 	Walkup: {
 		screen: WalkupScreen,
 		navigationOptions: {
-			tabBarLabel: 'Walkup',
+			tabBarLabel: 'Direct',
 			tabBarOnPress: (scene, jumpToIndex) => {
 				let parent = scene.navigation.dangerouslyGetParent();
 				let output = "Walkup-Tab " + scene.navigation.state.routeName;
