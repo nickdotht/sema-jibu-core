@@ -30,7 +30,7 @@ class SemaVolume extends Component {
 
     showWaterOperations( ){
         return (
-            <div className="WaterVolumeContainer">
+            <div className="WaterVolumeContainer" style = {this.getHeight()}>
 				<div className = "WaterVolumeProgress" style={{width:"100%", height:'100%'}}>
 					<LoadProgress/>
 				</div>
@@ -48,6 +48,13 @@ class SemaVolume extends Component {
             </div>
         );
     }
+    getHeight(){
+    	let windowHeight = window.innerHeight;
+        // TODO 52px is the height of the toolbar. (Empirical)
+		windowHeight -= 52;
+		let height = windowHeight.toString()+'px';
+    	return {height:height}
+	}
 }
 
 function mapStateToProps(state) {

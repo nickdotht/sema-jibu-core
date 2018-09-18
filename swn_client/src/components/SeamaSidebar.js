@@ -43,7 +43,7 @@ function CustomComponent1({ children }) {
 class SeamaSidebar extends Component {
     render() {
         return (
-            <div className="SeamaNavSidebar" style={SeamaSidebarStyle}>
+            <div className="SeamaNavSidebar" style={this.getStyle()}>
                 <div>
                     {<img src={require('images/swn-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
                 </div>
@@ -64,6 +64,17 @@ class SeamaSidebar extends Component {
             </div>
         );
     }
+	getStyle(){
+		let windowHeight = window.innerHeight;
+		// TODO 52px is the height of the toolbar. (Empirical)
+		windowHeight -= 52;
+		let height = windowHeight.toString()+'px';
+		return {
+			background:"rgb(24,55,106)",
+			width:"240px",
+			height:height}
+	}
+
 }
 
 

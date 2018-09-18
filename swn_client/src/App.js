@@ -21,7 +21,7 @@ import {
 class App extends Component {
 	componentWillMount() {
 		let self = this;
-
+		window.addEventListener('resize', this.resize)
 		this.unlisten = history.listen((location, action) => {
 			console.log("on route change", self);
 			switch( location.pathname ){
@@ -43,9 +43,11 @@ class App extends Component {
 	}
 
 	componentWillUnmount() {
+		window.removeEventListener('resize', this.resize)
 		this.unlisten();
 	}
-
+	resize = () => this.forceUpdate();
+	
 	render() {
 		return (
 			<Router history={ history }>

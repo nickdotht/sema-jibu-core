@@ -31,7 +31,7 @@ class SemaCustomer extends Component {
 
     showCustomers( ){
         return (
-            <div className="CustomerContainer">
+            <div className="CustomerContainer"  style = {this.getHeight()}>>
 				<div className = "CustomerProgress" style={{width:"100%", height:'100%'}}>
 					<LoadProgress/>
 				</div>
@@ -74,6 +74,14 @@ class SemaCustomer extends Component {
     		return "N/A";
 		}
 	}
+	getHeight(){
+		let windowHeight = window.innerHeight;
+		// TODO 52px is the height of the toolbar. (Empirical)
+		windowHeight -= 52;
+		let height = windowHeight.toString()+'px';
+		return {height:height}
+	}
+
 }
 
 

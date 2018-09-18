@@ -127,7 +127,7 @@ class SeamaToolbar extends Component {
 
 	render() {
 		return (
-			<div className="SeamaNavToolbar" >
+			<div className="SeamaNavToolbar" id = "semaToolbar">
 				{this.updateData()}
 				<Navbar bsStyle="inverse" style={{marginBottom:"0px",
 					borderRadius: 0}}>
