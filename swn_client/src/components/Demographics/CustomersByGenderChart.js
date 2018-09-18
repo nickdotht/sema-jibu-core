@@ -64,7 +64,14 @@ class CustomersByGenderChart extends Component {
 		return data;
 	}
 	getChartText( ) {
-		return "Customers By Gender";
+		let title = "Customers By Gender";
+		if( this.props.chartData.loaded && this.props.chartData.customerInfo.hasOwnProperty('customersByGender')) {
+		let total = this.props.chartData.customerInfo.customersByGender.reduce( (total, customer) => { return(total + customer.customerCount)}, 0);
+			if( total === 0 ) {
+				title = title + ". (No data available)";
+			}
+		}
+		return title;
 	}
 
 	calcGenderValues( customerInfo ){

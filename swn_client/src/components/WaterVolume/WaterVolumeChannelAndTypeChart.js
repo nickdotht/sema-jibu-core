@@ -5,41 +5,52 @@ import 'css/SemaChart.css';
 
 class WaterVolumeChannelAndTypeChart extends Component {
     render() {
-        return (
-			<div className = "ChartContainer" >
-        		<div className = "chart" style={{backgroundColor:'white', margin:"2px"}}>
-					<HorizontalBar
-						data = {this.getVolumeData()}
-						// data = {{
-						// labels: ["Walkup", "Reseller"],
-						// datasets: [
-						// 	{
-						// 		label: "Walkup",
-						// 		backgroundColor: ["rgba(99,255,132,0.2)", "rgba(99,132,255,0.2)" ],
-						// 		data: [55, 90 ],
-						// 	}
-						// ]
-						// }}
-						height={300}
-						width={500}
-						options={{
-							title: {
-								display: true,
-								text: this.getChartText(),
-								position:"top"
-							},
-							legend:{
-								position:"right"
-							}
+		if( this.props.chartData.loaded ) {
+			return (
+				<div className = "ChartContainer" >
+					<div className = "chart" style={{backgroundColor:'white', margin:"2px"}}>
+						<HorizontalBar
+							data = {this.getVolumeData()}
+							// data = {{
+							// labels: ["Walkup", "Reseller"],
+							// datasets: [
+							// 	{
+							// 		label: "Walkup",
+							// 		backgroundColor: ["rgba(99,255,132,0.2)", "rgba(99,132,255,0.2)" ],
+							// 		data: [55, 90 ],
+							// 	}
+							// ]
+							// }}
+							height={300}
+							width={500}
+							options={{
+								title: {
+									display: true,
+									text: this.getChartText(),
+									position:"top"
+								},
+								legend:{
+									position:"right"
+								}
 
 
-						}}
-					/>
+							}}
+						/>
+					</div>
 				</div>
-			</div>
 
-        );
-    }
+			);
+		}else{
+			return  (<div style={{textAlign:"center"}}>
+					{this.getChartText()}
+					<br/>
+					No Data available
+				</div>
+			);
+
+		}
+
+	}
 	getVolumeData(){
 		let data = {labels:[], datasets:[]}
 		if( this.props.chartData.loaded ) {
@@ -79,7 +90,17 @@ class WaterVolumeChannelAndTypeChart extends Component {
 	}
 
 	getChartText( ) {
-		return "Volume By Sales Channel and Consumer Type";
+		let title = "Volume By Sales Channel and Consumer Type";
+		let total = 0;
+		if( this.props.chartData.loaded && this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannelAndType')) {
+			total = this.props.chartData.volumeInfo.volumeByChannelAndType.reduce( (total, channelAndType) => {
+				return(total + channelAndType.volume.data.reduce( (total, data) =>{ return (total + data.volume)}, 0)) }, 0 );
+			if( total === 0 ){
+				title = title + ". (No data available)";
+			}
+		}
+		return title;
 	}
+
 }
 export default WaterVolumeChannelAndTypeChart;

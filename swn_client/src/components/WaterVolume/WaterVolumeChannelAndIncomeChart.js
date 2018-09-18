@@ -39,7 +39,7 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 								},
 								title: {
 									display: true,
-									text: 'Liters by Channel and Income',
+									text: this.getChartText(),
 									position: "top"
 								}
 
@@ -51,7 +51,7 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 			);
 		}else{
 			return  (<div style={{textAlign:"center"}}>
-						Liters by Channel and Income
+					{this.getChartText()}
 						<br/>
 						No Data available
 					</div>
@@ -59,10 +59,24 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 		}
 
 	}
+
+	getChartText( ) {
+		let title = "Liters by Channel and Income";
+		let total = 0;
+		if( this.props.chartData.loaded && this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannelAndIncome')) {
+			total = this.props.chartData.volumeInfo.volumeByChannelAndIncome.reduce( (total, channelAndIncome) => {
+				return(total + channelAndIncome.volume.data.reduce( (total, data) =>{ return (total + data.volume)}, 0)) }, 0 );
+			if( total === 0 ){
+				title = title + ". (No data available)";
+			}
+		}
+		return title;
+	}
+
 	getVolumeData(){
 		let data = {labels:[], datasets:[]}
 		if( this.props.chartData.loaded ) {
-    		if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel')){
+    		if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannelAndIncome')){
 				if( this.props.chartData.volumeInfo.volumeByChannelAndIncome.length > 0 ) {
 					// Create the bars
 					this.props.chartData.volumeInfo.volumeByChannelAndIncome.forEach(channelAndIncome => {

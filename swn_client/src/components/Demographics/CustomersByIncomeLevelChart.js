@@ -68,8 +68,17 @@ class CustomersByIncomeLevelChart extends Component {
 		}
 		return data;
 	}
+
 	getChartText( ) {
-		return "Customers By Income Level";
+		let title = "Customers By Income Level";
+		if( this.props.chartData.loaded && this.props.chartData.customerInfo.hasOwnProperty('customersByIncome')) {
+			let total = this.props.chartData.customerInfo.customersByIncome.reduce( (total, customer) => { return(total + customer.customerCount)}, 0);
+			if( total === 0 ) {
+				title = title + ". (No data available)";
+			}
+		}
+		return title;
 	}
+
 }
 export default CustomersByIncomeLevelChart;

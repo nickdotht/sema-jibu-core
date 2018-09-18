@@ -65,7 +65,15 @@ class CustomersByDistanceChart extends Component {
 		return data;
 	}
 	getChartText( ) {
-		return "Customers By Distance";
+    	let title = "Customers By Distance";
+		if( this.props.chartData.loaded && this.props.chartData.customerInfo.hasOwnProperty('customersByDistance')) {
+			let total = this.props.chartData.customerInfo.customersByDistance.reduce( (total, customer) => { return(total + customer.customerCount)}, 0);
+			if( total === 0 ){
+				title = title + ". (No data available)";
+			}
+		}
+		return title;
 	}
 }
 export default CustomersByDistanceChart;
+

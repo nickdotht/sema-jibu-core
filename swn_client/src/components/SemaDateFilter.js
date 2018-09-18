@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Nav,NavDropdown,MenuItem, Image } from 'react-bootstrap';
+import { Nav,NavDropdown,MenuItem } from 'react-bootstrap';
 import 'App.css';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -183,7 +183,7 @@ class SemaDateFilter extends Component {
 	}
 	handleSelectDate(eventKey){
 		console.log(JSON.stringify(eventKey));
-		if( this.dateKey != eventKey){
+		if( this.dateKey !== eventKey){
 			this.dateKey = eventKey
 			this.dateSelector = this.dateMenu[eventKey];
 			this.dateSelector.setStartEndDate( this );
