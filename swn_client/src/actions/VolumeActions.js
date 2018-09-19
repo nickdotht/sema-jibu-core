@@ -12,7 +12,8 @@ function initializeVolume() {
 		volumeInfo: {
 			volumeByChannel:{},
 			volumeByChannelAndIncome:[],
-			volumeByChannelAndType:[]
+			volumeByChannelAndType:[],
+			volumeByChannelAndPaymentType:[]
 		}
 	}
 }
@@ -63,14 +64,26 @@ const fetchVolumeData = ( params) => {
 			result.volumeInfo.volumeByChannelAndIncome.push(await fetchVolumeItem(params, "sales-channel", {incomeLT: 2}));
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*5)+10}} ));
 
-			if (types) {
-				for (let index = 0; index < types.customerTypes.length; index++) {
-					const volumeInfo = await fetchVolumeItem(params, "sales-channel", {customerType: types.customerTypes[index].id});
-					volumeInfo.customerTypeName = types.customerTypes[index].name;
-					result.volumeInfo.volumeByChannelAndType.push(volumeInfo);
-					window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*(5+index+1))+10}} ));
-				}
-			}
+			// if (types) {
+			// 	for (let index = 0; index < types.customerTypes.length; index++) {
+			// 		const volumeInfo = await fetchVolumeItem(params, "sales-channel", {customerType: types.customerTypes[index].id});
+			// 		volumeInfo.customerTypeName = types.customerTypes[index].name;
+			// 		result.volumeInfo.volumeByChannelAndType.push(volumeInfo);
+			// 		window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*(5+index+1))+10}} ));
+			// 	}
+			// }
+			result.volumeInfo.volumeByChannelAndPaymentType.push(await fetchVolumeItem(params, "sales-channel", {paymentType: "cash"}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*6)+10}} ));
+
+			result.volumeInfo.volumeByChannelAndPaymentType.push(await fetchVolumeItem(params, "sales-channel", {paymentType: "mobile"}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*7)+10}} ));
+
+			result.volumeInfo.volumeByChannelAndPaymentType.push(await fetchVolumeItem(params, "sales-channel", {paymentType: "card"}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*8)+10}} ));
+
+			result.volumeInfo.volumeByChannelAndPaymentType.push(await fetchVolumeItem(params, "sales-channel", {paymentType: "loan"}));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*9)+10}} ));
+
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 			resolve(result);
 		}catch( error ){
@@ -94,6 +107,9 @@ function fetchVolumeItem( params, type, options ) {
 
 		if(options.hasOwnProperty("customerType") ){
 			url = url + "&customer-type=" + options.customerType;
+		}
+		if(options.hasOwnProperty("paymentType") ){
+			url = url + "&payment-type=" + options.paymentType;
 		}
 		if( params.hasOwnProperty("startDate") ){
 			url = url + "&begin-date=" + params.startDate.toISOString();

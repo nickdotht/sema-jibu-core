@@ -18,6 +18,11 @@ class ReceiptSummary {
 		this.customerType = value;
 
 	}
+	addPaymentType( value ){
+		this.paymentType = value;
+
+	}
+
 	addData( data ){
 		this.volume.data.push( data );
 	}

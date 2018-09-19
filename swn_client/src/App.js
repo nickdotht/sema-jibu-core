@@ -47,7 +47,7 @@ class App extends Component {
 		this.unlisten();
 	}
 	resize = () => this.forceUpdate();
-	
+
 	render() {
 		return (
 			<Router history={ history }>

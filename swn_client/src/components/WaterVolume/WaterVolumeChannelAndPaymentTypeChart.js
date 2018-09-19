@@ -3,7 +3,7 @@ import {HorizontalBar} from 'react-chartjs-2';
 import { utilService } from 'services';
 import 'css/SemaChart.css';
 
-class WaterVolumeChannelAndTypeChart extends Component {
+class WaterVolumeChannelAndPaymentTypeChart extends Component {
     render() {
 		if( this.props.chartData.loaded ) {
 			return (
@@ -55,18 +55,18 @@ class WaterVolumeChannelAndTypeChart extends Component {
 		let data = {labels:[], datasets:[]}
 		if( this.props.chartData.loaded ) {
 			if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel')){
-				if( this.props.chartData.volumeInfo.volumeByChannelAndType.length > 0 ) {
+				if( this.props.chartData.volumeInfo.volumeByChannelAndPaymentType.length > 0 ) {
 					// Create the bars
-					this.props.chartData.volumeInfo.volumeByChannelAndType.forEach(channelAndType => {
-						data.labels.push(channelAndType.customerTypeName);
+					this.props.chartData.volumeInfo.volumeByChannelAndPaymentType.forEach(channelAndType => {
+						data.labels.push(channelAndType.paymentType);
 					});
 
 					// Create the labels
-					this.props.chartData.volumeInfo.volumeByChannelAndType[0].volume.data.forEach(salesChannel => {
+					this.props.chartData.volumeInfo.volumeByChannelAndPaymentType[0].volume.data.forEach(salesChannel => {
 						data.datasets.push( {label: salesChannel.salesChannel, data:[], stack: 1, backgroundColor:utilService.getBackgroundColorForChannel( salesChannel.salesChannel ), id: salesChannel.salesChannel});
 					});
 					// add the data
-					this.props.chartData.volumeInfo.volumeByChannelAndType.forEach(channelAndType => {
+					this.props.chartData.volumeInfo.volumeByChannelAndPaymentType.forEach(channelAndType => {
 						channelAndType.volume.data.forEach( dataPt =>{
 							this.addData( data.datasets, dataPt );
 						});
@@ -90,10 +90,10 @@ class WaterVolumeChannelAndTypeChart extends Component {
 	}
 
 	getChartText( ) {
-		let title = "Volume By Sales Channel and Consumer Type";
+		let title = "Volume By Sales Channel and Payment Type";
 		let total = 0;
-		if( this.props.chartData.loaded && this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannelAndType')) {
-			total = this.props.chartData.volumeInfo.volumeByChannelAndType.reduce( (total, channelAndType) => {
+		if( this.props.chartData.loaded && this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannelAndPaymentType')) {
+			total = this.props.chartData.volumeInfo.volumeByChannelAndPaymentType.reduce( (total, channelAndType) => {
 				return(total + channelAndType.volume.data.reduce( (total, data) =>{ return (total + data.volume)}, 0)) }, 0 );
 			if( total === 0 ){
 				title = title + ". (No data available)";
@@ -103,4 +103,4 @@ class WaterVolumeChannelAndTypeChart extends Component {
 	}
 
 }
-export default WaterVolumeChannelAndTypeChart;
+export default WaterVolumeChannelAndPaymentTypeChart;

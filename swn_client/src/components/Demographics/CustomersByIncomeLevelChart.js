@@ -4,40 +4,51 @@ import { utilService } from 'services';
 
 class CustomersByIncomeLevelChart extends Component {
     render() {
-        return (
-			<div className = "ChartContainer" >
-        		<div className = "chart" style={{backgroundColor:'white', margin:"2px"}}>
-					<Pie
-						data = {this.getCustomerData()}
-						// data = {{
-						// labels: ["Walkup", "Reseller"],
-						// datasets: [
-						// 	{
-						// 		label: "Walkup",
-						// 		backgroundColor: ["rgba(99,255,132,0.2)", "rgba(99,132,255,0.2)" ],
-						// 		data: [55, 90 ],
-						// 	}
-						// ]
-						// }}
-						height={300}
-						width={500}
-						options={{
-							title: {
-								display: true,
-								text: this.getChartText(),
-								position:"top"
-							},
-							legend:{
-								position:"right"
-							}
+		if( this.props.chartData.loaded ) {
+			return (
+				<div className="ChartContainer">
+					<div className="chart" style={{backgroundColor: 'white', margin: "2px"}}>
+						<Pie
+							data={this.getCustomerData()}
+							// data = {{
+							// labels: ["Walkup", "Reseller"],
+							// datasets: [
+							// 	{
+							// 		label: "Walkup",
+							// 		backgroundColor: ["rgba(99,255,132,0.2)", "rgba(99,132,255,0.2)" ],
+							// 		data: [55, 90 ],
+							// 	}
+							// ]
+							// }}
+							height={300}
+							width={500}
+							options={{
+								title: {
+									display: true,
+									text: this.getChartText(),
+									position: "top"
+								},
+								legend: {
+									position: "right"
+								}
 
 
-						}}
-					/>
+							}}
+						/>
+					</div>
 				</div>
-			</div>
 
-        );
+			);
+		}else{
+			return  (
+				<div style={{textAlign:"center"}}>
+					{this.getChartText()}
+					<br/>
+					No Data available
+				</div>
+			);
+		}
+
     }
 	getCustomerData(){
 		let data = {labels:[], datasets:[]}

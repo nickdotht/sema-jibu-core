@@ -78,6 +78,15 @@ router.get('/', async( request, response ) => {
 					params.push( request.query["customer-type"]);
 					receiptSummary.addCustomerType( request.query["customer-type"]);
 				}
+				if( request.query.hasOwnProperty("payment-type") ){
+					const paymentType = getPaymentType( request.query["payment-type"] );
+					if( paymentType === null ){
+						throw new Error("Invalid payment-type");
+					}
+					sqlQualifier = sqlQualifier + " AND " + paymentType + " > 0 ";
+					receiptSummary.addPaymentType( request.query["payment-type"]);
+				}
+
 				if (request.query.type == "sales-channel") {
 					const salesChannels = await getSalesChannels(connection);
 					for (let index = 0; index < salesChannels.length; index++) {
@@ -152,6 +161,20 @@ const getReceiptTypeSummary = ( connection, customerType,  sqlQualifier, params,
 	});
 };
 
+const getPaymentType =  param =>{
+	switch( param){
+		case "cash":
+			return "amount_cash";
+		case "mobile":
+			return "amount_mobile";
+		case "loan":
+			return "amount_loan";
+		case "card":
+			return "amount_card";
+		default:
+			return null;
 
+	}
+}
 
 module.exports = router;

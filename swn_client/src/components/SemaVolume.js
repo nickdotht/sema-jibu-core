@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import 'App.css';
 import WaterVolumeChannelAndIncomeChart from "./WaterVolume/WaterVolumeChannelAndIncomeChart";
 import WaterVolumeChannelChart from "./WaterVolume/WaterVolumeChannelChart"
-import WaterVolumeChannelAndTypeChart from "./WaterVolume/WaterVolumeChannelAndTypeChart"
+import WaterVolumeChannelAndPaymentTypeChart from "./WaterVolume/WaterVolumeChannelAndPaymentTypeChart"
 import 'css/SemaVolume.css';
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
@@ -42,7 +42,7 @@ class SemaVolume extends Component {
 						<WaterVolumeChannelChart  chartData={this.props.volume}/>
 					</div>
 					<div className="WaterVolumeCustomerType">
-						<WaterVolumeChannelAndTypeChart  chartData={this.props.volume}/>
+						<WaterVolumeChannelAndPaymentTypeChart chartData={this.props.volume}/>
 					</div>
 				</div>
             </div>
