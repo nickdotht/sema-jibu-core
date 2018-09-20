@@ -267,16 +267,36 @@ class CustomerBar extends Component {
 				this.props.orderActions.ClearOrder();
 				this.props.orderActions.SetOrderFlow('products');
 			} else {
-				this.props.orderActions.ClearOrder();
-				this.props.customerBarActions.ShowHideCustomers(1);
-				this.setState({ 'addFunction': true });
-				this.setState({ 'editFunction': true })
-				this.setState({ 'deleteFunction': true });
-				this.setState({ 'orderFunction': true });
+				if( this.props.hasOwnProperty("orderProducts") && this.props.orderProducts.length > 0 ) {
+					Alert.alert(
+						"Cancel Order",
+						'Are you sure you want to cancel this order?',
+						[
+							{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+							{
+								text: 'OK', onPress: () => {
+									this.doCancelOrder();
+								}
+							},
+						],
+						{ cancelable: false }
+					);
+				}else{
+					this.doCancelOrder();
+				}
 
 			}
 		}
 	};
+	doCancelOrder = () =>{
+		this.props.orderActions.ClearOrder();
+		this.props.customerBarActions.ShowHideCustomers(1);
+		this.setState({ 'addFunction': true });
+		this.setState({ 'editFunction': true })
+		this.setState({ 'deleteFunction': true });
+		this.setState({ 'orderFunction': true });
+
+	}
 	onAdd = ()=>{
 		if(this.state.addFunction ) {
 			console.log("CustomerBar:onAdd");
@@ -303,7 +323,8 @@ function mapStateToProps(state, props) {
 		selectedCustomer: state.customerReducer.selectedCustomer,
 		customers: state.customerReducer.customers,
 		searchString: state.customerReducer.searchString,
-		showView: state.customerBarReducer.showView
+		showView: state.customerBarReducer.showView,
+		orderProducts: state.orderReducer.products
 	};
 }
 
