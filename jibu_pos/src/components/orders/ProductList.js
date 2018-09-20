@@ -65,7 +65,27 @@ class ProductList extends Component {
 	};
 
 	prepareData = () =>{
-		return this.props.products;
+		let productMrp = PosStorage.getProductMrps();
+		if( Object.keys(productMrp).length === 0 && productMrp.constructor === Object){
+			return this.props.products;				// No mapping table
+		}else{
+			// There is a mapping table, exlude products not in the mapping table
+			let returnProducts = [];
+			let salesChannel = PosStorage.getSalesChannelFromName(this.props.filter);
+			if( salesChannel ) {
+				for( let index = 0; index < this.props.products.length; index++ ){
+					let product = this.props.products[index];
+					let productMrp = PosStorage.getProductMrps()[PosStorage.getProductMrpKeyFromIds(product.productId, salesChannel.id)];
+					if( productMrp != null ){
+						returnProducts.push( product );
+					}
+				}
+				return returnProducts;
+			}else{
+				return this.props.products;
+			}
+		}
+
 		// return [{id:1, data:"one"}, {id:2, data:"two"}, {id:3, data:"three"}, {id:4, data:"four"}, {id:5, data:"five"}];
 	};
 	getImage = (item)=>{
@@ -85,7 +105,7 @@ class ProductList extends Component {
 	};
 
 	getLabelBackground = () =>{
-		if( this.props.filter === "walkup") {
+		if( this.props.filter === "direct") {
 			return styles.imageLabelBackgroundWalkup;
 		}else{
 			return styles.imageLabelBackgroundReseller;

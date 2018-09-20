@@ -45,7 +45,7 @@ class OrderWalkupScreen extends Component {
 		let { fadeAnim } = this.state;
 		return (
 			<Animated.View style = {{flex:1, backgroundColor:'#ABC1DE', transform:[{translateX:fadeAnim}]}}>
-				<ProductList filter='walkup' viewWidth ={this.viewWidth} />
+				<ProductList filter='direct' viewWidth ={this.viewWidth} />
 			</Animated.View>
 		);
 	}
