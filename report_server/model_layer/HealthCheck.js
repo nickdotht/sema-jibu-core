@@ -15,8 +15,8 @@ class HealthCheck {
 	classToPlain(){
 		return {server:this._server,
 			database:this._database,
-			version:this._version,
-			schema:this._schema};
+			version:this.version,
+			schema:this.schema};
 	}
 }
 
