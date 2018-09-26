@@ -16,4 +16,4 @@ export default response =>
 			data: data,
 			status: response.status
 		}
-	};
+	});

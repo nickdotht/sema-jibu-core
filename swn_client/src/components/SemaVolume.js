@@ -3,6 +3,7 @@ import 'App.css';
 import WaterVolumeChannelAndIncomeChart from "./WaterVolume/WaterVolumeChannelAndIncomeChart";
 import WaterVolumeChannelChart from "./WaterVolume/WaterVolumeChannelChart"
 import WaterVolumeChannelAndPaymentTypeChart from "./WaterVolume/WaterVolumeChannelAndPaymentTypeChart"
+import CustomerSummaryPanel from "./Demographics/CustomerSummaryPanel";
 import 'css/SemaVolume.css';
 import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
@@ -34,12 +35,19 @@ class SemaVolume extends Component {
 				<div className = "WaterVolumeProgress" style={{width:"100%", height:'100%'}}>
 					<LoadProgress/>
 				</div>
-                <div className = "WaterVolumeChannelAndIncome">
-					<WaterVolumeChannelAndIncomeChart chartData={this.props.volume}/>
-                </div>
-                <div className = "WaterVolumeChannelAndCustomerType" style={{marginTop:'10px'}}>
+				<div className = "WaterVolumeChannelAndLabel">
+					<div className = "WaterVolumeChannelLabel">"
+						<CustomerSummaryPanel title = "Total Volume for the Period (Liters)" valueColor = "rgb(40,88,197)"
+											  value = {this.calcTotalIncome()}
+											  units = ""/>
+					</div>
 					<div className = "WaterVolumeChannel">
 						<WaterVolumeChannelChart  chartData={this.props.volume}/>
+					</div>
+				</div>
+                <div className = "WaterVolumeChannelAndCustomerType" style={{marginTop:'10px'}}>
+					<div className = "WaterVolumeChannelAndIncome">
+						<WaterVolumeChannelAndIncomeChart chartData={this.props.volume}/>
 					</div>
 					<div className="WaterVolumeCustomerType">
 						<WaterVolumeChannelAndPaymentTypeChart chartData={this.props.volume}/>
@@ -54,6 +62,15 @@ class SemaVolume extends Component {
 		windowHeight -= 52;
 		let height = windowHeight.toString()+'px';
     	return {height:height}
+	}
+	calcTotalIncome(){
+    	if( this.props.volume.volumeInfo.volumeByChannel.hasOwnProperty("volume")){
+			if( this.props.volume.volumeInfo.volumeByChannel.volume.hasOwnProperty("data")){
+				let totalVolume = this.props.volume.volumeInfo.volumeByChannel.volume.data.reduce( (total, salesChannel) => { return(total + salesChannel.volume)}, 0);
+				return totalVolume.toFixed(1);
+			}
+		}
+		return "N/A";
 	}
 }
 

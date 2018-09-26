@@ -68,7 +68,13 @@ class SemaCustomer extends Component {
 	calcHouseHoldPenetration(){
     	if( this.props.customer.customerInfo.allCustomers.customerCount && this.props.customer.customerInfo.allCustomers.consumerBase ){
     		if( this.props.customer.customerInfo.allCustomers.consumerBase > 0 ){
+    			let penetration =  Math.round(this.props.customer.customerInfo.allCustomers.customerCount/this.props.customer.customerInfo.allCustomers.consumerBase * 100);
+    			if( penetration == 0 && this.props.customer.customerInfo.allCustomers.customerCount > 0){
+    				return "> 1"
+				}
     			return Math.round(this.props.customer.customerInfo.allCustomers.customerCount/this.props.customer.customerInfo.allCustomers.consumerBase * 100).toString();
+			}else{
+				return "N/A";
 			}
 		}else{
     		return "N/A";
