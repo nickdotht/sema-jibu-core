@@ -11,6 +11,7 @@ import PosStorage from "../database/PosStorage";
 import * as SettingsActions from "../actions/SettingsActions";
 import * as ToolbarActions from "../actions/ToolBarActions";
 import * as CustomerActions from "../actions/CustomerActions";
+import ModalDropdown from 'react-native-modal-dropdown';
 
 import Communications from '../services/Communications';
 
@@ -89,8 +90,15 @@ class Settings extends Component {
 		this.url = React.createRef();
 		this.site = React.createRef();
 		this.user = React.createRef();
+		this.supportedLanguages = React.createRef();
 		this.password = React.createRef();
 		this.state = { animating: false };
+
+		this.onShowLanguages = this.onShowLanguages.bind(this);
+		this.onLanguageSelected = this.onLanguageSelected.bind(this);
+		// this.preferred_language = React.createRef();
+		// this.supported_languages = PosStorage.getSupportedLanguagesForDisplay();
+		// this.languageOptions = this.supported_languages.map(language => language.displayName);
 	}
 
 	componentDidMount() {
@@ -147,6 +155,25 @@ class Settings extends Component {
 							isSecure={true}
 							valueFn={this.getPassword.bind(this)}
 							ref={this.password}/>
+
+						<View style ={[{marginTop:"1%", flexDirection:'row',alignItems:'center'}]}>
+							<ModalDropdown
+								style ={{width:250}}
+								textStyle={styles.dropdownText}
+								dropdownTextStyle = {[styles.dropdownText, {width:250}]}
+								dropdownStyle ={{borderColor: 'black', borderWidth:2}}
+								ref = {this.supportedLanguages}
+								defaultValue = {this.getDefaultUILanguage()}
+								defaultIndex = {this.getDefaultUILanguageIndex()}
+								options={['Kreyòl Ayisyen', 'Français', 'English']}
+								onSelect={this.onLanguageSelected}
+							/>
+							<TouchableHighlight underlayColor = '#c0c0c0'
+												onPress={this.onShowLanguages}>
+								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+							</TouchableHighlight>
+						</View>
+
 						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
 							<SettingsButton
 								pressFn={this.onSaveSettings.bind(this)}
@@ -209,6 +236,10 @@ class Settings extends Component {
 
 	onCancelSettings() {
 		this.props.toolbarActions.ShowScreen("main");
+	}
+
+	onShowLanguages() {
+		this.supportedLanguages.current.show();
 	}
 
 	closeHandler() {
@@ -378,6 +409,18 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 			token,
 			siteId );
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
+	}
+
+	getDefaultUILanguage() {
+		return 'Preferred UI Language';
+	}
+
+	getDefaultUILanguageIndex() {
+		return -1;
+	}
+
+	onLanguageSelected(language) {
+		console.log(`Selected language is ${language}`);
 	}
 
 }
