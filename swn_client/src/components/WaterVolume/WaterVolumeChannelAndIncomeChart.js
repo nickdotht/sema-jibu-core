@@ -61,7 +61,7 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 	}
 
 	getChartText( ) {
-		let title = "Liters by Channel and Income";
+		let title = "Volume by Channel and Income";
 		let total = 0;
 		if( this.props.chartData.loaded && this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannelAndIncome')) {
 			total = this.props.chartData.volumeInfo.volumeByChannelAndIncome.reduce( (total, channelAndIncome) => {

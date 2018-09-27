@@ -28,7 +28,7 @@ class SemaDateFilter extends Component {
 
 	dateMenu = {
 		1: {key:1,
-			title:"Year to date",
+			title:"Yearly",
 			setStartEndDate:this.setYTD.bind(this),
 			setDisplayDate:this.setYTDDisplay.bind(this),
 			incrementStartEndDate:this.yearIncrement.bind(this),
@@ -36,14 +36,14 @@ class SemaDateFilter extends Component {
 			},
 
 		2: {key:2,
-			title:"This month",
+			title:"Monthly",
 			setStartEndDate:this.setThisMonth.bind(this),
 			setDisplayDate:this.setThisMonthDisplay.bind(this),
 			incrementStartEndDate:this.monthIncrement.bind(this),
 			decrementStartEndDate:this.monthDecrement.bind(this)
 			},
 		3: {key:3,
-			title:"all",
+			title:"Total",
 			setStartEndDate:this.setAll.bind(this),
 			setDisplayDate:this.setAllDisplay.bind(this),
 			incrementStartEndDate:()=>{},
