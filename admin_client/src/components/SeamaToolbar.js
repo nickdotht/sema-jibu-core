@@ -99,7 +99,7 @@ class SeamaToolbar extends Component {
 			case "/":
 				this.props.volumeActions.fetchVolume(params);
 				break;
-			case "/Demographics":
+			case "/Products":
 				this.props.customerActions.fetchCustomer(params);
 				break;
 			default:

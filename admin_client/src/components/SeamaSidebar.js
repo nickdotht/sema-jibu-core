@@ -40,13 +40,13 @@ class SeamaSidebar extends Component {
         return (
             <div className="SeamaNavSidebar" style={this.getStyle()}>
                 <div>
-                    {<img src={require('images/swn-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
+                    {<img src={require('images/swe-logo.png')} alt="logo" style={ImageStyle} />}
                 </div>
                 <ListGroup>
                     <CustomComponent1><i className="glyphicon glyphicon-tint" style={{paddingRight:"15px"}}/>
                         <Link to='/'>Users</Link></CustomComponent1>
                     <CustomComponent1><i className="glyphicon glyphicon-user" style={{paddingRight:"15px"}}/>
-                        <Link to='/Demographics'>Products</Link></CustomComponent1>
+                        <Link to='/Products'>Products</Link></CustomComponent1>
                     {/*<CustomComponent1><i className="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>*/}
                         {/*<Link to='/DistributionMap'>Distribution Map</Link></CustomComponent1>*/}
                     {/*<CustomComponent1><i className="glyphicon glyphicon-time" style={{paddingRight:"15px"}}/>*/}

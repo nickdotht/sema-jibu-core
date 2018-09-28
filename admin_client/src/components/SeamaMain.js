@@ -13,7 +13,7 @@ const Main = (props) => (
     <main>
         <Switch>
             <PrivateRoute exact path='/' component={SemaUsers}/>
-            <PrivateRoute path='/Demographics' component={SemaProducts}/>
+            <PrivateRoute path='/Products' component={SemaProducts}/>
             {/*<PrivateRoute path='/DistributionMap' component={SeamaDistributionMap}/>*/}
             {/*<PrivateRoute path='/DeliverySchedule' component={SeamaDeliverySchedule}/>*/}
             {/*<PrivateRoute path='/InventoryManagement' component={SeamaInventoryManagement}/>*/}
