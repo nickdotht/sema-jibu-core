@@ -7,7 +7,10 @@
 class Kiosk {
 	constructor(kiosk) {
 		this.id = kiosk.id;
-		this.active = kiosk["active"][0] === 1 ? true : false;
+		this.active = true;
+		if(kiosk.hasOwnProperty("active") ) {
+			this.active = kiosk["active"][0] === 1 ? true : false;
+		}
 		this.api_key = kiosk.api_key;
 		this.name = kiosk.name;
 		this.region_id = kiosk.region_id;

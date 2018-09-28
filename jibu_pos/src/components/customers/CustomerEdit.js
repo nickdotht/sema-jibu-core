@@ -55,6 +55,9 @@ class CustomerEdit extends Component {
 		this.customerTypeOptions = this.customerTypes.map( customerType =>{
 			return customerType.displayName;
 		});
+		this.customerTypesIndicies = this.customerTypes.map( customerType =>{
+			return customerType.id;
+		});
 
 	}
 	componentDidMount() {
@@ -216,9 +219,8 @@ class CustomerEdit extends Component {
 
 	getDefaultTypeIndex(){
 		if( this.props.isEdit ){
-			const customerTypes = PosStorage.getCustomerTypes();
-			for( let i = 0; i < customerTypes.length; i++ ){
-				if( customerTypes[i].id == this.props.selectedCustomer.customerTypeId ){
+			for( let i = 0; i < this.customerTypesIndicies.length; i++ ){
+				if( this.customerTypesIndicies[i] == this.props.selectedCustomer.customerTypeId ){
 					return i;
 				}
 			}

@@ -259,11 +259,16 @@ class Synchronization {
 	synchronizeProductMrps( lastProductSync){
 		return new Promise( resolve => {
 			console.log("Synchronization:synchronizeProductMrps - Begin");
-			Communications.getProductMrps(lastProductSync)
+			// Note- Because product mrps, do not currently have an 'active' flag,
+			// if a user 'deletes' a mapping by removing the row in the table, the delta won't get detected
+			// The current work around is return all mappings, (i.e. no deltas and re-write the mappings each time
+			// Note that this won't scale too well with many productMrps
+			// Communications.getProductMrps(lastProductSync)
+			Communications.getProductMrps()
 				.then(productMrps => {
 					if (productMrps.hasOwnProperty("productMRPs")) {
 						resolve( {error:null, remoteProductMrps: productMrps.productMRPs.length});
-						console.log("Synchronization:synchronizeProductMrps. No of new remote product MRPs: " + productMrps.productMRPs.length);
+						console.log("Synchronization:synchronizeProductMrps. No of remote product MRPs: " + productMrps.productMRPs.length);
 						PosStorage.saveProductMrps(productMrps.productMRPs);
 					}
 				})

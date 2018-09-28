@@ -177,6 +177,7 @@ class PosStorage {
 		this.lastSalesSync = firstSyncDate;
 		this.lastProductsSync = firstSyncDate;
 		this.inventoriesKeys = [];
+		this.productMrpDict = {};
 		let keyArray = [
 			[customersKey,  this.stringify(this.customersKeys)],
 			[productsKey,  this.stringify(this.productsKeys)],
@@ -775,6 +776,7 @@ class PosStorage {
 	}
 
 	saveProductMrps( productMrpsArray){
+		this.productMrpDict = {};	// Note - This assumes that all productMrps are being saved
 		productMrpsArray.forEach( productMrp => {
 			const key = this.getProductMrpKey( productMrp );
 			this.productMrpDict[key] = productMrp;
