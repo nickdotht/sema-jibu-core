@@ -3,30 +3,26 @@ import SeamaServiceError from "./SeamaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as volumeActions from 'actions/VolumeActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router'
-import UserList from "./common/UserList";
 
-import Button from "react-bootstrap/lib/Button";
-import Glyphicon from "react-bootstrap/lib/Glyphicon";
+import UserList from "./common/UserList";
+import Button from "./common/Button";
+
+// TODO split up container and presentational components
+import { fetchUsers } from "actions/UserActions";
 
 class SemaUsers extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			data: [{
-				username: "mike",
-				email: "123@gmail.com",
-				firstName: "mike",
-				lastName: "le"
-			}]
-		}
+	};
+
+	componentDidMount() {
+		this.props.fetchUsers();
 	};
 
 	showContent(){
-		const { healthCheck } = this.props;
-		const { data } = this.state;
+		const {healthCheck, users, loading} = this.props;
 
 		if( healthCheck.server !== "Ok" ){
 			return SeamaServiceError();
@@ -38,19 +34,18 @@ class SemaUsers extends Component {
 			<div style={{margin: "5px"}}>
 				<div className="">
 					<Button
-						bsStyle="primary"
-						bsSize="small"
+						buttonStyle="primary"
+						buttonSize="small"
 						className="pull-right"
 						onClick={this.props.onCreateClick}
-					>
-						<Glyphicon glyph="plus" />
-						Create User
-					</Button>
-
+						icon="plus"
+						buttonText="Create User"
+					/>
 					<h2>Users</h2>
 				</div>
 
-				<UserList data={data}/>
+				{!loading && <UserList data={users}/>}
+
 			</div>
 		);
 	}
@@ -63,15 +58,16 @@ class SemaUsers extends Component {
 
 function mapStateToProps(state) {
 	return {
-		volume:state.volume,
-		healthCheck: state.healthCheck
+		healthCheck: state.healthCheck,
+		users: state.user.users,
+		loading: state.user.loading
 	};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
-		volumeActions: bindActionCreators(volumeActions, dispatch),
-		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
+		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
+		fetchUsers: bindActionCreators(fetchUsers, dispatch)
 	};
 }
 
