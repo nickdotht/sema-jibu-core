@@ -12,6 +12,8 @@ import ModalDropdown from 'react-native-modal-dropdown';
 import PosStorage from "../../database/PosStorage";
 import * as CustomerActions from "../../actions/CustomerActions";
 
+import i18n from '../../app/i18n';
+
 class CustomerProperty extends Component {
 	constructor(props) {
 		super(props);
@@ -89,7 +91,7 @@ class CustomerEdit extends Component {
 							<CustomerProperty
 								reference = 'customerNumber'
 								marginTop = {0}
-								placeHolder = 'Telephone Number'
+								placeHolder = {i18n.t('telephone-number')}
 								parent ={this}
 								kbType = "phone-pad"
 								valueFn = {this.getTelephoneNumber}
@@ -97,7 +99,7 @@ class CustomerEdit extends Component {
 							<CustomerProperty
 								reference = 'customerName'
 								marginTop = "1%"
-								placeHolder = 'Name'
+								placeHolder = {i18n.t('account-name')}
 								parent ={this}
 								kbType = "default"
 								valueFn = {this.getName}
@@ -105,7 +107,7 @@ class CustomerEdit extends Component {
 							<CustomerProperty
 								reference = 'customerAddress'
 								marginTop = "1%"
-								placeHolder = 'Address'
+								placeHolder = {i18n.t('address')}
 								parent ={this}
 								kbType = "default"
 								valueFn = {this.getAddress}
@@ -191,7 +193,7 @@ class CustomerEdit extends Component {
 				}
 			}
 		}
-		return "Sales Channel";
+		return i18n.t('sales-channel');
 	}
 
 	getDefaultTypeValue(){
@@ -202,7 +204,7 @@ class CustomerEdit extends Component {
 				}
 			}
 		}
-		return "Customer Type";
+		return i18n.t('customer-type');
 	}
 
 	getDefaultChannelIndex(){
@@ -229,10 +231,10 @@ class CustomerEdit extends Component {
 	}
 
 	getHeaderText(){
-		return this.props.isEdit ? "Edit Customer" : "New Customer";
+		return this.props.isEdit ? i18n.t('edit-customer') : i18n.t('new-customer');
 	}
 	getSubmitText(){
-		return this.props.isEdit ? "Update Customer" : "Create Customer";
+		return this.props.isEdit ? i18n.t('update-customer') : i18n.t('create-customer');
 	}
 	onCancelEdit (){
 		this.props.toolbarActions.ShowScreen("main");

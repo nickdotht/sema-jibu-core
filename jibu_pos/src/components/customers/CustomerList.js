@@ -7,6 +7,8 @@ import Events from 'react-native-simple-events';
 import PosStorage from "../../database/PosStorage";
 import * as ToolbarActions from "../../actions/ToolBarActions";
 
+import i18n from '../../app/i18n';
+
 const anonymousId = "9999999-9999-9999-9999-9999999";
 
 class CustomerList extends Component {
@@ -189,7 +191,7 @@ class CustomerList extends Component {
 	onLongPressItem = (item, event) =>{
 		console.log("_onPressItemName");
 		this.setState({refresh: !this.state.refresh});
-		let actions = ["Edit", "Delete" ];
+		let actions = [i18n.t('edit'), i18n.t('delete')];
 		this.props.customerActions.CustomerSelected(item);
 		if(! this._isAnonymousCustomer( item )) {
 			if (event && event.target) {
@@ -212,15 +214,15 @@ class CustomerList extends Component {
 		}
 	}
 	deleteCustomer(){
-		let alertMessage = "Delete  customer " + this.props.selectedCustomer.name;
+		let alertMessage = i18n.t('delete-specific-customer', {customerName: this.props.selectedCustomer.name});
 		if (this.props.selectedCustomer.dueAmount === 0) {
 			Alert.alert(
 				alertMessage,
-				'Are you sure you want to delete this customer?',
+				i18n.t('are-you-sure', {doThat: i18n.t('delete-this-customer')}),
 				[
-					{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+					{ text: i18n.t('cancel'), onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
 					{
-						text: 'OK', onPress: () => {
+						text: i18n.t('ok'), onPress: () => {
 							PosStorage.deleteCustomer(this.props.selectedCustomer);	// Delete from storage
 							this.props.customerActions.CustomerSelected({});		// Clear selected customer
 							this.props.customerActions.setCustomers(PosStorage.getCustomers());
@@ -232,10 +234,10 @@ class CustomerList extends Component {
 			);
 		}else{
 			Alert.alert(
-				"Customer '" + this.props.selectedCustomer.name + "' has an outstanding credit and cannot be deleted",
+				i18n.t('credit-customer-no-delete', {customerName: this.props.selectedCustomer.name}),
 				'',
 				[
-					{ text: 'OK', onPress: () => console.log('OK Pressed') },
+					{ text: i18n.t('ok'), onPress: () => console.log('OK Pressed') },
 				],
 				{ cancelable: true }
 			);
@@ -260,19 +262,19 @@ class CustomerList extends Component {
 		return (
 			<View style={[{flex: 1, flexDirection: 'row', height:50, alignItems:'center'},styles.headerBackground]}>
 				<View style={ [{flex: 2}]}>
-					<Text style={[styles.headerItem,styles.leftMargin]}>Name</Text>
+					<Text style={[styles.headerItem,styles.leftMargin]}>{i18n.t('account-name')}</Text>
 				</View>
 				<View style={[ {flex: 1.5}]}>
-					<Text style={[styles.headerItem]}>Telephone</Text>
+					<Text style={[styles.headerItem]}>{i18n.t('telephone-number')}</Text>
 				</View>
 				<View style={ [ {flex: 2}]}>
-					<Text style={[styles.headerItem]}>Address</Text>
+					<Text style={[styles.headerItem]}>{i18n.t('address')}</Text>
 				</View>
 				<View style={ [{flex: .75}]}>
-					<Text style={[styles.headerItem]}>Balance</Text>
+					<Text style={[styles.headerItem]}>{i18n.t('balance')}</Text>
 				</View>
 				<View style={ [{flex: 1}]}>
-					<Text style={[styles.headerItem]}>Channel</Text>
+					<Text style={[styles.headerItem]}>{i18n.t('channel')}</Text>
 				</View>
 			</View>
 		);

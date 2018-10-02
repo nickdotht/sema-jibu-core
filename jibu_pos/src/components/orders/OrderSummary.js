@@ -5,14 +5,15 @@ import * as ProductActions from "../../actions/ProductActions";
 import * as OrderActions from "../../actions/OrderActions";
 import {connect} from "react-redux";
 
+import i18n from "../../app/i18n";
+
 class OrderSummary extends Component {
 	render() {
 		return (
 			<View style = {styles.container}>
 				<View style={{flex: 1, flexDirection: 'row'}}>
-					<Text style={[{flex: 3, marginLeft:20}, styles.summaryText]}>Order Summary</Text>
-					<Text style={[{flex: 1}, styles.summaryText]}>Cart ({this.getTotalOrders()})</Text>
-
+					<Text style={[{flex: 3, marginLeft:20}, styles.summaryText]}>{i18n.t('order-summary')}</Text>
+					<Text style={[{flex: 1}, styles.summaryText]}>{i18n.t('cart')} ({this.getTotalOrders()})</Text>
 				</View>
 			</View>
 

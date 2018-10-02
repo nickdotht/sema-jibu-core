@@ -19,6 +19,8 @@ import CustomerBarButton from './CustomerBarButton';
 import * as OrderActions from "../../actions/OrderActions";
 import Events from "react-native-simple-events";
 
+import i18n from '../../app/i18n';
+
 const anonymousId = "9999999-9999-9999-9999-9999999";
 
 class SelectedCustomerDetails extends React.Component {
@@ -26,11 +28,11 @@ class SelectedCustomerDetails extends React.Component {
 		return (
 			<View style = {styles.commandBarContainer}>
 				<View style={{ flexDirection:'row', height:40 }}>
-					<Text style={styles.selectedCustomerText}>Account Name</Text>
+					<Text style={styles.selectedCustomerText}>{i18n.t('account-name')}</Text>
 					<Text style={styles.selectedCustomerText}>{this.getName()}</Text>
 				</View>
 				<View style={{ flexDirection:'row', height:40 }}>
-					<Text style={styles.selectedCustomerText}>Telephone #</Text>
+					<Text style={styles.selectedCustomerText}>{i18n.t('telephone-number')}</Text>
 					<Text style={styles.selectedCustomerText}>{this.getPhone()}</Text>
 				</View>
 			</View>
@@ -192,7 +194,7 @@ class CustomerBar extends Component {
 			return (
 				<TextInput
 					// Adding hint in Text Input using Place holder.
-					placeholder="Search by Name or Telephone"
+					placeholder={i18n.t("search-placeholder")}
 
 					// Making the Under line Transparent.
 					underlineColorAndroid='transparent'
@@ -269,12 +271,12 @@ class CustomerBar extends Component {
 			} else {
 				if( this.props.hasOwnProperty("orderProducts") && this.props.orderProducts.length > 0 ) {
 					Alert.alert(
-						"Cancel Order",
-						'Are you sure you want to cancel this order?',
+						i18n.t('cancel-order'),
+						i18n.t('are-you-sure', {doThat: i18n.t('cancel-this-order')}),
 						[
-							{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+							{ text: i18n.t('no'), onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
 							{
-								text: 'OK', onPress: () => {
+								text: i18n.t('yes'), onPress: () => {
 									this.doCancelOrder();
 								}
 							},

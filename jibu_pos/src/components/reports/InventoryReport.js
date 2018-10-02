@@ -5,6 +5,7 @@ import * as reportActions from "../../actions/ReportActions";
 import { connect } from "react-redux";
 import DateFilter from "./DateFilter";
 import PosStorage from "../../database/PosStorage";
+import i18n from '../../app/i18n';
 
 class InventoryEdit extends Component {
 	constructor(props) {
@@ -28,7 +29,7 @@ class InventoryEdit extends Component {
 
 					<View style={[styles.editInventory]}>
 						<View style={{marginTop:5}}>
-							<Text style={{fontSize:28, fontWeight:'bold'}}>Inventory</Text>
+							<Text style={{fontSize:28, fontWeight:'bold'}}>{i18n.t('inventory')}</Text>
 						</View>
 						<View style={{flexDirection:'row',alignItems: 'center', justifyContent:'center', marginTop:20}}>
 							<Text style={{fontSize:18, fontWeight:'bold', flex:.7, paddingLeft:20}}>{this.props.title}</Text>
@@ -112,10 +113,10 @@ class InventoryReport extends Component {
 					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 10, }}>
 						<View style = {styles.titleText}>
 							<View style = {styles.leftHeader}>
-								<Text style = {styles.titleItem}>Sales</Text>
+								<Text style = {styles.titleItem}>{i18n.t('sales')}</Text>
 							</View>
 							<View style = {styles.rightHeader}>
-								<Text style = {styles.titleItem}>Inventory</Text>
+								<Text style = {styles.titleItem}>{i18n.t('inventory')}</Text>
 							</View>
 						</View>
 						<FlatList
@@ -141,23 +142,23 @@ class InventoryReport extends Component {
 					}}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<Text style={[styles.totalItem, { flex: 1.5 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .7 }]}>Total Sales</Text>
+							<Text style={[styles.totalItem, { flex: .7 }]}>{i18n.t('total-sales')}</Text>
 							<Text style={[styles.totalItem, { flex: 1.0 }]}>{this.getTotalLiters()}</Text>
-							<Text style={[styles.totalItem, { flex: .8 }]}>Delta Inventory </Text>
+							<Text style={[styles.totalItem, { flex: .8 }]}>{i18n.t('delta-inventory')}</Text>
 							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalInventory()}</Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15 }}>
 							<Text style={[styles.totalItem, { flex: 1.7 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .4}]}>Output</Text>
-							<Text style={[styles.totalItem, { flex: 1.0 }]}>(Sales + Inventory)</Text>
+							<Text style={[styles.totalItem, { flex: .4}]}>{i18n.t('output')}</Text>
+							<Text style={[styles.totalItem, { flex: 1.0 }]}>({i18n.t('sales')} + {i18n.t('inventory')})</Text>
 							<Text style={[styles.totalItem, { flex: .5 }]}>{this.getOutput()} </Text>
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15, alignItems:"center" }}>
 							<Text style={[styles.totalItem, { flex: .50 }]}> </Text>
-							<Text style={[styles.production, { flex: .33}]}>Production</Text>
-							<Text style={[styles.totalItem, { flex: .33 }]}>Previous Meter</Text>
-							<Text style={[styles.totalItem, { flex: .33 }]}>Current Meter </Text>
-							<Text style={[styles.totalItem, { flex: .40 }]}>Total Production </Text>
+							<Text style={[styles.production, { flex: .33}]}>{i18n.t('production')}</Text>
+							<Text style={[styles.totalItem, { flex: .33 }]}>{i18n.t('previous-meter')}</Text>
+							<Text style={[styles.totalItem, { flex: .33 }]}>{i18n.t('current-meter')}</Text>
+							<Text style={[styles.totalItem, { flex: .40 }]}>{i18n.t('total-production')}</Text>
 						</View>
 
 						<View style={[{ flex: 1, flexDirection: 'row', alignItems:"center", marginTop:5 }]}>
@@ -168,7 +169,7 @@ class InventoryReport extends Component {
 						</View>
 						<View style={{ flex: 1, flexDirection: 'row', marginTop:15, marginBottom:10 }}>
 							<Text style={[styles.totalItem, { flex: .66 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .33 }]}>Wastage: </Text>
+							<Text style={[styles.totalItem, { flex: .33 }]}>{i18n.t('wastage')}: </Text>
 							<Text style={[styles.totalItem, { flex: .33 }]}>{this.getWastage()}</Text>
 						</View>
 						<InventoryEdit
@@ -305,23 +306,23 @@ class InventoryReport extends Component {
 					<Text style={[styles.headerItem, styles.leftMargin]}>SKU</Text>
 				</View>
 				<View style={[{ flex: .5 }]}>
-					<Text style={[styles.headerItemCenter]}>Quantity</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('quantity')}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Liters/SKU</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('liters-per-sku')}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('total-liters')}</Text>
 				</View>
 				<View style ={[{width:20}]}/>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Previous</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('previous')}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Current</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('current')}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.headerItemCenter]}>Delta Liters</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('delta-liters')}</Text>
 				</View>
 			</View>
 		);

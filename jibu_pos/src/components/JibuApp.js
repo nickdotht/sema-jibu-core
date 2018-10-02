@@ -194,7 +194,7 @@ class ScreenSwitcher extends Component {
 		} else if (this.props.currentScreen.screenToShow === "editCustomer") {
 			return (<CustomerEdit isEdit = {true}/>);
 		} else if (this.props.currentScreen.screenToShow === "settings") {
-			return (<Settings/>);
+			return (<Settings />);
 		}
 	}
 }

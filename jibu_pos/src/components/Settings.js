@@ -14,6 +14,7 @@ import * as CustomerActions from "../actions/CustomerActions";
 import ModalDropdown from 'react-native-modal-dropdown';
 
 import Communications from '../services/Communications';
+import i18n from '../app/i18n';
 
 const {height, width} = Dimensions.get('window');
 const inputFontHeight = Math.round((24 * height)/752);
@@ -21,6 +22,14 @@ const marginTextInput = Math.round((5 * height)/752);
 const marginSpacing = Math.round((20 * height)/752);
 const inputTextWidth = 400;
 const marginInputItems = width/2 -inputTextWidth/2;
+
+const supportedUILanguages = [
+	{name: 'English', iso_code: 'en'},
+	{name: 'Français', iso_code: 'fr'},
+	{name: 'Kreyòl Ayisyen', iso_code: 'ht'}
+];
+// TODO: Turn into a state. Stupid.
+let selectedLanguage = {};
 
 class SettingsProperty extends Component {
 	constructor(props) {
@@ -96,9 +105,7 @@ class Settings extends Component {
 
 		this.onShowLanguages = this.onShowLanguages.bind(this);
 		this.onLanguageSelected = this.onLanguageSelected.bind(this);
-		// this.preferred_language = React.createRef();
-		// this.supported_languages = PosStorage.getSupportedLanguagesForDisplay();
-		// this.languageOptions = this.supported_languages.map(language => language.displayName);
+		this.onSaveSettings = this.onSaveSettings.bind(this);
 	}
 
 	componentDidMount() {
@@ -111,7 +118,7 @@ class Settings extends Component {
 				<View style={{ flexDirection: 'row' }}>
 
 					<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', height: 100 }}>
-						<Text style={[styles.headerText]}>{'Settings'}</Text>
+						<Text style={[styles.headerText]}>{i18n.t('settings')}</Text>
 					</View>
 					<View style={{ flexDirection: 'row-reverse', flex: 1, alignItems: 'center', height: 100 }}>
 						{this.getSettingsCancel()}
@@ -126,32 +133,32 @@ class Settings extends Component {
 						<SettingsProperty
 							parent = {this}
 							marginTop={10}
-							placeHolder='Sema Service URL, (http://sema-service)'
-							label="SEMA service URL"
+							placeHolder={i18n.t('service-url-placeholder')}
+							label={i18n.t('service-url-label')}
 							isSecure={false}
 							valueFn={this.getUrl.bind(this)}
 							ref={this.url}/>
 						<SettingsProperty
 							parent = {this}
 							marginTop={marginSpacing}
-							placeHolder='Site'
+							placeHolder={i18n.t('site-placeholder')}
 							isSecure={false}
-							label="Site"
+							label={i18n.t('site-label')}
 							valueFn={this.getSite.bind(this)}
 							ref={this.site}/>
 						<SettingsProperty
 							parent = {this}
 							marginTop={marginSpacing}
-							placeHolder='User'
-							label="User email"
+							placeHolder={i18n.t('username-or-email-placeholder')}
+							label={i18n.t('username-or-email-placeholder')}
 							isSecure={false}
 							valueFn={this.getUser.bind(this)}
 							ref={this.user}/>
 						<SettingsProperty
 							parent = {this}
 							marginTop={marginSpacing}
-							placeHolder='Password'
-							label="password"
+							placeHolder={i18n.t('password-placeholder')}
+							label={i18n.t('password-label')}
 							isSecure={true}
 							valueFn={this.getPassword.bind(this)}
 							ref={this.password}/>
@@ -165,7 +172,7 @@ class Settings extends Component {
 								ref = {this.supportedLanguages}
 								defaultValue = {this.getDefaultUILanguage()}
 								defaultIndex = {this.getDefaultUILanguageIndex()}
-								options={['Kreyòl Ayisyen', 'Français', 'English']}
+								options={supportedUILanguages.map(lang => lang.name)}
 								onSelect={this.onLanguageSelected}
 							/>
 							<TouchableHighlight underlayColor = '#c0c0c0'
@@ -176,21 +183,21 @@ class Settings extends Component {
 
 						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
 							<SettingsButton
-								pressFn={this.onSaveSettings.bind(this)}
+								pressFn={this.onSaveSettings}
 								enableFn = {this.enableSaveSettings.bind(this)}
-								label='Save Settings'/>
+								label={i18n.t('save-settings')}/>
 							<SettingsButton
 								pressFn={this.onConnection.bind(this)}
 								enableFn = {this.enableConnectionOrSync.bind(this)}
-								label='Connect'/>
+								label={i18n.t('connect')}/>
 							<SettingsButton
 								pressFn={this.onClearAll.bind(this)}
 								enableFn = {this.enableClearAll.bind(this)}
-								label='Clear...'/>
+								label={i18n.t('clear')}/>
 							<SettingsButton
 								pressFn={this.onSynchronize.bind(this)}
 								enableFn = {this.enableConnectionOrSync.bind(this)}
-								label='Synchronize Now'/>
+								label={i18n.t('sync-now')}/>
 						</View>
 					</View>
 
@@ -239,7 +246,7 @@ class Settings extends Component {
 	}
 
 	onShowLanguages() {
-		this.supportedLanguages.current.show();
+		 this.supportedLanguages.current.show();
 	}
 
 	closeHandler() {
@@ -402,25 +409,37 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 			// New site - clear all data
 			this._clearDataAndSync();
 		}
+		
 		PosStorage.saveSettings(this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText,
+			selectedLanguage,
 			token,
 			siteId );
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
 	}
 
 	getDefaultUILanguage() {
-		return 'Preferred UI Language';
+		console.log(`CURRENT UI LANGUAGE IS ${JSON.stringify(PosStorage.getSettings())}`);
+		return this.props.settings.uiLanguage.name;
 	}
 
 	getDefaultUILanguageIndex() {
-		return -1;
+		let langIdx;
+		supportedUILanguages.forEach((lang, idx) => {
+			if (lang.name === this.props.settings.uiLanguage.name) {
+				langIdx = idx;
+			}
+		});
+		return langIdx;
 	}
 
-	onLanguageSelected(language) {
-		console.log(`Selected language is ${language}`);
+	onLanguageSelected(langIdx) { 
+		selectedLanguage = supportedUILanguages.filter((lang, idx) => idx === Number(langIdx))[0];
+		console.log(`Selected language is ${selectedLanguage.name}`);
+		i18n.locale = selectedLanguage.iso_code;
+		this.onSaveSettings();
 	}
 
 }

@@ -17,6 +17,7 @@ import {
 import { Provider } from 'react-redux';
 import store from './store';
 import JibuApp from '../components/JibuApp';
+import PosStorage from '../database/PosStorage';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
@@ -28,6 +29,8 @@ const instructions = Platform.select({
 export default class App extends Component {
   componentWillMount() {
     RNLanguages.addEventListener('change', this._onLanguagesChange);
+    console.log(`APP COMPONENT CHECKED: ${PosStorage.getSettings().uiLanguage.iso_code}`);
+    i18n.locale = PosStorage.getSettings().uiLanguage.iso_code;
   }
 
   componentWillUnmount() {
@@ -41,7 +44,7 @@ export default class App extends Component {
   render() {
       return (
     <Provider store={store}>
-            <JibuApp/>
+            <JibuApp />
     </Provider>
       );
   }

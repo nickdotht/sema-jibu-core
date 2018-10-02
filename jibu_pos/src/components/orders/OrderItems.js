@@ -5,6 +5,8 @@ import {bindActionCreators} from "redux";
 import * as OrderActions from "../../actions/OrderActions";
 import PosStorage from "../../database/PosStorage";
 
+import i18n from "../../app/i18n";
+
 const widthQuanityModal = 250;
 const heightQuanityModal = 400;
 
@@ -89,13 +91,13 @@ class OrderItems extends Component {
 		return (
 			<View style={[{flex: 1, flexDirection: 'row'},styles.headerBackground]}>
 				<View style={ [{flex: 3}]}>
-					<Text style={[styles.headerItem,styles.headerLeftMargin]}>Item</Text>
+					<Text style={[styles.headerItem,styles.headerLeftMargin]}>{i18n.t('item')}</Text>
 				</View>
 				<View style={[ {flex: 1}]}>
-					<Text style={[styles.headerItem]}>Quantity</Text>
+					<Text style={[styles.headerItem]}>{i18n.t('quantity')}</Text>
 				</View>
 				<View style={ [ {flex: 1}]}>
-					<Text style={[styles.headerItem]}>Charge</Text>
+					<Text style={[styles.headerItem]}>{i18n.t('charge')}</Text>
 				</View>
 			</View>
 		);

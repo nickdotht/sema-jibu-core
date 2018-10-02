@@ -9,6 +9,7 @@ import * as CustomerBarActions from "../../actions/CustomerBarActions";
 import PosStorage from '../../database/PosStorage';
 
 import * as Utilities from "../../services/Utilities";
+import i18n from "../../app/i18n";
 
 class PaymentDescription extends Component {
 	render() {
@@ -107,7 +108,7 @@ class OrderPaymentScreen extends Component {
 						type = {"cash"}
 						checkBox = {this.state.isCash}
 						checkBoxChange = {this.checkBoxChangeCash.bind(this)}
-						checkBoxLabel = {'Cash'}
+						checkBoxLabel = {i18n.t('cash')}
 						value = {this.props.payment.cashToDisplay}
 						valueChange = {this.valuePaymentChange} />
 					{this.getCreditComponent()}
@@ -116,17 +117,17 @@ class OrderPaymentScreen extends Component {
 						type = {"mobile"}
 						checkBox = {this.state.isMobile}
 						checkBoxChange = {this.checkBoxChangeMobile.bind(this)}
-						checkBoxLabel = {'Mobile'}
+						checkBoxLabel = {i18n.t('mobile')}
 						value = {this.props.payment.mobileToDisplay}
 						valueChange = {this.valuePaymentChange}/>
 					{this.getSaleAmount()}
-					<PaymentDescription title = "Previous Amount Due:" total={Utilities.formatCurrency( this.calculateAmountDue())}/>
-					<PaymentDescription title = "Total Amount Due:" total={Utilities.formatCurrency( this.calculateTotalDue())}/>
+					<PaymentDescription title = {`${i18n.t('previous-amount-due')}:`} total={Utilities.formatCurrency( this.calculateAmountDue())}/>
+					<PaymentDescription title = {`${i18n.t('total-amount-due')}:`} total={Utilities.formatCurrency( this.calculateTotalDue())}/>
 					<View style={styles.completeOrder}>
 						<View style={{justifyContent:'center', height:80}}>
 							<TouchableHighlight underlayColor = '#c0c0c0'
 								onPress={() => this.onCompleteOrder()}>
-								<Text style={ [ {paddingTop:20, paddingBottom:20}, styles.buttonText]}>Complete Sale</Text>
+								<Text style={ [ {paddingTop:20, paddingBottom:20}, styles.buttonText]}>{i18n.t('complete-sale')}</Text>
 							</TouchableHighlight>
 						</View>
 					</View>
@@ -145,7 +146,7 @@ class OrderPaymentScreen extends Component {
 	getSaleAmount(){
 		if( !this.isPayoffOnly() ){
 			return (
-				<PaymentDescription title = "Sale Amount Due:" total={Utilities.formatCurrency( this.calculateOrderDue())}/>
+				<PaymentDescription title = {`${i18n.t('sale-amount-due')}: `} total={Utilities.formatCurrency( this.calculateOrderDue())}/>
 			);
 		}else{
 			return null;
@@ -173,7 +174,7 @@ class OrderPaymentScreen extends Component {
 					type = {"credit"}
 					checkBox = {this.state.isCredit}
 					checkBoxChange = {this.checkBoxChangeCredit.bind(this)}
-					checkBoxLabel = {'Loan'}
+					checkBoxLabel = {i18n.t('loan')}
 					value = {Utilities.formatCurrency(this.props.payment.credit)} />
 			)
 		}else{
@@ -340,7 +341,7 @@ class OrderPaymentScreen extends Component {
 			}}>
 
 				<View style={styles.orderProcessing}>
-					<Text style={{fontSize:24, fontWeight:'bold'}}>Processing order....</Text>
+					<Text style={{fontSize:24, fontWeight:'bold'}}>{i18n.t('processing-order')}</Text>
 				</View>
 			</View>
 		);

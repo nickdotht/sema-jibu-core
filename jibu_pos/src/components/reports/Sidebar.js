@@ -5,15 +5,17 @@ import { bindActionCreators } from "redux";
 import * as reportActions from "../../actions/ReportActions";
 import { connect } from "react-redux";
 
+import i18n from '../../app/i18n';
+
 class Sidebar extends Component {
 
 	render() {
 		return ( <View style={{ flex: 1, backgroundColor: colors.COLOR_REPORT_SIDEBAR_BACKGROUND }}>
 					<TouchableHighlight onPress={() => this.onSales()}>
-						<Text style={this.getSalesMenuStyle()}>Sales</Text>
+						<Text style={this.getSalesMenuStyle()}>{i18n.t('sales')}</Text>
 					</TouchableHighlight>
 					<TouchableHighlight onPress={() => this.onInventory()}>
-						<Text style={this.getInventoryMenuStyle()}>Inventory</Text>
+						<Text style={this.getInventoryMenuStyle()}>{i18n.t('inventory')}</Text>
 					</TouchableHighlight>
 				</View>
 		);
