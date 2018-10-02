@@ -11,14 +11,10 @@ import {
 
 const Main = (props) => (
     <main>
-        <Switch>
-            <PrivateRoute exact path='/' component={SemaUsers}/>
-            <PrivateRoute path='/Products' component={SemaProducts}/>
-            {/*<PrivateRoute path='/DistributionMap' component={SeamaDistributionMap}/>*/}
-            {/*<PrivateRoute path='/DeliverySchedule' component={SeamaDeliverySchedule}/>*/}
-            {/*<PrivateRoute path='/InventoryManagement' component={SeamaInventoryManagement}/>*/}
-            {/*<PrivateRoute path='/Financials' component={SeamaFinancials}/>*/}
-            <PrivateRoute component={SemaNotFound}/>
+			<Switch>
+				<PrivateRoute exact path='/' component={SemaUsers}/>
+				<PrivateRoute path='/Products' component={SemaProducts}/>
+				<PrivateRoute component={SemaNotFound}/>
         </Switch>
     </main>
 );
