@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
 // import ReactDOM from 'react-dom';
-import { Navbar, Label, Nav,NavDropdown,MenuItem } from 'react-bootstrap';
+import { Navbar, Label } from 'react-bootstrap';
 import 'App.css';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import {
-	kioskActions,
-	volumeActions,
-	customerActions,
 	authActions,
 	healthCheckActions
 } from 'actions';

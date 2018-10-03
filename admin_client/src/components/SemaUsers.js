@@ -22,7 +22,11 @@ class SemaUsers extends Component {
 	};
 
 showContent(){
-		const {healthCheck, users, loading} = this.props;
+		const {
+			healthCheck,
+			users,
+			loading
+		} = this.props;
 
 		if( healthCheck.server !== "Ok" ){
 			return SeamaServiceError();

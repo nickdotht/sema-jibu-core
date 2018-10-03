@@ -15,8 +15,8 @@ const Main = (props) => (
 				<PrivateRoute exact path='/' component={SemaUsers}/>
 				<PrivateRoute path='/Products' component={SemaProducts}/>
 				<PrivateRoute component={SemaNotFound}/>
-        </Switch>
+			</Switch>
     </main>
 );
 
-export default Main
+export default Main;
