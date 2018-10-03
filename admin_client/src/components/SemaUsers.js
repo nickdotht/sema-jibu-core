@@ -21,7 +21,7 @@ class SemaUsers extends Component {
 		this.props.fetchUsers();
 	};
 
-	showContent(){
+showContent(){
 		const {healthCheck, users, loading} = this.props;
 
 		if( healthCheck.server !== "Ok" ){

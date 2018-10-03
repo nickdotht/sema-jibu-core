@@ -36,18 +36,7 @@ const LabelStyleRight = {
 class SeamaToolbar extends Component {
 	constructor(props, context) {
 		super(props, context);
-		console.log("SeamaToolbar-constructor");
-
-		this.handleSelectKiosk = this.handleSelectKiosk.bind(this);
-		this.buildKioskMenuItems = this.buildKioskMenuItems.bind(this);
-		this.logOut = this.logOut.bind(this);
-		this.endDate = new Date(Date.now());
-		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
-		this.state = {
-			kiosks: "--Regions--",
-		};
-		console.log("foo");
-	}
+	};
 
 	componentDidMount() {
 		window.addEventListener('tokenExpired', this.handleExpiredEvent.bind(this));
@@ -63,63 +52,6 @@ class SeamaToolbar extends Component {
 	}
 
 
-	handleSelectKiosk(eventKey){
-		console.log(eventKey, this.props.kiosk.kiosks[eventKey].name);
-
-		this.setState({kiosks: this.props.kiosk.kiosks[eventKey].name});
-
-		let kioskParams = {kioskID:this.props.kiosk.kiosks[eventKey].id};
-		const previousKioskID = this.props.kiosk.selectedKiosk ?
-			this.props.kiosk.selectedKiosk.kioskID :
-			null;
-
-		if(kioskParams.kioskID !== previousKioskID) {
-			this.props.kioskActions.selectKiosk(kioskParams);
-			this.loadActivePage(kioskParams );
-		}
-	};
-
-
-	loadActivePage(kioskParams ){
-		let params = {};
-		if( kioskParams === null ){
-			if( this.props.kiosk.selectedKiosk === null ){
-				return;	// TODO - Shouldn't get here
-			}
-			params.kioskID = this.props.kiosk.selectedKiosk.kioskID;
-		}else{
-			params.kioskID = kioskParams.kioskID;
-		}
-		params.startDate = this.startDate;
-		params.endDate = this.endDate;
-		console.log("--------------------PARAMS "+ JSON.stringify(params));
-		this.props.volume.loaded = false;
-		this.props.customer.loaded = false;
-		switch (this.props.location.pathname) {
-			case "/":
-				this.props.volumeActions.fetchVolume(params);
-				break;
-			case "/Products":
-				this.props.customerActions.fetchCustomer(params);
-				break;
-			default:
-				console.log("Not implemented:", this.props.location.pathname);
-		}
-
-	}
-	buildKioskMenuItems(){
-		let menuItems = [];
-		if( this.props.kiosk.kiosks){
-			let keys = Object.keys(this.props.kiosk.kiosks);
-			for( let i = 0; i < keys.length; i++ ){
-				let kiosk = this.props.kiosk.kiosks[keys[i]];
-				 menuItems.push(<MenuItem eventKey={keys[i]} key={keys[i]} style={menuStyle}>{kiosk.name}</MenuItem>);
-			}
-		}
-		return menuItems;
-	}
-
-
 	logOut (){
 		console.log("logout");
 		this.props.authActions.logout();
@@ -128,25 +60,11 @@ class SeamaToolbar extends Component {
 	render() {
 		return (
 			<div className="SeamaNavToolbar" id = "semaToolbar">
-				{this.updateData()}
 				<Navbar bsStyle="inverse" style={{marginBottom:"0px",
-					borderRadius: 0}}>
-					<Label style={LabelStyleLeft}>
+				borderRadius: 0}}>
+					<Label style={LabelStyleRight}>
 						Version {this.props.Version}
 					</Label>
-					<Label style={LabelStyleLeft}>
-						Region:
-					</Label>
-					<Nav >
-						<NavDropdown title={this.state.kiosks} onSelect={this.handleSelectKiosk} id="basic-nav-dropdown" >
-							{this.buildKioskMenuItems()}
-						</NavDropdown>
-					</Nav>
-					<Label style={LabelStyleLeft}>
-						Date Range:
-					</Label>
-					<SemaDateFilter/>
-
 					<Label style={LabelStyleRight}> Server: {this.showServer()}</Label>
 					<Label onClick={this.logOut} href="#" style={LabelStyleRight}>
 						<a href="/">Logout</a>
@@ -165,39 +83,20 @@ class SeamaToolbar extends Component {
 		}
 		return this.props.healthCheck.server;
 	}
-
-	updateData(){
-		console.log("SemaToolbar - updateData - New Range: ", this.props.dateFilter.startDate, "-", this.props.dateFilter.endDate );
-		console.log("SemaToolbar - updateData - Old Range: ", this.startDate, "-", this.endDate );
-		if( this.startDate !== this.props.dateFilter.startDate ||
-			this.endDate !== this.props.dateFilter.endDate ){
-			console.log("_______________________");
-			this.startDate = this.props.dateFilter.startDate;
-			this.endDate = this.props.dateFilter.endDate;
-			this.loadActivePage(null );
-		}
-	}
 }
 
 function mapStateToProps(state) {
 	return {
 		logState: state.auth.LogState,
 		currentUser: state.auth.currentUser,
-		healthCheck: state.healthCheck,
-		kiosk:state.kiosk,
-		volume:state.volume,
-		customer:state.customer,
-		dateFilter:state.dateFilter
-	};
+		healthCheck: state.healthCheck
+		};
 }
 
 function mapDispatchToProps(dispatch) {
 	return {
 		authActions: bindActionCreators(authActions, dispatch),
-		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
-		kioskActions: bindActionCreators(kioskActions, dispatch),
-		volumeActions: bindActionCreators(volumeActions, dispatch),
-		customerActions: bindActionCreators(customerActions, dispatch)
+		healthCheckActions: bindActionCreators(healthCheckActions, dispatch)
 	};
 }
 
@@ -205,4 +104,3 @@ export default withRouter(connect(
 	mapStateToProps,
 	mapDispatchToProps
 )(SeamaToolbar));
-
