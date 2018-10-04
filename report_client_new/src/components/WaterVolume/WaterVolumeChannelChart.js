@@ -56,9 +56,9 @@ class WaterVolumeChannelChart extends Component {
 
 				data.datasets.push( {label: "Volume by Sales Channel", backgroundColor:[], data:[]});
 
-				this.props.chartData.volumeInfo.volumeByChannel.volume.data.forEach(salesChannel => {
+				this.props.chartData.volumeInfo.volumeByChannel.volume.data.forEach((salesChannel, index) => {
 					data.labels.push(salesChannel.salesChannel);
-					data.datasets[0].backgroundColor.push( utilService.getBackgroundColorForChannel( salesChannel.salesChannel ) );
+					data.datasets[0].backgroundColor.push( utilService.getBackgroundColorByIndex( index ) );
 					data.datasets[0].data.push(salesChannel.volume );
 				});
 

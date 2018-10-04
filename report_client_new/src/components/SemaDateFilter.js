@@ -164,7 +164,7 @@ class SemaDateFilter extends Component {
 			<div>
 				<Nav>
 					<div>
-						{<img src={require('images/left-arrow.png')} alt="logo" style={this.getImageStyle(true)} onClick={() => this.leftArrowClick()} />}
+						<img src={require('images/left-arrow.png')} alt={""} style={this.getImageStyle(true)} onClick={()=> this.leftArrowClick()} />
 					</div>
 				</Nav>
 				<Nav>
@@ -175,7 +175,7 @@ class SemaDateFilter extends Component {
 				</Nav>
 				<Nav>
 					<div>
-						{<img src={require('images/right-arrow.png')} alt="logo" style={this.getImageStyle(false)} onClick={() => this.rightArrowClick()} />}
+						{<img src={require('images/right-arrow.png')} alt={""} style={this.getImageStyle(false)} onClick={()=> this.rightArrowClick()} />}
 					</div>
 				</Nav>
 			</div>

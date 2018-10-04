@@ -4,7 +4,7 @@ import { Alert } from 'react-bootstrap';
 // TODO: Make this error page prettier
 const SeamaDatabaseError = props => {
 	return (
-		<Alert bsStyle="danger" className="SeamaServiceError">
+		<Alert bsStyle="danger" className="SemaServiceError">
 			<h4>Database Error</h4>
 			<p>
 				The SEAMA database is currently unavailable.

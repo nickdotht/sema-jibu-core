@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import 'App.css';
 import 'css/SemaCustomer.css';
 import LoadProgress from "./LoadProgress";
-import SeamaServiceError from "./SeamaServiceError";
+import SemaServiceError from "./SemaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,7 +21,7 @@ class SemaCustomer extends Component {
     }
     showContent(props){
 		if( this.props.healthCheck.server !== "Ok" ){
-			return SeamaServiceError(props);
+			return SemaServiceError(props);
 		}else  if( this.props.healthCheck.database !== "Ok" ){
 			return SeamaDatabaseError(props)
 		}
@@ -69,7 +69,7 @@ class SemaCustomer extends Component {
     	if( this.props.customer.customerInfo.allCustomers.customerCount && this.props.customer.customerInfo.allCustomers.consumerBase ){
     		if( this.props.customer.customerInfo.allCustomers.consumerBase > 0 ){
     			let penetration =  Math.round(this.props.customer.customerInfo.allCustomers.customerCount/this.props.customer.customerInfo.allCustomers.consumerBase * 100);
-    			if( penetration == 0 && this.props.customer.customerInfo.allCustomers.customerCount > 0){
+    			if( penetration === 0 && this.props.customer.customerInfo.allCustomers.customerCount > 0){
     				return "> 1"
 				}
     			return Math.round(this.props.customer.customerInfo.allCustomers.customerCount/this.props.customer.customerInfo.allCustomers.consumerBase * 100).toString();

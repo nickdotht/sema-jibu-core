@@ -33,10 +33,10 @@ const LabelStyleRight = {
 };
 
 
-class SeamaToolbar extends Component {
+class SemaToolbar extends Component {
 	constructor(props, context) {
 		super(props, context);
-		console.log("SeamaToolbar-constructor");
+		console.log("SeamToolbar-constructor");
 
 		this.handleSelectKiosk = this.handleSelectKiosk.bind(this);
 		this.buildKioskMenuItems = this.buildKioskMenuItems.bind(this);
@@ -101,6 +101,9 @@ class SeamaToolbar extends Component {
 				break;
 			case "/Demographics":
 				this.props.customerActions.fetchCustomer(params);
+				break;
+			case "/Sales":
+				this.props.salesActions.fetchSales(params);
 				break;
 			default:
 				console.log("Not implemented:", this.props.location.pathname);
@@ -204,5 +207,5 @@ function mapDispatchToProps(dispatch) {
 export default withRouter(connect(
 	mapStateToProps,
 	mapDispatchToProps
-)(SeamaToolbar));
+)(SemaToolbar));
 

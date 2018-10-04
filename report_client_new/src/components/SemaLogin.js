@@ -108,7 +108,7 @@ class NoService extends Component {
 
 	render() {
 		return (
-			<Alert bsStyle="info" className={`${this.state.show} SeamaServiceError`} style={{textAlign:"center", height:"130px"}}>
+			<Alert bsStyle="info" className={`${this.state.show} SemaServiceError`} style={{textAlign:"center", height:"130px"}}>
 				<h4>{this.props.header}</h4>
 				<p>{this.props.message}</p>
 				<Button bsStyle="info" onClick={this.handleClick} style={{marginTop:"15px"}}>Ok</Button>

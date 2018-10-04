@@ -2,9 +2,9 @@ import React from 'react';
 import { Alert } from 'react-bootstrap';
 
 // TODO: Make this error page prettier
-function SeamaServiceError(props){
+function SemaServiceError(props){
 	return(
-		<Alert bsStyle="danger" className="SeamaServiceError">
+		<Alert bsStyle="danger" className="SemaServiceError">
 			<h4>Service Error</h4>
 			<p>
 				The SEAMA service is currently unavailable.
@@ -13,4 +13,4 @@ function SeamaServiceError(props){
 	);
 }
 
-export default SeamaServiceError;
+export default SemaServiceError;

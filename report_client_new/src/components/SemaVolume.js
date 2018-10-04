@@ -5,7 +5,7 @@ import WaterVolumeChannelChart from "./WaterVolume/WaterVolumeChannelChart"
 import WaterVolumeChannelAndPaymentTypeChart from "./WaterVolume/WaterVolumeChannelAndPaymentTypeChart"
 import CustomerSummaryPanel from "./Demographics/CustomerSummaryPanel";
 import 'css/SemaVolume.css';
-import SeamaServiceError from "./SeamaServiceError";
+import SemaServiceError from "./SemaServiceError";
 import SeamaDatabaseError from "./SeamaDatabaseError";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -21,7 +21,7 @@ class SemaVolume extends Component {
     }
     showContent(props){
 		if( this.props.healthCheck.server !== "Ok" ){
-			return SeamaServiceError(props);
+			return SemaServiceError(props);
 		}else  if( this.props.healthCheck.database !== "Ok" ){
 			return SeamaDatabaseError(props)
 		}

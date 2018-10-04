@@ -9,6 +9,7 @@ function receiveVolume(data) {
 
 function initializeVolume() {
 	return {
+		loaded:false,
 		volumeInfo: {
 			volumeByChannel:{},
 			volumeByChannelAndIncome:[],

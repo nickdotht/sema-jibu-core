@@ -1,13 +1,13 @@
 import React from 'react';
-import SeamaToolbar from "./SeamaToolbar";
-import SeamaMain from "./SeamaMain";
-import SeamaSidebar from "./SeamaSidebar";
+import SemaToolbar from "./SemaToolbar";
+import SemaMain from "./SemaMain";
+import SemaSidebar from "./SemaSidebar";
 import { version } from '../../package.json';
 
 export const SemaContainer = ({ component: Component, ...rest }) => (
 	<div className="SeamaNav">
-		<SeamaToolbar Version={version}/>
-		<SeamaSidebar/>
-		<SeamaMain/>
+		<SemaToolbar Version={version}/>
+		<SemaSidebar/>
+		<SemaMain/>
 	</div>
 );

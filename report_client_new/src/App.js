@@ -36,6 +36,11 @@ class App extends Component {
 						this.props.customerActions.fetchCustomer(this.props.kiosk.selectedKiosk);
 					}
 					break;
+				case "/Sales":
+					if( this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
+						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
+					}
+					break;
 				default:
 					break;
 			}

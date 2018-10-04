@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ListGroup } from 'react-bootstrap';
 import 'App.css';
 
-const SeamaSidebarStyle = {
+const SemaSidebarStyle = {
     background:"rgb(24,55,106)",
 //    position:"fixed",
     width:"240px",
@@ -40,7 +40,7 @@ function CustomComponent1({ children }) {
 }
 
 
-class SeamaSidebar extends Component {
+class SemaSidebar extends Component {
     render() {
         return (
             <div className="SeamaNavSidebar" style={this.getStyle()}>
@@ -48,7 +48,9 @@ class SeamaSidebar extends Component {
                     {<img src={require('images/swn-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
                 </div>
                 <ListGroup>
-                    <CustomComponent1><i className="glyphicon glyphicon-tint" style={{paddingRight:"15px"}}/>
+					<CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
+						<Link to='/Sales'>Sales</Link></CustomComponent1>
+					<CustomComponent1><i className="glyphicon glyphicon-tint" style={{paddingRight:"15px"}}/>
                         <Link to='/'>Volumes</Link></CustomComponent1>
                     <CustomComponent1><i className="glyphicon glyphicon-user" style={{paddingRight:"15px"}}/>
                         <Link to='/Demographics'>Demographics</Link></CustomComponent1>
@@ -78,4 +80,4 @@ class SeamaSidebar extends Component {
 }
 
 
-export default SeamaSidebar;
+export default SemaSidebar;

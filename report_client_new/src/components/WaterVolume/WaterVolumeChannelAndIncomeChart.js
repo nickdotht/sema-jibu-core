@@ -91,8 +91,9 @@ class WaterVolumeChannelAndIncomeChart extends Component {
 					});
 
 					// Create the labels
-					this.props.chartData.volumeInfo.volumeByChannelAndIncome[0].volume.data.forEach(salesChannel => {
-						data.datasets.push( {label: salesChannel.salesChannel, data:[], stack: 1, backgroundColor:utilService.getBackgroundColorForChannel( salesChannel.salesChannel ), id: salesChannel.salesChannel});
+
+					this.props.chartData.volumeInfo.volumeByChannelAndIncome[0].volume.data.forEach((salesChannel,index) => {
+						data.datasets.push( {label: salesChannel.salesChannel, data:[], stack: 1, backgroundColor:utilService.getBackgroundColorByIndex( index ), id: salesChannel.salesChannel});
 					});
 					// add the data
 					this.props.chartData.volumeInfo.volumeByChannelAndIncome.forEach(channelAndIncome => {
