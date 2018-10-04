@@ -26,6 +26,8 @@ var sema_sales_by_channels_ex = require('./routes/sema_sales_by_channel_ex');
 var sema_receipt_summary = require('./routes/sema_receipt_summary');
 var sema_customer_summary = require('./routes/sema_customer_summary');
 
+var sema_users = require('./routes/sema_user');
+
 const winston = require('winston');
 
 const passport = require('passport');
@@ -80,7 +82,7 @@ app.use('/sema/dashboard/site/sales-by-channel/', sema_sales_by_channels_ex);
 app.use('/sema/dashboard/site/receipt-summary/', sema_receipt_summary);
 app.use('/sema/dashboard/site/customer-summary/', sema_customer_summary);
 
-
+app.use('/sema/users', isAuthenticated, sema_users);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
