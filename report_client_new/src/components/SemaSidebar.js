@@ -3,16 +3,6 @@ import { Link } from 'react-router-dom';
 import { ListGroup } from 'react-bootstrap';
 import 'App.css';
 
-const SemaSidebarStyle = {
-    background:"rgb(24,55,106)",
-//    position:"fixed",
-    width:"240px",
-    height:"100%",
-    // top:"52px",
-    // borderRight:"1px",
-    // borderRightColor:"#e0e0e0",
-    // borderRightStyle:"solid"
-};
 
 const SeamaListStyleActive = {
     textAlign:"left",

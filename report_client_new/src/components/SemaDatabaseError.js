@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert } from 'react-bootstrap';
 
 // TODO: Make this error page prettier
-const SeamaDatabaseError = props => {
+const SemaDatabaseError = props => {
 	return (
 		<Alert bsStyle="danger" className="SemaServiceError">
 			<h4>Database Error</h4>
@@ -13,4 +13,4 @@ const SeamaDatabaseError = props => {
 	);
 }
 
-export default SeamaDatabaseError;
+export default SemaDatabaseError;

@@ -8,6 +8,7 @@ import {
 	kioskActions,
 	volumeActions,
 	customerActions,
+	salesActions,
 	authActions,
 	healthCheckActions
 } from 'actions';
@@ -92,6 +93,7 @@ class SemaToolbar extends Component {
 		}
 		params.startDate = this.startDate;
 		params.endDate = this.endDate;
+		params.groupBy = this.props.dateFilter.groupType;
 		console.log("--------------------PARAMS "+ JSON.stringify(params));
 		this.props.volume.loaded = false;
 		this.props.customer.loaded = false;
@@ -200,6 +202,7 @@ function mapDispatchToProps(dispatch) {
 		healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
 		kioskActions: bindActionCreators(kioskActions, dispatch),
 		volumeActions: bindActionCreators(volumeActions, dispatch),
+		salesActions:bindActionCreators(salesActions, dispatch),
 		customerActions: bindActionCreators(customerActions, dispatch)
 	};
 }

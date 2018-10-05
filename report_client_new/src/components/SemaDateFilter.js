@@ -52,6 +52,7 @@ class SemaDateFilter extends Component {
 	};
 
 	setYTD() {
+		this.groupType = "year";
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
 
@@ -71,17 +72,18 @@ class SemaDateFilter extends Component {
 		this.startDate = new Date( this.startDate.getFullYear()+1, 0, 1 );
 		this.endDate = new Date( this.startDate.getFullYear(), 12, 0 );
 		this.setYTDDisplay();
-		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
+		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 
 	}
 	yearDecrement(){
 		this.startDate = new Date( this.startDate.getFullYear()-1, 0, 1 );
 		this.endDate = new Date( this.startDate.getFullYear(), 12, 0 );
 		this.setYTDDisplay();
-		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
+		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 
 	}
 	setThisMonth(){
+		this.groupType = "month";
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), this.endDate.getMonth(), 1 );
 		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
@@ -104,22 +106,22 @@ class SemaDateFilter extends Component {
 		this.startDate = new Date( this.startDate.setMonth(this.startDate.getMonth() + 1));
 		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
 		this.setThisMonthDisplay();
-		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
+		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 	}
 	monthDecrement(){
 		this.startDate = new Date( this.startDate.setMonth(this.startDate.getMonth()-1));
 		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
 		this.setThisMonthDisplay();
-		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
+		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 	}
 
 	setAll(){
+		this.groupType = "none";
 		this.startDate = new Date(1973, 0, 1);
 		this.endDate =new Date(Date.now());
 	};
 
 	setAllDisplay(){
-		console.log("foo");
 		this.setState( {displayDate: "All Dates"});
 		this.setState({nextEnable:false})
 		this.setState({prevEnable:false})
@@ -141,6 +143,7 @@ class SemaDateFilter extends Component {
 
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
+		this.groupType = "year";
 		this.minDate = new Date( 2017, 0, 1 );		// Min date allowed
 		this.maxDate = this.endDate;
 
@@ -156,7 +159,7 @@ class SemaDateFilter extends Component {
 	}
 
 	componentDidMount() {
-		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
+		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 	}
 
 	render() {
@@ -188,7 +191,7 @@ class SemaDateFilter extends Component {
 			this.dateSelector = this.dateMenu[eventKey];
 			this.dateSelector.setStartEndDate( this );
 			this.dateSelector.setDisplayDate(this);
-			this.props.dateFilterActions.setDateRange( this.startDate, this.endDate );
+			this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 		}
 	}
 	buildDateMenuItems(){

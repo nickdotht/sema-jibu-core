@@ -3,7 +3,7 @@ import 'App.css';
 import 'css/SemaCustomer.css';
 import LoadProgress from "./LoadProgress";
 import SemaServiceError from "./SemaServiceError";
-import SeamaDatabaseError from "./SeamaDatabaseError";
+import SemaDatabaseError from "./SemaDatabaseError";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as customerActions from 'actions/CustomerActions';
@@ -23,7 +23,7 @@ class SemaCustomer extends Component {
 		if( this.props.healthCheck.server !== "Ok" ){
 			return SemaServiceError(props);
 		}else  if( this.props.healthCheck.database !== "Ok" ){
-			return SeamaDatabaseError(props)
+			return SemaDatabaseError(props)
 		}
         return this.showCustomers();
 

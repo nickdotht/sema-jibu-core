@@ -5,3 +5,4 @@ export * from './KioskActions';
 export * from './CustomerActions';
 export * from './VolumeActions';
 export * from './DateFilterActions';
+export * from './SalesActions';

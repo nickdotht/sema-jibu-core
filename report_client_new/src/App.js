@@ -7,7 +7,8 @@ import {
 	authActions,
 	kioskActions,
 	volumeActions,
-	customerActions
+	customerActions,
+	salesActions
 } from 'actions';
 import { history } from './utils';
 import {
@@ -23,22 +24,30 @@ class App extends Component {
 		let self = this;
 		window.addEventListener('resize', this.resize)
 		this.unlisten = history.listen((location, action) => {
+			let params = {}
+			params.startDate = this.props.dateFilter.startDate;
+			params.endDate = this.props.dateFilter.endDate;
+			params.groupBy = this.props.dateFilter.groupType;
+			if( this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ){
+				params.kioskID = this.props.kiosk.selectedKiosk;
+			}
+
 			console.log("on route change", self);
 			switch( location.pathname ){
 				case "/":
 					if( ! this.props.volume.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID  ){
-						this.props.volumeActions.fetchVolume(this.props.kiosk.selectedKiosk);
+						this.props.volumeActions.fetchVolume(params);
 					}
 					break;
 				case "/Demographics":
 
 					if( ! this.props.customer.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
-						this.props.customerActions.fetchCustomer(this.props.kiosk.selectedKiosk);
+						this.props.customerActions.fetchCustomer(params);
 					}
 					break;
 				case "/Sales":
-					if( this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
-						this.props.salesActions.fetchSales(this.props.kiosk.selectedKiosk);
+					if( ! this.props.sales.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
+						this.props.salesActions.fetchSales(params);
 					}
 					break;
 				default:
@@ -80,7 +89,8 @@ function mapDispatchToProps(dispatch) {
 		authActions: bindActionCreators(authActions, dispatch),
 		kioskActions: bindActionCreators(kioskActions, dispatch),
 		volumeActions: bindActionCreators(volumeActions, dispatch),
-		customerActions: bindActionCreators(customerActions, dispatch)
+		customerActions: bindActionCreators(customerActions, dispatch),
+		salesActions: bindActionCreators(salesActions, dispatch)
 	};
 }
 
@@ -89,6 +99,8 @@ function mapStateToProps(state) {
 		kiosk: state.kiosk,
 		volume: state.volume,
 		customer: state.customer,
+		sales:state.sales,
+		dateFilter:state.dateFilter,
 		auth: state.auth
 	};
 }

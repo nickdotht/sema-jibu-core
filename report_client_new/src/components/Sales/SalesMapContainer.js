@@ -67,8 +67,8 @@ export class SalesMapContainer extends Component {
 			let maxSales = Number.MIN_SAFE_INTEGER;
 			let minSales = Number.MAX_SAFE_INTEGER;
 			this.props.retailers.forEach( retailer => {
-				if( retailer.periods[0].periodValue > maxSales ) maxSales = retailer.periods[0].periodValue;
-				if( retailer.periods[0].periodValue < minSales ) minSales = retailer.periods[0].periodValue;
+				if( retailer.periods[0].value > maxSales ) maxSales = retailer.periods[0].value;
+				if( retailer.periods[0].value < minSales ) minSales = retailer.periods[0].value;
 
 			});
 			this.props.retailers.forEach( retailer => { // iterate through locations saved in state
@@ -80,16 +80,16 @@ export class SalesMapContainer extends Component {
 						const lng = parseFloat(gps[1]);
 						const scaleVal = ()=> {
 							// Convert sales to a range for the marker scales. Min sales scale = 20. Max sales scale = 80
-							if(typeof retailer.periods[0].periodValue === "number"  )
-								return 20 + 60 *  (retailer.periods[0].periodValue-minSales)/(maxSales-minSales);
+							if(typeof retailer.periods[0].value === "number"  )
+								return 20 + 60 *  (retailer.periods[0].value-minSales)/(maxSales-minSales);
 							return 20;
 						};
 						const colorVal = ()=> {
 							// produce color based on trend
-							if(typeof retailer.periods[1].periodValue === "number" && typeof retailer.periods[2].periodValue === "number" ){
-								if( retailer.periods[1].periodValue > retailer.periods[2].periodValue ){
+							if(typeof retailer.periods[0].value === "number" && typeof retailer.periods[1].value === "number" ){
+								if( retailer.periods[0].value > retailer.periods[1].value ){
 									return "green";
-								}else if( retailer.periods[1].periodValue < retailer.periods[2].periodValue ){
+								}else if( retailer.periods[0].value < retailer.periods[1].value ){
 									return "red";
 								}
 							}

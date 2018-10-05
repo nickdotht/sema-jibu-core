@@ -6,7 +6,9 @@ class SalesSummary {
 		this.beginDate = beginDate;
 		this.endDate = endDate;
 		this.totalRevenue =   {total: null, period: null, periods: PeriodData.init3Periods()},
-		this.totalCustomers = {total: null, period: null, periods: PeriodData.init3Periods()}
+		this.totalCogs =   {total: null, period: null, periods: PeriodData.init3Periods()},
+		this.totalCustomers = {total: null, period: null, periods: PeriodData.init3Periods()},
+		this.customerSales = []
 	}
 
 	setTotalRevenue( value ){
@@ -29,22 +31,18 @@ class SalesSummary {
 		return this.totalCustomers.periods;
 	}
 
-	setNewCustomers( period, periods ){
-		this.newCustomers.period = period;
-		this.newCustomers.periods = periods;
+	setTotalCogs( value ){
+		this.totalCogs.total = value;
+	}
+	setTotalCogsPeriod( value ){
+		this.totalCogs.period = value;
+	}
+	getTotalCogsPeriods(){
+		return this.totalCogs.periods;
 	}
 
-	addCustomerType( value ){
-		this.customerType = value;
-
-	}
-	addPaymentType( value ){
-		this.paymentType = value;
-
-	}
-
-	addData( data ){
-		this.volume.data.push( data );
+	addCustomerSales( customerSales){
+		this.customerSales.push(customerSales)
 	}
 
 	classToPlain() {

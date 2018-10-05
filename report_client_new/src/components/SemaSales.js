@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router'
 import SemaServiceError from "./SemaServiceError";
-import SeamaDatabaseError from "./SeamaDatabaseError";
+import SemaDatabaseError from "./SemaDatabaseError";
 import SalesSummaryPanel1 from "./Sales/SalesSummaryPanel1";
 import SalesSummaryPanel2 from "./Sales/SalesSummaryPanel2";
 import SalesMapContainer from './Sales/SalesMapContainer';
@@ -28,7 +28,7 @@ class SemaSales extends Component {
 		if( this.props.healthCheck.server !== "Ok" ){
 			return SemaServiceError(props);
 		}else  if( this.props.healthCheck.database !== "Ok" ){
-			return SeamaDatabaseError(props)
+			return SemaDatabaseError(props)
 		}
 		return this.showSales();
 
@@ -39,54 +39,53 @@ class SemaSales extends Component {
 			<div className="SalesContainer">
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="New Customers" date={this.props.sales.newCustomers.periods[1].beginDate}
-											value={this.props.sales.newCustomers.periods[0].periodValue}
-											delta = {calcChange(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)}
-											valueColor = {calcColor(this.props.sales.newCustomers.periods[1].periodValue, this.props.sales.newCustomers.periods[2].periodValue)} />
+						<SalesSummaryPanel1 title="Total Customers" date={this.getDate(this.props.sales.salesInfo.totalCustomers.periods[0].endDate)}
+											value={formatTotalCustomers(this.props.sales.salesInfo)}
+											delta = {calcChange(this.props.sales.salesInfo.totalCustomers.periods[0].value, this.props.sales.salesInfo.totalCustomers.periods[1].value)}
+											valueColor = {calcColor(this.props.sales.salesInfo.totalCustomers.periods[0].value, this.props.sales.salesInfo.totalCustomers.periods[1].value)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="Total Revenue" date={this.props.sales.totalRevenue.periods[1].beginDate}
-											value={formatDollar(this.props.sales.totalRevenue.total)}
-											delta = {calcChange(this.props.sales.totalRevenue.periods[1].periodValue, this.props.sales.totalRevenue.periods[2].periodValue)}
-											valueColor = {calcColor(this.props.sales.totalRevenue.periods[1].periodValue, this.props.sales.totalRevenue.periods[2].periodValue)} />
+						<SalesSummaryPanel1 title="Total Revenue" date={this.getDate(this.props.sales.salesInfo.totalRevenue.periods[0].endDate)}
+											value={formatDollar(this.props.sales.salesInfo.totalRevenue.total)}
+											delta = {calcChange(this.props.sales.salesInfo.totalRevenue.periods[0].value, this.props.sales.salesInfo.totalRevenue.periods[1].value)}
+											valueColor = {calcColor(this.props.sales.salesInfo.totalRevenue.periods[0].value, this.props.sales.salesInfo.totalRevenue.periods[1].value)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="Net Income" date={this.props.sales.netIncome.periods[1].beginDate}
-											value={this.props.sales.netIncome.total}
-											delta = {calcChange(this.props.sales.netIncome.periods[1].periodValue, this.props.sales.netIncome.periods[2].periodValue)}
-											valueColor = {calcColor(this.props.sales.netIncome.periods[1].periodValue, this.props.sales.netIncome.periods[2].periodValue)} />
+						<SalesSummaryPanel1 title="Net Income" date={this.getDate(this.props.sales.salesInfo.totalRevenue.periods[0].endDate)}
+											value={calcNetRevenue( this.props.sales.salesInfo )}
+											delta = {calcNetRevenueDelta(this.props.sales.salesInfo)}
+											valueColor = {calcNetRevenueColor(this.props.sales.salesInfo)} />
 					</div>
 				</div>
 				<div className = "SalesContentContainer">
 					<div className= "SalesMapItem" id="salesMapId">
-						<SalesMapContainer google={this.props.google} retailers={this.props.sales.retailSales} />
+						<SalesMapContainer google={this.props.google} retailers={this.props.sales.salesInfo.customerSales} />
 					</div>
 					<div className= "SalesListItem">
-						<div><p style={{textAlign:"center"}}>{formatRetailSalesHeader(this.props.sales.retailSales)}</p></div>
-						<SalesRetailerList retailers={this.props.sales.retailSales}/>
+						<div><p style={{textAlign:"center"}}>{formatRetailSalesHeader(this.props.sales.salesInfo.customerSales)}</p></div>
+						<SalesRetailerList retailers={this.props.sales.salesInfo.customerSales}/>
 					</div>
 					<div className= "SalesBottomContainer">
 						<div className= "SalesBottomLeftTop">
 							<SalesSummaryPanel2 title="Total Customers"
-												value={ formatTotalCustomers(this.props.sales.totalCustomers)}
+												value={ formatTotalCustomers(this.props.sales.salesInfo)}
 												valueColor = "rgb(24, 55, 106)"
 												title2 = "All Channels" />
 						</div>
 						<div className= "SalesBottomLeftMiddle">
 							<SalesSummaryPanel2 title="Liters/Customer"
-												value={formatLitersPerCustomer(this.props.sales.gallonsPerCustomer)}
+												value={formatLitersPerCustomer("N/A")}
 												valueColor = "green"
-												title2 = {formatLitersPerPeriod(this.props.sales.gallonsPerCustomer)} />
+												title2 = {formatLitersPerPeriod(0)} />
 						</div>
 						<div className= "SalesBottomLeftBottom">
 							<SalesSummaryPanel2 title="Customer Growth"
-												value={formatCustomerGrowth(this.props.sales.newCustomers)}
+												value={formatCustomerGrowth(this.props.sales.salesInfo.totalCustomers)}
 												valueColor = "red"
 												title2 = "Expected: 2.5%" />
 						</div>
 						<div className= "SalesBottomRight">
-							<SalesByChannelChart chartData={this.props.sales.salesByChannel}/>
-							{/*<SalesByChannelChart chartData={foobar(this.props)}/>*/}
+							{/*<SalesByChannelChart chartData={this.props.sales.salesInfo.salesByChannel}/>*/}
 						</div>
 					</div>
 					{/*<div className= "SalesBottonRightItem">*/}
@@ -97,10 +96,42 @@ class SemaSales extends Component {
 			</div>
 		);
 	}
+	getDate( date){
+		return date === null ? "N/A": date;
+	}
 }
-// const foobar = (p)=>{
-//	return p.sales.salesByChannel;
-// }
+const calcNetRevenue = salesInfo =>{
+	if( salesInfo.totalRevenue.total &&  salesInfo.totalCogs.total ){
+		return formatDollar( salesInfo.totalRevenue.total = salesInfo.totalCogs.total);
+	}else{
+		return "N/A";
+	}
+}
+
+const calcNetRevenueDelta = salesInfo =>{
+	if( salesInfo.totalRevenue.periods[0].value &&  salesInfo.totalCogs.periods[0].value &&
+		salesInfo.totalRevenue.periods[1].value &&  salesInfo.totalCogs.periods[1].value ){
+		return calcChange( salesInfo.totalRevenue.periods[0].value - salesInfo.totalCogs.periods[0].value,
+					salesInfo.totalRevenue.periods[1].value - salesInfo.totalCogs.periods[1].value )
+	}else{
+		return "N/A";
+	}
+}
+
+
+const calcNetRevenueColor = salesInfo =>{
+	if( salesInfo.totalRevenue.periods[0].value &&  salesInfo.totalCogs.periods[0].value &&
+		salesInfo.totalRevenue.periods[1].value &&  salesInfo.totalCogs.periods[1].value ){
+		return calcColor( salesInfo.totalRevenue.periods[0].value - salesInfo.totalCogs.periods[0].value,
+			       salesInfo.totalRevenue.periods[1].value - salesInfo.totalCogs.periods[1].value )
+	}else{
+		return "gray";
+	}
+}
+
+const formatTotalCustomers = salesInfo =>{
+	return ( salesInfo.totalCustomers.total ) ? salesInfo.totalCustomers.total : "N/A";
+}
 
 const formatRetailSalesHeader = (retailSales) =>{
 	if( retailSales.length > 0 ){
@@ -114,41 +145,41 @@ const formatRetailSalesHeader = (retailSales) =>{
 
 const formatDollar = amount =>{
 	let suffix = "";
-	if( typeof amount === "string") return amount;
-	if( amount > 1000){
-		amount = amount/1000;
-		suffix = "k";
+	if( amount ) {
+		if (amount > 1000) {
+			amount = amount / 1000;
+			suffix = "k";
+		}
+		let formatter = new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: 'HTG',
+			minimumFractionDigits: 2,
+			// the default value for minimumFractionDigits depends on the currency
+			// and is usually already 2
+		});
+		return formatter.format(amount) + suffix;
+	}else{
+		return "N/A"
 	}
-	let formatter = new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: 'HTG',
-		minimumFractionDigits: 2,
-		// the default value for minimumFractionDigits depends on the currency
-		// and is usually already 2
-	});
-	return formatter.format(amount) + suffix;
 };
 
-const formatTotalCustomers = total =>{
-	if( typeof total === "string"){
-		return total;
-	}else{
-		return String(parseFloat(total.toFixed(0)));
-	}
-};
+// const formatTotalCustomers = total =>{
+// 	if( total === null){
+// 		return "N/A";
+// 	}else{
+// 		return String(parseFloat(total.toFixed(0)));
+// 	}
+// };
+
 const formatLitersPerCustomer = litersPerCustomer =>{
-	if( typeof litersPerCustomer.value === "string"){
-		return litersPerCustomer.value;
+	if( litersPerCustomer === "N/A"){
+		return litersPerCustomer;
 	}else{
 		return String(parseFloat(litersPerCustomer.value.toFixed(0)));
 	}
 };
 const formatLitersPerPeriod = litersPerCustomer =>{
-	if( litersPerCustomer.period.toLowerCase() === "n/a"){
-		return "N/A";
-	}else{
-		return "Liters/" + litersPerCustomer.period;
-	}
+	return "Liters/" + litersPerCustomer;
 };
 
 const formatCustomerGrowth = newCustomers =>{
@@ -162,9 +193,7 @@ const formatCustomerGrowth = newCustomers =>{
 
 
 const calcChange = (now, last) => {
-	if( typeof now === "string" ||
-		typeof last === "string" ||
-		!now || !last ){
+	if( !now  || !last ){
 		return "N/A"
 	}else{
 		return ((now/last)*100 -100).toFixed(2) + "%";
@@ -172,7 +201,7 @@ const calcChange = (now, last) => {
 
 };
 const calcColor = (now, last) => {
-	if( typeof now === "string" || typeof last === "string"){
+	if( !now  || !last){
 		return "gray"
 	}else{
 		if(now > last ) return "green";

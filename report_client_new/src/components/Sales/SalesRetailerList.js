@@ -25,18 +25,18 @@ export default class SalesRetailerList extends Component {
 		this.props.retailers.forEach( (retailer, index) => {
 			// rows.push(<tr {this.calcColor(retailer.thisPeriod, retailer.lastPeriod)}>
 			// rows.push(<tr style={{color:"red"}}>
-			rows.push(<tr key={index} style={this.calcColor(retailer.periods[1].periodValue, retailer.periods[2].periodValue)}>
+			rows.push(<tr key={index} style={this.calcColor(retailer.periods[0].value, retailer.periods[1].value)}>
 						<td>{index+1}.</td>
 						<td>{retailer.name}</td>
-						<td>{retailer.periods[0].periodValue}</td>
-						{this.calcTrend(retailer.periods[1].periodValue, retailer.periods[2].periodValue)}
+						<td>{retailer.periods[0].value}</td>
+						{this.calcTrend(retailer.periods[0].value, retailer.periods[1].value)}
 					</tr>
 			)
 		});
 		return rows;
 	}
 	calcTrend( now, last ){
-		if( now !== "N/A " && last !== "N/A" ){
+		if( now !== null && last !== null ){
 			if( now > last ){
 				return (<td style={{textAlign:"center"}}><i className="glyphicon glyphicon-arrow-up"/></td>);
 			}else if( now < last ) {
@@ -46,7 +46,7 @@ export default class SalesRetailerList extends Component {
 		return (<td style={{textAlign: "center"}}><i className="glyphicon glyphicon-minus"/></td>);
 	}
 	calcColor( now, last ){
-		if( now !== "N/A " && last !== "N/A" ){
+		if( now !== null && last !== null){
 			if( now > last ){
 				return ( {color:"green"});
 			}else if( now < last ) {

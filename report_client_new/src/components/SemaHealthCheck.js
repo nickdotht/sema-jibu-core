@@ -13,7 +13,7 @@ const LabelStyleRight = {
     fontWeight: "normal"
 };
 
-class SeamaHealthCheck extends React.Component {
+class SemaHealthCheck extends React.Component {
     componentWillMount() {
         this.props.healthCheckActions.fetchHealthCheck();
     }
@@ -29,7 +29,7 @@ class SeamaHealthCheck extends React.Component {
     }
 }
 
-SeamaHealthCheck.propTypes = {
+SemaHealthCheck.propTypes = {
     healthCheckActions: PropTypes.object,
     healthCheck: PropTypes.object
 };
@@ -49,4 +49,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)(SeamaHealthCheck);
+)(SemaHealthCheck);

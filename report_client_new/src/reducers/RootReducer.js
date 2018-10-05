@@ -4,6 +4,7 @@ import healthCheck from './HealthcheckReducer';
 import auth from './AuthReducer';
 import kiosk from './KioskReducer';
 import volume from './VolumeReducer';
+import sales from './SalesReducer';
 import customer from './CustomerReducer';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
@@ -39,6 +40,7 @@ const rootReducer = combineReducers({
 	kiosk: persistReducer(kioskPersistConfig, kiosk),
 	volume,
 	customer,
+	sales,
 	dateFilter
 });
 
