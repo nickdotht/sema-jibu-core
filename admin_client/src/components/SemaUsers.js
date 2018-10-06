@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { submit } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router';
@@ -64,7 +65,7 @@ class SemaUsers extends Component {
           <Modal
             show
             onClose={this.closeCreateModal}
-            onSave={() => {}}
+            onSave={this.props.onSave}
             title="Create User"
             body={<UserForm />}
           />
@@ -90,7 +91,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
-    fetchUsers: bindActionCreators(fetchUsers, dispatch)
+    fetchUsers: bindActionCreators(fetchUsers, dispatch),
+    onSave: () => dispatch(submit('userForm'))
   };
 }
 
