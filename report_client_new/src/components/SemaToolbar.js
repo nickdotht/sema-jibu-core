@@ -45,7 +45,7 @@ class SemaToolbar extends Component {
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
 		this.state = {
-			kiosks: "--Regions--",
+			kiosks: "--Sites--",
 		};
 		console.log("foo");
 	}
@@ -140,7 +140,7 @@ class SemaToolbar extends Component {
 						Version {this.props.Version}
 					</Label>
 					<Label style={LabelStyleLeft}>
-						Region:
+						Site:
 					</Label>
 					<Nav >
 						<NavDropdown title={this.state.kiosks} onSelect={this.handleSelectKiosk} id="basic-nav-dropdown" >

@@ -49,7 +49,6 @@ class PeriodData {
 				break;
 
 			case 'month':
-			default:
 				for( let i = 0; i < periods.length; i++ ){
 					periods[i].setDates(beginDate, endDate);
 					if( i == 0 ){
@@ -60,6 +59,9 @@ class PeriodData {
 					beginDate.addMonths(-1);
 					endDate.addMonths(-1);
 				}
+				break;
+			default:
+				break;
 		}
 	}
 

@@ -26,6 +26,12 @@ const sqlRevenueByPeriod =
 	GROUP BY  YEAR(created_at), %s(created_at) \
 	ORDER BY  YEAR(created_at) DESC, %s(created_at) DESC';
 
+const sqlRevenueAll =
+	'SELECT   SUM(total), SUM(cogs) \
+	FROM      receipt \
+	WHERE     kiosk_id=? AND receipt.created_at BETWEEN ? AND ?';
+
+
 const sqlCustomersByPeriod =
 	'SELECT   COUNT(id), YEAR(created_at), %s(created_at) \
 	FROM      customer_account \
@@ -159,13 +165,16 @@ const getRevenueByPeriod = (connection, requestParams, beginDate, endDate, sales
 		salesSummary.setTotalCogsPeriod(groupBy);
 		let periodsRevenue = salesSummary.getTotalRevenuePeriods();
 		let periodsCogs = salesSummary.getTotalCogsPeriods();
-		PeriodData.UpdatePeriodDates( periodsRevenue, endDate, requestParams["group-by"] );
-		PeriodData.UpdatePeriodDates( periodsCogs, endDate, requestParams["group-by"] );
-
-		let queryBeginDate = (periodsRevenue[periodsRevenue.length-1].beginDate < beginDate) ? periodsRevenue[periodsRevenue.length-1].beginDate : beginDate;
+		PeriodData.UpdatePeriodDates( periodsRevenue, endDate, groupBy );
+		PeriodData.UpdatePeriodDates( periodsCogs, endDate, groupBy );
+		let queryBeginDate = beginDate;
+		let sql = sqlRevenueAll;
+		if( groupBy !== "none"){
+			queryBeginDate = (periodsRevenue[periodsRevenue.length-1].beginDate < beginDate) ? periodsRevenue[periodsRevenue.length-1].beginDate : beginDate;
+			sql = sprintf(sqlRevenueByPeriod, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
+		}
 		let queryParams = [requestParams["site-id"], queryBeginDate, endDate]
 
-		const sql = sprintf(sqlRevenueByPeriod, requestParams["group-by"].toUpperCase(), requestParams["group-by"].toUpperCase(), requestParams["group-by"].toUpperCase());
 		connection.query(sql, queryParams, (err, sqlResult) => {
 			if (err) {
 				reject(err);
@@ -225,7 +234,7 @@ const getCustomerRevenue = (connection, requestParams, beginDate, endDate, sales
 					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
 						let year = endDate.getFullYear();
 						let month = endDate.getMonth() +1 ;	// range 1-12
-						while( index <  sqlResult.length && sqlResult[index]["MONTH(receipt.created_at)"] === month && sqlResult[index]["YEAR(receipt.created_at)"] === year ){
+						while( index <  sqlResult.length && matchOnGroupBy(sqlResult, index, year, month)){
 							updateSales(salesSummary, sqlResult, index, month, groupBy, endDate);
 							index +=1;
 						}
@@ -239,6 +248,7 @@ const getCustomerRevenue = (connection, requestParams, beginDate, endDate, sales
 		});
 	});
 };
+
 
 const getGallonsPerCustomer = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
@@ -260,6 +270,18 @@ const getGallonsPerCustomer = (connection, requestParams, results ) => {
 		});
 	});
 };
+
+const matchOnGroupBy = (sqlResult, index, groupBy, year, month ) =>{
+	switch( groupBy ){
+		case "month":
+			return (sqlResult[index]["MONTH(receipt.created_at)"] === month && sqlResult[index]["YEAR(receipt.created_at)"] === year);
+		case "year":
+			return (sqlResult[index]["YEAR(receipt.created_at)"] === year);
+		case "none":
+		default:
+			return true;
+	}
+}
 
 const getPeriodData = (sqlResult, periods, column, groupBy) =>{
 	if (Array.isArray(sqlResult) && sqlResult.length > 0) {
@@ -344,32 +366,31 @@ const getPeriodData = (sqlResult, periods, column, groupBy) =>{
 // 	}
 // };
 
-const updateSales = ( salesSummary, sqlResult, index, month, period, endDate ) => {
+const updateSales = ( salesSummary, sqlResult, index, month, groupBy, endDate ) => {
 
 	let customer = {
 		name: sqlResult[index]["name"],
 		id: sqlResult[index]["customer_account_id"],
-		period: period,
+		period: groupBy,
 		periods: PeriodData.init3Periods(),
 		gps: sqlResult[index]["gps_coordinates"]
 	};
 
-	PeriodData.UpdatePeriodDates( customer.periods, endDate, period );
+	PeriodData.UpdatePeriodDates( customer.periods, endDate, groupBy );
 
 	customer.periods[0].setValue( parseFloat(sqlResult[index]["SUM(receipt.total)"]));
 
-	index = getPrevPeriodSales( customer, sqlResult, index+1, customer.periods[1] );
+	index = getPrevPeriodSales( customer, sqlResult, index+1, customer.periods[1], groupBy );
 	if( index !== -1 ){
-		index = getPrevPeriodSales( customer, sqlResult, index+1, customer.periods[2]  );
+		index = getPrevPeriodSales( customer, sqlResult, index+1, customer.periods[2], groupBy );
 	}
 	salesSummary.addCustomerSales( customer);
 };
 
-const getPrevPeriodSales = ( retailer, sqlResult, index, nextPeriod ) => {
+const getPrevPeriodSales = ( customer, sqlResult, index, nextPeriod,  groupBy ) => {
 	while( index < sqlResult.length ){
-		if( sqlResult[index]["customer_account_id"] === retailer.id &&
-			sqlResult[index]["YEAR(receipt.created_at)"] === nextPeriod.beginDate.getFullYear() &&
-			sqlResult[index]["MONTH(receipt.created_at)"] === (nextPeriod.beginDate.getMonth() +1) ){
+		if( sqlResult[index]["customer_account_id"] === customer.id &&
+			matchOnGroupBy(sqlResult, index, groupBy, nextPeriod.beginDate.getFullYear(), (nextPeriod.beginDate.getMonth() +1))){
 			nextPeriod.setValue( parseFloat(sqlResult[index]["SUM(receipt.total)"]) );
 			return index;
 		}
@@ -378,6 +399,7 @@ const getPrevPeriodSales = ( retailer, sqlResult, index, nextPeriod ) => {
 	return -1;
 };
 
+// const matchOnGroupBy = (sqlResult, index, groupBy, year, month ) =>{
 // const initResults = () => {
 // 	return {
 // 		newCustomers: {period: "N/A", periods:PeriodData.init3Periods()},
