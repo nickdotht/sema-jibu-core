@@ -41,13 +41,13 @@ class SemaSales extends Component {
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Customers" date={this.getDate(this.props.sales.salesInfo.totalCustomers.periods[0].endDate)}
 											value={formatTotalCustomers(this.props.sales.salesInfo)}
-											delta = {calcChange(this.props.sales.salesInfo.totalCustomers.periods[0].value, this.props.sales.salesInfo.totalCustomers.periods[1].value)}
+											delta = {calcCustomerDelta( this.props.sales.salesInfo) }
 											valueColor = {calcColor(this.props.sales.salesInfo.totalCustomers.periods[0].value, this.props.sales.salesInfo.totalCustomers.periods[1].value)} />
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Revenue" date={this.getDate(this.props.sales.salesInfo.totalRevenue.periods[0].endDate)}
 											value={formatDollar(this.props.sales.salesInfo.totalRevenue.total)}
-											delta = {calcChange(this.props.sales.salesInfo.totalRevenue.periods[0].value, this.props.sales.salesInfo.totalRevenue.periods[1].value)}
+											delta = {calcRevenueDelta(this.props.sales.salesInfo)}
 											valueColor = {calcColor(this.props.sales.salesInfo.totalRevenue.periods[0].value, this.props.sales.salesInfo.totalRevenue.periods[1].value)} />
 					</div>
 					<div className ="SalesSummaryItem">
@@ -72,18 +72,18 @@ class SemaSales extends Component {
 												valueColor = "rgb(24, 55, 106)"
 												title2 = "All Channels" />
 						</div>
-						<div className= "SalesBottomLeftMiddle">
-							<SalesSummaryPanel2 title="Liters/Customer"
-												value={formatLitersPerCustomer("N/A")}
-												valueColor = "green"
-												title2 = {formatLitersPerPeriod(0)} />
-						</div>
-						<div className= "SalesBottomLeftBottom">
-							<SalesSummaryPanel2 title="Customer Growth"
-												value={formatCustomerGrowth(this.props.sales.salesInfo.totalCustomers)}
-												valueColor = "red"
-												title2 = "Expected: 2.5%" />
-						</div>
+						{/*<div className= "SalesBottomLeftMiddle">*/}
+							{/*<SalesSummaryPanel2 title="Liters/Customer"*/}
+												{/*value={formatLitersPerCustomer("N/A")}*/}
+												{/*valueColor = "green"*/}
+												{/*title2 = {formatLitersPerPeriod(0)} />*/}
+						{/*</div>*/}
+						{/*<div className= "SalesBottomLeftBottom">*/}
+							{/*<SalesSummaryPanel2 title="Customer Growth"*/}
+												{/*value={formatCustomerGrowth(this.props.sales.salesInfo.totalCustomers)}*/}
+												{/*valueColor = "red"*/}
+												{/*title2 = "Expected: 2.5%" />*/}
+						{/*</div>*/}
 						<div className= "SalesBottomRight">
 							{/*<SalesByChannelChart chartData={this.props.sales.salesInfo.salesByChannel}/>*/}
 						</div>
@@ -96,6 +96,7 @@ class SemaSales extends Component {
 			</div>
 		);
 	}
+
 	getDate( date){
 		return date === null ? "N/A": date;
 	}
@@ -109,15 +110,32 @@ const calcNetRevenue = salesInfo =>{
 }
 
 const calcNetRevenueDelta = salesInfo =>{
-	if( salesInfo.totalRevenue.periods[0].value &&  salesInfo.totalCogs.periods[0].value &&
-		salesInfo.totalRevenue.periods[1].value &&  salesInfo.totalCogs.periods[1].value ){
-		return calcChange( salesInfo.totalRevenue.periods[0].value - salesInfo.totalCogs.periods[0].value,
-					salesInfo.totalRevenue.periods[1].value - salesInfo.totalCogs.periods[1].value )
-	}else{
-		return "N/A";
+	if( salesInfo.totalRevenue.period === "none"){
+		return "";
+	}else {
+		if (salesInfo.totalRevenue.periods[0].value && salesInfo.totalCogs.periods[0].value &&
+			salesInfo.totalRevenue.periods[1].value && salesInfo.totalCogs.periods[1].value) {
+			return calcChange(salesInfo, salesInfo.totalRevenue.periods[0].value - salesInfo.totalCogs.periods[0].value,
+				salesInfo.totalRevenue.periods[1].value - salesInfo.totalCogs.periods[1].value)
+		} else {
+			return "N/A";
+		}
 	}
 }
-
+const calcCustomerDelta = salesInfo =>{
+	if( salesInfo.totalCustomers.period === "none") {
+		return "";
+	}else{
+		return calcChange(salesInfo, salesInfo.totalCustomers.periods[0].value, salesInfo.totalCustomers.periods[1].value);
+	}
+}
+const calcRevenueDelta = salesInfo =>{
+	if( salesInfo.totalRevenue.period === "none") {
+		return "";
+	}else{
+		return calcChange(salesInfo, salesInfo.totalRevenue.periods[0].value, salesInfo.totalRevenue.periods[1].value);
+	}
+}
 
 const calcNetRevenueColor = salesInfo =>{
 	if( salesInfo.totalRevenue.periods[0].value &&  salesInfo.totalCogs.periods[0].value &&
@@ -135,8 +153,20 @@ const formatTotalCustomers = salesInfo =>{
 
 const formatRetailSalesHeader = (retailSales) =>{
 	if( retailSales.length > 0 ){
-		return "Data to " + dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "dddd mmm, d, yyyy");
-		//return retailSales[0].
+		switch( retailSales[0].period){
+			case "none":
+				return "Total Sales";
+			case "year":
+				let startDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, yyyy");
+				let endDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, yyyy");
+				return "Sales from " + startDate + " - " + endDate;
+			case "month":
+				startDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, d, yyyy");
+				endDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, d, yyyy");
+				return "Sales from " + startDate + " - " + endDate;
+			default:
+				return "";
+		}
 	}
 	return "No data available";
 };
@@ -192,10 +222,35 @@ const formatCustomerGrowth = newCustomers =>{
 };
 
 
-const calcChange = (now, last) => {
+const calcChange = (salesInfo, now, last) => {
 	if( !now  || !last ){
 		return "N/A"
 	}else{
+		// Prorate the current period of it is incomplete
+		let nowDate = new Date();
+		switch( salesInfo.totalCustomers.period ){
+			case "year":
+				let periodYear = new Date(Date.parse(salesInfo.totalCustomers.periods[0].beginDate)).getFullYear();
+				if( nowDate.getFullYear() == periodYear ){
+					let start = new Date(periodYear, 0, 0);
+					let diff = nowDate - start;
+					let oneDay = 1000 * 60 * 60 * 24;
+					let dayOfYear = Math.floor(diff / oneDay);
+
+					now = ((365*now)/dayOfYear)
+				}
+				break;
+			case "month":
+				let period = new Date(Date.parse(salesInfo.totalCustomers.periods[0].beginDate));
+				periodYear = period.getFullYear();
+				let periodMonth = period.getMonth();
+				if( nowDate.getFullYear() == periodYear && nowDate.getMonth() == periodMonth ) {
+					let dayOfMonth = nowDate.getDate();
+					let daysInMonth =  new Date(periodYear, periodMonth+1, 0).getDate(); // Note: this is a trick to get the last day of the month
+					now = ((daysInMonth*now)/dayOfMonth)
+				}
+				break;
+		}
 		return ((now/last)*100 -100).toFixed(2) + "%";
 	}
 

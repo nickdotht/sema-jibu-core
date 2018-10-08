@@ -29,7 +29,7 @@ class App extends Component {
 			params.endDate = this.props.dateFilter.endDate;
 			params.groupBy = this.props.dateFilter.groupType;
 			if( this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ){
-				params.kioskID = this.props.kiosk.selectedKiosk;
+				params.kioskID = this.props.kiosk.selectedKiosk.kioskID;
 			}
 
 			console.log("on route change", self);

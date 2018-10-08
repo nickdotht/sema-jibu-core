@@ -50,5 +50,18 @@ class SalesSummary {
 	}
 
 }
+class CustomerSale{
+	constructor(name, id, groupBy, gpsCoordinates){
+		this.name = name;
+		this.id = id;
+		this.period = groupBy;
+		this.gps = gpsCoordinates;
+		this.total = null;
+		this.periods = PeriodData.init3Periods();
+	}
+	setTotal( value ){
+		this.total = value;
+	}
+}
 
-module.exports = SalesSummary;
+module.exports = {SalesSummary,CustomerSale};

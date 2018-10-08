@@ -6,7 +6,7 @@ require('datejs');
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const { PeriodData } = require(`${__basedir}/seama_services/datetime_services`);
 const { getMostRecentReceipt, getSalesChannels, getCustomerTypes} = require('../seama_services/sql_services');
-const SalesSummary = require('../model_layer/SalesSummary');
+const {SalesSummary, CustomerSale} = require('../model_layer/SalesSummary');
 
 /* GET data for sales view. */
 const sqlTotalCustomers =
@@ -26,10 +26,10 @@ const sqlRevenueByPeriod =
 	GROUP BY  YEAR(created_at), %s(created_at) \
 	ORDER BY  YEAR(created_at) DESC, %s(created_at) DESC';
 
-const sqlRevenueAll =
-	'SELECT   SUM(total), SUM(cogs) \
-	FROM      receipt \
-	WHERE     kiosk_id=? AND receipt.created_at BETWEEN ? AND ?';
+// const sqlRevenueAll =
+// 	'SELECT   SUM(total), SUM(cogs) \
+// 	FROM      receipt \
+// 	WHERE     kiosk_id=? AND receipt.created_at BETWEEN ? AND ?';
 
 
 const sqlCustomersByPeriod =
@@ -38,6 +38,12 @@ const sqlCustomersByPeriod =
 	WHERE     kiosk_id=? AND created_at BETWEEN ? AND ?\
 	GROUP BY  YEAR(created_at), %s(created_at) \
 	ORDER BY  YEAR(created_at) DESC, %s(created_at) DESC';
+
+
+// const sqlCustomersAll =
+// 	'SELECT   SUM(total), SUM(cogs) \
+// 	FROM      receipt \
+// 	WHERE     kiosk_id=? AND receipt.created_at BETWEEN ? AND ?';
 
 const sqlGallonsPerCustomer =
 	'SELECT    SUM(total_gallons), YEAR(created_date), %s(created_date) \
@@ -56,6 +62,15 @@ const sqlRetailerRevenue =
 	WHERE receipt.kiosk_id = ? AND receipt.created_at BETWEEN ? AND ? \
 	GROUP BY YEAR(receipt.created_at), %s(receipt.created_at), receipt.customer_account_id \
 	ORDER BY YEAR(receipt.created_at) DESC, %s(receipt.created_at)  DESC, SUM(receipt.total) DESC';
+
+const sqlRetailerRevenueTotal =
+	'SELECT SUM(receipt.total), receipt.customer_account_id, customer_account.name, customer_account.gps_coordinates \
+	FROM receipt \
+	INNER JOIN customer_account \
+	ON customer_account_id = customer_account.id \
+	WHERE receipt.kiosk_id = ? AND receipt.created_at BETWEEN ? AND ? \
+	GROUP BY receipt.customer_account_id \
+	ORDER BY SUM(receipt.total) DESC';
 
 const sqlLMostRecentReceipt =
 	'SELECT created_date FROM receipt \
@@ -163,16 +178,16 @@ const getRevenueByPeriod = (connection, requestParams, beginDate, endDate, sales
 		let groupBy = requestParams["group-by"];
 		salesSummary.setTotalRevenuePeriod(groupBy);
 		salesSummary.setTotalCogsPeriod(groupBy);
+		if( groupBy === "none"){
+			resolve();
+			return
+		}
 		let periodsRevenue = salesSummary.getTotalRevenuePeriods();
 		let periodsCogs = salesSummary.getTotalCogsPeriods();
 		PeriodData.UpdatePeriodDates( periodsRevenue, endDate, groupBy );
 		PeriodData.UpdatePeriodDates( periodsCogs, endDate, groupBy );
-		let queryBeginDate = beginDate;
-		let sql = sqlRevenueAll;
-		if( groupBy !== "none"){
-			queryBeginDate = (periodsRevenue[periodsRevenue.length-1].beginDate < beginDate) ? periodsRevenue[periodsRevenue.length-1].beginDate : beginDate;
-			sql = sprintf(sqlRevenueByPeriod, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
-		}
+		let queryBeginDate = (periodsRevenue[periodsRevenue.length-1].beginDate < beginDate) ? periodsRevenue[periodsRevenue.length-1].beginDate : beginDate;
+		let sql = sprintf(sqlRevenueByPeriod, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
 		let queryParams = [requestParams["site-id"], queryBeginDate, endDate]
 
 		connection.query(sql, queryParams, (err, sqlResult) => {
@@ -193,13 +208,19 @@ const getRevenueByPeriod = (connection, requestParams, beginDate, endDate, sales
 
 const getCustomersByPeriod = (connection, requestParams, beginDate, endDate, salesSummary ) => {
 	return new Promise((resolve, reject) => {
-		salesSummary.setTotalCustomersPeriod(requestParams.groupby);
 		let groupBy = requestParams["group-by"];
+		salesSummary.setTotalCustomersPeriod(groupBy);
+		if( groupBy === "none"){
+			resolve();
+			return
+		}
+
 		let periods = salesSummary.getTotalCustomersPeriods();
 		PeriodData.UpdatePeriodDates( periods, endDate, groupBy );
 		let queryBeginDate = (periods[periods.length-1].beginDate < beginDate) ? periods[periods.length-1].beginDate : beginDate;
+		let sql = sprintf(sqlCustomersByPeriod, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
+
 		let queryParams = [requestParams["site-id"], queryBeginDate, endDate]
-		const sql = sprintf(sqlCustomersByPeriod, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
 		connection.query(sql, queryParams, (err, sqlResult) => {
 			if (err) {
 				reject(err);
@@ -219,23 +240,55 @@ const getCustomersByPeriod = (connection, requestParams, beginDate, endDate, sal
 
 
 const getCustomerRevenue = (connection, requestParams, beginDate, endDate, salesSummary ) => {
+	if( requestParams["group-by"] === "none"){
+		return getCustomerRevenueTotal( connection, requestParams, beginDate, endDate, salesSummary );
+	}else {
+		return new Promise((resolve, reject) => {
+			let groupBy = requestParams["group-by"];
+			let periods = salesSummary.getTotalCustomersPeriods();
+			let queryBeginDate = (periods[periods.length - 1].beginDate < beginDate) ? periods[periods.length - 1].beginDate : beginDate;
+			let queryParams = [requestParams["site-id"], queryBeginDate, endDate]
+			const sql = sprintf(sqlRetailerRevenue, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
+			connection.query(sql, queryParams, (err, sqlResult) => {
+				if (err) {
+					reject(err);
+				} else {
+					try {
+						let index = 0;
+						if (Array.isArray(sqlResult) && sqlResult.length > 0) {
+							let year = endDate.getFullYear();
+							let month = endDate.getMonth() + 1;	// range 1-12
+							while (index < sqlResult.length && matchOnGroupBy(sqlResult, index, groupBy, year, month)) {
+								updateSalesPeriods(salesSummary, sqlResult, index, month, groupBy, endDate);
+								index += 1;
+							}
+						}
+						semaLog.info(index, " Resellers found");
+						resolve();
+					} catch (ex) {
+						reject({ message: ex.message, stack: ex.stack });
+					}
+				}
+			});
+		});
+	}
+};
+
+const getCustomerRevenueTotal = (connection, requestParams, beginDate, endDate, salesSummary ) => {
 	return new Promise((resolve, reject) => {
 		let groupBy = requestParams["group-by"];
 		let periods = salesSummary.getTotalCustomersPeriods();
-		let queryBeginDate = (periods[periods.length-1].beginDate < beginDate) ? periods[periods.length-1].beginDate : beginDate;
+		let queryBeginDate = beginDate;
 		let queryParams = [requestParams["site-id"], queryBeginDate, endDate]
-		const sql = sprintf(sqlRetailerRevenue, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
-		connection.query(sql, queryParams, (err, sqlResult) => {
+		connection.query(sqlRetailerRevenueTotal, queryParams, (err, sqlResult) => {
 			if (err) {
 				reject(err);
 			} else {
 				try{
 					let index = 0;
 					if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-						let year = endDate.getFullYear();
-						let month = endDate.getMonth() +1 ;	// range 1-12
-						while( index <  sqlResult.length && matchOnGroupBy(sqlResult, index, year, month)){
-							updateSales(salesSummary, sqlResult, index, month, groupBy, endDate);
+						while( index <  sqlResult.length ){
+							updateSales(salesSummary, sqlResult, index, groupBy );
 							index +=1;
 						}
 					}
@@ -248,7 +301,6 @@ const getCustomerRevenue = (connection, requestParams, beginDate, endDate, sales
 		});
 	});
 };
-
 
 const getGallonsPerCustomer = (connection, requestParams, results ) => {
 	return new Promise((resolve, reject) => {
@@ -366,15 +418,17 @@ const getPeriodData = (sqlResult, periods, column, groupBy) =>{
 // 	}
 // };
 
-const updateSales = ( salesSummary, sqlResult, index, month, groupBy, endDate ) => {
+const updateSales = ( salesSummary, sqlResult, index, groupBy ) => {
 
-	let customer = {
-		name: sqlResult[index]["name"],
-		id: sqlResult[index]["customer_account_id"],
-		period: groupBy,
-		periods: PeriodData.init3Periods(),
-		gps: sqlResult[index]["gps_coordinates"]
-	};
+	let customer = new CustomerSale(sqlResult[index]["name"], sqlResult[index]["customer_account_id"], groupBy, sqlResult[index]["gps_coordinates"]);
+
+	customer.setTotal( parseFloat(sqlResult[index]["SUM(receipt.total)"]));
+	salesSummary.addCustomerSales( customer);
+};
+
+const updateSalesPeriods = ( salesSummary, sqlResult, index, month, groupBy, endDate ) => {
+
+	let customer = new CustomerSale(sqlResult[index]["name"], sqlResult[index]["customer_account_id"], groupBy, sqlResult[index]["gps_coordinates"]);
 
 	PeriodData.UpdatePeriodDates( customer.periods, endDate, groupBy );
 

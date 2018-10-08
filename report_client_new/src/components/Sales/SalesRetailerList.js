@@ -28,12 +28,19 @@ export default class SalesRetailerList extends Component {
 			rows.push(<tr key={index} style={this.calcColor(retailer.periods[0].value, retailer.periods[1].value)}>
 						<td>{index+1}.</td>
 						<td>{retailer.name}</td>
-						<td>{retailer.periods[0].value}</td>
+						<td>{this.getValue( retailer )}</td>
 						{this.calcTrend(retailer.periods[0].value, retailer.periods[1].value)}
 					</tr>
 			)
 		});
 		return rows;
+	}
+	getValue( retailer){
+		if( retailer.period === "none"){
+			return retailer.total;
+		}else{
+			return retailer.periods[0].value;
+		}
 	}
 	calcTrend( now, last ){
 		if( now !== null && last !== null ){

@@ -9,7 +9,7 @@ export class SalesMapContainer extends Component {
 		this.state = {parentDiv : document.getElementById('salesMapId')};
 		this.state.lastWidth = this.state.parentDiv.offsetWidth;
 		console.log("SalesMapContainer- Parent Width", this.state.lastWidth);
-
+		this.first = true;
 		// this.state.parentDiv.addEventListener('resize', (event) => console.log(event.detail));
 
 		// This is a hack to resize the map... a better solution is needed!!!
@@ -22,6 +22,10 @@ export class SalesMapContainer extends Component {
 				if( self.state.lastWidth !== 0 ){
 					document.getElementById('mapId').style["width"] = self.state.lastWidth + "px";
 				}
+			}
+			if( this.first ) {
+				this.forceUpdate();
+				this.first = false;
 			}
 		},100);
 		// function checkResize (mutations) {
