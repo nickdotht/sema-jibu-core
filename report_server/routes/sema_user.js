@@ -51,16 +51,24 @@ router.post('/', (req, res) => {
 					error: 'Email/username already exists'
 				});
 			} else {
-				db.User.create({
-					username,
-					email,
-					passsword,
-					first_name: firstName,
-					last_name: lastName
-				}).then(user => res.json({ message: 'Success' }));
+				db.user
+					.create({
+						username,
+						email,
+						password,
+						first_name: firstName,
+						last_name: lastName
+					})
+					.then(user => {
+						semaLog.info('Create user success');
+						res.json({ message: 'Create user success' });
+					});
 			}
 		})
-		.catch(err => res.status(400).json({ error: err }));
+		.catch(err => {
+			semaLog.error('Create user - failed', err);
+			res.status(400).json({ error: 'Failed to create user' });
+		});
 });
 
 router.put('/:id', (req, res) => {
@@ -91,8 +99,11 @@ router.delete('/:id', (req, res) => {
 				id: req.params.id
 			}
 		})
-		.then(res => res.json(res))
-		.catch(err => res.status(500).json({ error: err }));
+		.then(res => res.json({ message: 'Delete user success' }))
+		.catch(err => {
+			semaLog.error('delete user - failed', err);
+			res.status(400).json({ error: err });
+		});
 });
 
 module.exports = router;

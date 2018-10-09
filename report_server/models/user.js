@@ -65,7 +65,7 @@ const user = (sequelize, DataTypes) => {
 		}
 	);
 
-	User.beforeSave(async (user, options) => {
+	User.beforeCreate(async (user, options) => {
 		if (!user.changed('password')) return;
 
 		try {
