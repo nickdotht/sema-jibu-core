@@ -39,7 +39,7 @@ const fetchVolumeData = ( params) => {
 			let tick = 9;	// approx number of REST calls
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 			// let types = await fetchCustomerTypes();
-			let units = await fetchWaterUnits();
+			let units = await fetchMeasureUnits();
 			result.volumeInfo.volumeWaterMeasureUnits = units.waterUnits;
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:10}} ));
 			// if( types ){
@@ -95,10 +95,10 @@ const fetchVolumeData = ( params) => {
 		}
 	});
 }
-function fetchWaterUnits(){
+function fetchMeasureUnits(){
 	return new Promise((resolve, reject ) => {
 		axiosService
-			.get('/sema/water-units')
+			.get('/sema/measure-units')
 			.then(response => {
 				if (response.status === 200) {
 					resolve(response.data)

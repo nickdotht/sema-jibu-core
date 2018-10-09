@@ -14,8 +14,8 @@ const sqlTotalCustomers =
     FROM customer_account \
     WHERE customer_account.kiosk_id = ?';
 
-const sqlDistinctCustomers =
-	'SELECT COUNT(distinct name) FROM receipt_details where kiosk_id = ? \ ' +
+const sqlCustomerCount =
+	'SELECT COUNT(name) FROM receipt_details where kiosk_id = ? \ ' +
 	'AND created_at BETWEEN ? AND ?';
 
 const sqlTotalRevenue =
@@ -127,7 +127,7 @@ router.get('/', async (request, response) => {
 				}
 				var salesSummary = new SalesSummary( beginDate, endDate );
 				await getTotalCustomers(connection, request.query, salesSummary);
-				await getDistinctCustomers(connection, request.query, salesSummary, beginDate, endDate);
+				await getCustomerCount(connection, request.query, salesSummary, beginDate, endDate);
 				await getTotalRevenue(connection, request.query, salesSummary);
 				await getRevenueByPeriod(connection, request.query, beginDate, endDate, salesSummary);
 				// await getGallonsPerCustomer(connection, request.query, results);
@@ -159,14 +159,14 @@ const getTotalCustomers = (connection, requestParams, results ) => {
 		});
 	});
 };
-const getDistinctCustomers = (connection, requestParams, results, beginDate, endDate ) => {
+const getCustomerCount = (connection, requestParams, results, beginDate, endDate ) => {
 	return new Promise((resolve, reject) => {
-		connection.query(sqlDistinctCustomers, [requestParams["site-id"], beginDate, endDate ], (err, sqlResult ) => {
+		connection.query(sqlCustomerCount, [requestParams["site-id"], beginDate, endDate ], (err, sqlResult ) => {
 			if (err) {
 				reject(err);
 			} else {
 				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
-					results.setDistinctCustomers(sqlResult[0]["COUNT(distinct name)"]);
+					results.setCustomerCount(sqlResult[0]["COUNT(name)"]);
 				}
 				resolve();
 			}

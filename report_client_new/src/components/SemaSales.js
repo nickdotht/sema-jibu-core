@@ -51,7 +51,7 @@ class SemaSales extends Component {
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Revenue" date={this.getDateSince(this.props.sales.salesInfo.totalRevenue)}
-											value={formatDollar(this.props.sales.salesInfo.totalRevenue.total)}
+											value={formatDollar(this.props.sales.salesInfo.currencyUnits, this.props.sales.salesInfo.totalRevenue.total)}
 											delta = {calcRevenueDelta(this.props.sales.salesInfo)}
 											valueColor = {calcColor(this.props.sales.salesInfo.totalRevenue.periods[0].value, this.props.sales.salesInfo.totalRevenue.periods[1].value)} />
 					</div>
@@ -102,13 +102,10 @@ class SemaSales extends Component {
 		}
 	}
 
-	// getDate( date){
-	// 	return date === null ? "N/A": date;
-	// }
 }
 const calcNetRevenue = salesInfo =>{
 	if( salesInfo.totalRevenue.total &&  salesInfo.totalCogs.total ){
-		return formatDollar( salesInfo.totalRevenue.total - salesInfo.totalCogs.total);
+		return formatDollar( salesInfo.currencyUnits, salesInfo.totalRevenue.total - salesInfo.totalCogs.total);
 	}else{
 		return "N/A";
 	}
@@ -181,31 +178,34 @@ const formatRevenuePerCustomer = (salesInfo) =>{
 		let revenuePerCustomer = 0;
 		switch( salesInfo.totalRevenue.period ){
 			case "none":
-				revenuePerCustomer = salesInfo.totalRevenue.total/salesInfo.distinctCustomers;
+				revenuePerCustomer = salesInfo.totalRevenue.total/salesInfo.customerCount;
 				break;
 			case "year":
 			case "month":
-				revenuePerCustomer = salesInfo.totalRevenue.periods[0].value/salesInfo.distinctCustomers;
+				revenuePerCustomer = salesInfo.totalRevenue.periods[0].value/salesInfo.customerCount;
 				break;
 			default:
 				revenuePerCustomer = 0;
 		}
-		return formatDollar( revenuePerCustomer );
+		return formatDollar( salesInfo.currencyUnits, revenuePerCustomer );
 	}
 	return "N/A";
 };
 
 const formatNoOfCustomers = (salesInfo) =>{
 	if( salesInfo.totalRevenue.period ){
-		return "For " + salesInfo.distinctCustomers + " customers";
+		return "For " + salesInfo.customerCount + " customers";
 	}
 	return "";
 };
 
 
 
-const formatDollar = amount =>{
+const formatDollar = (currencyUnits, amount ) =>{
 	let suffix = "";
+	if(! currencyUnits ){
+		currencyUnits = 'USD';
+	}
 	if( amount ) {
 		if (amount > 1000) {
 			amount = amount / 1000;
@@ -213,7 +213,7 @@ const formatDollar = amount =>{
 		}
 		let formatter = new Intl.NumberFormat('en-US', {
 			style: 'currency',
-			currency: 'HTG',
+			currency: currencyUnits,
 			minimumFractionDigits: 2,
 			// the default value for minimumFractionDigits depends on the currency
 			// and is usually already 2
@@ -224,40 +224,31 @@ const formatDollar = amount =>{
 	}
 };
 
-// const formatTotalCustomers = total =>{
-// 	if( total === null){
-// 		return "N/A";
+// const formatLitersPerCustomer = litersPerCustomer =>{
+// 	if( litersPerCustomer === "N/A"){
+// 		return litersPerCustomer;
 // 	}else{
-// 		return String(parseFloat(total.toFixed(0)));
+// 		return String(parseFloat(litersPerCustomer.value.toFixed(0)));
 // 	}
 // };
-
-const formatLitersPerCustomer = litersPerCustomer =>{
-	if( litersPerCustomer === "N/A"){
-		return litersPerCustomer;
-	}else{
-		return String(parseFloat(litersPerCustomer.value.toFixed(0)));
-	}
-};
-const formatLitersPerPeriod = litersPerCustomer =>{
-	return "Liters/" + litersPerCustomer;
-};
-
-const formatCustomerGrowth = newCustomers =>{
-	if( typeof newCustomers.periods[1].periodValue === "string" ||
-		typeof newCustomers.periods[2].periodValue === "string"){
-		return "N/A";
-	}else{
-		return ((newCustomers.periods[1].periodValue/newCustomers.periods[2].periodValue *100) -100).toFixed(2) + "%"
-	}
-};
+// const formatLitersPerPeriod = litersPerCustomer =>{
+// 	return "Liters/" + litersPerCustomer;
+// };
+// const formatCustomerGrowth = newCustomers =>{
+// 	if( typeof newCustomers.periods[1].periodValue === "string" ||
+// 		typeof newCustomers.periods[2].periodValue === "string"){
+// 		return "N/A";
+// 	}else{
+// 		return ((newCustomers.periods[1].periodValue/newCustomers.periods[2].periodValue *100) -100).toFixed(2) + "%"
+// 	}
+// };
 
 
 const calcChange = (salesInfo, now, last) => {
 	if( !now  || !last ){
 		return "N/A"
 	}else{
-		// Prorate the current period of it is incomplete
+		// Pro-rate the current period of it is incomplete
 		let nowDate = new Date();
 		switch( salesInfo.totalCustomers.period ){
 			case "year":

@@ -8,7 +8,7 @@ class SalesSummary {
 		this.totalRevenue =   {total: null, period: null, periods: PeriodData.init3Periods()},
 		this.totalCogs =   {total: null, period: null, periods: PeriodData.init3Periods()},
 		this.totalCustomers = {total: null, period: null, periods: PeriodData.init3Periods()},
-		this.distinctCustomers = null;
+		this.customerCount = null;
 		this.customerSales = []
 	}
 
@@ -25,8 +25,8 @@ class SalesSummary {
 	setTotalCustomers( value ){
 		this.totalCustomers.total = value;
 	}
-	setDistinctCustomers( value ){
-		this.distinctCustomers =value;
+	setCustomerCount( value ){
+		this.customerCount =value;
 	}
 	setTotalCustomersPeriod( value ){
 		this.totalCustomers.period = value;

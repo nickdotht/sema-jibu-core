@@ -19,7 +19,8 @@ function initializeSales() {
 			endDate:null,
 			totalRevenue : {total: null, period: null, periods: PeriodData.init3Periods()},
 			totalCustomers: {total: null, period: null, periods: PeriodData.init3Periods()},
-			distinctCustomers:null,
+			customerCount:null,
+			currencyUnits:'USD',
 			customerSales:[],
 			salesByChannel: {beginDate: null, endDate: null, datasets: []}
 		}
@@ -41,7 +42,12 @@ const fetchSalesData = ( params) => {
 		try {
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 			salesInfo = await fetchSalesSummary(params);
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:50}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:33}} ));
+
+			let units = await fetchMeasureUnits();
+			salesInfo.currencyUnits = units.currencyUnits;
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:66}} ));
+
 			salesInfo.salesByChannel = await fetchSalesByChannel(params);
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
 			resolve(salesInfo);
@@ -105,6 +111,23 @@ function fetchSalesByChannel( params ) {
 				reject( error)
 			});
 	});
+}
+function fetchMeasureUnits(){
+	return new Promise((resolve, reject ) => {
+		axiosService
+			.get('/sema/measure-units')
+			.then(response => {
+				if (response.status === 200) {
+					resolve(response.data)
+				} else {
+					reject({})
+				}
+			})
+			.catch(function (error) {
+				reject(error)
+			});
+	});
+
 }
 
 function forceUpdate() {
