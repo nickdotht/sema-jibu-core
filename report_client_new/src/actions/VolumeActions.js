@@ -14,7 +14,8 @@ function initializeVolume() {
 			volumeByChannel:{},
 			volumeByChannelAndIncome:[],
 			volumeByChannelAndType:[],
-			volumeByChannelAndPaymentType:[]
+			volumeByChannelAndPaymentType:[],
+			volumeWaterMeasureUnits: 'liters'
 		}
 	}
 }
@@ -35,13 +36,13 @@ const fetchVolumeData = ( params) => {
 	return new Promise (async(resolve, reject ) => {
 		let result = initializeVolume();
 		try {
-			let tick = 10;
+			let tick = 9;	// approx number of REST calls
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
-			let types = await fetchCustomerTypes();
+			// let types = await fetchCustomerTypes();
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:10}} ));
-			if( types ){
-				tick = 5 + types.customerTypes.length + 1; // approximate number of api calls
-			}
+			// if( types ){
+			// 	tick = 5 + types.customerTypes.length + 1; // approximate number of api calls
+			// }
 			let tickPct = 100/tick;		// Percentage increase per api call
 
 			result.volumeInfo.volumeByChannel = await fetchVolumeItem(params, "sales-channel", {});
@@ -83,9 +84,7 @@ const fetchVolumeData = ( params) => {
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*8)+10}} ));
 
 			result.volumeInfo.volumeByChannelAndPaymentType.push(await fetchVolumeItem(params, "sales-channel", {paymentType: "loan"}));
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*9)+10}} ));
-
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
 			resolve(result);
 		}catch( error ){
 			console.log("fetchVolumeData - Failed ");

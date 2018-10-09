@@ -13,6 +13,8 @@ import SalesMapContainer from './Sales/SalesMapContainer';
 import SalesRetailerList from './Sales/SalesRetailerList';
 import * as salesActions from 'actions/SalesActions';
 import SalesByChannelChart from "./Sales/SalesByChannelChart";
+import LoadProgress from "./LoadProgress";
+
 let dateFormat = require('dateformat');
 
 class SemaSales extends Component {
@@ -37,6 +39,9 @@ class SemaSales extends Component {
 	showSales(){
 		return (
 			<div className="SalesContainer">
+				<div className = "SalesProgress" style={{width:"100%", height:'100%'}}>
+					<LoadProgress/>
+				</div>
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Customers" date={this.getDate(this.props.sales.salesInfo.totalCustomers.periods[0].endDate)}
@@ -85,7 +90,7 @@ class SemaSales extends Component {
 												{/*title2 = "Expected: 2.5%" />*/}
 						{/*</div>*/}
 						<div className= "SalesBottomRight">
-							{/*<SalesByChannelChart chartData={this.props.sales.salesInfo.salesByChannel}/>*/}
+							<SalesByChannelChart chartData={this.props.sales}/>
 						</div>
 					</div>
 					{/*<div className= "SalesBottonRightItem">*/}

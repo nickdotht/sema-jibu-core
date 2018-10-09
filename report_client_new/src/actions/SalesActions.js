@@ -34,8 +34,25 @@ function fetchSales(params) {
 	};
 }
 
+const fetchSalesData = ( params) => {
+	return new Promise(async (resolve, reject) => {
+		let salesInfo = initializeSales();
+		try {
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
+			salesInfo = await fetchSalesSummary(params);
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:50}} ));
+			salesInfo.salesByChannel = await fetchSalesByChannel(params);
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
+			resolve(salesInfo);
+		} catch (error) {
+			console.log("fetchVolumeData - Failed ");
+			resolve(salesInfo);
 
-function fetchSalesData( params ) {
+		}
+	});
+}
+
+function fetchSalesSummary( params ) {
 	return new Promise((resolve, reject ) => {
 		let url = '/sema/dashboard/site/sales-summary?site-id=' + params.kioskID ;
 		if( params.hasOwnProperty("startDate") ){
@@ -64,6 +81,30 @@ function fetchSalesData( params ) {
 }
 
 
+function fetchSalesByChannel( params ) {
+	return new Promise((resolve, reject ) => {
+		let url = '/sema/dashboard/site/receipt-summary?site-id=' + params.kioskID + "&type=sales-channel";
+
+		if( params.hasOwnProperty("startDate") ){
+			url = url + "&begin-date=" + params.startDate.toISOString();
+		}
+		if( params.hasOwnProperty("endDate") ){
+			url = url + "&end-date=" + params.endDate.toISOString();
+		}
+		axiosService
+			.get(url)
+			.then(response => {
+				if(response.status === 200){
+					resolve(response.data)
+				}else{
+					reject({})
+				}
+			})
+			.catch(function(error){
+				reject( error)
+			});
+	});
+}
 
 function forceUpdate() {
 	console.log("forceUpdate - ");

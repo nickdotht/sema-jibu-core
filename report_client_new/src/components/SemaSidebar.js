@@ -64,7 +64,7 @@ class SemaSidebar extends Component {
 		return {
 			background:"rgb(24,55,106)",
 			width:"240px",
-			height:height}
+			height:"100%"}
 	}
 
 }

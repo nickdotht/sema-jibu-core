@@ -6,7 +6,7 @@ const { getMostRecentReceipt, getSalesChannels, getCustomerTypes} = require('../
 const ReceiptSummary = require('../model_layer/ReceiptSummary');
 
 
-const sqlSalesChannelSummary = 'SELECT SUM(volume)\
+const sqlSalesChannelSummary = 'SELECT SUM(volume), SUM(total)\
 					FROM receipt_details \
 					WHERE  sales_channel_id  = ? AND kiosk_id = ? \
 					AND created_at BETWEEN ? AND ?';
@@ -124,7 +124,13 @@ const getReceiptChannelSummary = ( connection, salesChannel, sqlQualifier, param
 					if(  sqlResult[0]["SUM(volume)"] != null ) {
 						volume = parseFloat( sqlResult[0]["SUM(volume)"].toFixed(2));
 					}
-					receiptSummary.addData({ salesChannel: salesChannel.name, volume:volume } );
+					receiptSummary.addVolumeData({ salesChannel: salesChannel.name, volume:volume } );
+
+					let total = 0;
+					if(  sqlResult[0]["SUM(total)"] != null ) {
+						total = parseFloat( sqlResult[0]["SUM(total)"].toFixed(2));
+					}
+					receiptSummary.addTotalData({ salesChannel: salesChannel.name, total:total } );
 					semaLog.info("getReceiptChannelSummary - processed salesChannel ", salesChannel.name );
 					resolve();
 				}

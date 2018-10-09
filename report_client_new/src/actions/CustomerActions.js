@@ -81,9 +81,7 @@ const fetchCustomerData = ( params) => {
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*9)+10}} ));
 
 			result.customerInfo.customersByDistance.push(await fetchCustomerItem(params, {distanceLT: 100}));
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:(tickPct*10)+10}} ));
-
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
 			resolve(result);
 		}catch( error ){
 			console.log("fetchCustomerData - Failed ");
