@@ -19,6 +19,7 @@ function initializeSales() {
 			endDate:null,
 			totalRevenue : {total: null, period: null, periods: PeriodData.init3Periods()},
 			totalCustomers: {total: null, period: null, periods: PeriodData.init3Periods()},
+			distinctCustomers:null,
 			customerSales:[],
 			salesByChannel: {beginDate: null, endDate: null, datasets: []}
 		}

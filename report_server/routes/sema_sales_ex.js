@@ -14,6 +14,10 @@ const sqlTotalCustomers =
     FROM customer_account \
     WHERE customer_account.kiosk_id = ?';
 
+const sqlDistinctCustomers =
+	'SELECT COUNT(distinct name) FROM receipt_details where kiosk_id = ? \ ' +
+	'AND created_at BETWEEN ? AND ?';
+
 const sqlTotalRevenue =
 	'SELECT SUM(total), SUM(cogs) \
 	FROM receipt \
@@ -123,6 +127,7 @@ router.get('/', async (request, response) => {
 				}
 				var salesSummary = new SalesSummary( beginDate, endDate );
 				await getTotalCustomers(connection, request.query, salesSummary);
+				await getDistinctCustomers(connection, request.query, salesSummary, beginDate, endDate);
 				await getTotalRevenue(connection, request.query, salesSummary);
 				await getRevenueByPeriod(connection, request.query, beginDate, endDate, salesSummary);
 				// await getGallonsPerCustomer(connection, request.query, results);
@@ -148,6 +153,20 @@ const getTotalCustomers = (connection, requestParams, results ) => {
 			} else {
 				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
 					results.setTotalCustomers(sqlResult[0]["COUNT(*)"]);
+				}
+				resolve();
+			}
+		});
+	});
+};
+const getDistinctCustomers = (connection, requestParams, results, beginDate, endDate ) => {
+	return new Promise((resolve, reject) => {
+		connection.query(sqlDistinctCustomers, [requestParams["site-id"], beginDate, endDate ], (err, sqlResult ) => {
+			if (err) {
+				reject(err);
+			} else {
+				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
+					results.setDistinctCustomers(sqlResult[0]["COUNT(distinct name)"]);
 				}
 				resolve();
 			}
@@ -188,7 +207,7 @@ const getRevenueByPeriod = (connection, requestParams, beginDate, endDate, sales
 		PeriodData.UpdatePeriodDates( periodsCogs, endDate, groupBy );
 		let queryBeginDate = (periodsRevenue[periodsRevenue.length-1].beginDate < beginDate) ? periodsRevenue[periodsRevenue.length-1].beginDate : beginDate;
 		let sql = sprintf(sqlRevenueByPeriod, groupBy.toUpperCase(), groupBy.toUpperCase(), groupBy.toUpperCase());
-		let queryParams = [requestParams["site-id"], queryBeginDate, endDate]
+		let queryParams = [requestParams["site-id"], queryBeginDate, endDate];
 
 		connection.query(sql, queryParams, (err, sqlResult) => {
 			if (err) {
@@ -336,44 +355,24 @@ const matchOnGroupBy = (sqlResult, index, groupBy, year, month ) =>{
 }
 
 const getPeriodData = (sqlResult, periods, column, groupBy) =>{
-	if (Array.isArray(sqlResult) && sqlResult.length > 0) {
-		periods[0].setValue(sqlResult[0][column]);
-	}
-	switch( groupBy){
-		case "month":
-			if (Array.isArray(sqlResult) && sqlResult.length > 1) {
-				if( PeriodData.IsExpectedYearMonth( periods[1], new Date( sqlResult[1]["YEAR(created_at)"], sqlResult[1]["MONTH(created_at)"] -1 ))){
-					periods[1].setValue( sqlResult[1][column]);
-				}else{
-					periods[1].setValue(0);
+	if (Array.isArray(sqlResult) ){
+		for (let sqlRow of sqlResult) {
+			for (let period of periods) {
+				switch( groupBy) {
+					case "month":
+						if (PeriodData.IsExpectedYearMonth(period, new Date(sqlRow["YEAR(created_at)"], sqlRow["MONTH(created_at)"] - 1))) {
+							period.setValue(sqlRow[column]);
+						}
+						break;
+					case "year":
+						if (PeriodData.IsExpectedYear(period, new Date(sqlRow["YEAR(created_at)"], 0, 1))) {
+							period.setValue(sqlRow[column]);
+						}
+						break;
+
 				}
 			}
-			if (Array.isArray(sqlResult) && sqlResult.length > 2) {
-				if( PeriodData.IsExpectedYearMonth( periods[2], new Date( sqlResult[2]["YEAR(created_at)"], sqlResult[2]["MONTH(created_at)"] -1 ))) {
-					periods[2].setValue(sqlResult[2][column]);
-				}else{
-					periods[2].setValue(0);
-				}
-			}
-			break;
-		case "year":
-			if (Array.isArray(sqlResult) && sqlResult.length > 1) {
-				if( PeriodData.IsExpectedYear( periods[1], new Date( sqlResult[1]["YEAR(created_at)"], 0, 1 ))){
-					periods[1].setValue( sqlResult[1][column]);
-				}else{
-					periods[1].setValue(0);
-				}
-			}
-			if (Array.isArray(sqlResult) && sqlResult.length > 2) {
-				if( PeriodData.IsExpectedYear( periods[2], new Date( sqlResult[2]["YEAR(created_at)"], 0, 1 ))) {
-					periods[2].setValue(sqlResult[2][column]);
-				}else{
-					periods[2].setValue(0);
-				}
-			}
-			break;
-		default:
-			break;
+		}
 	}
 
 }

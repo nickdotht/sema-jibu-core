@@ -44,19 +44,19 @@ class SemaSales extends Component {
 				</div>
 				<div className = "SalesSummaryContainer">
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="Total Customers" date={this.getDate(this.props.sales.salesInfo.totalCustomers.periods[0].endDate)}
+						<SalesSummaryPanel1 title="Total Customers" date={this.getDateSince(this.props.sales.salesInfo.totalCustomers)}
 											value={formatTotalCustomers(this.props.sales.salesInfo)}
 											delta = {calcCustomerDelta( this.props.sales.salesInfo) }
 											valueColor = {calcColor(this.props.sales.salesInfo.totalCustomers.periods[0].value, this.props.sales.salesInfo.totalCustomers.periods[1].value)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="Total Revenue" date={this.getDate(this.props.sales.salesInfo.totalRevenue.periods[0].endDate)}
+						<SalesSummaryPanel1 title="Total Revenue" date={this.getDateSince(this.props.sales.salesInfo.totalRevenue)}
 											value={formatDollar(this.props.sales.salesInfo.totalRevenue.total)}
 											delta = {calcRevenueDelta(this.props.sales.salesInfo)}
 											valueColor = {calcColor(this.props.sales.salesInfo.totalRevenue.periods[0].value, this.props.sales.salesInfo.totalRevenue.periods[1].value)} />
 					</div>
 					<div className ="SalesSummaryItem">
-						<SalesSummaryPanel1 title="Net Income" date={this.getDate(this.props.sales.salesInfo.totalRevenue.periods[0].endDate)}
+						<SalesSummaryPanel1 title="Gross Margin" date={this.getDateSince(this.props.sales.salesInfo.totalRevenue)}
 											value={calcNetRevenue( this.props.sales.salesInfo )}
 											delta = {calcNetRevenueDelta(this.props.sales.salesInfo)}
 											valueColor = {calcNetRevenueColor(this.props.sales.salesInfo)} />
@@ -72,43 +72,43 @@ class SemaSales extends Component {
 					</div>
 					<div className= "SalesBottomContainer">
 						<div className= "SalesBottomLeftTop">
-							<SalesSummaryPanel2 title="Total Customers"
-												value={ formatTotalCustomers(this.props.sales.salesInfo)}
+							<SalesSummaryPanel2 title="Revenue/Customer"
+												value={ formatRevenuePerCustomer(this.props.sales.salesInfo)}
 												valueColor = "rgb(24, 55, 106)"
-												title2 = "All Channels" />
+												title2 = {formatNoOfCustomers(this.props.sales.salesInfo)} />
 						</div>
-						{/*<div className= "SalesBottomLeftMiddle">*/}
-							{/*<SalesSummaryPanel2 title="Liters/Customer"*/}
-												{/*value={formatLitersPerCustomer("N/A")}*/}
-												{/*valueColor = "green"*/}
-												{/*title2 = {formatLitersPerPeriod(0)} />*/}
-						{/*</div>*/}
-						{/*<div className= "SalesBottomLeftBottom">*/}
-							{/*<SalesSummaryPanel2 title="Customer Growth"*/}
-												{/*value={formatCustomerGrowth(this.props.sales.salesInfo.totalCustomers)}*/}
-												{/*valueColor = "red"*/}
-												{/*title2 = "Expected: 2.5%" />*/}
-						{/*</div>*/}
 						<div className= "SalesBottomRight">
 							<SalesByChannelChart chartData={this.props.sales}/>
 						</div>
 					</div>
-					{/*<div className= "SalesBottonRightItem">*/}
-						{/*<p>Bottom Right</p>*/}
-					{/*</div>*/}
 				</div>
 
 			</div>
 		);
 	}
 
-	getDate( date){
-		return date === null ? "N/A": date;
+	getDateSince( metric){
+		if( metric.periods[1].beginDate != null ){
+			switch( metric.period ){
+				case "month":
+					return " since " + dateFormat(metric.periods[1].beginDate, "mmm, yyyy");
+				case "year":
+					return " since " + dateFormat(metric.periods[1].beginDate, "yyyy");
+				case "none":
+					return "";
+			}
+		}else{
+			return "N/A"
+		}
 	}
+
+	// getDate( date){
+	// 	return date === null ? "N/A": date;
+	// }
 }
 const calcNetRevenue = salesInfo =>{
 	if( salesInfo.totalRevenue.total &&  salesInfo.totalCogs.total ){
-		return formatDollar( salesInfo.totalRevenue.total = salesInfo.totalCogs.total);
+		return formatDollar( salesInfo.totalRevenue.total - salesInfo.totalCogs.total);
 	}else{
 		return "N/A";
 	}
@@ -174,6 +174,32 @@ const formatRetailSalesHeader = (retailSales) =>{
 		}
 	}
 	return "No data available";
+};
+
+const formatRevenuePerCustomer = (salesInfo) =>{
+	if( salesInfo.totalRevenue.period ){
+		let revenuePerCustomer = 0;
+		switch( salesInfo.totalRevenue.period ){
+			case "none":
+				revenuePerCustomer = salesInfo.totalRevenue.total/salesInfo.distinctCustomers;
+				break;
+			case "year":
+			case "month":
+				revenuePerCustomer = salesInfo.totalRevenue.periods[0].value/salesInfo.distinctCustomers;
+				break;
+			default:
+				revenuePerCustomer = 0;
+		}
+		return formatDollar( revenuePerCustomer );
+	}
+	return "N/A";
+};
+
+const formatNoOfCustomers = (salesInfo) =>{
+	if( salesInfo.totalRevenue.period ){
+		return "For " + salesInfo.distinctCustomers + " customers";
+	}
+	return "";
 };
 
 

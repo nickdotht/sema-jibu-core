@@ -39,6 +39,8 @@ const fetchVolumeData = ( params) => {
 			let tick = 9;	// approx number of REST calls
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 			// let types = await fetchCustomerTypes();
+			let units = await fetchWaterUnits();
+			result.volumeInfo.volumeWaterMeasureUnits = units.waterUnits;
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:10}} ));
 			// if( types ){
 			// 	tick = 5 + types.customerTypes.length + 1; // approximate number of api calls
@@ -93,7 +95,23 @@ const fetchVolumeData = ( params) => {
 		}
 	});
 }
+function fetchWaterUnits(){
+	return new Promise((resolve, reject ) => {
+		axiosService
+			.get('/sema/water-units')
+			.then(response => {
+				if (response.status === 200) {
+					resolve(response.data)
+				} else {
+					reject(initializeVolume())
+				}
+			})
+			.catch(function (error) {
+				reject(error)
+			});
+	});
 
+}
 
 function fetchVolumeItem( params, type, options ) {
 	return new Promise((resolve, reject ) => {

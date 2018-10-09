@@ -37,7 +37,7 @@ class SemaVolume extends Component {
 				</div>
 				<div className = "WaterVolumeChannelAndLabel">
 					<div className = "WaterVolumeChannelLabel">"
-						<CustomerSummaryPanel title = "Total Volume for the Period (Liters)" valueColor = "rgb(40,88,197)"
+						<CustomerSummaryPanel title = {this.getTitle(this.props.volume)} valueColor = "rgb(40,88,197)"
 											  value = {this.calcTotalIncome()}
 											  units = ""/>
 					</div>
@@ -56,6 +56,13 @@ class SemaVolume extends Component {
             </div>
         );
     }
+    getTitle( volume ){
+    	if( volume.loaded ){
+			return "Total Volume for the Period (" + volume.volumeInfo.volumeWaterMeasureUnits + ")";
+		}else{
+			return "Total Volume for the Period";
+		}
+	}
     getHeight(){
     	let windowHeight = window.innerHeight;
         // TODO 52px is the height of the toolbar. (Empirical)
