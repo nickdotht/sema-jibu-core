@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router';
 
-import { fetchUsers } from 'actions/UserActions';
+import { fetchUsers, deleteUser } from 'actions/UserActions';
 import UserList from './common/UserList';
 import Button from './common/Button';
 import Modal from './common/Modal';
@@ -70,7 +70,12 @@ class SemaUsers extends Component {
             body={<UserForm />}
           />
         )}
-        {!loading && <UserList data={users} />}
+        {!loading && (
+          <UserList
+            data={users}
+            onDeleteClick={id => this.props.deleteUser(id)}
+          />
+        )}
       </div>
     );
   }
@@ -92,6 +97,7 @@ function mapDispatchToProps(dispatch) {
   return {
     healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
     fetchUsers: bindActionCreators(fetchUsers, dispatch),
+    deleteUser: bindActionCreators(deleteUser, dispatch),
     onSave: () => dispatch(submit('userForm'))
   };
 }
