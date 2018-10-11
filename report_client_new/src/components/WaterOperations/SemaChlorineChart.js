@@ -16,7 +16,7 @@ class SemaChlorineChart extends Component {
 						<Line
 							data={this.getChartData(this.props.chartData)}
 							height={300}
-							width={200}
+							width={500}
 							options={{
 								maintainAspectRatio: false,
 								scales: {

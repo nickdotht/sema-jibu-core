@@ -32,7 +32,7 @@ class SemaWaterOperations extends Component {
 
     showWaterOperations( ){
         return (
-            <div className="WaterOperationsContainer">
+            <div className="WaterOperationsContainer" style = {this.getHeight()}>
                 <div className = "WaterSummaryContainer">
 					<div className = "WaterProduction">
 						<div className ="WaterSummaryItem">
@@ -87,6 +87,14 @@ class SemaWaterOperations extends Component {
     		return this.props.water.waterOperationsInfo.totalProduction - this.props.water.waterOperationsInfo.fillStation;
 		}
 	}
+	getHeight(){
+		let windowHeight = window.innerHeight;
+		// TODO 52px is the height of the toolbar. (Empirical)
+		windowHeight -= 52;
+		let height = windowHeight.toString()+'px';
+		return {height:height}
+	}
+
 }
 
 function mapStateToProps(state) {

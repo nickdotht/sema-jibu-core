@@ -31,7 +31,7 @@ class SemaCustomer extends Component {
 
     showCustomers( ){
         return (
-            <div className="CustomerContainer"  style = {this.getHeight()}>>
+            <div className="CustomerContainer"  style = {this.getHeight()}>
 				<div className = "CustomerProgress" style={{width:"100%", height:'100%'}}>
 					<LoadProgress/>
 				</div>
