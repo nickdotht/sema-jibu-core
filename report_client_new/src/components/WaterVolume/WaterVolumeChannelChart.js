@@ -46,7 +46,6 @@ class WaterVolumeChannelChart extends Component {
 					No Data available
 				</div>
 			);
-
 		}
     }
 	getVolumeData(){

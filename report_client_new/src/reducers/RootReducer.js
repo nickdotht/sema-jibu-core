@@ -6,6 +6,7 @@ import kiosk from './KioskReducer';
 import volume from './VolumeReducer';
 import sales from './SalesReducer';
 import customer from './CustomerReducer';
+import waterOperations from './WaterOperationsReducer';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer } from 'redux-persist';
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
 	volume,
 	customer,
 	sales,
+	waterOperations,
 	dateFilter
 });
 

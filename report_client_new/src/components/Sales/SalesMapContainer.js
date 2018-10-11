@@ -51,7 +51,6 @@ export class SalesMapContainer extends Component {
 	componentDidUpdate() {
 		this.loadMap(); // call loadMap function to load the google map
 	}
-
 	loadMap() {
 		if (this.props && this.props.google) { // checks to make sure that props have been passed
 			const {google} = this.props; // sets props equal to google
@@ -61,8 +60,8 @@ export class SalesMapContainer extends Component {
 			const node = ReactDOM.findDOMNode(mapRef); // finds the 'map' div in the React DOM, names it node
 
 			const mapConfig = Object.assign({}, {
-				center: {lat: 18.59737, lng: -72.32735}, // sets center of google map to NYC.
-				zoom: 11, // sets zoom. Lower numbers are zoomed further out.
+				center: {lat: 41.2865, lng:174.7762}, // Wellington - New zealand.
+				zoom: 1, // sets zoom. Lower numbers are zoomed further out.
 				mapTypeId: 'satellite' // optional main map layer. Terrain, satellite, hybrid or roadmap--if unspecified, defaults to roadmap.
 			});
 
@@ -137,7 +136,8 @@ export class SalesMapContainer extends Component {
 		const style = { // MUST specify dimensions of the Google map or it will not work. Also works best when style is specified inside the render function and created as an object
 			width: this.state.parentDiv.offsetWidth,
 //			width: '400px',
-			height: '400px' // 75vh similarly will take up roughly 75% of the height of the screen. px also works.
+			height: this.state.parentDiv.offsetHeight // 75vh similarly will take up roughly 75% of the height of the screen. px also works.
+			// height: '400px' // 75vh similarly will take up roughly 75% of the height of the screen. px also works.
 		};
 
 		return ( // in our return function you must return a div with ref='map' and style.

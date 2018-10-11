@@ -6,3 +6,4 @@ export * from './CustomerActions';
 export * from './VolumeActions';
 export * from './DateFilterActions';
 export * from './SalesActions';
+export * from './WaterOperationsActions';

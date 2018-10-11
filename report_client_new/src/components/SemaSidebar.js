@@ -35,13 +35,15 @@ class SemaSidebar extends Component {
         return (
             <div className="SeamaNavSidebar" style={this.getStyle()}>
                 <div>
-                    {<img src={require('images/swe-logo.png')} alt="logo" style={ImageStyle} />}
+                    {<img src={require('images/swe-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
                 </div>
                 <ListGroup>
 					<CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
+						<Link to='/'>Water operations</Link></CustomComponent1>
+					<CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
 						<Link to='/Sales'>Sales</Link></CustomComponent1>
 					<CustomComponent1><i className="glyphicon glyphicon-tint" style={{paddingRight:"15px"}}/>
-                        <Link to='/'>Volumes</Link></CustomComponent1>
+                        <Link to='/Volumes'>Volumes</Link></CustomComponent1>
                     <CustomComponent1><i className="glyphicon glyphicon-user" style={{paddingRight:"15px"}}/>
                         <Link to='/Demographics'>Demographics</Link></CustomComponent1>
                     {/*<CustomComponent1><i className="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>*/}

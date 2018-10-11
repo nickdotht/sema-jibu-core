@@ -77,7 +77,7 @@ class SalesByChannelChart extends Component {
 			if( total === 0 ){
 				title = title + " (No data available)";
 			}else {
-				title = title + " (" + total.toFixed(1) + " for this period)";
+				title = title + " (" + utilService.formatDollar(this.props.chartData.salesInfo.currencyUnits, total) + " for this period)";
 			}
 		}
 		return title;

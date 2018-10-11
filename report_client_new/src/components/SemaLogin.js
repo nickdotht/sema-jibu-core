@@ -49,7 +49,7 @@ class SemaLogin extends Component {
 		return (
 			<div className="LogIn">
 				<div>
-					{<img  src={require('images/swn-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
+					{<img  src={require('images/swe-logo.png')} alt="logo" style={ImageStyle} />}
 				</div>
 
 				<Form horizontal className="normal">

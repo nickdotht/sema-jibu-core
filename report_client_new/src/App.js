@@ -8,7 +8,8 @@ import {
 	kioskActions,
 	volumeActions,
 	customerActions,
-	salesActions
+	salesActions,
+	waterOperationsActions
 } from 'actions';
 import { history } from './utils';
 import {
@@ -35,6 +36,12 @@ class App extends Component {
 			console.log("on route change", self);
 			switch( location.pathname ){
 				case "/":
+
+					if( ! this.props.sales.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
+						this.props.waterOperationsActions.fetchWaterOperations(params);
+					}
+					break;
+				case "/Volumes":
 					if( ! this.props.volume.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID  ){
 						this.props.volumeActions.fetchVolume(params);
 					}
@@ -90,7 +97,8 @@ function mapDispatchToProps(dispatch) {
 		kioskActions: bindActionCreators(kioskActions, dispatch),
 		volumeActions: bindActionCreators(volumeActions, dispatch),
 		customerActions: bindActionCreators(customerActions, dispatch),
-		salesActions: bindActionCreators(salesActions, dispatch)
+		salesActions: bindActionCreators(salesActions, dispatch),
+		waterOperationsActions: bindActionCreators(waterOperationsActions, dispatch)
 	};
 }
 

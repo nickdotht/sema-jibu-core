@@ -27,6 +27,7 @@ var sema_receipt_summary = require('./routes/sema_receipt_summary');
 var sema_customer_summary = require('./routes/sema_customer_summary');
 var sema_sales_ex = require('./routes/sema_sales_ex');
 var sema_units = require('./routes/sema_units');
+var sema_water_chart = require('./routes/sema_water_chart');
 
 const winston = require('winston');
 
@@ -83,6 +84,7 @@ app.use('/sema/dashboard/site/receipt-summary/', sema_receipt_summary);
 app.use('/sema/dashboard/site/customer-summary/', sema_customer_summary);
 app.use('/sema/dashboard/site/sales-summary/', sema_sales_ex);
 app.use('/sema/measure-units/', sema_units);
+app.use('/sema/dashboard/site/water-chart/', sema_water_chart);
 
 
 

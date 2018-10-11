@@ -14,6 +14,7 @@ import SalesRetailerList from './Sales/SalesRetailerList';
 import * as salesActions from 'actions/SalesActions';
 import SalesByChannelChart from "./Sales/SalesByChannelChart";
 import LoadProgress from "./LoadProgress";
+import { utilService } from 'services';
 
 let dateFormat = require('dateformat');
 
@@ -51,7 +52,7 @@ class SemaSales extends Component {
 					</div>
 					<div className ="SalesSummaryItem">
 						<SalesSummaryPanel1 title="Total Revenue" date={this.getDateSince(this.props.sales.salesInfo.totalRevenue)}
-											value={formatDollar(this.props.sales.salesInfo.currencyUnits, this.props.sales.salesInfo.totalRevenue.total)}
+											value={utilService.formatDollar(this.props.sales.salesInfo.currencyUnits, this.props.sales.salesInfo.totalRevenue.total)}
 											delta = {calcRevenueDelta(this.props.sales.salesInfo)}
 											valueColor = {calcColor(this.props.sales.salesInfo.totalRevenue.periods[0].value, this.props.sales.salesInfo.totalRevenue.periods[1].value)} />
 					</div>
@@ -105,7 +106,7 @@ class SemaSales extends Component {
 }
 const calcNetRevenue = salesInfo =>{
 	if( salesInfo.totalRevenue.total &&  salesInfo.totalCogs.total ){
-		return formatDollar( salesInfo.currencyUnits, salesInfo.totalRevenue.total - salesInfo.totalCogs.total);
+		return utilService.formatDollar( salesInfo.currencyUnits, salesInfo.totalRevenue.total - salesInfo.totalCogs.total);
 	}else{
 		return "N/A";
 	}
@@ -187,7 +188,7 @@ const formatRevenuePerCustomer = (salesInfo) =>{
 			default:
 				revenuePerCustomer = 0;
 		}
-		return formatDollar( salesInfo.currencyUnits, revenuePerCustomer );
+		return utilService.formatDollar( salesInfo.currencyUnits, revenuePerCustomer );
 	}
 	return "N/A";
 };
@@ -201,28 +202,6 @@ const formatNoOfCustomers = (salesInfo) =>{
 
 
 
-const formatDollar = (currencyUnits, amount ) =>{
-	let suffix = "";
-	if(! currencyUnits ){
-		currencyUnits = 'USD';
-	}
-	if( amount ) {
-		if (amount > 1000) {
-			amount = amount / 1000;
-			suffix = "k";
-		}
-		let formatter = new Intl.NumberFormat('en-US', {
-			style: 'currency',
-			currency: currencyUnits,
-			minimumFractionDigits: 2,
-			// the default value for minimumFractionDigits depends on the currency
-			// and is usually already 2
-		});
-		return formatter.format(amount) + suffix;
-	}else{
-		return "N/A"
-	}
-};
 
 // const formatLitersPerCustomer = litersPerCustomer =>{
 // 	if( litersPerCustomer === "N/A"){

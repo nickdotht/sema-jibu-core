@@ -44,8 +44,37 @@ const getBackgroundColorByIndex2 = index =>{
 	return colors2[pickIndex];
 };
 
+const formatDollar = (currencyUnits, amount ) =>{
+	let suffix = "";
+	if(! currencyUnits ){
+		currencyUnits = 'USD';
+	}
+	if( amount ) {
+		if (amount > 1000) {
+			amount = amount / 1000;
+			suffix = "k";
+		}
+		let formatter = new Intl.NumberFormat('en-US', {
+			style: 'currency',
+			currency: currencyUnits,
+			minimumFractionDigits: 2,
+			// the default value for minimumFractionDigits depends on the currency
+			// and is usually already 2
+		});
+		return formatter.format(amount) + suffix;
+	}else{
+		return "N/A"
+	}
+};
+
+const isEmptyObject = ( obj ) =>{
+	return (Object.keys(obj).length === 0 && obj.constructor === Object) ? true: false;
+}
+
 export const utilService = {
 	getBackgroundColorForChannel,
 	getBackgroundColorByIndex,
-	getBackgroundColorByIndex2
+	getBackgroundColorByIndex2,
+	isEmptyObject,
+	formatDollar
 };

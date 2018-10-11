@@ -10,7 +10,8 @@ import {
 	customerActions,
 	salesActions,
 	authActions,
-	healthCheckActions
+	healthCheckActions,
+	waterOperationsActions
 } from 'actions';
 import { withRouter } from 'react-router'
 import SemaDateFilter from "./SemaDateFilter";
@@ -98,7 +99,7 @@ class SemaToolbar extends Component {
 		this.props.volume.loaded = false;
 		this.props.customer.loaded = false;
 		switch (this.props.location.pathname) {
-			case "/":
+			case "/Volumes":
 				this.props.volumeActions.fetchVolume(params);
 				break;
 			case "/Demographics":
@@ -106,6 +107,9 @@ class SemaToolbar extends Component {
 				break;
 			case "/Sales":
 				this.props.salesActions.fetchSales(params);
+				break;
+			case "/":
+				this.props.waterOperationsActions.fetchWaterOperations(params);
 				break;
 			default:
 				console.log("Not implemented:", this.props.location.pathname);
@@ -203,6 +207,7 @@ function mapDispatchToProps(dispatch) {
 		kioskActions: bindActionCreators(kioskActions, dispatch),
 		volumeActions: bindActionCreators(volumeActions, dispatch),
 		salesActions:bindActionCreators(salesActions, dispatch),
+		waterOperationsActions:bindActionCreators(waterOperationsActions, dispatch),
 		customerActions: bindActionCreators(customerActions, dispatch)
 	};
 }
