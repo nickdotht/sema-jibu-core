@@ -17,14 +17,10 @@ import { authActions, healthCheckActions } from 'actions';
 class SemaLogin extends Component {
   constructor(props, context) {
     super(props, context);
-
-    console.log('SemaLogin-constructor');
-
     this.handleClick = this.handleClick.bind(this);
   }
 
   handleClick(event) {
-    console.log('SemaLogin - handleClick');
     this.props.authActions.login(
       this.inputUser.value,
       this.inputPassword.value
@@ -35,7 +31,6 @@ class SemaLogin extends Component {
 
   componentWillUnmount() {
     this.props.healthCheckActions.fetchHealthCheck();
-    this.props.kioskActions.fetchKiosks();
   }
 
   render() {
