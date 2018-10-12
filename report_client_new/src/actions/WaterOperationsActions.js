@@ -22,9 +22,9 @@ function initializeWaterOperations() {
 			flowRateProduct: 82,
 			flowRateSource: 81,
 			flowRateDistribution: 83,
-			production: createBlankChart(),
+			production: {},
 			chlorine: {},
-			tds: createBlankChart()
+			tds: {}
 		}
 	}
 }
@@ -45,9 +45,19 @@ const fetchWaterOperationsData = ( params) => {
 		waterInfo.waterOperationsInfo.endDate = params.endDate;
 		try {
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
-			let chlorineParams = Object.assign({}, params);
-			chlorineParams.type = "totalchlorine";
-			waterInfo.waterOperationsInfo.chlorine = await fetchChart(chlorineParams );
+			let production = Object.assign({}, params);
+			production.type = "production";
+			waterInfo.waterOperationsInfo.production = await fetchChart(production );
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:33}} ));
+
+			let chlorine = Object.assign({}, params);
+			chlorine.type = "totalchlorine";
+			waterInfo.waterOperationsInfo.chlorine = await fetchChart(chlorine );
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:66}} ));
+
+			let tds = Object.assign({}, params);
+			tds.type = "tds";
+			waterInfo.waterOperationsInfo.tds = await fetchChart(tds );
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
 
 			resolve(waterInfo);

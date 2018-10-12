@@ -36,7 +36,7 @@ class SemaChlorineChart extends Component {
 								},
 								title: {
 									display: true,
-									text: 'Chlorine Level (PPM)',
+									text: this.getChartTitle(this.props.chartData),
 									position: "top"
 								}
 
@@ -47,7 +47,7 @@ class SemaChlorineChart extends Component {
 			);
 		}else{
 			return  (<div style={{textAlign:"center"}}>
-					Total Chlorine
+					Chlorine
 					<br/>
 					No Data available
 				</div>
@@ -55,6 +55,18 @@ class SemaChlorineChart extends Component {
 
 		}
     }
+    getChartTitle(chlorine){
+    	switch( chlorine.type){
+			case "totalchlorine":
+				return "Total Chlorine (PPM)";
+			case "freechlorine":
+				return "Free Chlorine (PPM)";
+			default:
+				return "Chlorine";
+				break;
+		}
+
+	}
     getChartData( chlorineData ){
     	if( utilService.isEmptyObject(chlorineData) || utilService.isEmptyObject(chlorineData.data )){
 			return { labels: [], datasets: []}

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import 'App.css';
 import SemaSummaryPanel1 from "./WaterOperations/SemaSummaryPanel1";
-// import SeamaWaterProductionChart from "./WaterQuality/SeamaWaterProductionChart";
+import SemaProductionChart from "./WaterOperations/SemaProductionChart";
 import SemaChlorineChart from "./WaterOperations/SemaChlorineChart";
-// import SeamaWaterTdsChart from "./WaterQuality/SeamaWaterTdsChart";
+import SemaTDSChart from "./WaterOperations/SemaTDSChart";
 import 'css/SemaWaterOperations.css';
 // import SeamaWaterQualityNavigation from "./WaterQuality/SeamaWaterQualityNavigation";
 import SemaServiceError from "./SemaServiceError";
@@ -67,13 +67,13 @@ class SemaWaterOperations extends Component {
                 {/*</div>*/}
                 <div className = "WaterChartContainer">
                     <div className= "WaterMainChartItem">
-                        {/*<SeamaWaterProductionChart chartData={this.props.water.production}/>*/}
+                        <SemaProductionChart chartData={this.props.water.waterOperationsInfo.production}/>
                     </div>
                     <div className= "WaterSecondaryChart1Item">
                         <SemaChlorineChart chartData={this.props.water.waterOperationsInfo.chlorine}/>
                     </div>
                     <div className= "WaterSecondaryChart2Item">
-                        {/*<SeamaWaterTdsChart chartData={this.props.water.tds}/>*/}
+                        <SemaTDSChart chartData={this.props.water.waterOperationsInfo.tds}/>
                     </div>
                 </div>
             </div>

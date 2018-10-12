@@ -21,6 +21,13 @@ const sqlReadingChart =
     AND reading.created_at BETWEEN ? AND ? \
     ORDER BY reading.created_at';
 
+const sqlVolumeReadingChart =
+	'SELECT  YEAR(reading.created_at), MONTH(reading.created_at),  DAY(reading.created_at), MAX(value), MIN(value) \
+	FROM reading \
+	WHERE reading.kiosk_id = ? AND reading.parameter_id = ? AND reading.sampling_site_id = ? \
+    AND reading.created_at BETWEEN ? AND ? \
+	GROUP BY YEAR(reading.created_at), MONTH(reading.created_at), DAY(reading.created_at) \
+	ORDER BY  YEAR(reading.created_at) ASC, MONTH(reading.created_at) ASC, DAY(reading.created_at) ASC';
 
 router.get('/', async( request, response ) => {
 	semaLog.info( 'sema_water_chart Entry - SiteId: - ', request.query["site-id"]);
@@ -67,9 +74,16 @@ router.get('/', async( request, response ) => {
 					case "totalchlorine":
 						parameter = "Total Chlorine";
 						break;
+					case "tds":
+						parameter = "Total Dissolved Solids";
+						break;
+					case "production":
+						parameter = "Volume";
+						samplingSite = "B:Product";
+						break;
 					default:
 						connection.release();
-						const msg = "sema_water_chart: Unknowm chart type: " +request.query.type;
+						const msg = "sema_water_chart: Unknown chart type: " +request.query.type;
 						semaLog.error(msg );
 						response.status(400).send(msg);
 
@@ -77,9 +91,12 @@ router.get('/', async( request, response ) => {
 				await getParametersAndSamplingSiteIds(connection);
 				const parameterId = getParameterIdFromMap(parameter);
 				const samplingSiteId = getSamplingSiteIdFromMap(samplingSite);
+				if( request.query.type === 'production'){
+					await getProductionReading(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId, waterChart);
 
-				await getReading( connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId, waterChart  );
-
+				}else {
+					await getReading(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId, waterChart);
+				}
 				semaLog.info("sema_water_chart exit");
 				response.json(waterChart.classToPlain());
 				connection.release();
@@ -104,6 +121,31 @@ const getReading = (connection, siteId, beginDate, endDate, parameterId, samplin
 					if (Array.isArray(result) && result.length >= 1) {
 						const timeTicks = result.map(item =>{return item.created_at});
 						const values = result.map(item =>{return parseFloat(item.value)});
+						waterChart.setData({time: timeTicks, values: values});
+					}
+					resolve();
+				}catch( ex){
+					reject( ex.message);
+				}
+			}
+		});
+	});
+}
+
+
+const getProductionReading = (connection, siteId, beginDate, endDate, parameterId, samplingSiteId, waterChart) =>{
+
+	return new Promise((resolve, reject) => {
+		connection.query(sqlVolumeReadingChart, [siteId, parameterId, samplingSiteId, beginDate, endDate], function (err, result) {
+			if (err) {
+				reject(err);
+			} else {
+				try {
+					if (Array.isArray(result) && result.length >= 1) {
+						const timeTicks = result.map(item =>{
+							return new Date(item["YEAR(reading.created_at)"], item["MONTH(reading.created_at)"]-1, item["DAY(reading.created_at)"] );
+						});
+						const values = result.map(item =>{return item["MAX(value)"] - item["MIN(value)"]});
 						waterChart.setData({time: timeTicks, values: values});
 					}
 					resolve();
