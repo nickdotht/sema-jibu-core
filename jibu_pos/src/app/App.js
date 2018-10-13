@@ -7,30 +7,20 @@
 import RNLanguages from 'react-native-languages';
 import i18n from './i18n';
 import React, { Component } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
 
 import { Provider } from 'react-redux';
 import store from './store';
 import JibuApp from '../components/JibuApp';
 import PosStorage from '../database/PosStorage';
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import { isEmptyObj } from '../services/Utilities';
 
 export default class App extends Component {
-  componentWillMount() {
+  async componentWillMount() {
     RNLanguages.addEventListener('change', this._onLanguagesChange);
-    console.log(`APP COMPONENT CHECKED: ${PosStorage.getSettings().uiLanguage.iso_code}`);
-    i18n.locale = PosStorage.getSettings().uiLanguage.iso_code;
+    const savedSettings = await PosStorage.loadSettings();
+    const uiLanguage = !isEmptyObj(savedSettings) && !isEmptyObj(savedSettings.uiLanguage) ? savedSettings.uiLanguage : {name: 'English', iso_code: 'en'}
+    console.log(`Setting UI Language: ${JSON.stringify(uiLanguage)}`);
+    i18n.locale = uiLanguage.iso_code;
   }
 
   componentWillUnmount() {

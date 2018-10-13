@@ -328,7 +328,7 @@ class CustomerEdit extends Component {
 			}}>
 
 				<View style={styles.updating}>
-					<Text style={{fontSize:24, fontWeight:'bold'}}>Updating....</Text>
+					<Text style={{fontSize:24, fontWeight:'bold'}}>{i18n.t('updating')}</Text>
 				</View>
 			</View>
 		);

@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox, ActivityIndicator} from "react-native";
+import { View, Text, ScrollView, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox, ActivityIndicator} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import PropTypes from 'prop-types';
 
@@ -28,13 +28,13 @@ const supportedUILanguages = [
 	{name: 'Français', iso_code: 'fr'},
 	{name: 'Kreyòl Ayisyen', iso_code: 'ht'}
 ];
-// TODO: Turn into a state. Stupid.
-let selectedLanguage = {};
 
 class SettingsProperty extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {propertyText : this.props.valueFn()};
+		this.state = {
+			propertyText: this.props.valueFn()
+		};
 
 	}
 
@@ -101,7 +101,10 @@ class Settings extends Component {
 		this.user = React.createRef();
 		this.supportedLanguages = React.createRef();
 		this.password = React.createRef();
-		this.state = { animating: false };
+		this.state = {
+			animating: false,
+			selectedLanguage: {}
+		};
 
 		this.onShowLanguages = this.onShowLanguages.bind(this);
 		this.onLanguageSelected = this.onLanguageSelected.bind(this);
@@ -114,7 +117,7 @@ class Settings extends Component {
 
 	render() {
 		return (
-			<View style={{ flex: 1 }}>
+			<ScrollView style={{ flex: 1 }}>
 				<View style={{ flexDirection: 'row' }}>
 
 					<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', height: 100 }}>
@@ -207,7 +210,7 @@ class Settings extends Component {
 						<ActivityIndicator size='large' />
 					</View>
 				}
-			</View>
+			</ScrollView>
 
 		);
 	}
@@ -336,7 +339,7 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText);
 		try {
-			let message = "Successfully connected to the SEMA service";
+			let message = i18n.t('successful-connection');
 			Communications.login()
 				.then(result => {
 					console.log("Passed - status" + result.status + " " + JSON.stringify(result.response));
@@ -344,9 +347,9 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 						Communications.getSiteId(result.response.token, this.site.current.state.propertyText)
 							.then(siteId => {
 								if (siteId === -1) {
-									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' does not exist";
+									message = i18n.t('successful-connection-but', {what: this.site.current.state.propertyText, happened: i18n.t('does-not-exist')});
 								}else if (siteId === -2) {
-									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' is not active";
+									message = i18n.t('successful-connection-but', {what: this.site.current.state.propertyText, happened: i18n.t('is-not-active')})
 								} else {
 
 									this.saveSettings(result.response.token, siteId);
@@ -359,8 +362,8 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 								}
 								this.setState({animating: false});
 								Alert.alert(
-									"Network Connection",
-									message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+									i18n.t('network-connection'),
+									message, [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 								);
 								if (siteId !== -1 && siteId !== -2) {
 									this.closeHandler();
@@ -371,8 +374,8 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 						this.setState({animating: false});
 						message = result.response.msg + "(Error code: " + result.status + ")";
 						Alert.alert(
-							"Network Connection",
-							message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+							i18n.t('network-connection'),
+							message, [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 						);
 					}
 				})
@@ -380,8 +383,8 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 					console.log("Failed- status " + result.status + " " + result.response.message);
 					this.setState({animating: false});
 					Alert.alert(
-						"Network Connection",
-						result.response.message + ". (" + result.status + ")", [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+						i18n.t('network-connection'),
+						result.response.message + ". (" + result.status + ")", [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 					);
 				})
 		} catch (error) {
@@ -414,14 +417,14 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText,
-			selectedLanguage,
+			this.state.selectedLanguage,
 			token,
 			siteId );
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
 	}
 
 	getDefaultUILanguage() {
-		console.log(`CURRENT UI LANGUAGE IS ${JSON.stringify(PosStorage.getSettings())}`);
+		console.log(`CURRENT UI LANGUAGE IS ${this.props.settings.uiLanguage.name}`);
 		return this.props.settings.uiLanguage.name;
 	}
 
@@ -436,9 +439,11 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 	}
 
 	onLanguageSelected(langIdx) { 
-		selectedLanguage = supportedUILanguages.filter((lang, idx) => idx === Number(langIdx))[0];
-		console.log(`Selected language is ${selectedLanguage.name}`);
-		i18n.locale = selectedLanguage.iso_code;
+		this.setState({
+			selectedLanguage: supportedUILanguages.filter((lang, idx) => idx === Number(langIdx))[0]
+		});
+		console.log(`Selected language is ${this.state.selectedLanguage.name}`);
+		i18n.locale = this.state.selectedLanguage.iso_code;
 		this.onSaveSettings();
 	}
 
