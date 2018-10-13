@@ -5,6 +5,7 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const associations = require('./associations');
+const customMethods = require('./custom-methods');
 const db = {};
 
 const sequelize = new Sequelize(
@@ -32,6 +33,7 @@ fs.readdirSync(__dirname)
 		db[model.name] = model;
 	});
 
+customMethods(db);
 associations(db);
 
 db.sequelize = sequelize;
