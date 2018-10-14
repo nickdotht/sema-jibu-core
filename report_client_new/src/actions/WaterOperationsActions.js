@@ -17,8 +17,8 @@ function initializeWaterOperations() {
 			waterMeasureUnits: 'liters',
 			totalProduction: null,
 			fillStation: null,
-			pressurePreMembrane: 110,
-			pressurePostMembrane: 105,
+			pressurePreMembrane: null,
+			pressurePostMembrane: null,
 			flowRateProduct: 82,
 			flowRateSource: 81,
 			flowRateDistribution: 83,
@@ -48,6 +48,8 @@ const fetchWaterOperationsData = ( params) => {
 			let summary = await fetchSummary(params );
 			waterInfo.waterOperationsInfo.totalProduction = summary.totalProduction;
 			waterInfo.waterOperationsInfo.fillStation = summary.fillStation;
+			waterInfo.waterOperationsInfo.pressurePostMembrane = summary.pressurePostMembrane;
+			waterInfo.waterOperationsInfo.pressurePreMembrane = summary.pressurePreMembrane;
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:25}} ));
 
 

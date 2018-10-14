@@ -88,6 +88,10 @@ router.get('/', async( request, response ) => {
 				samplingSiteId = getSamplingSiteIdFromMap("Water Treatment Unit");
 				const pressureIn = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
 				waterSummary.setPressurePreMembrane( pressureIn );
+				parameterId = getParameterIdFromMap("PRE-FILTER PRESSURE IN");
+				const pressureOut = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
+				waterSummary.setPressurePostMembrane( pressureOut );
+
 				semaLog.info("sema_water_summary exit");
 				response.json(waterSummary.classToPlain());
 				connection.release();
@@ -131,7 +135,7 @@ const getAverage = (connection, siteId, beginDate, endDate, parameterId, samplin
 			} else {
 				try {
 					if (Array.isArray(result) && result.length >= 1) {
-						resolve( result[0].value);
+						resolve( result[0]["AVG(value)"]);
 					}else {
 						resolve(null);
 					}

@@ -66,7 +66,7 @@ class SemaSummaryPanel2 extends Component {
 		if( ! value ){
 			value = "N/A";
 		}
-		return value;
+		return Math.round(value);
 	}
 
 	populateRow2Col4(){
@@ -74,7 +74,7 @@ class SemaSummaryPanel2 extends Component {
 		if( ! value ){
 			return "N/A";
 		}else{
-			return value;
+			return Math.round(value);
 		}
 	}
 
