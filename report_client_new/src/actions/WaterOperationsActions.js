@@ -16,7 +16,7 @@ function initializeWaterOperations() {
 			endDate:null,
 			waterMeasureUnits: 'liters',
 			totalProduction: null,
-			fillStation: 95,
+			fillStation: null,
 			pressurePreMembrane: 110,
 			pressurePostMembrane: 105,
 			flowRateProduct: 82,
@@ -45,15 +45,21 @@ const fetchWaterOperationsData = ( params) => {
 		waterInfo.waterOperationsInfo.endDate = params.endDate;
 		try {
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
+			let summary = await fetchSummary(params );
+			waterInfo.waterOperationsInfo.totalProduction = summary.totalProduction;
+			waterInfo.waterOperationsInfo.fillStation = summary.fillStation;
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:25}} ));
+
+
 			let production = Object.assign({}, params);
 			production.type = "production";
 			waterInfo.waterOperationsInfo.production = await fetchChart(production );
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:33}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:50}} ));
 
 			let chlorine = Object.assign({}, params);
 			chlorine.type = "totalchlorine";
 			waterInfo.waterOperationsInfo.chlorine = await fetchChart(chlorine );
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:66}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:75}} ));
 
 			let tds = Object.assign({}, params);
 			tds.type = "tds";
@@ -80,6 +86,31 @@ function fetchChart( params ) {
 		}
 		if( params.hasOwnProperty("type") ){
 			url = url + "&type=" + params.type;
+		}
+
+		axiosService
+			.get(url)
+			.then(response => {
+				if(response.status === 200){
+					resolve(response.data)
+				}else{
+					reject(initializeWaterOperations())
+				}
+			})
+			.catch(function(error){
+				reject( error)
+			});
+	});
+}
+
+function fetchSummary( params ) {
+	return new Promise((resolve, reject ) => {
+		let url = '/sema/dashboard/site/water-summary?site-id=' + params.kioskID ;
+		if( params.hasOwnProperty("startDate") ){
+			url = url + "&begin-date=" + params.startDate.toISOString();
+		}
+		if( params.hasOwnProperty("endDate") ){
+			url = url + "&end-date=" + params.endDate.toISOString();
 		}
 
 		axiosService
