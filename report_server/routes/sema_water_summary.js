@@ -92,6 +92,14 @@ router.get('/', async( request, response ) => {
 				const pressureOut = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
 				waterSummary.setPressurePostMembrane( pressureOut );
 
+				parameterId = getParameterIdFromMap("Feed Flow Rate");
+				const feedFlowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
+				waterSummary.setFeedFlowRate( feedFlowRate );
+
+				parameterId = getParameterIdFromMap("Feed Flow Rate");
+				const productFlowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
+				waterSummary.setProductFlowRate( productFlowRate );
+
 				semaLog.info("sema_water_summary exit");
 				response.json(waterSummary.classToPlain());
 				connection.release();
