@@ -21,10 +21,10 @@ class SemaSummaryPanel2 extends Component {
 									<td className="WaterOpTableRow1Col2to4">{this.populateRow1Col4()}</td>
 								</tr>
 								<tr>
-									<td style={{border:"none", paddingBottom:0, paddingTop:"3px"}}>{this.populateRow2Col1()}</td>
-									<td className="WaterOpTableRow2Col2to4" style={{paddingTop:"3px"}}>{this.populateRow2Col2()}</td>
-									<td className="WaterOpTableRow2Col2to4" style={{paddingTop:"3px"}}>{this.populateRow2Col3()}</td>
-									<td className="WaterOpTableRow2Col2to4" style={{paddingTop:"3px"}}>{this.populateRow2Col4()}</td>
+									<td style={{border:"none", paddingBottom:0, paddingTop:"3px", fontSize:"16px"}}>{this.populateRow2Col1()}</td>
+									<td className="WaterOpTableRow2Col2to4" style={this.getStyle()}>{this.populateRow2Col2()}</td>
+									<td className="WaterOpTableRow2Col2to4" style={this.getStyle()}>{this.populateRow2Col3()}</td>
+									<td className="WaterOpTableRow2Col2to4" style={this.getStyle()}>{this.populateRow2Col4()}</td>
 								</tr>
 							</tbody>
 						</Table>
@@ -56,25 +56,29 @@ class SemaSummaryPanel2 extends Component {
 	populateRow2Col2(){
     	let value = ( this.props.type === "pressure") ? this.props.data.pressurePreMembrane : this.props.data.flowRateProduct;
 		if( ! value ){
-			value = "N/A";
+			return "N/A";
 		}
-		return value;
+		return Math.round(value);
 	}
 
 	populateRow2Col3(){
 		let value = ( this.props.type === "pressure") ? this.props.data.pressurePostMembrane : this.props.data.flowRateSource;
 		if( ! value ){
-			value = "N/A";
+			return "N/A";
 		}
 		return Math.round(value);
 	}
 
 	populateRow2Col4(){
-		let value = ( this.props.type === "pressure") ? " " : this.props.data.flowRateDistribution;
-		if( ! value ){
-			return "N/A";
+		if( this.props.type === "pressure"){
+			return " ";
 		}else{
-			return Math.round(value);
+			let value = this.props.data.flowRateDistribution;
+			if( ! value ){
+				return "N/A";
+			}else {
+				return Math.round(value);
+			}
 		}
 	}
 
@@ -89,7 +93,13 @@ class SemaSummaryPanel2 extends Component {
 	formatDate(dateVal){
 		return  dateFormat((Date.parse(dateVal)), "dddd. mmm, d, yyyy");
 	}
-
+	getStyle(){
+		if( this.props.type === "pressure") {
+			return {paddingTop: "3px", color: "rgb(219,86,13)", fontSize:"large"};
+		}else{
+			return {paddingTop: "3px", color: "rgb(91,26,143)", fontSize:"large"};
+		}
+	}
 }
 export default SemaSummaryPanel2;
 

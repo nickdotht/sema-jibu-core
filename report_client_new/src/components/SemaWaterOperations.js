@@ -14,6 +14,7 @@ import * as waterOperationsActions from 'actions/WaterOperationsActions';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router'
 import SemaSummaryPanel2 from "./WaterOperations/SemaSummaryPanel2";
+import LoadProgress from "./LoadProgress";
 
 class SemaWaterOperations extends Component {
 
@@ -33,6 +34,9 @@ class SemaWaterOperations extends Component {
     showWaterOperations( ){
         return (
             <div className="WaterOperationsContainer" style = {this.getHeight()}>
+				<div className = "WaterSummaryProgress" style={{width:"100%", height:'100%'}}>
+					<LoadProgress/>
+				</div>
                 <div className = "WaterSummaryContainer">
 					<div className = "WaterProduction">
 						<div className ="WaterSummaryItem">
