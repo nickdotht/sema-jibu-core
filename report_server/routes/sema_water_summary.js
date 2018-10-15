@@ -88,17 +88,22 @@ router.get('/', async( request, response ) => {
 				samplingSiteId = getSamplingSiteIdFromMap("Water Treatment Unit");
 				const pressureIn = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
 				waterSummary.setPressurePreMembrane( pressureIn );
-				parameterId = getParameterIdFromMap("PRE-FILTER PRESSURE IN");
+				parameterId = getParameterIdFromMap("PRE-FILTER PRESSURE OUT");
 				const pressureOut = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
 				waterSummary.setPressurePostMembrane( pressureOut );
 
-				parameterId = getParameterIdFromMap("Feed Flow Rate");
-				const feedFlowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
-				waterSummary.setFeedFlowRate( feedFlowRate );
+				parameterId = getParameterIdFromMap("Flow Rate");
+				samplingSiteId = getSamplingSiteIdFromMap("A:Feed");
+				let flowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
+				waterSummary.setSourceFlowRate( flowRate );
 
-				parameterId = getParameterIdFromMap("Feed Flow Rate");
-				const productFlowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
-				waterSummary.setProductFlowRate( productFlowRate );
+				samplingSiteId = getSamplingSiteIdFromMap("B:Product");
+				flowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
+				waterSummary.setProductFlowRate( flowRate );
+
+				samplingSiteId = getSamplingSiteIdFromMap("D:Fill");
+				flowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
+				waterSummary.setDistributionFlowRate( flowRate );
 
 				semaLog.info("sema_water_summary exit");
 				response.json(waterSummary.classToPlain());

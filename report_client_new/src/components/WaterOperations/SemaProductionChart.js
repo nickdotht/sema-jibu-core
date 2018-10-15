@@ -69,23 +69,82 @@ class SemaProductionChart extends Component {
 			production.datasets[0].borderColor='rgb(53, 91, 183)';
 			production.labels = production.labels.map(function(time)
 				{return moment(time ).format("MMM Do YY")});
-			let lineSet = {
-				label: "Forecast",
-				data: productionData.data.values.map(function (value) {
-					return (value * .8)
-				}),
-				type: "line",
-				borderColor:'rgb(231, 113, 50)',
-				backgroundColor:'rgb(231, 113, 50)',
-				fill:false,
-				pointRadius:0,
-				borderWidth:5
-			};
-			production.datasets.unshift(lineSet );
-
+			// Add the moving average
+			let movingAvg = this.movingAverage(productionData);
+			if(movingAvg ) {
+				let lineSet = {
+					label: "Forecast",
+					data: movingAvg,
+					type: "line",
+					borderColor: 'rgb(231, 113, 50)',
+					backgroundColor: 'rgb(231, 113, 50)',
+					fill: false,
+					pointRadius: 0,
+					borderWidth: 5
+				};
+				production.datasets.unshift(lineSet);
+			}
 			return production;
 		}
 	}
+	movingAverage( productionData) {
+		// Calculate number of days in range...
+		let movingAvg = null;
+		const count = productionData.data.time.length;
+		if (count > 1) {
+			const daysInRange = Math.round((Date.parse(productionData.data.time[count-1]) - Date.parse(productionData.data.time[0])) / (1000 * 60 * 60 * 24));
+			if (daysInRange > 10) {
+				// Use a 10% moving average, about 3 days for a monthly range, 36 days for a year
+				const window = Math.round(daysInRange * .10);
+				if (window > 1) {
+					movingAvg = calcMovingAvg(productionData.data.values, window, null);
+				}
+			}
+		}
+		return movingAvg;
+	}
+}
+/**
+ * returns an array with moving average of the input array
+ * @param array - the input array
+ * @param count - the number of elements to include in the moving average calculation
+ * @param qualifier - an optional function that will be called on each
+ *  value to determine whether it should be used
+ */
+function calcMovingAvg(array, count, qualifier){
+
+	// calculate average for subarray
+	var avg = function(array, qualifier){
+
+		var sum = 0, count = 0, val;
+		for (var i in array){
+			val = array[i];
+			if (!qualifier || qualifier(val)){
+				sum += val;
+				count++;
+			}
+		}
+
+		return sum / count;
+	};
+
+	var result = [], val;
+
+	// pad beginning of result with null values
+	for (var i=0; i < count-1; i++)
+		result.push(null);
+
+	// calculate average for each subarray and add to result
+	for (var i=0, len=array.length - count; i <= len; i++){
+
+		val = avg(array.slice(i, i + count), qualifier);
+		if (isNaN(val))
+			result.push(null);
+		else
+			result.push(val);
+	}
+
+	return result;
 }
 
 export default SemaProductionChart;

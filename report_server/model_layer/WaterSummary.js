@@ -7,8 +7,9 @@ class WaterSummary {
 		this.fillStation = null;
 		this.pressurePreMembrane = null;
 		this.pressurePostMembrane = null;
-		this.feedFlowRate = null;
+		this.distributionFlowRate = null;
 		this.productFlowRate = null;
+		this.sourceFlowRate = null;
 	}
 
 	setTotalProduction( value ){
@@ -24,11 +25,14 @@ class WaterSummary {
 	setPressurePostMembrane( value ){
 		this.pressurePostMembrane = value;
 	}
-	setFeedFlowRate( value ){
-		this.feedFlowRate = value;
+	setDistributionFlowRate( value ){
+		this.distributionFlowRate = value;
 	}
 	setProductFlowRate( value ){
 		this.productFlowRate = value;
+	}
+	setSourceFlowRate( value ){
+		this.sourceFlowRate = value;
 	}
 
 	classToPlain() {

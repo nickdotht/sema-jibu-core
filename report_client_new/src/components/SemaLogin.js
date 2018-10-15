@@ -48,9 +48,9 @@ class SemaLogin extends Component {
 	render() {
 		return (
 			<div className="LogIn">
-				<div>
-					{<img  src={require('images/swe-logo.png')} alt="logo" style={ImageStyle} />}
-				</div>
+				{/*<div>*/}
+					{/*{<img  src={require('images/swe-logo.png')} alt="logo" style={ImageStyle} />}*/}
+				{/*</div>*/}
 
 				<Form horizontal className="normal">
 					<FormGroup controlId="formUser">
