@@ -42,6 +42,6 @@ export const deleteUser = id => dispatch => {
   dispatch(deleteUserRequest());
   return axiosService
     .delete(`/sema/users/${id}`)
-    .then(response => dispatch(deleteUser(response.data)))
+    .then(response => dispatch(deleteUserSuccess(response.data)))
     .catch(err => dispatch(deleteUserFailure(err)));
 };

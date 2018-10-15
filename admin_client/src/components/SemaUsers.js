@@ -88,8 +88,7 @@ class SemaUsers extends Component {
 function mapStateToProps(state) {
   return {
     healthCheck: state.healthCheck,
-    users: state.user.users,
-    loading: state.user.loading
+    users: state.users
   };
 }
 

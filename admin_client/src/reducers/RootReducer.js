@@ -17,7 +17,7 @@ const rootPersistConfig = {
 const rootReducer = combineReducers({
   healthCheck,
   auth,
-  user: userReducer,
+  users: userReducer,
   form: formReducer
 });
 

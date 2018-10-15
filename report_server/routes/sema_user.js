@@ -61,7 +61,10 @@ router.post('/', (req, res) => {
 					})
 					.then(user => {
 						semaLog.info('Create user success');
-						res.json({ message: 'Create user success' });
+						res.json({
+							message: 'Create user success',
+							user: user.toJSON()
+						});
 					});
 			}
 		})
@@ -74,34 +77,73 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
 	const { username, email, password, firstName, lastName } = req.body;
 	db.user
-		.update(
-			{
+		.find({
+			where: {
+				id: req.params.id
+			}
+		})
+		.then(user => {
+			if (!user) {
+				res.status(404).json({
+					message: 'User not found'
+				});
+			}
+			user.update({
 				username,
 				email,
 				password,
 				first_name: firstName,
 				last_name: lastName
-			},
-			{
-				where: {
-					id: req.params.id
-				}
-			}
-		)
-		.then(res => res.json(res))
-		.catch(err => res.status(500).json({ error: err }));
+			})
+				.then(updatedUser =>
+					res
+						.status(200)
+						.json({ message: 'User updated', user: user.toJSON() })
+				)
+				.catch(err => {
+					semaLog.error('Update user failed', err);
+					res.status(400).json({ error: err });
+				});
+		})
+		.catch(err => {
+			semaLog.error('Update user - find user fail', err);
+			res.status(400).json({ error: err });
+		});
 });
 
 router.delete('/:id', (req, res) => {
+	const id = req.params.id;
 	db.user
-		.destroy({
-			where: {
-				id: req.params.id
+		.find({
+			where: { id }
+		})
+		.then(user => {
+			if (!user) {
+				res.status(404).json({
+					message: 'User not found'
+				});
+			}
+
+			if (user.active) {
+				res.status(400).json({
+					message: 'User must be deactivated'
+				});
+			} else {
+				user.destroy()
+					.then(() =>
+						res.status(200).json({
+							message: `User ${id} successfully deleted`,
+							id
+						})
+					)
+					.catch(err => {
+						semaLog.error('Delete user failed', err);
+						res.status(400).json({ error: err });
+					});
 			}
 		})
-		.then(res => res.json({ message: 'Delete user success' }))
 		.catch(err => {
-			semaLog.error('delete user - failed', err);
+			semaLog.error('Delete user - user not found');
 			res.status(400).json({ error: err });
 		});
 });

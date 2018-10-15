@@ -23,8 +23,15 @@ module.exports = models => {
 	// to the client
 	models.user.prototype.toJSON = function() {
 		var values = Object.assign({}, this.get());
-
 		delete values.password;
-		return values;
+
+		return {
+			id: values.id,
+			email: values.email,
+			username: values.username,
+			firstName: values.first_name,
+			lastName: values.last_name
+			// role: values.roles.map(role => role.authority)
+		};
 	};
 };

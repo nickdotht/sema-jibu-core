@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -32,7 +31,10 @@ const winston = require('winston');
 
 const passport = require('passport');
 const configurePassport = require('./config/passport');
-const { isAuthenticated, isAuthorized } = require('./seama_services/auth_services');
+const {
+	isAuthenticated,
+	isAuthorized
+} = require('./seama_services/auth_services');
 const cors = require('cors');
 
 const { version } = require('./package.json');
@@ -71,7 +73,7 @@ app.use('/untapped/sales-by-channel', isAuthenticated, sema_sales_by_channel);
 app.use('/sema/health-check', seama_health_check);
 app.use('/sema/login', seama_login);
 app.use('/sema/kiosks', isAuthenticated, seama_kiosks);
-app.use('/sema/site/customers/', isAuthenticated,sema_customers);
+app.use('/sema/site/customers/', isAuthenticated, sema_customers);
 app.use('/sema/site/receipts/', sema_receipts);
 app.use('/sema/products/', isAuthenticated, sema_products);
 app.use('/sema/sales-channels/', isAuthenticated, sema_sales_channels);
