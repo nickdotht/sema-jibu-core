@@ -38,7 +38,7 @@ class SemaSidebar extends Component {
                     {<img src={require('images/swe-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
                 </div>
                 <ListGroup>
-					<CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
+					<CustomComponent1><i className="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}/>
 						<Link to='/'>Water operations</Link></CustomComponent1>
 					<CustomComponent1><i className="glyphicon glyphicon-shopping-cart" style={{paddingRight:"15px"}}/>
 						<Link to='/Sales'>Sales</Link></CustomComponent1>
