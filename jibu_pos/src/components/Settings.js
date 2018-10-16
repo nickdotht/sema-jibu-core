@@ -271,40 +271,40 @@ class Settings extends Component {
 				console.log( "Synchronization-result: " +  JSON.stringify( syncResult));
 				// let foo = this._getSyncResults(syncResult);
 				Alert.alert(
-					"Synchronization Results",
-					this._getSyncResults(syncResult), [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+					i18n.t('sync-results'),
+					this._getSyncResults(syncResult), [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 				);
 			});
 	}
 	_getSyncResults(syncResult){
-		if( syncResult.status != "success") return "Synchronization error: " + syncResult.error;
-		if( syncResult.hasOwnProperty("customers") && syncResult.customers.error != null ) return "Synchronization error: " + syncResult.customers.error;
-		if( syncResult.hasOwnProperty("products") && syncResult.products.error != null ) return "Synchronization error: " + syncResult.products.error;
-		if( syncResult.hasOwnProperty("sales") && syncResult.sales.error != null ) return "Synchronization error: " + syncResult.sales.error;
-		if( syncResult.hasOwnProperty("productMrps") && syncResult.productMrps.error != null ) return "Synchronization error: " + syncResult.productMrps.error;
+		if( syncResult.status != "success") return i18n.t('sync-error', {error: syncResult.error});
+		if( syncResult.hasOwnProperty("customers") && syncResult.customers.error != null ) return i18n.t('sync-error', {error: syncResult.customers.error});
+		if( syncResult.hasOwnProperty("products") && syncResult.products.error != null ) return i18n.t('sync-error', {error: syncResult.products.error});
+		if( syncResult.hasOwnProperty("sales") && syncResult.sales.error != null ) return i18n.t('sync-error', {error: syncResult.sales.error});
+		if( syncResult.hasOwnProperty("productMrps") && syncResult.productMrps.error != null ) return i18n.t('sync-error', {error: syncResult.productMrps.error});
 
 		else{
 			if( syncResult.customers.localCustomers == 0 && syncResult.customers.remoteCustomers == 0 &&
 				syncResult.products.remoteProducts == 0 && syncResult.sales.localReceipts == 0 &&
 				syncResult.productMrps.remoteProductMrps == 0 ) {
-				return "Data is up to date";
-			}else{ return `${syncResult.customers.localCustomers + syncResult.customers.remoteCustomers } customers updated
-${syncResult.products.remoteProducts} products updated
-${syncResult.sales.localReceipts} sales receipts updated
-${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
+				return i18n.t('data-is-up-to-date');
+			}else{ return `${syncResult.customers.localCustomers + syncResult.customers.remoteCustomers } ${i18n.t('customers-updated')}
+${syncResult.products.remoteProducts} ${i18n.t('products-updated')}
+${syncResult.sales.localReceipts} ${i18n.t('sales-receipts-updated')}
+${syncResult.productMrps.remoteProductMrps} ${i18n.t('product-sales-channel-prices-updated')}`;
 			}
 		}
 	}
 	onClearAll() {
 		console.log("Settings:onClearAll");
-		let alertMessage = "Clear All Data";
+		let alertMessage = i18n.t('clear-all-data');
 		Alert.alert(
 			alertMessage,
-			'Are you sure you want to delete all data? (This cannot be undone)',
+			i18n.t('are-you-sure', {doThat: i18n.t('delete-all-data')}),
 			[
-				{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+				{ text: i18n.t('no'), onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
 				{
-					text: 'Yes', onPress: () => {
+					text: i18n.t('yes'), onPress: () => {
 						this._clearDataAndSync();
 						this.closeHandler();
 
@@ -429,7 +429,7 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 	}
 
 	getDefaultUILanguageIndex() {
-		let langIdx;
+		let langIdx = 0;
 		supportedUILanguages.forEach((lang, idx) => {
 			if (lang.name === this.props.settings.uiLanguage.name) {
 				langIdx = idx;
@@ -441,10 +441,11 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 	onLanguageSelected(langIdx) { 
 		this.setState({
 			selectedLanguage: supportedUILanguages.filter((lang, idx) => idx === Number(langIdx))[0]
+		}, () => {
+			console.log(`Selected language is ${this.state.selectedLanguage.name}`);
+			i18n.locale = this.state.selectedLanguage.iso_code;
+			this.onSaveSettings();
 		});
-		console.log(`Selected language is ${this.state.selectedLanguage.name}`);
-		i18n.locale = this.state.selectedLanguage.iso_code;
-		this.onSaveSettings();
 	}
 
 }
