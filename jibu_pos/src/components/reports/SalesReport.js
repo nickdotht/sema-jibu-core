@@ -6,6 +6,8 @@ import * as reportActions from "../../actions/ReportActions";
 import DateFilter from "./DateFilter";
 import * as Utilities from "../../services/Utilities";
 
+import i18n from '../../app/i18n';
+
 class SalesReport extends Component {
 	constructor(props) {
 		super(props);
@@ -24,7 +26,7 @@ class SalesReport extends Component {
 					<View style={{ flex: .7, backgroundColor: 'white', marginLeft: 10, marginRight: 10, marginTop: 10, }}>
 						<View style = {styles.titleText}>
 							<View style = {styles.leftHeader}>
-								<Text style = {styles.titleItem}>Sales </Text>
+								<Text style = {styles.titleItem}>{i18n.t('sales')}</Text>
 							</View>
 						</View>
 						<FlatList
@@ -49,9 +51,9 @@ class SalesReport extends Component {
 					}}>
 						<View style={{ flex: 1, flexDirection: 'row' }}>
 							<Text style={[styles.totalItem, { flex: 1.5 }]}> </Text>
-							<Text style={[styles.totalItem, { flex: .7 }]}>Total Liters </Text>
+							<Text style={[styles.totalItem, { flex: .7 }]}>{i18n.t('total-liters')}</Text>
 							<Text style={[styles.totalItem, { flex: .6 }]}>{this.getTotalLiters()}</Text>
-							<Text style={[styles.totalItem, { flex: .7 }]}>Total Sales </Text>
+							<Text style={[styles.totalItem, { flex: .7 }]}>{i18n.t('total-sales')}</Text>
 							<Text style={[styles.totalItem, { flex: .9 }]}>{Utilities.formatCurrency(this.getTotalSales())}</Text>
 						</View>
 					</View>
@@ -125,19 +127,19 @@ class SalesReport extends Component {
 					<Text style={[styles.headerItem,styles.leftMargin]}>SKU</Text>
 				</View>
 				<View style={[ {flex: .5}]}>
-					<Text style={[styles.headerItemCenter]}>Quantity</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('quantity')}</Text>
 				</View>
 				<View style={ [ {flex: .7}]}>
-					<Text style={[styles.headerItemCenter]}>Liters/SKU</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('liters-per-sku')}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.headerItemCenter]}>Total Liters</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('total-liters')}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.headerItemCenter]}>Price/SKU</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('price-per-sku')}</Text>
 				</View>
 				<View style={ [{flex: .7}]}>
-					<Text style={[styles.headerItemCenter]}>Total Sales</Text>
+					<Text style={[styles.headerItemCenter]}>{i18n.t('total-sales')}</Text>
 				</View>
 			</View>
 		);

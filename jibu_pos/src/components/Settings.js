@@ -1,5 +1,5 @@
 import React, {Component}  from "react";
-import { View, Text, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox, ActivityIndicator} from "react-native";
+import { View, Text, ScrollView, TouchableHighlight, TextInput, StyleSheet, Dimensions, Image, Alert, CheckBox, ActivityIndicator} from "react-native";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import PropTypes from 'prop-types';
 
@@ -11,8 +11,10 @@ import PosStorage from "../database/PosStorage";
 import * as SettingsActions from "../actions/SettingsActions";
 import * as ToolbarActions from "../actions/ToolBarActions";
 import * as CustomerActions from "../actions/CustomerActions";
+import ModalDropdown from 'react-native-modal-dropdown';
 
 import Communications from '../services/Communications';
+import i18n from '../app/i18n';
 
 const {height, width} = Dimensions.get('window');
 const inputFontHeight = Math.round((24 * height)/752);
@@ -21,10 +23,18 @@ const marginSpacing = Math.round((20 * height)/752);
 const inputTextWidth = 400;
 const marginInputItems = width/2 -inputTextWidth/2;
 
+const supportedUILanguages = [
+	{name: 'English', iso_code: 'en'},
+	{name: 'Français', iso_code: 'fr'},
+	{name: 'Kreyòl Ayisyen', iso_code: 'ht'}
+];
+
 class SettingsProperty extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {propertyText : this.props.valueFn()};
+		this.state = {
+			propertyText: this.props.valueFn()
+		};
 
 	}
 
@@ -89,8 +99,16 @@ class Settings extends Component {
 		this.url = React.createRef();
 		this.site = React.createRef();
 		this.user = React.createRef();
+		this.supportedLanguages = React.createRef();
 		this.password = React.createRef();
-		this.state = { animating: false };
+		this.state = {
+			animating: false,
+			selectedLanguage: {}
+		};
+
+		this.onShowLanguages = this.onShowLanguages.bind(this);
+		this.onLanguageSelected = this.onLanguageSelected.bind(this);
+		this.onSaveSettings = this.onSaveSettings.bind(this);
 	}
 
 	componentDidMount() {
@@ -99,11 +117,11 @@ class Settings extends Component {
 
 	render() {
 		return (
-			<View style={{ flex: 1 }}>
+			<ScrollView style={{ flex: 1 }}>
 				<View style={{ flexDirection: 'row' }}>
 
 					<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', height: 100 }}>
-						<Text style={[styles.headerText]}>{'Settings'}</Text>
+						<Text style={[styles.headerText]}>{i18n.t('settings')}</Text>
 					</View>
 					<View style={{ flexDirection: 'row-reverse', flex: 1, alignItems: 'center', height: 100 }}>
 						{this.getSettingsCancel()}
@@ -118,52 +136,71 @@ class Settings extends Component {
 						<SettingsProperty
 							parent = {this}
 							marginTop={10}
-							placeHolder='Sema Service URL, (http://sema-service)'
-							label="SEMA service URL"
+							placeHolder={i18n.t('service-url-placeholder')}
+							label={i18n.t('service-url-label')}
 							isSecure={false}
 							valueFn={this.getUrl.bind(this)}
 							ref={this.url}/>
 						<SettingsProperty
 							parent = {this}
 							marginTop={marginSpacing}
-							placeHolder='Site'
+							placeHolder={i18n.t('site-placeholder')}
 							isSecure={false}
-							label="Site"
+							label={i18n.t('site-label')}
 							valueFn={this.getSite.bind(this)}
 							ref={this.site}/>
 						<SettingsProperty
 							parent = {this}
 							marginTop={marginSpacing}
-							placeHolder='User'
-							label="User email"
+							placeHolder={i18n.t('username-or-email-placeholder')}
+							label={i18n.t('username-or-email-placeholder')}
 							isSecure={false}
 							valueFn={this.getUser.bind(this)}
 							ref={this.user}/>
 						<SettingsProperty
 							parent = {this}
 							marginTop={marginSpacing}
-							placeHolder='Password'
-							label="password"
+							placeHolder={i18n.t('password-placeholder')}
+							label={i18n.t('password-label')}
 							isSecure={true}
 							valueFn={this.getPassword.bind(this)}
 							ref={this.password}/>
+
+						<View style ={[{marginTop:"1%", flexDirection:'row',alignItems:'center'}]}>
+							<ModalDropdown
+								style ={{width:250}}
+								textStyle={styles.dropdownText}
+								dropdownTextStyle = {[styles.dropdownText, {width:250}]}
+								dropdownStyle ={{borderColor: 'black', borderWidth:2}}
+								ref = {this.supportedLanguages}
+								defaultValue = {this.getDefaultUILanguage()}
+								defaultIndex = {this.getDefaultUILanguageIndex()}
+								options={supportedUILanguages.map(lang => lang.name)}
+								onSelect={this.onLanguageSelected}
+							/>
+							<TouchableHighlight underlayColor = '#c0c0c0'
+												onPress={this.onShowLanguages}>
+								<Text style={{fontSize:40}}>{"\u2B07"}</Text>
+							</TouchableHighlight>
+						</View>
+
 						<View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
 							<SettingsButton
-								pressFn={this.onSaveSettings.bind(this)}
+								pressFn={this.onSaveSettings}
 								enableFn = {this.enableSaveSettings.bind(this)}
-								label='Save Settings'/>
+								label={i18n.t('save-settings')}/>
 							<SettingsButton
 								pressFn={this.onConnection.bind(this)}
 								enableFn = {this.enableConnectionOrSync.bind(this)}
-								label='Connect'/>
+								label={i18n.t('connect')}/>
 							<SettingsButton
 								pressFn={this.onClearAll.bind(this)}
 								enableFn = {this.enableClearAll.bind(this)}
-								label='Clear...'/>
+								label={i18n.t('clear')}/>
 							<SettingsButton
 								pressFn={this.onSynchronize.bind(this)}
 								enableFn = {this.enableConnectionOrSync.bind(this)}
-								label='Synchronize Now'/>
+								label={i18n.t('sync-now')}/>
 						</View>
 					</View>
 
@@ -173,7 +210,7 @@ class Settings extends Component {
 						<ActivityIndicator size='large' />
 					</View>
 				}
-			</View>
+			</ScrollView>
 
 		);
 	}
@@ -211,6 +248,10 @@ class Settings extends Component {
 		this.props.toolbarActions.ShowScreen("main");
 	}
 
+	onShowLanguages() {
+		 this.supportedLanguages.current.show();
+	}
+
 	closeHandler() {
 		this.onCancelSettings();
 	};
@@ -230,40 +271,40 @@ class Settings extends Component {
 				console.log( "Synchronization-result: " +  JSON.stringify( syncResult));
 				// let foo = this._getSyncResults(syncResult);
 				Alert.alert(
-					"Synchronization Results",
-					this._getSyncResults(syncResult), [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+					i18n.t('sync-results'),
+					this._getSyncResults(syncResult), [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 				);
 			});
 	}
 	_getSyncResults(syncResult){
-		if( syncResult.status != "success") return "Synchronization error: " + syncResult.error;
-		if( syncResult.hasOwnProperty("customers") && syncResult.customers.error != null ) return "Synchronization error: " + syncResult.customers.error;
-		if( syncResult.hasOwnProperty("products") && syncResult.products.error != null ) return "Synchronization error: " + syncResult.products.error;
-		if( syncResult.hasOwnProperty("sales") && syncResult.sales.error != null ) return "Synchronization error: " + syncResult.sales.error;
-		if( syncResult.hasOwnProperty("productMrps") && syncResult.productMrps.error != null ) return "Synchronization error: " + syncResult.productMrps.error;
+		if( syncResult.status != "success") return i18n.t('sync-error', {error: syncResult.error});
+		if( syncResult.hasOwnProperty("customers") && syncResult.customers.error != null ) return i18n.t('sync-error', {error: syncResult.customers.error});
+		if( syncResult.hasOwnProperty("products") && syncResult.products.error != null ) return i18n.t('sync-error', {error: syncResult.products.error});
+		if( syncResult.hasOwnProperty("sales") && syncResult.sales.error != null ) return i18n.t('sync-error', {error: syncResult.sales.error});
+		if( syncResult.hasOwnProperty("productMrps") && syncResult.productMrps.error != null ) return i18n.t('sync-error', {error: syncResult.productMrps.error});
 
 		else{
 			if( syncResult.customers.localCustomers == 0 && syncResult.customers.remoteCustomers == 0 &&
 				syncResult.products.remoteProducts == 0 && syncResult.sales.localReceipts == 0 &&
 				syncResult.productMrps.remoteProductMrps == 0 ) {
-				return "Data is up to date";
-			}else{ return `${syncResult.customers.localCustomers + syncResult.customers.remoteCustomers } customers updated
-${syncResult.products.remoteProducts} products updated
-${syncResult.sales.localReceipts} sales receipts updated
-${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
+				return i18n.t('data-is-up-to-date');
+			}else{ return `${syncResult.customers.localCustomers + syncResult.customers.remoteCustomers } ${i18n.t('customers-updated')}
+${syncResult.products.remoteProducts} ${i18n.t('products-updated')}
+${syncResult.sales.localReceipts} ${i18n.t('sales-receipts-updated')}
+${syncResult.productMrps.remoteProductMrps} ${i18n.t('product-sales-channel-prices-updated')}`;
 			}
 		}
 	}
 	onClearAll() {
 		console.log("Settings:onClearAll");
-		let alertMessage = "Clear All Data";
+		let alertMessage = i18n.t('clear-all-data');
 		Alert.alert(
 			alertMessage,
-			'Are you sure you want to delete all data? (This cannot be undone)',
+			i18n.t('are-you-sure', {doThat: i18n.t('delete-all-data')}),
 			[
-				{ text: 'No', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+				{ text: i18n.t('no'), onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
 				{
-					text: 'Yes', onPress: () => {
+					text: i18n.t('yes'), onPress: () => {
 						this._clearDataAndSync();
 						this.closeHandler();
 
@@ -298,7 +339,7 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText);
 		try {
-			let message = "Successfully connected to the SEMA service";
+			let message = i18n.t('successful-connection');
 			Communications.login()
 				.then(result => {
 					console.log("Passed - status" + result.status + " " + JSON.stringify(result.response));
@@ -306,9 +347,9 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 						Communications.getSiteId(result.response.token, this.site.current.state.propertyText)
 							.then(siteId => {
 								if (siteId === -1) {
-									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' does not exist";
+									message = i18n.t('successful-connection-but', {what: this.site.current.state.propertyText, happened: i18n.t('does-not-exist')});
 								}else if (siteId === -2) {
-									message = "Successfully connected to the SEMA service but site '" + this.site.current.state.propertyText + "' is not active";
+									message = i18n.t('successful-connection-but', {what: this.site.current.state.propertyText, happened: i18n.t('is-not-active')})
 								} else {
 
 									this.saveSettings(result.response.token, siteId);
@@ -321,8 +362,8 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 								}
 								this.setState({animating: false});
 								Alert.alert(
-									"Network Connection",
-									message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+									i18n.t('network-connection'),
+									message, [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 								);
 								if (siteId !== -1 && siteId !== -2) {
 									this.closeHandler();
@@ -333,8 +374,8 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 						this.setState({animating: false});
 						message = result.response.msg + "(Error code: " + result.status + ")";
 						Alert.alert(
-							"Network Connection",
-							message, [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+							i18n.t('network-connection'),
+							message, [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 						);
 					}
 				})
@@ -342,8 +383,8 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 					console.log("Failed- status " + result.status + " " + result.response.message);
 					this.setState({animating: false});
 					Alert.alert(
-						"Network Connection",
-						result.response.message + ". (" + result.status + ")", [{ text: 'OK', style: 'cancel' },], { cancelable: true }
+						i18n.t('network-connection'),
+						result.response.message + ". (" + result.status + ")", [{ text: i18n.t('ok'), style: 'cancel' },], { cancelable: true }
 					);
 				})
 		} catch (error) {
@@ -371,13 +412,40 @@ ${syncResult.productMrps.remoteProductMrps} product/channel prices updated`;
 			// New site - clear all data
 			this._clearDataAndSync();
 		}
+		
 		PosStorage.saveSettings(this.url.current.state.propertyText,
 			this.site.current.state.propertyText,
 			this.user.current.state.propertyText,
 			this.password.current.state.propertyText,
+			this.state.selectedLanguage,
 			token,
 			siteId );
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
+	}
+
+	getDefaultUILanguage() {
+		console.log(`CURRENT UI LANGUAGE IS ${this.props.settings.uiLanguage.name}`);
+		return this.props.settings.uiLanguage.name;
+	}
+
+	getDefaultUILanguageIndex() {
+		let langIdx = 0;
+		supportedUILanguages.forEach((lang, idx) => {
+			if (lang.name === this.props.settings.uiLanguage.name) {
+				langIdx = idx;
+			}
+		});
+		return langIdx;
+	}
+
+	onLanguageSelected(langIdx) { 
+		this.setState({
+			selectedLanguage: supportedUILanguages.filter((lang, idx) => idx === Number(langIdx))[0]
+		}, () => {
+			console.log(`Selected language is ${this.state.selectedLanguage.name}`);
+			i18n.locale = this.state.selectedLanguage.iso_code;
+			this.onSaveSettings();
+		});
 	}
 
 }

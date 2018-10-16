@@ -294,7 +294,7 @@ class Synchronization {
 						if (result.status === 200) {
 							console.log("New token Acquired");
 							PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user,
-								settings.password, result.response.token, settings.siteId );
+								settings.password, settings.uiLanguage, result.response.token, settings.siteId );
 							Communications.setToken(result.response.token);
 							PosStorage.setTokenExpiration();
 						}

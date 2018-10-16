@@ -3,6 +3,7 @@ import { View, Text, Button, TouchableHighlight, StyleSheet, TouchableNativeFeed
 import * as OrderActions from "../../actions/OrderActions";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
+import i18n from "../../app/i18n";
 
 class OrderCheckout extends Component {
 	render() {
@@ -11,7 +12,7 @@ class OrderCheckout extends Component {
 				<View style={[{flex: 1, justifyContent:'center'}, this.getOpacity()]}>
 					<TouchableHighlight underlayColor = '#c0c0c0'
 						onPress={() => this.onPay()}>
-						<Text style={[{paddingTop:20, paddingBottom:20}, styles.buttonText]}>Pay</Text>
+						<Text style={[{paddingTop:20, paddingBottom:20}, styles.buttonText]}>{i18n.t('pay')}</Text>
 					</TouchableHighlight>
 				</View>
 			</View>

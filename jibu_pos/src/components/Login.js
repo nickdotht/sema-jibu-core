@@ -8,6 +8,8 @@ import * as ToolbarActions from "../actions/ToolBarActions";
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
 
+import i18n from '../app/i18n';
+
 
 class Login extends Component {
 	constructor(props) {
@@ -44,7 +46,7 @@ class Login extends Component {
 									<TextInput
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
-										placeholder = 'User name or email'
+										placeholder = {i18n.t('username-or-email-placeholder')}
 										value = {this.state.username}
 										onChangeText={(text) => {this.setState({username:text}); this.setState({ invalidCredentials: false })}}/>
 
@@ -54,7 +56,7 @@ class Login extends Component {
 										style = {[styles.inputText, ]}
 										underlineColorAndroid='transparent'
 										secureTextEntry = {true}
-										placeholder = 'Password'
+										placeholder = {i18n.t('password-placeholder')}
 										value = {this.state.password}
 										onChangeText={(text) => {this.setState({password:text}); this.setState({ invalidCredentials: false })}}/>
 
@@ -64,7 +66,7 @@ class Login extends Component {
 									<View style={{justifyContent:'center', height:100, width:'30%', alignItems:'center'}}>
 										<TouchableHighlight underlayColor = '#c0c0c0'
 															onPress={() => this.onLogin()}>
-											<Text style={ [ {paddingTop:30, paddingBottom:30, width:300 }, styles.buttonText]}>Sign In</Text>
+											<Text style={ [ {paddingTop:30, paddingBottom:30, width:300 }, styles.buttonText]}>{i18n.t('sign-in')}</Text>
 										</TouchableHighlight>
 									</View>
 								</View>
@@ -118,7 +120,7 @@ class Login extends Component {
 			}}>
 
 				<View style={styles.loggingIn}>
-					<Text style={{fontSize:24, fontWeight:'bold'}}>Signing in....</Text>
+					<Text style={{fontSize:24, fontWeight:'bold'}}>{i18n.t('signing-in')}</Text>
 				</View>
 			</View>
 		);
@@ -127,7 +129,7 @@ class Login extends Component {
 		if (this.state.invalidCredentials) {
 			return (
 				<View style={[{ marginTop: 30 }, styles.errorContainer]}>
-					<Text style={styles.inputText}>Invalid user name and/or password</Text>
+					<Text style={styles.inputText}>{i18n.t('invalid-credentials')}</Text>
 				</View>
 
 			)

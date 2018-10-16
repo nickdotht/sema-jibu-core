@@ -66,7 +66,7 @@ class PosStorage {
 		this.lastProductsSync = firstSyncDate;
 		this.tokenExpiration = firstSyncDate;
 
-		this.settings = {semaUrl:"", site:"", user:"", password:"", token:"", siteId:"" };
+		this.settings = {semaUrl:"", site:"", user:"", password:"", uiLanguage:{}, token:"", siteId:"" };
 		this.salesChannels = [];
 		this.customerTypes = [];
 		this.productMrpDict = {};
@@ -684,8 +684,19 @@ class PosStorage {
 		return this.settings;
 	}
 
-	saveSettings( url, site, user, password, token, siteId  ){
-		let settings = {semaUrl:url, site:site, user:user, password:password, token:token, siteId:siteId };
+	loadSettings() {
+		console.log("PosStorage:loadSettings" );
+		return new Promise((resolve, reject) => {
+			this.getKey(settingsKey)
+				.then(settings => {
+					resolve(this.parseJson(settings));
+				})
+				.catch(err => reject(err))
+		});
+	}
+
+	saveSettings( url, site, user, password, uiLanguage, token, siteId  ){
+		let settings = {semaUrl:url, site, user, password, uiLanguage, token, siteId };
 		this.settings = settings;
 		this.setKey( settingsKey, this.stringify( settings));
 

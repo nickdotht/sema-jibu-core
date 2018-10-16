@@ -12,6 +12,13 @@ require( 'intl/locale-data/jsonp/sw-KE');	// Kenya
 require( 'intl/locale-data/jsonp/sw-TZ');	// Tanzania
 require( 'intl/locale-data/jsonp/en-ZW');	// Zimbabwe
 
+export const isEmptyObj = (obj) => {
+	for(var key in obj) {
+		if(obj.hasOwnProperty(key))
+			return false;
+	}
+	return true;
+}
 
 export function formatCurrency( value ){
 	let locale = 'en-US';
