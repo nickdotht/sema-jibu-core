@@ -19,6 +19,15 @@ const userToClient = user => {
 /* GET users listing. */
 router.get('/', function(req, res) {
 	semaLog.info('users - Enter');
+	// const roles = await db.user.getRoles();
+	// console.log('roles ===', roles);
+	db.user.findOne().then(user => {
+		user.getRoles().then(role => {
+			console.log('roles ===', JSON.stringify(role));
+			return;
+		});
+	});
+
 	db.user
 		.findAll({
 			include: [
@@ -37,7 +46,8 @@ router.get('/', function(req, res) {
 
 router.post('/', (req, res) => {
 	semaLog.info('create user - enter');
-	const { username, email, password, firstName, lastName } = req.body;
+	const { username, email, password, firstName, lastName, roles } = req.body;
+	let assignedRoles;
 
 	db.user
 		.findOne({
@@ -47,23 +57,50 @@ router.post('/', (req, res) => {
 		})
 		.then(user => {
 			if (user) {
+				semaLog.info('Email/username already exists');
 				res.status(400).json({
 					error: 'Email/username already exists'
 				});
 			} else {
-				db.user
-					.create({
-						username,
-						email,
-						password,
-						first_name: firstName,
-						last_name: lastName
+				db.role
+					.findAll({
+						where: {
+							code: [roles]
+						}
 					})
-					.then(user => {
-						semaLog.info('Create user success');
+					.then(dbRoles => {
+						if (!dbRoles) {
+							res.status(400).json({
+								error: 'Role(s) do not exist'
+							});
+						}
+						assignedRoles = dbRoles;
+						return db.user.create({
+							username,
+							email,
+							password,
+							first_name: firstName,
+							last_name: lastName
+						});
+					})
+					.then(createdUser => {
+						semaLog.info('User was created');
+						return assignedRoles.forEach(role =>
+							role.addUser(createdUser)
+						);
+					})
+					.then(result => {
+						semaLog.info('add role(s) to user');
 						res.json({
-							message: 'Create user success',
-							user: user.toJSON()
+							message: 'create user success',
+							user: result
+						});
+					})
+					.catch(err => {
+						semaLog.error('Create user with role - failed');
+						res.status(400).json({
+							message: 'ERROR',
+							err
 						});
 					});
 			}
@@ -128,19 +165,19 @@ router.delete('/:id', (req, res) => {
 				res.status(400).json({
 					message: 'User must be deactivated'
 				});
-			} else {
-				user.destroy()
-					.then(() =>
-						res.status(200).json({
-							message: `User ${id} successfully deleted`,
-							id
-						})
-					)
-					.catch(err => {
-						semaLog.error('Delete user failed', err);
-						res.status(400).json({ error: err });
-					});
 			}
+
+			user.destroy()
+				.then(() =>
+					res.status(200).json({
+						message: `User ${id} successfully deleted`,
+						id
+					})
+				)
+				.catch(err => {
+					semaLog.error('Delete user failed', err);
+					res.status(400).json({ error: err });
+				});
 		})
 		.catch(err => {
 			semaLog.error('Delete user - user not found');
