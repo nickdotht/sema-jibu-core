@@ -22,6 +22,7 @@ import {
 
 class App extends Component {
 	componentWillMount() {
+		document.body.style.backgroundColor = "rgb(24,55,106)";
 		let self = this;
 		window.addEventListener('resize', this.resize)
 		this.unlisten = history.listen((location, action) => {
