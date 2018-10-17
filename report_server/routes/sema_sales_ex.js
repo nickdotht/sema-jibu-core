@@ -14,8 +14,9 @@ const sqlTotalCustomers =
     FROM customer_account \
     WHERE customer_account.kiosk_id = ?';
 
+/* Note this returns the number of distinct customers for the period */
 const sqlCustomerCount =
-	'SELECT COUNT(name) FROM receipt_details where kiosk_id = ? \ ' +
+	'SELECT COUNT(DISTINCT name) FROM receipt_details where kiosk_id = ? \ ' +
 	'AND created_at BETWEEN ? AND ?';
 
 const sqlTotalRevenue =
@@ -166,7 +167,7 @@ const getCustomerCount = (connection, requestParams, results, beginDate, endDate
 				reject(err);
 			} else {
 				if (Array.isArray(sqlResult) && sqlResult.length >= 1) {
-					results.setCustomerCount(sqlResult[0]["COUNT(name)"]);
+					results.setCustomerCount(sqlResult[0]["COUNT(DISTINCT name)"]);
 				}
 				resolve();
 			}
