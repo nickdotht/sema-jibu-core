@@ -35,11 +35,28 @@ class SemaVolume extends Component {
 				<div className = "WaterVolumeProgress" style={{width:"100%", height:'100%'}}>
 					<LoadProgress/>
 				</div>
-				<div className = "WaterVolumeChannelAndLabel">
-					<div className = "WaterVolumeChannelLabel">"
-						<CustomerSummaryPanel title = {this.getTitle(this.props.volume)} valueColor = "rgb(40,88,197)"
-											  value = {this.calcTotalIncome()}
-											  units = ""/>
+				<div className = "WaterVolumeChannelAndLabels">
+					<div className = "WaterVolumeLabels">
+						<div className = "WaterVolumeLabel1">"
+							<CustomerSummaryPanel title = {this.getTitleVolumePeriod(this.props.volume)} valueColor = "rgb(40,88,197)"
+												  value = {this.calcTotalVolume()}
+												  units = ""/>
+						</div>
+						<div className = "WaterVolumeLabel2">"
+							<CustomerSummaryPanel title = {this.getTitleLitersPerPerson(this.props.volume)} valueColor = "rgb(40,88,197)"
+												  value = {this.calcTotalLitersPerPerson()}
+												  units = ""/>
+						</div>
+						<div className = "WaterVolumeLabel3">"
+							<CustomerSummaryPanel title = {this.getTitlePurchaseFrequency(this.props.volume)} valueColor = "rgb(40,88,197)"
+												  value = {this.calcPurchaseFrequency()}
+												  units = ""/>
+						</div>
+						<div className = "WaterVolumeLabel4">"
+							<CustomerSummaryPanel title = {this.getTitleVolumePerPurchase(this.props.volume)} valueColor = "rgb(40,88,197)"
+												  value = {this.calcVolumePerPurchase()}
+												  units = ""/>
+						</div>
 					</div>
 					<div className = "WaterVolumeChannel">
 						<WaterVolumeChannelChart  chartData={this.props.volume}/>
@@ -56,21 +73,42 @@ class SemaVolume extends Component {
             </div>
         );
     }
-    getTitle( volume ){
+	getTitleVolumePeriod( volume ){
     	if( volume.loaded ){
-			return "Total Volume for the Period (" + volume.volumeInfo.volumeWaterMeasureUnits + ")";
+			return "Total Volume (" + volume.volumeInfo.volumeWaterMeasureUnits + ")";
 		}else{
-			return "Total Volume for the Period";
+			return "Total Volume";
 		}
 	}
-    getHeight(){
+	getTitleLitersPerPerson( volume ){
+		if( volume.loaded ){
+			return "Volume/Consumer (" + volume.volumeInfo.volumeWaterMeasureUnits + ")";
+		}else{
+			return "Volume/Consumer";
+		}
+	}
+	getTitlePurchaseFrequency( volume ){
+		return "Avg. Purchase Frequency";
+	}
+
+
+	getTitleVolumePerPurchase( volume ){
+		if( volume.loaded ){
+			return "Volume/Purchase (" + volume.volumeInfo.volumeWaterMeasureUnits + ")";
+		}else{
+			return "Volume/Purchase";
+		}
+	}
+
+
+	getHeight(){
     	let windowHeight = window.innerHeight;
         // TODO 52px is the height of the toolbar. (Empirical)
 		windowHeight -= 52;
 		let height = windowHeight.toString()+'px';
     	return {height:height}
 	}
-	calcTotalIncome(){
+	calcTotalVolume(){
     	if( this.props.volume.volumeInfo.volumeByChannel.hasOwnProperty("volume")){
 			if( this.props.volume.volumeInfo.volumeByChannel.volume.hasOwnProperty("data")){
 				let totalVolume = this.props.volume.volumeInfo.volumeByChannel.volume.data.reduce( (total, salesChannel) => { return(total + salesChannel.volume)}, 0);
@@ -79,11 +117,76 @@ class SemaVolume extends Component {
 		}
 		return "N/A";
 	}
+	calcTotalLitersPerPerson(){
+    	const totalVolume = this.calcTotalVolume();
+    	if( totalVolume != "N/A") {
+			// Find the kiosk.
+			const kiosk = this.getKiosk();
+			if (kiosk && kiosk.consumerBase && kiosk.consumerBase > 0) {
+				const value = totalVolume / kiosk.consumerBase;
+				return value.toFixed(1);
+			}
+		}
+		return "N/A";
+
+	}
+	calcVolumePerPurchase(){
+		const totalVolume = this.calcTotalVolume();		// Total volume for the period
+		if( totalVolume != "N/A"){
+			const totalReceipts = this.calcTotalReceipts();
+			if( totalReceipts != "N/A" ){
+				return (totalVolume/totalReceipts).toFixed(1);
+			}
+		}
+		return "N/A";
+	}
+	calcPurchaseFrequency(){
+		const distinctCustomers = this.calcDistinctCustomers();		// Total distinct customers for the period
+		if( distinctCustomers != "N/A"){
+			const totalReceipts = this.calcTotalReceipts();
+			if( totalReceipts != "N/A" ){
+				return (totalReceipts/distinctCustomers).toFixed(1);
+			}
+		}
+		return "N/A";
+	}
+
+	calcTotalReceipts(){
+		if( this.props.volume.volumeInfo.volumeByChannel.hasOwnProperty("total")){
+			if( this.props.volume.volumeInfo.volumeByChannel.total.hasOwnProperty("data")){
+				let totalReceipts = this.props.volume.volumeInfo.volumeByChannel.total.data.reduce( (totalReceipts, dataItem) => { return(totalReceipts + dataItem.receipts)}, 0);
+				return totalReceipts;
+			}
+		}
+		return "N/A";
+	}
+
+	calcDistinctCustomers(){
+		if( this.props.volume.volumeInfo.volumeByChannel.hasOwnProperty("total")){
+			if( this.props.volume.volumeInfo.volumeByChannel.total.hasOwnProperty("data")){
+				let distinctCustomers = this.props.volume.volumeInfo.volumeByChannel.total.data.reduce( (distinctCustomers, dataItem) => { return(distinctCustomers + dataItem.numberCustomers)}, 0);
+				return distinctCustomers;
+			}
+		}
+		return "N/A";
+	}
+
+	getKiosk() {
+		if (this.props.kiosk.selectedKiosk) {
+			for (let index = 0; index < this.props.kiosk.kiosks.length; index++) {
+				if (this.props.kiosk.kiosks[index].id === this.props.kiosk.selectedKiosk.kioskID) {
+					return this.props.kiosk.kiosks[index];
+				}
+			}
+		}
+		return null;
+	}
 }
 
 function mapStateToProps(state) {
 	return {
 		volume:state.volume,
+		kiosk:state.kiosk,
 		healthCheck: state.healthCheck
 	};
 }

@@ -7,8 +7,11 @@ class CustomerSummary {
 	addCustomerCount( value ){
 		this.customerCount = value;
 	}
-	addConsumerBase( value ){
-		this.consumerBase = value;
+	addCustomerConsumerBase( value ){
+		this.customerConsumerBase = value;
+	}
+	addSiteConsumerBase( value ){
+		this.siteConsumerBase = value;
 	}
 
 	addIncomeGT( value ){

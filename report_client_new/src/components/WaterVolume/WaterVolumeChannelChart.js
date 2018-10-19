@@ -51,8 +51,8 @@ class WaterVolumeChannelChart extends Component {
 	getVolumeData(){
 		let data = {labels:[], datasets:[]}
 		if( this.props.chartData.loaded ) {
-    		if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel')){
-
+    		if( this.props.chartData.volumeInfo.hasOwnProperty('volumeByChannel') &&
+				this.props.chartData.volumeInfo.volumeByChannel.hasOwnProperty('volume') ){
 				data.datasets.push( {label: "Volume by Sales Channel", backgroundColor:[], data:[]});
 
 				this.props.chartData.volumeInfo.volumeByChannel.volume.data.forEach((salesChannel, index) => {

@@ -55,16 +55,17 @@ class CustomersByGenderChart extends Component {
 
 				data.datasets.push( {label: "", backgroundColor:[], data:[]});
 				let [ maleCount, femaleCount, naCount] = this.calcGenderValues( this.props.chartData.customerInfo );
+				let total = maleCount + femaleCount + naCount;
 
-				data.labels.push("Male");
+				data.labels.push("Male (" + ((maleCount *100)/total).toFixed(0) + "%)");
 				data.datasets[0].backgroundColor.push( utilService.getBackgroundColorByIndex2( 0 ) );
 				data.datasets[0].data.push(maleCount );
 
-				data.labels.push("Female");
+				data.labels.push("Female (" + ((femaleCount *100)/total).toFixed(0) + "%)");
 				data.datasets[0].backgroundColor.push( utilService.getBackgroundColorByIndex2( 1 ) );
 				data.datasets[0].data.push(femaleCount );
 
-				data.labels.push("Not Available");
+				data.labels.push("Not Available (" + ((naCount *100)/total).toFixed(0) + "%)");
 				data.datasets[0].backgroundColor.push( utilService.getBackgroundColorByIndex2( 2 ) );
 				data.datasets[0].data.push(naCount );
 
