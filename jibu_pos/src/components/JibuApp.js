@@ -99,6 +99,7 @@ class JibuApp extends Component {
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this));
 		Events.on('ProductsUpdated', 'productUpdate1', this.onProductsUpdated.bind(this));
+		Events.on('SalesChannelsUpdated', 'SalesChannelsUpdated1', this.onSalesChannelUpdated.bind(this));
 
 		console.log("JibuApp = Mounted-Done");
 
@@ -116,6 +117,11 @@ class JibuApp extends Component {
 	onProductsUpdated = () =>{
 		this.props.productActions.setProducts(this.posStorage.getProducts());
 	};
+
+	onSalesChannelUpdated() {
+		console.log('Update sales channels bar');
+		this.forceUpdate();
+	}
 
 	handleConnectivityChange = isConnected => {
 		console.log("handleConnectivityChange: " + isConnected);
