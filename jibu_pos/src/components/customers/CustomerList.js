@@ -78,8 +78,7 @@ class CustomerList extends Component {
 		this.salesChannels = PosStorage.getSalesChannelsForDisplay();
 		let data = [];
 		if (this.props.customers.length > 0) {
-			data = this.props.customers.slice();
-			data = this.filterItems( data );
+			data = this.filterItems(this.props.customers);
 			data.sort((a, b) => {
 				if( this._isAnonymousCustomer(a )){
 					return -1;		//anonymous walk-up client always is at the top
@@ -92,14 +91,35 @@ class CustomerList extends Component {
 		return data;
 	};
 	filterItems = (data) => {
-		let filteredItems = [];
-		for( let i = 0; i < data.length; i++ ){
-			if( this.filterItem( data[i], this.salesChannels)){
-				filteredItems.push(data[i]);
+		let filteredItems = data.filter(item => {
+			let salesChannel = this._getSalesChannelName(item.salesChannelId, this.salesChannels);
+			
+			if (this._isAnonymousCustomer(item)) {
+				return true;	// Anonymous client is always shown
 			}
-		}
-		return filteredItems;
 
+			// If there is a search string
+			if (this.state.searchString.length > 0) {
+				const filterString = this.state.searchString.toLowerCase();
+				const name = item.name.toLowerCase();
+				const names = name.split(' ');
+				if (name.startsWith(filterString) ||
+					(names.length > 1 && names[names.length-1].startsWith(filterString)) ||
+					item.phoneNumber.startsWith(filterString)) {
+
+					return this.props.filter === 'all' ||
+						(this.props.filter === "credit" && item.dueAmount > 0) ||
+						this.props.filter === salesChannel;
+				} else {
+					return false;
+				}
+			}
+
+			return this.props.filter === 'all' ||
+			(this.props.filter === "credit" && item.dueAmount > 0) ||
+			this.props.filter === salesChannel;
+		});
+		return filteredItems;
 	};
 
 	getRow = (item, index, separators) =>{
@@ -146,36 +166,6 @@ class CustomerList extends Component {
 		}
 	}
 
-	filterItem = (item, salesChannels )=> {
-		try {
-			let salesChannel = this._getSalesChannelName(item.salesChannelId, salesChannels);
-
-			if ( this._isAnonymousCustomer(item) ) {
-				return true;	// Anonymous client is always shown
-			}
-			if (this.props.filter === "all" ||
-				(this.props.filter === "reseller" && salesChannel === "reseller") ||
-				(this.props.filter === "walkup" && salesChannel !== "reseller") ||
-				(this.props.filter === "credit" && item.dueAmount > 0)) {
-				if (this.state.searchString.length >= 2) {
-					const filterString = this.state.searchString.toLowerCase();
-					const name = item.name.toLowerCase();
-					const names = name.split(' ');
-					if (name.startsWith(filterString) ||
-						(names.length > 1 && names[names.length-1].startsWith(filterString)) ||
-						item.phoneNumber.startsWith(filterString)) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-				return true;
-			}
-		}catch( error ){
-			console.log( "CustomerList:filterItem " + error);
-		}
-		return false;
-	};
 	_getSalesChannelName(channelId, salesChannels){
 		for( let i = 0; i < salesChannels.length; i++ ){
 			if( salesChannels[i].id === channelId){
@@ -294,6 +284,8 @@ class SearchWatcher extends React.Component {
 		return this.searchEvent();
 
 	}
+
+	// TODO: Use states instead of setTimeout
 	searchEvent(){
 		console.log("SearchWatcher");
 		let that = this;
