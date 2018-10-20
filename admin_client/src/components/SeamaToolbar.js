@@ -1,26 +1,33 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 // import ReactDOM from 'react-dom';
-import { Navbar, Nav, NavItem } from "react-bootstrap";
-import "App.css";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { authActions, healthCheckActions } from "actions";
-import { withRouter } from "react-router";
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import 'App.css';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { authActions, healthCheckActions } from 'actions';
+import { withRouter } from 'react-router';
 
 class SeamaToolbar extends Component {
-  componentDidMount() {
-    window.addEventListener("tokenExpired", this.handleExpiredEvent.bind(this));
+  constructor(props) {
+    super(props);
+    this.logOut = this.logOut.bind(this);
   }
+
+  componentDidMount() {
+    window.addEventListener('tokenExpired', this.handleExpiredEvent.bind(this));
+  }
+
   handleExpiredEvent(event) {
-    console.log("tokenExpired");
+    console.log('tokenExpired');
     this.props.authActions.logout();
   }
+
   componentWillUnmount() {
-    window.removeEventListener("tokenExpired", this.handleExpiredEvent);
+    window.removeEventListener('tokenExpired', this.handleExpiredEvent);
   }
 
   logOut() {
-    console.log("logout");
+    console.log('logout');
     this.props.authActions.logout();
   }
 
@@ -35,17 +42,24 @@ class SeamaToolbar extends Component {
         <Navbar
           bsStyle="inverse"
           style={{
-            marginBottom: "0px",
+            marginBottom: '0px',
             borderRadius: 0
           }}
         >
           <Navbar.Text>
-            Welcome {first_name} {last_name}
+            Welcome
+            {' '}
+            {first_name}
+            {' '}
+            {last_name}
           </Navbar.Text>
-          <Navbar.Text>Version: {this.props.Version}</Navbar.Text>
+          <Navbar.Text>
+            Version:
+            {this.props.Version}
+          </Navbar.Text>
           <Navbar.Text>
             Server:
-            {healthCheck.server === "Ok"
+            {healthCheck.server === 'Ok'
               ? healthCheck.version
               : healthCheck.server}
           </Navbar.Text>

@@ -1,39 +1,39 @@
 // TODO make API call to get roles
 export default [
   {
-    value: 3,
+    value: 'admin',
     label: 'Admin'
   },
   {
-    value: 4,
+    value: 'hq',
     label: 'HQ Staff'
   },
   {
-    value: 5,
+    value: 'reg_manager',
     label: 'Regional Manager'
   },
   {
-    value: 6,
+    value: 'marketing',
     label: 'Marketing'
   },
   {
-    value: 7,
+    value: 'technical',
     label: 'Technical'
   },
   {
-    value: 8,
+    value: 'supervisor',
     label: 'Kiosk Supervisor'
   },
   {
-    value: 9,
+    value: 'operator',
     label: 'Kiosk Operator'
   },
   {
-    value: 10,
+    value: 'assistant',
     label: 'Kiosk Assistant'
   },
   {
-    value: 11,
+    value: 'driver',
     label: 'Kiosk Driver'
   }
 ];

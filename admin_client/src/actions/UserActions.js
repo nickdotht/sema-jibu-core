@@ -3,6 +3,9 @@ import {
   FETCH_USERS_REQUEST,
   FETCH_USERS_SUCCESS,
   FETCH_USERS_FAILURE,
+  CREATE_USER_REQUEST,
+  CREATE_USER_SUCCESS,
+  CREATE_USER_FAILURE,
   DELETE_USER_REQUEST,
   DELETE_USER_SUCCESS,
   DELETE_USER_FAILURE
@@ -17,6 +20,16 @@ export const fetchSuccess = data => ({
 
 export const fetchFailure = data => ({
   type: FETCH_USERS_FAILURE,
+  payload: data
+});
+
+export const createUserRequest = () => ({ type: CREATE_USER_REQUEST });
+export const createUserSuccess = data => ({
+  type: CREATE_USER_SUCCESS,
+  payload: data
+});
+export const createUserFailure = data => ({
+  type: CREATE_USER_FAILURE,
   payload: data
 });
 
@@ -36,6 +49,14 @@ export const fetchUsers = () => dispatch => {
     .get('/sema/users')
     .then(response => dispatch(fetchSuccess(response.data)))
     .catch(err => dispatch(fetchFailure(err)));
+};
+
+export const createUser = data => dispatch => {
+  dispatch(createUserRequest());
+  return axiosService
+    .post('/sema/users', { data })
+    .then(response => dispatch(createUserSuccess(response.data)))
+    .catch(err => dispatch(createUserFailure(err)));
 };
 
 export const deleteUser = id => dispatch => {

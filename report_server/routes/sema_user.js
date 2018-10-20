@@ -19,14 +19,6 @@ const userToClient = user => {
 /* GET users listing. */
 router.get('/', function(req, res) {
 	semaLog.info('users - Enter');
-	// const roles = await db.user.getRoles();
-	// console.log('roles ===', roles);
-	db.user.findOne().then(user => {
-		user.getRoles().then(role => {
-			console.log('roles ===', JSON.stringify(role));
-			return;
-		});
-	});
 
 	db.user
 		.findAll({
@@ -46,7 +38,14 @@ router.get('/', function(req, res) {
 
 router.post('/', (req, res) => {
 	semaLog.info('create user - enter');
-	const { username, email, password, firstName, lastName, roles } = req.body;
+	const {
+		username,
+		email,
+		password,
+		firstName,
+		lastName,
+		roles
+	} = req.body.data;
 	let assignedRoles;
 
 	db.user
@@ -97,7 +96,7 @@ router.post('/', (req, res) => {
 						});
 					})
 					.catch(err => {
-						semaLog.error('Create user with role - failed');
+						semaLog.error(`Create user with role - failed ${err}`);
 						res.status(400).json({
 							message: 'ERROR',
 							err
@@ -106,7 +105,7 @@ router.post('/', (req, res) => {
 			}
 		})
 		.catch(err => {
-			semaLog.error('Create user - failed', err);
+			semaLog.error(`Create user failed - ${err}`);
 			res.status(400).json({ error: 'Failed to create user' });
 		});
 });
@@ -150,6 +149,7 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
 	const id = req.params.id;
+	semaLog.info(`Enter delete user ${id}`);
 	db.user
 		.find({
 			where: { id }

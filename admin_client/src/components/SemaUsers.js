@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { submit } from 'redux-form';
 import { bindActionCreators } from 'redux';
+import { submit } from 'redux-form';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router';
 
-import { fetchUsers, deleteUser } from 'actions/UserActions';
+import { fetchUsers, deleteUser, createUser } from 'actions/UserActions';
 import UserList from './common/UserList';
 import Button from './common/Button';
 import Modal from './common/Modal';
@@ -38,6 +38,10 @@ class SemaUsers extends Component {
     this.props.fetchUsers();
   }
 
+  submit() {
+    console.log('submit');
+  }
+
   showContent() {
     const { healthCheck, users, loading } = this.props;
 
@@ -67,7 +71,9 @@ class SemaUsers extends Component {
             onClose={this.closeCreateModal}
             onSave={this.props.onSave}
             title="Create User"
-            body={<UserForm />}
+            body={
+              <UserForm onSubmit={values => this.props.createUser(values)} />
+            }
           />
         )}
         {!loading && (
@@ -97,6 +103,7 @@ function mapDispatchToProps(dispatch) {
     healthCheckActions: bindActionCreators(healthCheckActions, dispatch),
     fetchUsers: bindActionCreators(fetchUsers, dispatch),
     deleteUser: bindActionCreators(deleteUser, dispatch),
+    createUser: bindActionCreators(createUser, dispatch),
     onSave: () => dispatch(submit('userForm'))
   };
 }
