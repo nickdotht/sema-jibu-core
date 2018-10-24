@@ -4,16 +4,19 @@ import { bindActionCreators } from 'redux';
 import { submit } from 'redux-form';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router';
+import { RingLoader } from 'react-spinners';
 
 import { fetchUsers, deleteUser, createUser } from 'actions/UserActions';
 import UserList from './common/UserList';
 import Button from './common/Button';
 import Modal from './common/Modal';
 import UserForm from './common/UserForm';
+import './common/style.css';
 
 // TODO split up container and presentational components
 import SeamaDatabaseError from './SeamaDatabaseError';
 import SeamaServiceError from './SeamaServiceError';
+import { createLoadingSelector } from '../reducers/selectors';
 
 class SemaUsers extends Component {
   constructor(props) {
@@ -36,10 +39,6 @@ class SemaUsers extends Component {
 
   componentDidMount() {
     this.props.fetchUsers();
-  }
-
-  submit() {
-    console.log('submit');
   }
 
   showContent() {
@@ -76,6 +75,11 @@ class SemaUsers extends Component {
             }
           />
         )}
+        {loading && (
+          <div className="spinner">
+            <RingLoader color="#36D7B7" />
+          </div>
+        )}
         {!loading && (
           <UserList
             data={users}
@@ -91,10 +95,12 @@ class SemaUsers extends Component {
   }
 }
 
+const loadingSelector = createLoadingSelector(['FETCH_USERS']);
 function mapStateToProps(state) {
   return {
     healthCheck: state.healthCheck,
-    users: state.users
+    users: state.users,
+    loading: loadingSelector(state)
   };
 }
 

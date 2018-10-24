@@ -6,6 +6,7 @@ import { persistReducer } from 'redux-persist';
 import healthCheck from './HealthcheckReducer';
 import auth from './AuthReducer';
 import userReducer from './UserReducer';
+import loadingReducer from './LoadingReducer';
 
 const rootPersistConfig = {
   key: 'root',
@@ -18,7 +19,8 @@ const rootReducer = combineReducers({
   healthCheck,
   auth,
   users: userReducer,
-  form: formReducer
+  form: formReducer,
+  loading: loadingReducer
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);
