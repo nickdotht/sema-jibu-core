@@ -47,6 +47,7 @@ router.post('/', (req, res) => {
 		roles
 	} = req.body.data;
 	let assignedRoles;
+	let createdUser;
 
 	db.user
 		.findOne({
@@ -82,8 +83,9 @@ router.post('/', (req, res) => {
 							last_name: lastName
 						});
 					})
-					.then(createdUser => {
+					.then(newUser => {
 						semaLog.info('User was created');
+						createdUser = newUser;
 						return assignedRoles.forEach(role =>
 							role.addUser(createdUser)
 						);
@@ -92,7 +94,7 @@ router.post('/', (req, res) => {
 						semaLog.info('add role(s) to user');
 						res.json({
 							message: 'create user success',
-							user: result
+							user: createdUser.toJSON()
 						});
 					})
 					.catch(err => {

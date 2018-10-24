@@ -70,9 +70,14 @@ class SemaUsers extends Component {
             onClose={this.closeCreateModal}
             onSave={this.props.onSave}
             title="Create User"
-            body={
-              <UserForm onSubmit={values => this.props.createUser(values)} />
-            }
+            body={(
+              <UserForm
+                onSubmit={values => {
+                  this.props.createUser(values);
+                  this.closeCreateModal();
+                }}
+              />
+            )}
           />
         )}
         {loading && (
