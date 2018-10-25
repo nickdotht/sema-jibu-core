@@ -34,33 +34,41 @@ class CustomerViews {
 	constructor() {
 		this.views = {};
 		this.navigator;
+		this.buildNavigator();
+	}
 
-		PosStorage.loadSalesChannels()
-			.then(savedSalesChannels => {
-				this.createScreens(savedSalesChannels);
-
-				this.navigator = createBottomTabNavigator(this.views, {
-					tabBarOptions: {
+	buildNavigator() {
+		return new Promise(resolve => {
+			console.log("buildNavigator");
+			this.views = {}
+			PosStorage.loadSalesChannels()
+				.then(savedSalesChannels => {
+					this.createScreens(savedSalesChannels);
+					this.navigator = createBottomTabNavigator(this.views, {
+						tabBarOptions: {
 						activeTintColor: '#F0F0F0',
 						activeBackgroundColor: "#18376A",
 						inactiveTintColor: '#000000',
 						inactiveBackgroundColor: 'white',
-						style: { borderTopColor:'black', borderTopWidth:3},
+						style: { borderTopColor: 'black', borderTopWidth: 3 },
 						// style: {padding:0, margin:0, borderColor:'red', borderWidth:5, justifyContent: 'center', alignItems: 'center' },
 						labelStyle: {
 							fontSize: 18,
 							padding: 12
 						},
-						tabStyle: {justifyContent: 'center', alignItems: 'center'},
+						tabStyle: { justifyContent: 'center', alignItems: 'center' },
 						// tabStyle: {
-						// 	borderBottomColor: '#ebcccc',
-						// 	width: 100,
-						// 	height:600,
-						// 	// backgroundColor:"yellow"
+						//     borderBottomColor: '#ebcccc',
+						//     width: 100,
+						//     height:600,
+						//     // backgroundColor:"yellow"
 						// }
-					}
+						}
+					});
+					resolve();
+	
 				});
-			});
+		});
 	}
 
 	// Create screens from sales channels
@@ -72,7 +80,7 @@ class CustomerViews {
 		salesChannels.push({name: 'credit'});
 		
 		salesChannels.forEach(salesChannel => {
-			channelScreen = (props) => (<SalesChannelScreen
+			channelScreen = props => (<SalesChannelScreen
 												screenProps={props.screenProps}
 												navigation={props.navigation}
 												filter={salesChannel.name} />);
