@@ -1,6 +1,7 @@
 import {
   FETCH_USERS_SUCCESS,
   CREATE_USER_SUCCESS,
+  UPDATE_USER_SUCCESS,
   DELETE_USER_SUCCESS,
   TOGGLE_USER_SUCCESS
 } from 'actions';
@@ -13,6 +14,7 @@ const userReducer = (state = [], action) => {
     case CREATE_USER_SUCCESS:
       user = action.payload.user;
       return [...state, { ...user }];
+    case UPDATE_USER_SUCCESS:
     case TOGGLE_USER_SUCCESS:
       user = action.payload.user;
       return state.map(item => {

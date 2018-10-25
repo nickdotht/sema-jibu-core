@@ -98,10 +98,10 @@ class SemaUsers extends Component {
                   this.closeCreateModal();
                 }}
               />
-)}
+            )}
           />
         )}
-
+        
         <UserList
           loading={loading}
           data={users}
