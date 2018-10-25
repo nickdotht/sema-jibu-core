@@ -13,7 +13,7 @@ const userToClient = user => {
 		username: user.username,
 		firstName: user.first_name,
 		lastName: user.last_name,
-		role: user.roles.map(role => role.authority)
+		role: user.roles.map(role => role.code)
 	};
 };
 /* GET users listing. */

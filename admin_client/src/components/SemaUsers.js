@@ -24,9 +24,27 @@ class SemaUsers extends Component {
 
     this.openCreateModal = this.openCreateModal.bind(this);
     this.closeCreateModal = this.closeCreateModal.bind(this);
+    this.editUser = this.editUser.bind(this);
     this.state = {
-      show: false
+      show: false,
+      editMode: false,
+      editUser: {}
     };
+  }
+
+  componentDidMount() {
+    this.props.fetchUsers();
+  }
+
+  clearState() {
+    this.setState({ show: false, editMode: false, editUser: {} });
+  }
+
+  editUser(id) {
+    const { users } = this.props;
+    const user = users.filter(user => id === user.id);
+    this.setState({ editMode: true, editUser: user });
+    this.openCreateModal();
   }
 
   openCreateModal() {
@@ -34,15 +52,12 @@ class SemaUsers extends Component {
   }
 
   closeCreateModal() {
-    this.setState({ show: false });
-  }
-
-  componentDidMount() {
-    this.props.fetchUsers();
+    this.clearState();
   }
 
   showContent() {
     const { healthCheck, users, loading } = this.props;
+    const { editMode } = this.state;
 
     if (healthCheck.server !== 'Ok') {
       return SeamaServiceError();
@@ -69,15 +84,18 @@ class SemaUsers extends Component {
             show
             onClose={this.closeCreateModal}
             onSave={this.props.onSave}
-            title="Create User"
+            title={editMode ? 'Edit User' : 'Create User'}
             body={(
               <UserForm
+                user={this.state.editUser}
                 onSubmit={values => {
-                  this.props.createUser(values);
+                  editMode
+                    ? this.props.updateUser(values)
+                    : this.props.createUser(values);
                   this.closeCreateModal();
                 }}
               />
-            )}
+)}
           />
         )}
         {loading && (
@@ -88,6 +106,7 @@ class SemaUsers extends Component {
         {!loading && (
           <UserList
             data={users}
+            onEditClick={id => this.editUser(id)}
             onDeleteClick={id => this.props.deleteUser(id)}
           />
         )}
@@ -115,6 +134,7 @@ function mapDispatchToProps(dispatch) {
     fetchUsers: bindActionCreators(fetchUsers, dispatch),
     deleteUser: bindActionCreators(deleteUser, dispatch),
     createUser: bindActionCreators(createUser, dispatch),
+    updateUser: values => console.log('edit users ', values),
     onSave: () => dispatch(submit('userForm'))
   };
 }
