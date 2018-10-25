@@ -120,7 +120,9 @@ class JibuApp extends Component {
 
 	onSalesChannelUpdated() {
 		console.log('Update sales channels bar');
-		this.forceUpdate();
+		CustomerViews.buildNavigator().then(() => {
+			this.forceUpdate();
+		});
 	}
 
 	handleConnectivityChange = isConnected => {
@@ -183,10 +185,11 @@ class JibuApp extends Component {
 
 class ViewSwitcher extends Component {
 	render() {
+		const CVNavigator = CustomerViews;
 		if (this.props.Jibu.props.showView.showNewOrder) {
 			return (<OrderView/>)
 		} else {
-			return (<CustomerViews.navigator screenProps={{parent: this.props.Jibu}}/>)
+			return (<CVNavigator.navigator screenProps={{parent: this.props.Jibu}}/>)
 		}
 	}
 }
