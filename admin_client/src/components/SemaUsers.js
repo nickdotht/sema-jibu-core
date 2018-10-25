@@ -4,14 +4,17 @@ import { bindActionCreators } from 'redux';
 import { submit } from 'redux-form';
 import * as healthCheckActions from 'actions/healthCheckActions';
 import { withRouter } from 'react-router';
-import { RingLoader } from 'react-spinners';
-
-import { fetchUsers, deleteUser, createUser } from 'actions/UserActions';
+import {
+  fetchUsers,
+  deleteUser,
+  createUser,
+  updateUser,
+  toggleUser
+} from 'actions/UserActions';
 import UserList from './common/UserList';
 import Button from './common/Button';
 import Modal from './common/Modal';
 import UserForm from './common/UserForm';
-import './common/style.css';
 
 // TODO split up container and presentational components
 import SeamaDatabaseError from './SeamaDatabaseError';
@@ -98,18 +101,14 @@ class SemaUsers extends Component {
 )}
           />
         )}
-        {loading && (
-          <div className="spinner">
-            <RingLoader color="#36D7B7" />
-          </div>
-        )}
-        {!loading && (
-          <UserList
-            data={users}
-            onEditClick={id => this.editUser(id)}
-            onDeleteClick={id => this.props.deleteUser(id)}
-          />
-        )}
+
+        <UserList
+          loading={loading}
+          data={users}
+          onToggleUser={id => this.props.toggleUser(id)}
+          onEditClick={id => this.editUser(id)}
+          onDeleteClick={id => this.props.deleteUser(id)}
+        />
       </div>
     );
   }
@@ -119,7 +118,13 @@ class SemaUsers extends Component {
   }
 }
 
-const loadingSelector = createLoadingSelector(['FETCH_USERS']);
+const loadingSelector = createLoadingSelector([
+  'FETCH_USERS',
+  'CREATE_USER',
+  'UPDATE_USER',
+  'DELETE_USER',
+  'TOGGLE_USER'
+]);
 function mapStateToProps(state) {
   return {
     healthCheck: state.healthCheck,
@@ -134,7 +139,8 @@ function mapDispatchToProps(dispatch) {
     fetchUsers: bindActionCreators(fetchUsers, dispatch),
     deleteUser: bindActionCreators(deleteUser, dispatch),
     createUser: bindActionCreators(createUser, dispatch),
-    updateUser: values => console.log('edit users ', values),
+    updateUser: bindActionCreators(updateUser, dispatch),
+    toggleUser: bindActionCreators(toggleUser, dispatch),
     onSave: () => dispatch(submit('userForm'))
   };
 }

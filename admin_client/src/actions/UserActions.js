@@ -1,45 +1,55 @@
 import { axiosService } from 'services';
-import {
-  FETCH_USERS_REQUEST,
-  FETCH_USERS_SUCCESS,
-  FETCH_USERS_FAILURE,
-  CREATE_USER_REQUEST,
-  CREATE_USER_SUCCESS,
-  CREATE_USER_FAILURE,
-  DELETE_USER_REQUEST,
-  DELETE_USER_SUCCESS,
-  DELETE_USER_FAILURE
-} from './ActionTypes';
+import * as a from './ActionTypes';
 
-export const fetchUsersRequest = () => ({ type: FETCH_USERS_REQUEST });
+export const fetchUsersRequest = () => ({ type: a.FETCH_USERS_REQUEST });
 
 export const fetchSuccess = data => ({
-  type: FETCH_USERS_SUCCESS,
+  type: a.FETCH_USERS_SUCCESS,
   payload: data
 });
 
 export const fetchFailure = data => ({
-  type: FETCH_USERS_FAILURE,
+  type: a.FETCH_USERS_FAILURE,
   payload: data
 });
 
-export const createUserRequest = () => ({ type: CREATE_USER_REQUEST });
+export const updateUserRequest = () => ({ type: a.UPDATE_USER_REQUEST });
+export const updateUserSuccess = data => ({
+  type: a.UPDATE_USER_SUCCESS,
+  payload: data
+});
+export const updateUserFailure = data => ({
+  type: a.UPDATE_USER_FAILURE,
+  payload: data
+});
+
+export const createUserRequest = () => ({ type: a.CREATE_USER_REQUEST });
 export const createUserSuccess = data => ({
-  type: CREATE_USER_SUCCESS,
+  type: a.CREATE_USER_SUCCESS,
   payload: data
 });
 export const createUserFailure = data => ({
-  type: CREATE_USER_FAILURE,
+  type: a.CREATE_USER_FAILURE,
   payload: data
 });
 
-export const deleteUserRequest = () => ({ type: DELETE_USER_REQUEST });
+export const deleteUserRequest = () => ({ type: a.DELETE_USER_REQUEST });
 export const deleteUserSuccess = data => ({
-  type: DELETE_USER_SUCCESS,
+  type: a.DELETE_USER_SUCCESS,
   payload: data
 });
 export const deleteUserFailure = data => ({
-  type: DELETE_USER_FAILURE,
+  type: a.DELETE_USER_FAILURE,
+  payload: data
+});
+
+export const toggleUserRequest = () => ({ type: a.TOGGLE_USER_REQUEST });
+export const toggleUserSuccess = data => ({
+  type: a.TOGGLE_USER_SUCCESS,
+  payload: data
+});
+export const toggleUserFailure = data => ({
+  type: a.TOGGLE_USER_FAILURE,
   payload: data
 });
 
@@ -57,6 +67,22 @@ export const createUser = data => dispatch => {
     .post('/sema/users', { data })
     .then(response => dispatch(createUserSuccess(response.data)))
     .catch(err => dispatch(createUserFailure(err)));
+};
+
+export const updateUser = data => dispatch => {
+  dispatch(updateUserRequest());
+  return axiosService
+    .put(`/sema/users/${data.id}`, { data })
+    .then(response => dispatch(updateUserSuccess(response.data)))
+    .catch(err => dispatch(updateUserFailure(err)));
+};
+
+export const toggleUser = id => dispatch => {
+  dispatch(toggleUserRequest());
+  return axiosService
+    .put(`/sema/users/toggle/${id}`)
+    .then(response => dispatch(toggleUserSuccess(response.data)))
+    .catch(err => dispatch(toggleUserFailure(err)));
 };
 
 export const deleteUser = id => dispatch => {

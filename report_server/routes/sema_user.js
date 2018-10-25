@@ -13,7 +13,8 @@ const userToClient = user => {
 		username: user.username,
 		firstName: user.first_name,
 		lastName: user.last_name,
-		role: user.roles.map(role => role.code)
+		role: user.roles.map(role => role.code),
+		active: !!user.active
 	};
 };
 /* GET users listing. */
@@ -112,8 +113,39 @@ router.post('/', (req, res) => {
 		});
 });
 
+router.put('/toggle/:id', (req, res) => {
+	semaLog.info('Users activate/deactivate - Enter ');
+	db.user
+		.find({
+			where: {
+				id: req.params.id
+			}
+		})
+		.then(user => {
+			if (!user) {
+				res.status(404).json({
+					message: 'User not found'
+				});
+			}
+			user.update({
+				active: !user.active
+			}).then(updatedUser => {
+				res.status(200).json({
+					message: `User ${
+						user.active ? 'is active' : 'is deactive'
+					}`,
+					user: user.toJSON()
+				});
+			});
+		})
+		.catch(err => {
+			res.status(400).json({
+				messsage: `User toggle update failed`
+			});
+		});
+});
 router.put('/:id', (req, res) => {
-	const { username, email, password, firstName, lastName } = req.body;
+	const { username, email, password, firstName, lastName } = req.body.data;
 	db.user
 		.find({
 			where: {
@@ -139,12 +171,12 @@ router.put('/:id', (req, res) => {
 						.json({ message: 'User updated', user: user.toJSON() })
 				)
 				.catch(err => {
-					semaLog.error('Update user failed', err);
+					semaLog.error(`Update user failed - ${err}`);
 					res.status(400).json({ error: err });
 				});
 		})
 		.catch(err => {
-			semaLog.error('Update user - find user fail', err);
+			semaLog.error(`Update user - find user fail - ${err}`);
 			res.status(400).json({ error: err });
 		});
 });

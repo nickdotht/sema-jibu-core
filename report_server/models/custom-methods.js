@@ -30,7 +30,8 @@ module.exports = models => {
 			email: values.email,
 			username: values.username,
 			firstName: values.first_name,
-			lastName: values.last_name
+			lastName: values.last_name,
+			active: values.active
 			// role: values.roles.map(role => role.authority)
 		};
 	};
