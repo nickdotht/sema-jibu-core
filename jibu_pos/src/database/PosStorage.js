@@ -745,6 +745,9 @@ class PosStorage {
 		return new Promise((resolve, reject) => {
 			this.getKey(salesChannelsKey)
 				.then(salesChannels => {
+					if (!salesChannels) {
+						salesChannels = [];
+					}
 					resolve(this.parseJson(salesChannels));
 				})
 				.catch(err => reject(err))
