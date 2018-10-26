@@ -4,6 +4,8 @@ import { bindActionCreators } from "redux";
 import * as reportActions from "../../actions/ReportActions";
 import { connect } from "react-redux";
 
+import i18n from '../../app/i18n';
+
 const dayInMilliseconds =  24*60*60*1000;
 
 class DateFilter extends Component {
@@ -16,14 +18,12 @@ class DateFilter extends Component {
 		console.log( "DateFilter - maxDate = " + this.maxDate.toString());
 		console.log( "DateFilter - minDate = " + this.minDate.toString());
 		this.props.reportActions.setReportFilter( this.state.currentDate, new Date( this.state.currentDate.getTime() + dayInMilliseconds));
-
-
 	}
 	render() {
 		return (
 			<View style={styles.filterContainer}>
 				<View style={styles.filterItemContainer}>
-					<Text style={{fontSize:20}}>Daily Data</Text>
+					<Text style={{fontSize:20}}>{i18n.t('daily-data')}</Text>
 				</View>
 				<View style={styles.filterItemContainer}>
 					{this.getPreviousButton()}

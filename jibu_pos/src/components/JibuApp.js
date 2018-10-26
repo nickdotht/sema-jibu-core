@@ -6,9 +6,9 @@ import {
 } from 'react-native';
 
 import Toolbar from './Toolbar';
-import {CustomerViews} from './customers/CustomerViews'
+import CustomerViews from './customers/CustomerViews';
 import CustomerBar from "./customers/CustomerBar";
-import OrderView from "./orders/OrderView"
+import OrderView from "./orders/OrderView";
 import Login from './Login';
 import CustomerEdit from './customers/CustomerEdit';
 import Settings from './Settings';
@@ -97,15 +97,16 @@ class JibuApp extends Component {
 			Synchronization.setConnected( isConnected );
 		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
-		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this) );
-		Events.on('ProductsUpdated', 'productUpdate1', this.onProductsUpdated.bind(this) );
+		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this));
+		Events.on('ProductsUpdated', 'productUpdate1', this.onProductsUpdated.bind(this));
+		Events.on('SalesChannelsUpdated', 'SalesChannelsUpdated1', this.onSalesChannelUpdated.bind(this));
 
 		console.log("JibuApp = Mounted-Done");
 
 	}
 	componentWillUnmount(){
-		Events.rm('CustomersUpdated', 'customerUpdate1') ;
-		Events.rm('ProductsUpdated', 'productUpdate1') ;
+		Events.rm('CustomersUpdated', 'customerUpdate1');
+		Events.rm('ProductsUpdated', 'productUpdate1');
 		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );
 	}
 
@@ -116,6 +117,13 @@ class JibuApp extends Component {
 	onProductsUpdated = () =>{
 		this.props.productActions.setProducts(this.posStorage.getProducts());
 	};
+
+	onSalesChannelUpdated() {
+		console.log('Update sales channels bar');
+		CustomerViews.buildNavigator().then(() => {
+			this.forceUpdate();
+		});
+	}
 
 	handleConnectivityChange = isConnected => {
 		console.log("handleConnectivityChange: " + isConnected);
@@ -131,17 +139,17 @@ class JibuApp extends Component {
 
 	getLoginOrHomeScreen(){
 		console.log("getLoginOrHomeScreen - isLoggedIn: " +this.props.showScreen.isLoggedIn);
-		if( this.props.showScreen.isLoggedIn ) {
+		if (!this.props.showScreen.isLoggedIn) {
+			return(
+				<Login/>
+			);
+		} else{
 			return (
 				<View style={{flex: 1}}>
 					<Toolbar/>
 					<ScreenSwitcher currentScreen={this.props.showScreen} Jibu={this}/>
 				</View>
 
-			);
-		}else{
-			return(
-				<Login/>
 			);
 		}
 	}
@@ -174,38 +182,37 @@ class JibuApp extends Component {
 	}
 
 }
-class ScreenSwitcher extends Component {
 
+class ViewSwitcher extends Component {
 	render() {
-		if (this.props.currentScreen.screenToShow === "main") {
-			return (
-				<View style={{ flex: 1 }}>
-					<CustomerBar/>
-					<ViewSwitcher Jibu={this.props.Jibu}/>
-				</View>
-
-			);
-		} else if (this.props.currentScreen.screenToShow === "report") {
-			return (<View style={{flex:1}}>
-				<SiteReport/>
-			</View>);
-		} else if (this.props.currentScreen.screenToShow === "newCustomer") {
-			return (<CustomerEdit isEdit = {false}/>);
-		} else if (this.props.currentScreen.screenToShow === "editCustomer") {
-			return (<CustomerEdit isEdit = {true}/>);
-		} else if (this.props.currentScreen.screenToShow === "settings") {
-			return (<Settings/>);
+		if (this.props.Jibu.props.showView.showNewOrder) {
+			return (<OrderView/>)
+		} else {
+			return (<CustomerViews.navigator screenProps={{parent: this.props.Jibu}}/>)
 		}
 	}
 }
 
-class ViewSwitcher extends Component {
-
+class ScreenSwitcher extends Component {
 	render() {
-		if (this.props.Jibu.props.showView.showNewOrder ) {
-			return (<OrderView/>)
-		} else {
-			return (<CustomerViews screenProps={{parent: this.props.Jibu}}/>)
+		switch(this.props.currentScreen.screenToShow) {
+			case 'settings':
+				return (<Settings />);
+			case 'report':
+				return (<View style={{flex:1}}>
+					<SiteReport/>
+				</View>);
+			case 'newCustomer':
+				return (<CustomerEdit isEdit = {false}/>);
+			case 'editCustomer':
+				return (<CustomerEdit isEdit = {true}/>);
+			case 'main':
+				return (
+					<View style={{ flex: 1 }}>
+						<CustomerBar/>
+						<ViewSwitcher ref={this.viewSwitcherInstance} Jibu={this.props.Jibu}/>
+					</View>
+				);
 		}
 	}
 }

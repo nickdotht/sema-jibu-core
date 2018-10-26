@@ -194,19 +194,24 @@ class Synchronization {
 	}
 
 	synchronizeSalesChannels(){
-		return new Promise((resolve ) => {
+		return new Promise(async resolve => {
 			console.log("Synchronization:synchronizeSalesChannels - Begin");
+			const savedSalesChannels = await PosStorage.loadSalesChannels();
 			Communications.getSalesChannels()
 				.then(salesChannels => {
 					if (salesChannels.hasOwnProperty("salesChannels")) {
 						console.log("Synchronization:synchronizeSalesChannels. No of sales channels: " + salesChannels.salesChannels.length);
-						PosStorage.saveSalesChannels(salesChannels.salesChannels);
+						// TODO: Not a totally good idea because there might be name changes, not just removals and additions
+						if (savedSalesChannels.length !== salesChannels.salesChannels.length) {
+							PosStorage.saveSalesChannels(salesChannels.salesChannels);
+							Events.trigger('SalesChannelsUpdated', {});
+						}
 					}
-					resolve( salesChannels);
+					resolve(salesChannels);
 				})
 				.catch(error => {
 					console.log("Synchronization.getSalesChannels - error " + error);
-					resolve( null);
+					resolve(null);
 				});
 		});
 	}
@@ -294,7 +299,7 @@ class Synchronization {
 						if (result.status === 200) {
 							console.log("New token Acquired");
 							PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user,
-								settings.password, result.response.token, settings.siteId );
+								settings.password, settings.uiLanguage, result.response.token, settings.siteId );
 							Communications.setToken(result.response.token);
 							PosStorage.setTokenExpiration();
 						}

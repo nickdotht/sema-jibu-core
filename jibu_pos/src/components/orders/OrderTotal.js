@@ -6,11 +6,13 @@ import * as OrderActions from "../../actions/OrderActions";
 import PosStorage from "../../database/PosStorage";
 import * as Utilities from "../../services/Utilities";
 
+import i18n from "../../app/i18n";
+
 class OrderTotal extends Component {
 	render() {
 		return (
 			<View style = {styles.container}>
-				<Text style={[{flex: 2}, styles.totalText]}>Order Total</Text>
+				<Text style={[{flex: 2}, styles.totalText]}>{i18n.t('order-total')}</Text>
 				<Text style={[{flex: 3}, styles.totalText]}>{Utilities.formatCurrency(this.getAmount())}</Text>
 
 			</View>

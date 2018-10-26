@@ -16,6 +16,8 @@ import Communications from "../services/Communications";
 import PosStorage from "../database/PosStorage";
 import * as SettingsActions from "../actions/SettingsActions";
 
+import i18n from '../app/i18n';
+
 class Toolbar extends Component {
     render() {
         return (
@@ -23,10 +25,10 @@ class Toolbar extends Component {
 				<View style = {[styles.leftToolbar]}>
 					<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
 					<TouchableHighlight onPress={() => this.onVersion()}>
-						<Text style = {[styles.text_style, {marginLeft:50}]}>Version {packageJson.version}</Text>
+						<Text style = {[styles.text_style, {marginLeft:50}]}>{i18n.t('version')} {packageJson.version}</Text>
 					</TouchableHighlight>
 					<Text style = {[styles.text_style, {marginLeft:20}, this.getNetworkStyle()]}>{this.getNetworkState()}</Text>
-					<Text style = {[styles.text_style, {marginLeft:30}]}>Site:</Text>
+					<Text style = {[styles.text_style, {marginLeft:30}]}>{i18n.t('site')}:</Text>
 					<View style = {[styles.site_container, {marginLeft:20}]}>
 						<Text style = {styles.site_text}>{this.props.settings.site}</Text>
 					</View>
@@ -49,7 +51,7 @@ class Toolbar extends Component {
 		if( this.props.showScreen.screenToShow !== "settings" ){
 			return(
 				<TouchableHighlight onPress={() => this.onLogout()}>
-					<Text style = {[styles.text_style,{marginRight:20}]}>Logout</Text>
+					<Text style = {[styles.text_style,{marginRight:20}]}>{i18n.t('logout')}</Text>
 				</TouchableHighlight>
 
 			)
@@ -59,7 +61,7 @@ class Toolbar extends Component {
 	};
 
     getNetworkState  = () =>{
-    	return this.props.network.isNWConnected ? "ONLINE" : "OFFLINE";
+    	return this.props.network.isNWConnected ? i18n.t('online') : i18n.t('offline');
 	};
 	getNetworkStyle  = () =>{
 		return this.props.network.isNWConnected ? {} : {color:'red'};
@@ -101,7 +103,7 @@ class Toolbar extends Component {
 		let settings = PosStorage.getSettings();
 
 		// Save with empty token - This will force username/password validation
-		PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user, settings.password, "", settings.siteId );
+		PosStorage.saveSettings( settings.semaUrl, settings.site, settings.user, settings.password, settings.uiLanguage, "", settings.siteId );
 		this.props.settingsActions.setSettings(PosStorage.getSettings());
 		Communications.setToken("");
 

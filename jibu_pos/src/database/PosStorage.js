@@ -3,6 +3,7 @@ This class contains the persistence implementation of the tablet business object
 
  */
 const {React,AsyncStorage} = require('react-native');
+import { capitalizeWord } from '../services/Utilities';
 
 const uuidv1 = require('uuid/v1');
 
@@ -66,7 +67,7 @@ class PosStorage {
 		this.lastProductsSync = firstSyncDate;
 		this.tokenExpiration = firstSyncDate;
 
-		this.settings = {semaUrl:"", site:"", user:"", password:"", token:"", siteId:"" };
+		this.settings = {semaUrl:"", site:"", user:"", password:"", uiLanguage:{}, token:"", siteId:"" };
 		this.salesChannels = [];
 		this.customerTypes = [];
 		this.productMrpDict = {};
@@ -684,12 +685,24 @@ class PosStorage {
 		return this.settings;
 	}
 
-	saveSettings( url, site, user, password, token, siteId  ){
-		let settings = {semaUrl:url, site:site, user:user, password:password, token:token, siteId:siteId };
+	loadSettings() {
+		console.log("PosStorage:loadSettings" );
+		return new Promise((resolve, reject) => {
+			this.getKey(settingsKey)
+				.then(settings => {
+					resolve(this.parseJson(settings));
+				})
+				.catch(err => reject(err))
+		});
+	}
+
+	saveSettings( url, site, user, password, uiLanguage, token, siteId  ){
+		let settings = {semaUrl:url, site, user, password, uiLanguage, token, siteId };
 		this.settings = settings;
 		this.setKey( settingsKey, this.stringify( settings));
 
 	}
+
 	setTokenExpiration(){
 		// Currently the token is good for one day (24 hours)
 		let expirationDate = new Date();
@@ -721,16 +734,32 @@ class PosStorage {
 	getSalesChannels(){
 		return this.salesChannels;
 	}
+
 	saveSalesChannels( salesChannelArray  ){
 		this.salesChannels = salesChannelArray;
 		this.setKey( salesChannelsKey, this.stringify( salesChannelArray));
 	}
+
+	loadSalesChannels() {
+		console.log("PosStorage:loadSalesChannels" );
+		return new Promise((resolve, reject) => {
+			this.getKey(salesChannelsKey)
+				.then(salesChannels => {
+					if (!salesChannels) {
+						salesChannels = [];
+					}
+					resolve(this.parseJson(salesChannels));
+				})
+				.catch(err => reject(err))
+		});
+	}
+	
 	getSalesChannelsForDisplay(){
 		return this.salesChannels.map( salesChannel =>{
 			return {
 				id: salesChannel.id,
 				name: salesChannel.name,
-				displayName: salesChannel.name.charAt(0).toUpperCase() + salesChannel.name.slice(1)
+				displayName: capitalizeWord(salesChannel.name)
 			};
 		});
 	}
@@ -750,7 +779,7 @@ class PosStorage {
 				customerTypesForDisplay.push({
 					id: customerType.id,
 					name: customerType.name,
-					displayName: customerType.name.charAt(0).toUpperCase() + customerType.name.slice(1)
+					displayName: capitalizeWord(customerType.name)
 				});
 			}
 		})

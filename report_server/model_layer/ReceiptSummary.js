@@ -5,6 +5,7 @@ class ReceiptSummary {
 		this.endDate = endDate;
 		this.type = type;
 		this.volume = {data:[]}
+		this.total = {data:[]}
 	}
 
 	addIncomeGT( value ){
@@ -23,8 +24,11 @@ class ReceiptSummary {
 
 	}
 
-	addData( data ){
+	addVolumeData( data ){
 		this.volume.data.push( data );
+	}
+	addTotalData( data ){
+		this.total.data.push( data );
 	}
 
 	classToPlain() {
