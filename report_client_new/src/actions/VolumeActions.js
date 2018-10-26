@@ -1,5 +1,6 @@
 import * as allActions from './ActionTypes';
 import { axiosService } from 'services';
+import { utilService } from 'services';
 
 function receiveVolume(data) {
 	console.log("receiveVolume - ", data.toString());
@@ -130,10 +131,10 @@ function fetchVolumeItem( params, type, options ) {
 			url = url + "&payment-type=" + options.paymentType;
 		}
 		if( params.hasOwnProperty("startDate") ){
-			url = url + "&begin-date=" + params.startDate.toISOString();
+			url = url + "&begin-date=" + utilService.formatDateForUrl(params.startDate);
 		}
 		if( params.hasOwnProperty("endDate") ){
-			url = url + "&end-date=" + params.endDate.toISOString();
+			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
 		}
 		axiosService
 			.get(url)

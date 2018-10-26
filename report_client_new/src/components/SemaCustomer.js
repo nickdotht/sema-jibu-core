@@ -43,9 +43,9 @@ class SemaCustomer extends Component {
 												  units = ""/>
 						</div>
 						<div className= "CustomerSummaryRow2Col1Bottom">
-							<CustomerSummaryPanel title = "Household Penetration" valueColor = "rgb(40,88,197)"
+							<CustomerSummaryPanel title = "Consumer Penetration" valueColor = "rgb(40,88,197)"
 												  value = {this.calcHouseHoldPenetration()}
-												  units = "%"/>
+												  units = "(%)"/>
 						</div>
 					</div>
 					<div className = "CustomerSummaryRow2Col2">
@@ -66,13 +66,13 @@ class SemaCustomer extends Component {
         );
     }
 	calcHouseHoldPenetration(){
-    	if( this.props.customer.customerInfo.allCustomers.customerCount && this.props.customer.customerInfo.allCustomers.consumerBase ){
-    		if( this.props.customer.customerInfo.allCustomers.consumerBase > 0 ){
-    			let penetration =  Math.round(this.props.customer.customerInfo.allCustomers.customerCount/this.props.customer.customerInfo.allCustomers.consumerBase * 100);
-    			if( penetration === 0 && this.props.customer.customerInfo.allCustomers.customerCount > 0){
-    				return "> 1"
+    	if( this.props.customer.customerInfo.allCustomers.customerConsumerBase && this.props.customer.customerInfo.allCustomers.siteConsumerBase ){
+    		if( this.props.customer.customerInfo.allCustomers.siteConsumerBase > 0 ){
+    			let penetration =  Math.round(this.props.customer.customerInfo.allCustomers.customerConsumerBase/this.props.customer.customerInfo.allCustomers.siteConsumerBase * 100);
+    			if( penetration === 0 && this.props.customer.customerInfo.allCustomers.customerConsumerBase > 0){
+    				return "< 1"
 				}
-    			return Math.round(this.props.customer.customerInfo.allCustomers.customerCount/this.props.customer.customerInfo.allCustomers.consumerBase * 100).toString();
+    			return penetration;
 			}else{
 				return "N/A";
 			}

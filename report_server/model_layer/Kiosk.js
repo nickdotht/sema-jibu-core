@@ -15,6 +15,9 @@ class Kiosk {
 		this.name = kiosk.name;
 		this.region_id = kiosk.region_id;
 		this.version = kiosk.version;
+		if(kiosk.hasOwnProperty("consumer_base") ) {
+			this.consumerBase = kiosk.consumer_base;
+		}
 	}
 	classToPlain(){
 		return {
@@ -23,7 +26,8 @@ class Kiosk {
 			api_key:this.api_key,
 			name:this.name,
 			region_id:this.region_id,
-			version:this.version};
+			version:this.version,
+			consumerBase: this.consumerBase};
 	}
 }
 

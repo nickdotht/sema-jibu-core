@@ -55,15 +55,19 @@ class CustomersByDistanceChart extends Component {
 
 				data.datasets.push( {label: "", backgroundColor:[], data:[]});
 				let index = 0;
+				let label = "";
+				let totalCustomers = this.props.chartData.customerInfo.customersByDistance.reduce( (total, customer) => { return(total + customer.customerCount)}, 0);
+
 				this.props.chartData.customerInfo.customersByDistance.forEach(distance => {
 					if (distance.hasOwnProperty("distanceLessThan") && distance.hasOwnProperty("distanceGreaterThan")) {
-						let label = "" + distance.distanceGreaterThan + " - " + distance.distanceLessThan + " M" ;
-						data.labels.push(label);
+						label = "" + distance.distanceGreaterThan + " - " + distance.distanceLessThan + " M" ;
 					} else if (distance.hasOwnProperty("distanceLessThan")) {
-						data.labels.push("<" + distance.distanceLessThan + " M" );
+						label = "<" + distance.distanceLessThan + " M";
 					} else if (distance.hasOwnProperty("distanceGreaterThan")) {
-						data.labels.push(">" + distance.distanceGreaterThan + " M");
+						label = ">" + distance.distanceGreaterThan + " M";
 					}
+					let percentage = ((distance.customerCount * 100)/totalCustomers).toFixed(0);
+					data.labels.push(label + ' (' + percentage + '%)');
 
 					data.datasets[0].backgroundColor.push( utilService.getBackgroundColorByIndex( index ) );
 					data.datasets[0].data.push(distance.customerCount );

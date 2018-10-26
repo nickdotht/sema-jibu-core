@@ -1,5 +1,6 @@
 import * as allActions from './ActionTypes';
 import { axiosService } from 'services';
+import { utilService } from 'services';
 
 function receiveSales(data) {
 	data = updateSales(data);
@@ -63,10 +64,10 @@ function fetchSalesSummary( params ) {
 	return new Promise((resolve, reject ) => {
 		let url = '/sema/dashboard/site/sales-summary?site-id=' + params.kioskID ;
 		if( params.hasOwnProperty("startDate") ){
-			url = url + "&begin-date=" + params.startDate.toISOString();
+			url = url + "&begin-date=" + utilService.formatDateForUrl(params.startDate);
 		}
 		if( params.hasOwnProperty("endDate") ){
-			url = url + "&end-date=" + params.endDate.toISOString();
+			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
 		}
 		if( params.hasOwnProperty("groupBy") ){
 			url = url + "&group-by=" + params.groupBy;
@@ -93,10 +94,10 @@ function fetchSalesByChannel( params ) {
 		let url = '/sema/dashboard/site/receipt-summary?site-id=' + params.kioskID + "&type=sales-channel";
 
 		if( params.hasOwnProperty("startDate") ){
-			url = url + "&begin-date=" + params.startDate.toISOString();
+			url = url + "&begin-date=" + utilService.formatDateForUrl(params.startDate);
 		}
 		if( params.hasOwnProperty("endDate") ){
-			url = url + "&end-date=" + params.endDate.toISOString();
+			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
 		}
 		axiosService
 			.get(url)

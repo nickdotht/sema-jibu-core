@@ -6,7 +6,7 @@ const { getMostRecentReceipt, getSalesChannels, getCustomerTypes} = require('../
 const ReceiptSummary = require('../model_layer/ReceiptSummary');
 
 
-const sqlSalesChannelSummary = 'SELECT SUM(volume), SUM(total)\
+const sqlSalesChannelSummary = 'SELECT SUM(volume), SUM(total), COUNT(receipt_id),  COUNT(DISTINCT(customer_account_id)) \
 					FROM receipt_details \
 					WHERE  sales_channel_id  = ? AND kiosk_id = ? \
 					AND created_at BETWEEN ? AND ?';
@@ -50,12 +50,14 @@ router.get('/', async( request, response ) => {
 
 		// Check for income and customerType qualifiers
 		__pool.getConnection(async (err, connection) => {
+			var rSummary = null;
 			try {
 				if (endDate == null) {
 					endDate = await getMostRecentReceipt(connection, request.query["site-id"]);
 					beginDate = new Date(endDate.getFullYear(), 0);	// 	Default to start of the year
 				}
 				const receiptSummary = new ReceiptSummary( request.query.type, beginDate, endDate);
+				rSummary = receiptSummary;
 				let params = [request.query["site-id"], beginDate, endDate];
 				let sqlQualifier = "";
 				if( request.query.hasOwnProperty("income-lt") && request.query.hasOwnProperty("income-gt") ){
@@ -104,7 +106,7 @@ router.get('/', async( request, response ) => {
 				connection.release();
 			} catch (err) {
 				connection.release();
-				__te(err, response, 500, {});
+				__te(err, response, 500, rSummary);
 			}
 		});
 
@@ -130,7 +132,17 @@ const getReceiptChannelSummary = ( connection, salesChannel, sqlQualifier, param
 					if(  sqlResult[0]["SUM(total)"] != null ) {
 						total = parseFloat( sqlResult[0]["SUM(total)"].toFixed(2));
 					}
-					receiptSummary.addTotalData({ salesChannel: salesChannel.name, total:total } );
+					let numReceipts = 0;
+					if(  sqlResult[0]["COUNT(receipt_id)"] != null ) {
+						numReceipts = sqlResult[0]["COUNT(receipt_id)"];
+					}
+
+					let numCustomers = 0;
+					if(  sqlResult[0]["COUNT(DISTINCT(customer_account_id))"] != null ) {
+						numCustomers = sqlResult[0]["COUNT(DISTINCT(customer_account_id))"];
+					}
+
+					receiptSummary.addTotalData({ salesChannel: salesChannel.name, total:total, receipts:numReceipts, numberCustomers:numCustomers } );
 					semaLog.info("getReceiptChannelSummary - processed salesChannel ", salesChannel.name );
 					resolve();
 				}
