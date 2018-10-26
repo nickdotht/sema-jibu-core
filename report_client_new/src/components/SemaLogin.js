@@ -11,18 +11,18 @@ import {
 	kioskActions
 } from 'actions';
 
-const ImageStyle = {
-	display: 'block',
-	marginLeft: '10%',
-	// marginRight: 'auto',
-	// paddingRight: "8%"
-
-	// resize:"both",
-	// width:'100%',
-	// height:'100%',
-	// maxWidth: '100%',
-	// marginBottom: '5px'
-};
+// const ImageStyle = {
+// 	display: 'block',
+// 	marginLeft: '10%',
+// 	// marginRight: 'auto',
+// 	// paddingRight: "8%"
+//
+// 	// resize:"both",
+// 	// width:'100%',
+// 	// height:'100%',
+// 	// maxWidth: '100%',
+// 	// marginBottom: '5px'
+// };
 
 class SemaLogin extends Component {
 	constructor(props, context) {

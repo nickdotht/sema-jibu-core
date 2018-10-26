@@ -96,6 +96,7 @@ class SemaSales extends Component {
 				case "year":
 					return " since " + dateFormat(metric.periods[1].beginDate, "yyyy");
 				case "none":
+				default:
 					return "";
 			}
 		}else{
@@ -232,7 +233,7 @@ const calcChange = (salesInfo, now, last) => {
 		switch( salesInfo.totalCustomers.period ){
 			case "year":
 				let periodYear = new Date(Date.parse(salesInfo.totalCustomers.periods[0].beginDate)).getFullYear();
-				if( nowDate.getFullYear() == periodYear ){
+				if( nowDate.getFullYear() === periodYear ){
 					let start = new Date(periodYear, 0, 0);
 					let diff = nowDate - start;
 					let oneDay = 1000 * 60 * 60 * 24;
@@ -242,10 +243,11 @@ const calcChange = (salesInfo, now, last) => {
 				}
 				break;
 			case "month":
+			default:
 				let period = new Date(Date.parse(salesInfo.totalCustomers.periods[0].beginDate));
 				periodYear = period.getFullYear();
 				let periodMonth = period.getMonth();
-				if( nowDate.getFullYear() == periodYear && nowDate.getMonth() == periodMonth ) {
+				if( nowDate.getFullYear() === periodYear && nowDate.getMonth() === periodMonth ) {
 					let dayOfMonth = nowDate.getDate();
 					let daysInMonth =  new Date(periodYear, periodMonth+1, 0).getDate(); // Note: this is a trick to get the last day of the month
 					now = ((daysInMonth*now)/dayOfMonth)

@@ -18,7 +18,7 @@ class CustomerSummaryPanel extends Component {
     }
     format(){
 		if( typeof this.props.value === "string") return this.props.value;
-    	if( typeof this.props.value == 'number' ){
+    	if( typeof this.props.value === 'number' ){
 			return Math.round(this.props.value);
 		}else{
     		return "N/A"
