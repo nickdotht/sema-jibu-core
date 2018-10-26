@@ -185,11 +185,10 @@ class JibuApp extends Component {
 
 class ViewSwitcher extends Component {
 	render() {
-		const CVNavigator = CustomerViews;
 		if (this.props.Jibu.props.showView.showNewOrder) {
 			return (<OrderView/>)
 		} else {
-			return (<CVNavigator.navigator screenProps={{parent: this.props.Jibu}}/>)
+			return (<CustomerViews.navigator screenProps={{parent: this.props.Jibu}}/>)
 		}
 	}
 }
