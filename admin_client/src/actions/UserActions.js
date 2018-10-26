@@ -1,5 +1,8 @@
 import { axiosService } from 'services';
+import get from 'lodash/get';
 import * as a from './ActionTypes';
+
+const extractError = err => ({ message: get(err, 'response.data.err', '') });
 
 export const fetchUsersRequest = () => ({ type: a.FETCH_USERS_REQUEST });
 
@@ -24,33 +27,33 @@ export const updateUserFailure = data => ({
 });
 
 export const createUserRequest = () => ({ type: a.CREATE_USER_REQUEST });
-export const createUserSuccess = data => ({
+export const createUserSuccess = payload => ({
   type: a.CREATE_USER_SUCCESS,
-  payload: data
+  payload
 });
-export const createUserFailure = data => ({
+export const createUserFailure = payload => ({
   type: a.CREATE_USER_FAILURE,
-  payload: data
+  payload
 });
 
 export const deleteUserRequest = () => ({ type: a.DELETE_USER_REQUEST });
-export const deleteUserSuccess = data => ({
+export const deleteUserSuccess = payload => ({
   type: a.DELETE_USER_SUCCESS,
-  payload: data
+  payload
 });
-export const deleteUserFailure = data => ({
+export const deleteUserFailure = payload => ({
   type: a.DELETE_USER_FAILURE,
-  payload: data
+  payload
 });
 
 export const toggleUserRequest = () => ({ type: a.TOGGLE_USER_REQUEST });
-export const toggleUserSuccess = data => ({
+export const toggleUserSuccess = payload => ({
   type: a.TOGGLE_USER_SUCCESS,
-  payload: data
+  payload
 });
-export const toggleUserFailure = data => ({
+export const toggleUserFailure = payload => ({
   type: a.TOGGLE_USER_FAILURE,
-  payload: data
+  payload
 });
 
 export const fetchUsers = () => dispatch => {
@@ -58,7 +61,7 @@ export const fetchUsers = () => dispatch => {
   return axiosService
     .get('/sema/users')
     .then(response => dispatch(fetchSuccess(response.data)))
-    .catch(err => dispatch(fetchFailure(err)));
+    .catch(err => dispatch(fetchFailure(extractError(err))));
 };
 
 export const createUser = data => dispatch => {
@@ -66,7 +69,7 @@ export const createUser = data => dispatch => {
   return axiosService
     .post('/sema/users', { data })
     .then(response => dispatch(createUserSuccess(response.data)))
-    .catch(err => dispatch(createUserFailure(err)));
+    .catch(err => dispatch(createUserFailure(extractError(err))));
 };
 
 export const updateUser = data => dispatch => {
@@ -74,7 +77,7 @@ export const updateUser = data => dispatch => {
   return axiosService
     .put(`/sema/users/${data.id}`, { data })
     .then(response => dispatch(updateUserSuccess(response.data)))
-    .catch(err => dispatch(updateUserFailure(err)));
+    .catch(err => dispatch(updateUserFailure(extractError(err))));
 };
 
 export const toggleUser = id => dispatch => {
@@ -82,7 +85,7 @@ export const toggleUser = id => dispatch => {
   return axiosService
     .put(`/sema/users/toggle/${id}`)
     .then(response => dispatch(toggleUserSuccess(response.data)))
-    .catch(err => dispatch(toggleUserFailure(err)));
+    .catch(err => dispatch(toggleUserFailure(extractError(err))));
 };
 
 export const deleteUser = id => dispatch => {
@@ -90,5 +93,5 @@ export const deleteUser = id => dispatch => {
   return axiosService
     .delete(`/sema/users/${id}`)
     .then(response => dispatch(deleteUserSuccess(response.data)))
-    .catch(err => dispatch(deleteUserFailure(err)));
+    .catch(err => dispatch(deleteUserFailure(extractError(err))));
 };

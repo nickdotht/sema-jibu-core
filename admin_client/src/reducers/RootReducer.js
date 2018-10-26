@@ -7,6 +7,7 @@ import healthCheck from './HealthcheckReducer';
 import auth from './AuthReducer';
 import userReducer from './UserReducer';
 import loadingReducer from './LoadingReducer';
+import alertReducer from './AlertReducer';
 
 const rootPersistConfig = {
   key: 'root',
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
   auth,
   users: userReducer,
   form: formReducer,
-  loading: loadingReducer
+  loading: loadingReducer,
+  alert: alertReducer
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

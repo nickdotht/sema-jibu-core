@@ -15,11 +15,15 @@ import UserList from './common/UserList';
 import Button from './common/Button';
 import Modal from './common/Modal';
 import UserForm from './common/UserForm';
+import Alert from './common/Alert';
 
 // TODO split up container and presentational components
 import SeamaDatabaseError from './SeamaDatabaseError';
 import SeamaServiceError from './SeamaServiceError';
-import { createLoadingSelector } from '../reducers/selectors';
+import {
+  createLoadingSelector,
+  createAlertMessageSelector
+} from '../reducers/selectors';
 
 class SemaUsers extends Component {
   constructor(props) {
@@ -59,7 +63,9 @@ class SemaUsers extends Component {
   }
 
   showContent() {
-    const { healthCheck, users, loading } = this.props;
+    const { healthCheck, users, loading, alert } = this.props;
+    console.log('loading ===', loading);
+    console.log('alert =====', alert);
     const { editMode } = this.state;
 
     if (healthCheck.server !== 'Ok') {
@@ -71,6 +77,7 @@ class SemaUsers extends Component {
 
     return (
       <div style={{ margin: '5px' }}>
+        {alert && <Alert type="danger" message={alert.message} />}
         <div className="">
           <Button
             buttonStyle="primary"
@@ -98,7 +105,7 @@ class SemaUsers extends Component {
                   this.closeCreateModal();
                 }}
               />
-            )}
+)}
           />
         )}
 
@@ -125,11 +132,20 @@ const loadingSelector = createLoadingSelector([
   'DELETE_USER',
   'TOGGLE_USER'
 ]);
+const alertSelector = createAlertMessageSelector([
+  'FETCH_USERS',
+  'CREATE_USER',
+  'UPDATE_USER',
+  'DELETE_USER',
+  'TOGGLE_USER'
+]);
+
 function mapStateToProps(state) {
   return {
     healthCheck: state.healthCheck,
     users: state.users,
-    loading: loadingSelector(state)
+    loading: loadingSelector(state),
+    alert: alertSelector(state)
   };
 }
 

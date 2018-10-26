@@ -118,8 +118,11 @@ router.delete('/:id', async (req, res) => {
 
 	try {
 		let user = await db.user.find({ where: { id } });
+		let role = await user.getRoles();
 		if (!user) throw new Error('User not found');
+		if (role) throw new Error('User must not have any role(s)');
 		if (user.active) throw new Error('User must be deactivated');
+
 		await user.destroy();
 		semaLog.info('User successfully deleted');
 		res.json({
