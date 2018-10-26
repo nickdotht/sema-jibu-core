@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
 		}
 
 		// Everything went well
-		const token = jwt.sign(user.toJSON(), process.env.JWT_SECRET, {
+		const token =  jwt.sign(await user.toJSON(), process.env.JWT_SECRET, {
 			expiresIn: process.env.JWT_EXPIRATION_LENGTH
 		});
 
