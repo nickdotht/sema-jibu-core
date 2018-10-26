@@ -6,35 +6,23 @@ const Op = Sequelize.Op;
 
 const db = require('../models');
 
-const userToClient = user => {
-	return {
-		id: user.id,
-		email: user.email,
-		username: user.username,
-		firstName: user.first_name,
-		lastName: user.last_name,
-		role: user.roles.map(role => role.code),
-		active: !!user.active
-	};
-};
 /* GET users listing. */
-router.get('/', function(req, res) {
-	semaLog.info('users - Enter');
+router.get('/', async (req, res) => {
+	semaLog.info('GET users - Enter');
 
-	db.user
-		.findAll({
-			include: [
-				{
-					model: db.role
-				}
-			]
-		})
-		.then(users => {
-			let userData = [];
-			userData = users.map(user => userToClient(user));
-			res.json({ users: userData });
-		})
-		.catch(err => res.status(500).json({ error: err }));
+	try {
+		let users = await db.user.findAll();
+		let userData = await Promise.all(
+			users.map(async user => await user.toJSON())
+		);
+		res.json({ users: userData });
+	} catch (err) {
+		semaLog.error(`GET users failed - ${err}`);
+		res.status(400).json({
+			message: `Failed to GET users ${err}`,
+			error: `${err}`
+		});
+	}
 });
 
 router.post('/', async (req, res) => {
@@ -66,13 +54,12 @@ router.post('/', async (req, res) => {
 		});
 		semaLog.info('User created success');
 
-		const dbRoles = await db.role.findAll({ where: { code: [role] } });
-		dbRoles.forEach(role => role.addUser(createdUser));
-		semaLog.info('Roles added to user success');
+		const dbRoles = await db.role.findAll({ where: { code: role } });
+		await Promise.all(dbRoles.map(async r => await r.addUser(createdUser)));
 
 		res.json({
 			message: 'create user success',
-			user: createdUser.toJSON()
+			user: await createdUser.toJSON()
 		});
 	} catch (err) {
 		semaLog.error(`Create user failed - ${err}`);
@@ -108,9 +95,10 @@ router.put('/:id', async (req, res) => {
 		});
 
 		await updatedUser.setRoles([]); // clear roles
-		const dbRoles = await db.role.findAll({ where: { code: [role] } });
-		dbRoles.forEach(role => role.addUser(updatedUser));
-
+		if (user.role) {
+			const dbRoles = await db.role.findAll({ where: { code: role } });
+			dbRoles.forEach(role => role.addUser(updatedUser));
+		}
 		res.json({
 			message: 'Update user success',
 			user: Object.assign({ ...updatedUser.toJSON() }, { role })
@@ -124,42 +112,25 @@ router.put('/:id', async (req, res) => {
 	}
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
 	const id = req.params.id;
 	semaLog.info(`Enter delete user ${id}`);
-	db.user
-		.find({
-			where: { id }
-		})
-		.then(user => {
-			if (!user) {
-				res.status(404).json({
-					message: 'User not found'
-				});
-			}
 
-			if (user.active) {
-				res.status(400).json({
-					message: 'User must be deactivated'
-				});
-			}
-
-			user.destroy()
-				.then(() =>
-					res.status(200).json({
-						message: `User ${id} successfully deleted`,
-						id
-					})
-				)
-				.catch(err => {
-					semaLog.error('Delete user failed', err);
-					res.status(400).json({ error: err });
-				});
-		})
-		.catch(err => {
-			semaLog.error('Delete user - user not found');
-			res.status(400).json({ error: err });
+	try {
+		let user = await db.user.find({ where: { id } });
+		if (!user) throw new Error('User not found');
+		if (user.active) throw new Error('User must be deactivated');
+		await user.destroy();
+		semaLog.info('User successfully deleted');
+		res.json({
+			message: `User ${id} successfully deleted`,
+			id
 		});
+	} catch (err) {
+		const message = `Delete user ${id} failed - ${err}`;
+		semaLog.error(message);
+		res.status(400).json({ message, err: `${err}` });
+	}
 });
 
 router.put('/toggle/:id', (req, res) => {

@@ -21,9 +21,10 @@ module.exports = models => {
 
 	// We override the default toJSON so we NEVER send the password
 	// to the client
-	models.user.prototype.toJSON = function() {
+	models.user.prototype.toJSON = async function() {
 		var values = Object.assign({}, this.get());
 		delete values.password;
+		let role = await this.getRoles();
 
 		return {
 			id: values.id,
@@ -31,8 +32,8 @@ module.exports = models => {
 			username: values.username,
 			firstName: values.first_name,
 			lastName: values.last_name,
-			active: values.active
-			// role: values.roles.map(role => role.authority)
+			active: values.active,
+			role: role.map(r => ({ code: r.code, authority: r.authority }))
 		};
 	};
 };

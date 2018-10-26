@@ -101,7 +101,7 @@ class SemaUsers extends Component {
             )}
           />
         )}
-        
+
         <UserList
           loading={loading}
           data={users}
