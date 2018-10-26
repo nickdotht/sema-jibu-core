@@ -133,36 +133,32 @@ router.delete('/:id', async (req, res) => {
 	}
 });
 
-router.put('/toggle/:id', (req, res) => {
+router.put('/toggle/:id', async (req, res) => {
 	semaLog.info('Users activate/deactivate - Enter ');
-	db.user
-		.find({
-			where: {
-				id: req.params.id
-			}
-		})
-		.then(user => {
-			if (!user) {
-				res.status(404).json({
-					message: 'User not found'
-				});
-			}
-			user.update({
-				active: !user.active
-			}).then(updatedUser => {
-				res.status(200).json({
-					message: `User ${
-						user.active ? 'is active' : 'is deactive'
-					}`,
-					user: user.toJSON()
-				});
-			});
-		})
-		.catch(err => {
-			res.status(400).json({
-				messsage: `User toggle update failed`
-			});
+	const id = req.params.id;
+	try {
+		let user = await db.user.find({ where: { id: id } });
+		if (!user) {
+			throw new Error('User not found');
+		}
+
+		let updatedUser = await user.update({ active: !user.active });
+		res.json({
+			message: `User ${id} changed to ${
+				user.active ? 'active' : 'not active'
+			}`,
+			user: await updatedUser.toJSON()
 		});
+	} catch (err) {
+		const message = `Toggle user ${id} to ${
+			user.active ? 'not active' : 'active'
+		} failed - ${err}`;
+		semaLog.error(message);
+		res.status(400).json({
+			messsage,
+			err: `${err}`
+		});
+	}
 });
 
 module.exports = router;
