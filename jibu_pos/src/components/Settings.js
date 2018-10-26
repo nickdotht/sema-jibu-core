@@ -345,17 +345,17 @@ ${syncResult.productMrps.remoteProductMrps} ${i18n.t('product-sales-channel-pric
 					console.log("Passed - status" + result.status + " " + JSON.stringify(result.response));
 					if (result.status === 200) {
 						Communications.getSiteId(result.response.token, this.site.current.state.propertyText)
-							.then(siteId => {
+							.then(async siteId => {
 								if (siteId === -1) {
 									message = i18n.t('successful-connection-but', {what: this.site.current.state.propertyText, happened: i18n.t('does-not-exist')});
 								}else if (siteId === -2) {
 									message = i18n.t('successful-connection-but', {what: this.site.current.state.propertyText, happened: i18n.t('is-not-active')})
 								} else {
-
 									this.saveSettings(result.response.token, siteId);
 									Communications.setToken(result.response.token);
 									Communications.setSiteId(siteId);
 									PosStorage.setTokenExpiration();
+									await Synchronization.synchronizeSalesChannels();
 									Synchronization.scheduleSync();
 									// PosStorage.saveConfiguration( result.response.token, siteId );
 									// this.props.settingsActions.setConfiguration(PosStorage.getConfiguration());
