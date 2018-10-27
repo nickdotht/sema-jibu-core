@@ -189,7 +189,7 @@ class ViewSwitcher extends Component {
 		if (this.props.Jibu.props.showView.showNewOrder) {
 			return (<OrderView/>)
 		} else {
-			return (<CustomerViews.navigator screenProps={{parent: this.props.Jibu}}/>)
+			return (CustomerViews.navigator ? <CustomerViews.navigator screenProps={{parent: this.props.Jibu}}/> : null);
 		}
 	}
 }
