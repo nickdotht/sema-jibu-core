@@ -185,7 +185,6 @@ class JibuApp extends Component {
 
 class ViewSwitcher extends Component {
 	render() {
-		CustomerViews.buildNavigator();
 		if (this.props.Jibu.props.showView.showNewOrder) {
 			return (<OrderView/>)
 		} else {
