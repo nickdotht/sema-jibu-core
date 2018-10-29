@@ -92,9 +92,9 @@ class SemaSales extends Component {
 		if( metric.periods[1].beginDate != null ){
 			switch( metric.period ){
 				case "month":
-					return " since " + dateFormat(metric.periods[1].beginDate, "mmm, yyyy");
+					return " since " + dateFormat(convertDateToUTC(new Date(Date.parse(metric.periods[1].beginDate))), "mmm, yyyy");
 				case "year":
-					return " since " + dateFormat(metric.periods[1].beginDate, "yyyy");
+					return " since " + dateFormat(convertDateToUTC(new Date( Date.parse(metric.periods[1].beginDate))), "yyyy");
 				case "none":
 				default:
 					return "";
@@ -105,6 +105,11 @@ class SemaSales extends Component {
 	}
 
 }
+
+function convertDateToUTC(date) {
+	return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
 const calcNetRevenue = salesInfo =>{
 	if( salesInfo.totalRevenue.total &&  salesInfo.totalCogs.total ){
 		return utilService.formatDollar( salesInfo.currencyUnits, salesInfo.totalRevenue.total - salesInfo.totalCogs.total);
@@ -161,12 +166,12 @@ const formatRetailSalesHeader = (retailSales) =>{
 			case "none":
 				return "Total Sales";
 			case "year":
-				let startDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, yyyy");
-				let endDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, yyyy");
+				let startDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, yyyy");
+				let endDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, yyyy");
 				return "Sales from " + startDate + " - " + endDate;
 			case "month":
-				startDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, d, yyyy");
-				endDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, d, yyyy");
+				startDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, d, yyyy");
+				endDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, d, yyyy");
 				return "Sales from " + startDate + " - " + endDate;
 			default:
 				return "";
