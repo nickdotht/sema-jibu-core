@@ -65,7 +65,7 @@ class SemaSales extends Component {
 				</div>
 				<div className = "SalesContentContainer">
 					<div className= "SalesMapItem" id="salesMapId">
-						<SalesMapContainer google={this.props.google} retailers={this.props.sales.salesInfo.customerSales} />
+						<SalesMapContainer google={this.props.google} retailers={this.props.sales.salesInfo.customerSales} kiosk={this.props.kiosk} />
 					</div>
 					<div className= "SalesListItem">
 						<div><p style={{textAlign:"center"}}>{formatRetailSalesHeader(this.props.sales.salesInfo.customerSales)}</p></div>
@@ -276,6 +276,7 @@ const calcColor = (now, last) => {
 function mapStateToProps(state) {
 	return {
 		sales:state.sales,
+		kiosk:state.kiosk,
 		healthCheck: state.healthCheck
 	};
 }

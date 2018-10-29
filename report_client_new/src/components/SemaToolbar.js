@@ -98,6 +98,9 @@ class SemaToolbar extends Component {
 		console.log("--------------------PARAMS "+ JSON.stringify(params));
 		this.props.volume.loaded = false;
 		this.props.customer.loaded = false;
+		this.props.sales.loaded = false;
+		this.props.water.loaded = false;
+
 		switch (this.props.location.pathname) {
 			case "/Volumes":
 				this.props.volumeActions.fetchVolume(params);
@@ -194,6 +197,8 @@ function mapStateToProps(state) {
 		currentUser: state.auth.currentUser,
 		healthCheck: state.healthCheck,
 		kiosk:state.kiosk,
+		sales:state.sales,
+		water:state.waterOperations,
 		volume:state.volume,
 		customer:state.customer,
 		dateFilter:state.dateFilter
