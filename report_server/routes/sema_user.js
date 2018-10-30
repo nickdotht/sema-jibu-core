@@ -2,6 +2,7 @@ const express = require('express');
 const Sequelize = require('sequelize');
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const router = express.Router();
+const _ = require('lodash');
 const Op = Sequelize.Op;
 
 const db = require('../models');
@@ -50,7 +51,8 @@ router.post('/', async (req, res) => {
 			email,
 			password,
 			first_name: firstName,
-			last_name: lastName
+			last_name: lastName,
+			active: true
 		});
 		semaLog.info('User created success');
 
@@ -80,19 +82,23 @@ router.put('/:id', async (req, res) => {
 		lastName,
 		role
 	} = req.body.data;
+	let userData = {
+		username,
+		email,
+		first_name: firstName,
+		last_name: lastName
+	};
+
+	if (password) {
+		userData = Object.assign(userData, { password });
+	}
 
 	try {
 		const user = await db.user.find({ where: { id: req.params.id } });
 		if (!user) {
 			throw new Error('User not found');
 		}
-		let updatedUser = await user.update({
-			username,
-			email,
-			password,
-			first_name: firstName,
-			last_name: lastName
-		});
+		let updatedUser = await user.update({ userData });
 
 		await updatedUser.setRoles([]); // clear roles
 		if (user.role) {
@@ -120,8 +126,8 @@ router.delete('/:id', async (req, res) => {
 		let user = await db.user.find({ where: { id } });
 		let role = await user.getRoles();
 		if (!user) throw new Error('User not found');
-		if (role) throw new Error('User must not have any role(s)');
 		if (user.active) throw new Error('User must be deactivated');
+		if (role) throw new Error('User must not have any role(s)');
 
 		await user.destroy();
 		semaLog.info('User successfully deleted');
