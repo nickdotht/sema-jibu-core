@@ -98,16 +98,18 @@ router.put('/:id', async (req, res) => {
 		if (!user) {
 			throw new Error('User not found');
 		}
-		let updatedUser = await user.update({ userData });
 
+		let updatedUser = await user.update({ userData });
 		await updatedUser.setRoles([]); // clear roles
-		if (user.role) {
+		if (role) {
 			const dbRoles = await db.role.findAll({ where: { code: role } });
-			dbRoles.forEach(role => role.addUser(updatedUser));
+			await Promise.all(
+				dbRoles.map(async r => await r.addUser(updatedUser))
+			);
 		}
 		res.json({
 			message: 'Update user success',
-			user: Object.assign({ ...updatedUser.toJSON() }, { role })
+			user: await updatedUser.toJSON()
 		});
 	} catch (err) {
 		semaLog.error(`Update user failed - ${err}`);
