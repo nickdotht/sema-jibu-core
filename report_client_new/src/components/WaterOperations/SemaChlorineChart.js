@@ -63,7 +63,6 @@ class SemaChlorineChart extends Component {
 				return "Free Chlorine (PPM)";
 			default:
 				return "Chlorine";
-				break;
 		}
 
 	}

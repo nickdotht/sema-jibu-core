@@ -38,7 +38,7 @@ class App extends Component {
 			switch( location.pathname ){
 				case "/":
 
-					if( ! this.props.sales.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
+					if( ! this.props.water.loaded && this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID ) {
 						this.props.waterOperationsActions.fetchWaterOperations(params);
 					}
 					break;
@@ -109,6 +109,7 @@ function mapStateToProps(state) {
 		volume: state.volume,
 		customer: state.customer,
 		sales:state.sales,
+		water:state.waterOperations,
 		dateFilter:state.dateFilter,
 		auth: state.auth
 	};

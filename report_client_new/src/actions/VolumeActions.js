@@ -151,22 +151,22 @@ function fetchVolumeItem( params, type, options ) {
 	});
 }
 
-function fetchCustomerTypes(  ) {
-	return new Promise((resolve, reject ) => {
-		axiosService
-			.get('/sema/customer-types')
-			.then(response => {
-				if(response.status === 200){
-					resolve(response.data)
-				}else{
-					reject(null)
-				}
-			})
-			.catch(function(error){
-				reject(error)
-			});
-	});
-}
+// function fetchCustomerTypes(  ) {
+// 	return new Promise((resolve, reject ) => {
+// 		axiosService
+// 			.get('/sema/customer-types')
+// 			.then(response => {
+// 				if(response.status === 200){
+// 					resolve(response.data)
+// 				}else{
+// 					reject(null)
+// 				}
+// 			})
+// 			.catch(function(error){
+// 				reject(error)
+// 			});
+// 	});
+// }
 
 const updateVolume = volumeData => {
 	return {

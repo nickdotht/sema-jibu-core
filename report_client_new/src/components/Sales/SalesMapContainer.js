@@ -120,6 +120,41 @@ export class SalesMapContainer extends Component {
 					}
 				}
 			});
+			if( this.props.kiosk.selectedKiosk && this.props.kiosk.selectedKiosk.kioskID){
+				for( let index =0; index < this.props.kiosk.kiosks.length; index ++ ){
+					if( this.props.kiosk.selectedKiosk.kioskID === this.props.kiosk.kiosks[index].id ){
+						if( this.props.kiosk.kiosks[index].gpsCoordinates) {
+							let gps = this.props.kiosk.kiosks[index].gpsCoordinates.split(',');
+							if (gps && gps.length === 2) {
+								const lat = parseFloat(gps[0]);
+								const lng = parseFloat(gps[1]);
+								let marker = new google.maps.Marker({ // creates a new Google maps Marker object.
+									position: {lat: lat, lng: lng}, // sets position of marker to specified location
+									map: this.map, // sets markers to appear on the map we just created on line 35
+									title: this.props.kiosk.kiosks[index].name, // the title of the marker is set to the kiosk name
+									label: {
+										text: this.props.kiosk.kiosks[index].name,
+										color: "white"
+									},
+
+									icon: {
+										path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+										scale: 20,
+										fillColor: "blue",
+										fillOpacity: 0.8,
+										strokeOpacity: 0.8,
+										strokeWeight: 0,
+									},
+									zIndex: google.maps.Marker.MAX_ZINDEX
+								});
+								markers.push(marker);
+
+							}
+						}
+						break;
+					}
+				}
+			}
 			if( markers.length > 0 ) {
 				// Zoom the map to fit all markers
 				let bounds = new google.maps.LatLngBounds();

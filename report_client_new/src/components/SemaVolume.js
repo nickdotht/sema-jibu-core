@@ -119,7 +119,7 @@ class SemaVolume extends Component {
 	}
 	calcTotalLitersPerPerson(){
     	const totalVolume = this.calcTotalVolume();
-    	if( totalVolume != "N/A") {
+    	if( totalVolume !== "N/A") {
 			// Find the kiosk.
 			const kiosk = this.getKiosk();
 			if (kiosk && kiosk.consumerBase && kiosk.consumerBase > 0) {
@@ -132,9 +132,9 @@ class SemaVolume extends Component {
 	}
 	calcVolumePerPurchase(){
 		const totalVolume = this.calcTotalVolume();		// Total volume for the period
-		if( totalVolume != "N/A"){
+		if( totalVolume !== "N/A"){
 			const totalReceipts = this.calcTotalReceipts();
-			if( totalReceipts != "N/A" ){
+			if( totalReceipts !== "N/A" ){
 				return (totalVolume/totalReceipts).toFixed(1);
 			}
 		}
@@ -142,9 +142,9 @@ class SemaVolume extends Component {
 	}
 	calcPurchaseFrequency(){
 		const distinctCustomers = this.calcDistinctCustomers();		// Total distinct customers for the period
-		if( distinctCustomers != "N/A"){
+		if( distinctCustomers !== "N/A"){
 			const totalReceipts = this.calcTotalReceipts();
-			if( totalReceipts != "N/A" ){
+			if( totalReceipts !== "N/A" ){
 				return (totalReceipts/distinctCustomers).toFixed(1);
 			}
 		}

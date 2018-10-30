@@ -1,5 +1,5 @@
 import * as allActions from './ActionTypes';
-import moment from "moment/moment";
+// import moment from "moment/moment";
 import { axiosService } from 'services';
 import { utilService } from 'services';
 
