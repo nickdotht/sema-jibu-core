@@ -88,13 +88,28 @@ class SalesReport extends Component {
 	}
 
 	getTotalLiters(){
-		if( this.props.salesData.totalLiters ){
+		if( this.props.salesData.totalLiters && this.props.salesData.totalLiters !== 'N/A' ){
 			return this.props.salesData.totalLiters.toFixed(2);
 		}else{
 			return 0;
 		}
 
 	}
+
+	getItemTotalLiters(item) {
+		if( item.totalLiters && item.totalLiters !== 'N/A' ){
+			return `${item.totalLiters.toFixed(2)} L`;
+		}
+		return 'N/A';
+	}
+
+	getItemLitersPerSku(item) {
+		if (item.litersPerSku && item.litersPerSku !== 'N/A') {
+			return `${item.litersPerSku} L`;
+		}
+		return 'N/A';
+	}
+
 	getRow = (item)=>{
 		console.log("SalesReport - getRow");
 		return (
@@ -106,10 +121,10 @@ class SalesReport extends Component {
 					<Text style={[styles.rowItemCenter]}>{item.quantity}</Text>
 				</View>
 				<View style={[ {flex: .7}]}>
-					<Text style={[styles.rowItemCenter]}>{item.litersPerSku} L</Text>
+					<Text style={[styles.rowItemCenter]}>{this.getItemLitersPerSku(item)}</Text>
 				</View>
 				<View style={[{flex: .7}]}>
-					<Text style={[styles.rowItemCenter]}>{item.totalLiters.toFixed(2)} L</Text>
+					<Text style={[styles.rowItemCenter]}>{this.getItemTotalLiters(item)}</Text>
 				</View>
 				<View style={[{flex: .7}]}>
 					<Text style={[styles.rowItemCenter]}>{item.pricePerSku.toFixed(2)}</Text>
