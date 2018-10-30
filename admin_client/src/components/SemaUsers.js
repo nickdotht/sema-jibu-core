@@ -64,8 +64,6 @@ class SemaUsers extends Component {
 
   showContent() {
     const { healthCheck, users, loading, alert } = this.props;
-    console.log('loading ===', loading);
-    console.log('alert =====', alert);
     const { editMode } = this.state;
 
     if (healthCheck.server !== 'Ok') {
@@ -97,6 +95,7 @@ class SemaUsers extends Component {
             title={editMode ? 'Edit User' : 'Create User'}
             body={(
               <UserForm
+                editMode={editMode}
                 user={this.state.editUser}
                 onSubmit={values => {
                   editMode

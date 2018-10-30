@@ -14,9 +14,6 @@ export const validateUserForm = values => {
   if (!values.username) {
     errors.username = 'Required';
   }
-  if (!values.password) {
-    errors.password = 'Required';
-  }
   if (!values.role) {
     errors.role = 'Required';
   }

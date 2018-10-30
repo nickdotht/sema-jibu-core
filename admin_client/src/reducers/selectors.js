@@ -9,6 +9,6 @@ export const createAlertMessageSelector = actions => state =>
   // * We assume when any request fails on a page that
   //   requires multiple API calls, we shows the first error
   _(actions)
-    .map(action => _.get(state, `alert.${action}`))
+    .map(action => _.get(state, `alert.error`))
     .compact()
     .first() || '';

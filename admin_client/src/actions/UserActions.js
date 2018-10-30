@@ -2,7 +2,10 @@ import { axiosService } from 'services';
 import get from 'lodash/get';
 import * as a from './ActionTypes';
 
-const extractError = err => ({ message: get(err, 'response.data.err', '') });
+const extractError = err => ({
+  type: 'error',
+  message: get(err, 'response.data.err', '')
+});
 
 export const fetchUsersRequest = () => ({ type: a.FETCH_USERS_REQUEST });
 
@@ -55,6 +58,8 @@ export const toggleUserFailure = payload => ({
   type: a.TOGGLE_USER_FAILURE,
   payload
 });
+
+export const clearErrors = () => ({ type: 'CLEAR_ERRORS' });
 
 export const fetchUsers = () => dispatch => {
   dispatch(fetchUsersRequest());
