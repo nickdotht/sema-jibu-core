@@ -50,14 +50,14 @@ class InventoryEdit extends Component {
 						<View style={{flexDirection:'row',  justifyContent:'center', marginTop:20}}>
 							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3}}>
 								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.okMethod( this.props.sku, this.state.inventoryQuantity)}>
-									<Text style={styles.buttonText}>Ok</Text>
+									<Text style={styles.buttonText}>{i18n.t('ok')}</Text>
 								</TouchableHighlight>
 							</View>
 							<View style={{flex:.1,backgroundColor:'white'}}>
 							</View>
 							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3 }}>
 								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.cancelMethod()}>
-									<Text style={styles.buttonText}>Cancel</Text>
+									<Text style={styles.buttonText}>{i18n.t('cancel')}</Text>
 								</TouchableHighlight>
 							</View>
 						</View>
