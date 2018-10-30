@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 		semaLog.error(`GET users failed - ${err}`);
 		res.status(400).json({
 			message: `Failed to GET users ${err}`,
-			error: `${err}`
+			err: `${err}`
 		});
 	}
 });
@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
 		semaLog.error(`Create user failed - ${err}`);
 		res.status(400).json({
 			message: `Failed to create user ${err}`,
-			error: `${err}`
+			err: `${err}`
 		});
 	}
 });
@@ -115,7 +115,7 @@ router.put('/:id', async (req, res) => {
 		semaLog.error(`Update user failed - ${err}`);
 		res.status(400).json({
 			message: `Update user failed - ${err}`,
-			error: `${err}`
+			err: `${err}`
 		});
 	}
 });
