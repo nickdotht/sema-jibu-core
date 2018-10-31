@@ -99,7 +99,7 @@ router.put('/:id', async (req, res) => {
 			throw new Error('User not found');
 		}
 
-		let updatedUser = await user.update({ userData });
+		let updatedUser = await user.update(userData);
 		await updatedUser.setRoles([]); // clear roles
 		if (role) {
 			const dbRoles = await db.role.findAll({ where: { code: role } });
@@ -129,7 +129,7 @@ router.delete('/:id', async (req, res) => {
 		let role = await user.getRoles();
 		if (!user) throw new Error('User not found');
 		if (user.active) throw new Error('User must be deactivated');
-		if (role) throw new Error('User must not have any role(s)');
+		if (role.length) throw new Error('User must not have any role(s)');
 
 		await user.destroy();
 		semaLog.info('User successfully deleted');
