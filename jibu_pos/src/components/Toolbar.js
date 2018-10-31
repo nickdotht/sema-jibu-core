@@ -23,7 +23,7 @@ class Toolbar extends Component {
         return (
         	<View style ={styles.toolbar}>
 				<View style = {[styles.leftToolbar]}>
-					<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
+					<Image source={require('../images/swe-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
 					<TouchableHighlight onPress={() => this.onVersion()}>
 						<Text style = {[styles.text_style, {marginLeft:50}]}>{i18n.t('version')} {packageJson.version}</Text>
 					</TouchableHighlight>

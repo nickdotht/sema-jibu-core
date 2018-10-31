@@ -13,7 +13,6 @@ export default class InitializeDB {
 		return new Promise((resolve, reject) => {
 			SQLite.echoTest().then(() => {
 				SQLite.openDatabase({name: 'main', createFromLocation : "db.sqlite"}).then((DB) => {
-				// SQLite.openDatabase({name: "test1.db", createFromLocation: "~/database/jibu.db"}).then((DB) => {
 					this.db = DB;
 					this.verifyDatabase(this.db).then(()=> {
 						resolve();

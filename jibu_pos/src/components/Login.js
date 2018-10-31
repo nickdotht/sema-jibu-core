@@ -31,7 +31,7 @@ class Login extends Component {
 		return (
 			<View style={{flex:1}}>
 				<ImageBackground
-					source={require('../images/jibu-login.png')}
+					source={require('../images/swe-login.jpg')}
 					resizeMode ='cover'
 					style = {styles.imgBackground}>
 					<KeyboardAwareScrollView
@@ -40,7 +40,7 @@ class Login extends Component {
 						scrollEnabled={false}>
 						<View style ={{flex:1, alignItems:'center' }}>
 								<View style ={{marginTop:'1.5%'}}>
-									<Image source={require('../images/jibu-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
+									<Image source={require('../images/swe-logo.png')} resizeMode ='stretch' style={styles.logoSize}/>
 								</View>
 								<View style ={[{marginTop:'1.5%'}, styles.inputContainer]}>
 									<TextInput
