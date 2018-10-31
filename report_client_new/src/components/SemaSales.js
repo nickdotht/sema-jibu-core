@@ -65,7 +65,7 @@ class SemaSales extends Component {
 				</div>
 				<div className = "SalesContentContainer">
 					<div className= "SalesMapItem" id="salesMapId">
-						<SalesMapContainer google={this.props.google} retailers={this.props.sales.salesInfo.customerSales} />
+						<SalesMapContainer google={this.props.google} retailers={this.props.sales.salesInfo.customerSales} kiosk={this.props.kiosk} />
 					</div>
 					<div className= "SalesListItem">
 						<div><p style={{textAlign:"center"}}>{formatRetailSalesHeader(this.props.sales.salesInfo.customerSales)}</p></div>
@@ -92,10 +92,11 @@ class SemaSales extends Component {
 		if( metric.periods[1].beginDate != null ){
 			switch( metric.period ){
 				case "month":
-					return " since " + dateFormat(metric.periods[1].beginDate, "mmm, yyyy");
+					return " since " + dateFormat(convertDateToUTC(new Date(Date.parse(metric.periods[1].beginDate))), "mmm, yyyy");
 				case "year":
-					return " since " + dateFormat(metric.periods[1].beginDate, "yyyy");
+					return " since " + dateFormat(convertDateToUTC(new Date( Date.parse(metric.periods[1].beginDate))), "yyyy");
 				case "none":
+				default:
 					return "";
 			}
 		}else{
@@ -104,6 +105,11 @@ class SemaSales extends Component {
 	}
 
 }
+
+function convertDateToUTC(date) {
+	return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
 const calcNetRevenue = salesInfo =>{
 	if( salesInfo.totalRevenue.total &&  salesInfo.totalCogs.total ){
 		return utilService.formatDollar( salesInfo.currencyUnits, salesInfo.totalRevenue.total - salesInfo.totalCogs.total);
@@ -160,12 +166,12 @@ const formatRetailSalesHeader = (retailSales) =>{
 			case "none":
 				return "Total Sales";
 			case "year":
-				let startDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, yyyy");
-				let endDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, yyyy");
+				let startDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, yyyy");
+				let endDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, yyyy");
 				return "Sales from " + startDate + " - " + endDate;
 			case "month":
-				startDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, d, yyyy");
-				endDate = dateFormat((new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, d, yyyy");
+				startDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].beginDate))), "mmm, d, yyyy");
+				endDate = dateFormat(convertDateToUTC(new Date(Date.parse(retailSales[0].periods[0].endDate))), "mmm, d, yyyy");
 				return "Sales from " + startDate + " - " + endDate;
 			default:
 				return "";
@@ -232,7 +238,7 @@ const calcChange = (salesInfo, now, last) => {
 		switch( salesInfo.totalCustomers.period ){
 			case "year":
 				let periodYear = new Date(Date.parse(salesInfo.totalCustomers.periods[0].beginDate)).getFullYear();
-				if( nowDate.getFullYear() == periodYear ){
+				if( nowDate.getFullYear() === periodYear ){
 					let start = new Date(periodYear, 0, 0);
 					let diff = nowDate - start;
 					let oneDay = 1000 * 60 * 60 * 24;
@@ -242,10 +248,11 @@ const calcChange = (salesInfo, now, last) => {
 				}
 				break;
 			case "month":
+			default:
 				let period = new Date(Date.parse(salesInfo.totalCustomers.periods[0].beginDate));
 				periodYear = period.getFullYear();
 				let periodMonth = period.getMonth();
-				if( nowDate.getFullYear() == periodYear && nowDate.getMonth() == periodMonth ) {
+				if( nowDate.getFullYear() === periodYear && nowDate.getMonth() === periodMonth ) {
 					let dayOfMonth = nowDate.getDate();
 					let daysInMonth =  new Date(periodYear, periodMonth+1, 0).getDate(); // Note: this is a trick to get the last day of the month
 					now = ((daysInMonth*now)/dayOfMonth)
@@ -269,6 +276,7 @@ const calcColor = (now, last) => {
 function mapStateToProps(state) {
 	return {
 		sales:state.sales,
+		kiosk:state.kiosk,
 		healthCheck: state.healthCheck
 	};
 }

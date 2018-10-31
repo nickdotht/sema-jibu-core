@@ -8,6 +8,7 @@ class Kiosk {
 	constructor(kiosk) {
 		this.id = kiosk.id;
 		this.active = true;
+		this.gpsCoordinates = null;
 		if(kiosk.hasOwnProperty("active") ) {
 			this.active = kiosk["active"][0] === 1 ? true : false;
 		}
@@ -15,6 +16,12 @@ class Kiosk {
 		this.name = kiosk.name;
 		this.region_id = kiosk.region_id;
 		this.version = kiosk.version;
+		if(kiosk.hasOwnProperty("consumer_base") ) {
+			this.consumerBase = kiosk.consumer_base;
+		}
+		if(kiosk.hasOwnProperty("gps_coordinates") ) {
+			this.gpsCoordinates = kiosk.gps_coordinates;
+		}
 	}
 	classToPlain(){
 		return {
@@ -23,7 +30,9 @@ class Kiosk {
 			api_key:this.api_key,
 			name:this.name,
 			region_id:this.region_id,
-			version:this.version};
+			version:this.version,
+			consumerBase: this.consumerBase,
+			gpsCoordinates:this.gpsCoordinates};
 	}
 }
 

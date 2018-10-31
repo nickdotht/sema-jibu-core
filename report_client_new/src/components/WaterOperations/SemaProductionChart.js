@@ -131,11 +131,11 @@ function calcMovingAvg(array, count, qualifier){
 	var result = [], val;
 
 	// pad beginning of result with null values
-	for (var i=0; i < count-1; i++)
+	for (let i=0; i < count-1; i++)
 		result.push(null);
 
 	// calculate average for each subarray and add to result
-	for (var i=0, len=array.length - count; i <= len; i++){
+	for (let i=0, len=array.length - count; i <= len; i++){
 
 		val = avg(array.slice(i, i + count), qualifier);
 		if (isNaN(val))

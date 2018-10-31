@@ -5,10 +5,11 @@ const semaLog = require('../seama_services/sema_logger');
 const CustomerSummary = require('../model_layer/CustomerSummary');
 
 // Not that the consumer base per kiosk is simply the sum of consumer_base divided by the count of customers
-const sqlCustomerSummary = 'SELECT COUNT(customer_name), sum(consumer_base)/COUNT(customer_name)\
+const sqlCustomerSummary = "SELECT COUNT(customer_name), SUM(kiosk_consumer_base)/COUNT(customer_name),  SUM(customer_consumer_base) \
  					FROM customer_details \
 					WHERE  kiosk_id = ? \
-					AND created_at BETWEEN ? AND ?';
+					AND active = b'1' \
+					AND created_at BETWEEN ? AND ?";
 
 
 
@@ -121,8 +122,12 @@ const getCustomerSummary = ( connection, sqlQualifier, params, customerSummary) 
 					if(  sqlResult[0]["COUNT(customer_name)"] != null ) {
 						customerSummary.addCustomerCount( sqlResult[0]["COUNT(customer_name)"] );
 					}
-					if(  sqlResult[0]["sum(consumer_base)/COUNT(customer_name)"] != null ) {
-						customerSummary.addConsumerBase( sqlResult[0]["sum(consumer_base)/COUNT(customer_name)"] );
+					// Note site_consumer_base is the potential number of consumers this kiosk/site may service
+					if(  sqlResult[0]["SUM(kiosk_consumer_base)/COUNT(customer_name)"] != null ) {
+						customerSummary.addSiteConsumerBase( sqlResult[0]["SUM(kiosk_consumer_base)/COUNT(customer_name)"] );
+					}
+					if(  sqlResult[0]["SUM(customer_consumer_base)"] != null ) {
+						customerSummary.addCustomerConsumerBase( sqlResult[0]["SUM(customer_consumer_base)"] );
 					}
 					resolve();
 				}

@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { ListGroup } from 'react-bootstrap';
 import 'App.css';
 
+// import logo from 'images/swe-sidebar-logo.png';
+
+import {sideBarLogo} from "../Branding"
 
 const SeamaListStyleActive = {
     textAlign:"left",
@@ -35,7 +38,8 @@ class SemaSidebar extends Component {
         return (
             <div className="SeamaNavSidebar" style={this.getStyle()}>
                 <div>
-                    {<img src={require('images/swe-sidebar-logo.png')} alt="logo" style={ImageStyle} />}
+					{/*{<img src={require('images/swe-sidebar-logo.png')} alt="logo" style={ImageStyle} />}*/}
+					{<img src={sideBarLogo} alt="logo" style={ImageStyle} />}
                 </div>
                 <ListGroup>
 					<CustomComponent1><i className="glyphicon glyphicon-map-marker" style={{paddingRight:"15px"}}/>

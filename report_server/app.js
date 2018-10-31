@@ -68,6 +68,10 @@ app.use(express.static(path.join(__dirname, 'public_react/build/')));
 app.use(express.static(path.join('..', 'documentations')));
 
 app.use('/', index);
+app.use('/Sales', index);
+app.use('/Volumes', index);
+app.use('/Demographics', index);
+
 app.use('/untapped/health-check', seama_health_check);
 app.use('/untapped/login', seama_login);
 app.use('/untapped/kiosks', isAuthenticated, seama_kiosks);

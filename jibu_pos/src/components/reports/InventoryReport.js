@@ -50,14 +50,14 @@ class InventoryEdit extends Component {
 						<View style={{flexDirection:'row',  justifyContent:'center', marginTop:20}}>
 							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3}}>
 								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.okMethod( this.props.sku, this.state.inventoryQuantity)}>
-									<Text style={styles.buttonText}>Ok</Text>
+									<Text style={styles.buttonText}>{i18n.t('ok')}</Text>
 								</TouchableHighlight>
 							</View>
 							<View style={{flex:.1,backgroundColor:'white'}}>
 							</View>
 							<View style={{backgroundColor:"#2858a7", borderRadius:10, flex:.3 }}>
 								<TouchableHighlight underlayColor = '#c0c0c0' onPress={() => this.props.cancelMethod()}>
-									<Text style={styles.buttonText}>Cancel</Text>
+									<Text style={styles.buttonText}>{i18n.t('cancel')}</Text>
 								</TouchableHighlight>
 							</View>
 						</View>
@@ -220,12 +220,26 @@ class InventoryReport extends Component {
 	}
 
 	getTotalLiters() {
-		if (this.props.inventoryData.salesAndProducts.totalLiters) {
+		if (this.props.inventoryData.salesAndProducts.totalLiters && this.props.inventoryData.salesAndProducts.totalLiters !== 'N/A') {
 			return this.props.inventoryData.salesAndProducts.totalLiters.toFixed(2) + ' L';
 		} else {
 			return '-';
 		}
 
+	}
+
+	getItemTotalLiters(item) {
+		if( item.totalLiters && item.totalLiters !== 'N/A' ){
+			return `${item.totalLiters.toFixed(2)} L`;
+		}
+		return 'N/A';
+	}
+
+	getItemLitersPerSku(item) {
+		if (item.litersPerSku && item.litersPerSku !== 'N/A') {
+			return `${item.litersPerSku} L`;
+		}
+		return 'N/A';
 	}
 
 	getRow = (item) => {
@@ -239,10 +253,10 @@ class InventoryReport extends Component {
 					<Text style={[styles.rowItemCenter]}>{item.quantity}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItemCenter]}>{item.litersPerSku} L</Text>
+					<Text style={[styles.rowItemCenter]}>{this.getItemLitersPerSku(item)}</Text>
 				</View>
 				<View style={[{ flex: .7 }]}>
-					<Text style={[styles.rowItemCenter]}>{item.totalLiters.toFixed(2)} L</Text>
+					<Text style={[styles.rowItemCenter]}>{this.getItemTotalLiters(item)}</Text>
 				</View>
 				<View style ={[{width:20}]}/>
 
@@ -359,11 +373,12 @@ class InventoryReport extends Component {
 	}
 
 	getTotalForSkuDisplay( item ) {
+		if (!item.litersPerSku || item.litersPerSku === 'N/A') return '-';
 		let current = this.getInventorySkuForDisplay(true, item);
 		if (current == '-') return '-';
 		let previous = this.getInventorySkuForDisplay(false, item);
 		if (previous == '-') return '-';
-		return ((current - previous) * item.litersPerSku).toFixed(2) + ' L';
+		return `${((current - previous) * item.litersPerSku).toFixed(2)} L`;
 	}
 
 	getTotalInventory(){

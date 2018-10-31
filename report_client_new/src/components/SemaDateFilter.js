@@ -70,14 +70,14 @@ class SemaDateFilter extends Component {
 	};
 	yearIncrement(){
 		this.startDate = new Date( this.startDate.getFullYear()+1, 0, 1 );
-		this.endDate = new Date( this.startDate.getFullYear(), 12, 0 );
+		this.endDate = new Date( this.startDate.getFullYear(), 12, 0, 23, 59, 59 );
 		this.setYTDDisplay();
 		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 
 	}
 	yearDecrement(){
 		this.startDate = new Date( this.startDate.getFullYear()-1, 0, 1 );
-		this.endDate = new Date( this.startDate.getFullYear(), 12, 0 );
+		this.endDate = new Date( this.startDate.getFullYear(), 12, 0, 23, 59, 59 );
 		this.setYTDDisplay();
 		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 
@@ -86,7 +86,7 @@ class SemaDateFilter extends Component {
 		this.groupType = "month";
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), this.endDate.getMonth(), 1 );
-		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
+		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0, 23, 59, 59);
 
 	};
 	setThisMonthDisplay (){
@@ -104,13 +104,13 @@ class SemaDateFilter extends Component {
 	};
 	monthIncrement() {
 		this.startDate = new Date( this.startDate.setMonth(this.startDate.getMonth() + 1));
-		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
+		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0, 23, 59, 59);
 		this.setThisMonthDisplay();
 		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 	}
 	monthDecrement(){
 		this.startDate = new Date( this.startDate.setMonth(this.startDate.getMonth()-1));
-		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0);
+		this.endDate  = new Date(this.startDate.getFullYear(), this.startDate.getMonth()+1, 0, 23, 59, 59);
 		this.setThisMonthDisplay();
 		this.props.dateFilterActions.setDateRange( this.startDate, this.endDate, this.groupType );
 	}
@@ -144,7 +144,7 @@ class SemaDateFilter extends Component {
 		this.endDate = new Date(Date.now());
 		this.startDate = new Date( this.endDate.getFullYear(), 0, 1 );
 		this.groupType = "year";
-		this.minDate = new Date( 2017, 0, 1 );		// Min date allowed
+		this.minDate = new Date( 2016, 0, 1 );		// Min date allowed
 		this.maxDate = this.endDate;
 
 		this.dateSelector = this.dateMenu[1];

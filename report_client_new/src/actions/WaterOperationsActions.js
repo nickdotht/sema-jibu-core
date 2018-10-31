@@ -1,6 +1,7 @@
 import * as allActions from './ActionTypes';
-import moment from "moment/moment";
+// import moment from "moment/moment";
 import { axiosService } from 'services';
+import { utilService } from 'services';
 
 function receiveWaterOperations(data) {
 	console.log("receiveWaterOperations ");
@@ -85,10 +86,10 @@ function fetchChart( params ) {
 	return new Promise((resolve, reject ) => {
 		let url = '/sema/dashboard/site/water-chart?site-id=' + params.kioskID ;
 		if( params.hasOwnProperty("startDate") ){
-			url = url + "&begin-date=" + params.startDate.toISOString();
+			url = url + "&begin-date=" + utilService.formatDateForUrl(params.startDate);
 		}
 		if( params.hasOwnProperty("endDate") ){
-			url = url + "&end-date=" + params.endDate.toISOString();
+			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
 		}
 		if( params.hasOwnProperty("type") ){
 			url = url + "&type=" + params.type;
@@ -113,10 +114,10 @@ function fetchSummary( params ) {
 	return new Promise((resolve, reject ) => {
 		let url = '/sema/dashboard/site/water-summary?site-id=' + params.kioskID ;
 		if( params.hasOwnProperty("startDate") ){
-			url = url + "&begin-date=" + params.startDate.toISOString();
+			url = url + "&begin-date=" + utilService.formatDateForUrl(params.startDate);
 		}
 		if( params.hasOwnProperty("endDate") ){
-			url = url + "&end-date=" + params.endDate.toISOString();
+			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
 		}
 
 		axiosService

@@ -6,7 +6,7 @@ import 'css/SemaCustomer.css';
 
 class CustomerSummaryPanel extends Component {
     render() {
-        return (<div style={{width:"80%"}}>
+        return (<div style={{width:"90%"}}>
                 <Panel className="CustomerSummaryPanel">
                     <Panel.Body  style={{padding:"7px"}}>
                         <Panel.Title componentClass="h3" style={{margin:"5px"}}>{this.props.title}</Panel.Title>
@@ -18,7 +18,7 @@ class CustomerSummaryPanel extends Component {
     }
     format(){
 		if( typeof this.props.value === "string") return this.props.value;
-    	if( this.props.value ){
+    	if( typeof this.props.value === 'number' ){
 			return Math.round(this.props.value);
 		}else{
     		return "N/A"
@@ -28,5 +28,4 @@ class CustomerSummaryPanel extends Component {
 
 }
 export default CustomerSummaryPanel;
-
 

@@ -67,6 +67,16 @@ const formatDollar = (currencyUnits, amount ) =>{
 	}
 };
 
+const formatDateForUrl = dateTime =>{
+	return ( "" + dateTime.getFullYear() + '-'  +
+		('0'+ (dateTime.getMonth() +1)).slice(-2) + '-' +
+		('0'+ dateTime.getDate()).slice(-2) + 'T' +
+		('0'+ dateTime.getHours()).slice(-2) + ':' +
+		('0'+ dateTime.getMinutes()).slice(-2) + ':' +
+		('0'+ dateTime.getSeconds()).slice(-2) );
+};
+
+
 const isEmptyObject = ( obj ) =>{
 	return (Object.keys(obj).length === 0 && obj.constructor === Object) ? true: false;
 }
@@ -76,5 +86,6 @@ export const utilService = {
 	getBackgroundColorByIndex,
 	getBackgroundColorByIndex2,
 	isEmptyObject,
-	formatDollar
+	formatDollar,
+	formatDateForUrl
 };

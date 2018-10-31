@@ -746,7 +746,7 @@ class PosStorage {
 			this.getKey(salesChannelsKey)
 				.then(salesChannels => {
 					if (!salesChannels) {
-						salesChannels = [];
+						return resolve([]);
 					}
 					resolve(this.parseJson(salesChannels));
 				})

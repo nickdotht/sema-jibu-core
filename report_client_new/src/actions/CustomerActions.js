@@ -1,5 +1,6 @@
 import * as allActions from './ActionTypes';
 import { axiosService } from 'services';
+import { utilService } from 'services';
 
 function receiveCustomer(data) {
 	console.log("receiveCustomer - ", data.toString());
@@ -113,10 +114,10 @@ function fetchCustomerItem( params, options ) {
 			url = url + "&distance-gt=" + options.distanceGT;
 		}
 		if( params.hasOwnProperty("startDate") ){
-			url = url + "&begin-date=" + params.startDate.toISOString();
+			url = url + "&begin-date=" + utilService.formatDateForUrl(params.startDate);
 		}
 		if( params.hasOwnProperty("endDate") ){
-			url = url + "&end-date=" + params.endDate.toISOString();
+			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
 		}
 
 		axiosService
