@@ -10,7 +10,7 @@ import React, { Component } from 'react';
 
 import { Provider } from 'react-redux';
 import store from './store';
-import JibuApp from '../components/JibuApp';
+import PosApp from '../components/PosApp';
 import PosStorage from '../database/PosStorage';
 import { isEmptyObj } from '../services/Utilities';
 
@@ -34,7 +34,7 @@ export default class App extends Component {
   render() {
       return (
     <Provider store={store}>
-            <JibuApp />
+            <PosApp />
     </Provider>
       );
   }
