@@ -31,7 +31,7 @@ import * as ToolbarActions from "../actions/ToolBarActions";
 
 console.ignoredYellowBox = ['Warning: isMounted','Setting a timer'];
 
-class JibuApp extends Component {
+class PosApp extends Component {
 	constructor(props) {
 		super(props);
 
@@ -40,9 +40,9 @@ class JibuApp extends Component {
 		this.posStorage = PosStorage;
 	}
 	componentDidMount() {
-		console.log("JibuApp - componentDidMount enter");
+		console.log("PosApp - componentDidMount enter");
 		this.posStorage.initialize( false ).then( (isInitialized) => {
-			console.log("JibuApp - componentDidMount - Storage initialized");
+			console.log("PosApp - componentDidMount - Storage initialized");
 
 			let settings = this.posStorage.getSettings();
 			this.props.settingsActions.setSettings( settings );
@@ -75,16 +75,16 @@ class JibuApp extends Component {
 			// Otherwise proceed to the settings screen.
 			// Note: Without customerTypes. Customers can't be created since Customer creation requires both salesChannelIds AND customerTypes
 			if( this.isLoginComplete() ){
-				console.log("JibuApp - Auto login - All settings exist");
+				console.log("PosApp - Auto login - All settings exist");
 				this.props.toolbarActions.SetLoggedIn(true);
 				this.props.toolbarActions.ShowScreen("main");
-				console.log("JibuApp - starting synchronization");
+				console.log("PosApp - starting synchronization");
 				Synchronization.scheduleSync( );
 			}else if( this.isSettingsComplete() ){
-				console.log("JibuApp - login required - No Token");
+				console.log("PosApp - login required - No Token");
 				this.props.toolbarActions.SetLoggedIn(false);
 			}else{
-				console.log("JibuApp - Settings not complete");
+				console.log("PosApp - Settings not complete");
 				this.props.toolbarActions.SetLoggedIn(true);	// So that the login screen doesn't show
 				this.props.toolbarActions.ShowScreen("settings");
 
@@ -101,7 +101,7 @@ class JibuApp extends Component {
 		Events.on('ProductsUpdated', 'productUpdate1', this.onProductsUpdated.bind(this));
 		Events.on('SalesChannelsUpdated', 'SalesChannelsUpdated1', this.onSalesChannelUpdated.bind(this));
 
-		console.log("JibuApp = Mounted-Done");
+		console.log("PosApp = Mounted-Done");
 
 	}
 	componentWillUnmount(){
@@ -147,7 +147,7 @@ class JibuApp extends Component {
 			return (
 				<View style={{flex: 1}}>
 					<Toolbar/>
-					<ScreenSwitcher currentScreen={this.props.showScreen} Jibu={this}/>
+					<ScreenSwitcher currentScreen={this.props.showScreen} Pos={this}/>
 				</View>
 
 			);
@@ -185,10 +185,10 @@ class JibuApp extends Component {
 
 class ViewSwitcher extends Component {
 	render() {
-		if (this.props.Jibu.props.showView.showNewOrder) {
+		if (this.props.Pos.props.showView.showNewOrder) {
 			return (<OrderView/>)
 		} else {
-			return (CustomerViews.navigator ? <CustomerViews.navigator screenProps={{parent: this.props.Jibu}}/> : null);
+			return (CustomerViews.navigator ? <CustomerViews.navigator screenProps={{parent: this.props.Pos}}/> : null);
 		}
 	}
 }
@@ -210,7 +210,7 @@ class ScreenSwitcher extends Component {
 				return (
 					<View style={{ flex: 1 }}>
 						<CustomerBar/>
-						<ViewSwitcher ref={this.viewSwitcherInstance} Jibu={this.props.Jibu}/>
+						<ViewSwitcher ref={this.viewSwitcherInstance} Pos={this.props.Pos}/>
 					</View>
 				);
 		}
@@ -239,7 +239,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 //Connect everything
-export default connect(mapStateToProps, mapDispatchToProps)(JibuApp);
+export default connect(mapStateToProps, mapDispatchToProps)(PosApp);
 
 
 
