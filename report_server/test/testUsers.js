@@ -11,7 +11,7 @@ describe('Users', () => {
 	let user;
 
 	after(async () => {
-		const u = await db.user.find({ where: { id: user.id } });
+		const u = await db.user.findOne({ where: { id: user.id } });
 		if (u) {
 			await u.setRoles([]); // clear roles
 			await u.destroy();
