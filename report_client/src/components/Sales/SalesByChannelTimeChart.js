@@ -24,14 +24,28 @@ class SalesByChannelTimeChart extends Component {
 								xAxes: [{
 									type: 'time',
 									time: {
-										unit: 'month',
+										unit: this.getTimeUnit(),
 										displayFormats: {
 											day: 'MMM D'
 										},
-										min: this.calcDate(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.beginDate),
-										max: this.calcDate(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.endDate)
-									}
+										min:this.getMin(),
+										max:this.getMax(),
+									},
+
+									// max: this.calcDate(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.endDate)
 								}]
+
+								// xAxes: [{
+								// 	type: 'time',
+								// 	time: {
+								// 		unit: 'month',
+								// 		displayFormats: {
+								// 			day: 'MMM D'
+								// 		},
+								// 		min: this.calcDate(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.beginDate),
+								// 		max: this.calcDate(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.endDate)
+								// 	}
+								// }]
 							},
 							title: {
 								display: true,
@@ -52,6 +66,30 @@ class SalesByChannelTimeChart extends Component {
 
 		}
 	}
+	getTimeUnit(){
+		if(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.groupBy === "day"){
+			return "week";
+		}else{
+			return "month";
+		}
+	}
+	getMin(){
+		// For monthly data, (groupBy => "day) return the first day of month
+		if(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.groupBy === "day"){
+			return this.calcDate(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.beginDate);
+		}else{
+			return null;
+		}
+	}
+	getMax(){
+		// For monthly data, (groupBy => "day) return the end day of month
+		if(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.groupBy === "day"){
+			return this.calcDate(this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.endDate);
+		}else{
+			return null;
+		}
+	}
+
 	getChartDataSets(){
 		let datasets = this.props.chartData.salesInfo.salesByChannelHistory.salesByChannel.datasets;
 		let returnSets = [];

@@ -62,8 +62,14 @@ router.get('/', async( request, response ) => {
 				results.salesByChannel.beginDate = beginDate;
 				results.salesByChannel.endDate = endDate;
 				const salesChannels = await getSalesChannels(connection);
+				let groupBy = "day";
+				if( request.query.hasOwnProperty("group-by")){
+					groupBy = request.query["group-by"];
+					results.salesByChannel.groupBy = groupBy;
+				}
+
 				for( let index = 0; index < salesChannels.length; index++  ){
-					await getSalesByChannel( connection, salesChannels[index], request.query["site-id"], beginDate, endDate, results );
+					await getSalesByChannel( connection, salesChannels[index], request.query["site-id"], beginDate, endDate, groupBy, results );
 				}
 				semaLog.info("sales-by-channel exit");
 				response.json(results);
@@ -78,9 +84,8 @@ router.get('/', async( request, response ) => {
 });
 
 
-const getSalesByChannel = ( connection, salesChannel, kioskId, beginDate, endDate, results) =>{
+const getSalesByChannel = ( connection, salesChannel, kioskId, beginDate, endDate, groupBy, results) =>{
 	return new Promise((resolve, reject ) => {
-		let groupBy = "month";
 		let sqlQuery = sqlSalesByChannelDay;
 		if( groupBy === "month" ){
 			sqlQuery = sqlSalesByChannelMonth
@@ -125,7 +130,7 @@ const getSalesByChannel = ( connection, salesChannel, kioskId, beginDate, endDat
 const initResults = () =>{
 	return {
 		// salesByChannel: { labels: [], datasets: []}
-		salesByChannel: { beginDate:"N/A", endDate: "N/A", datasets: []}
+		salesByChannel: { beginDate:"N/A", endDate: "N/A", groupBy:"day", datasets: []}
 
 	}
 };

@@ -54,7 +54,14 @@ const fetchSalesData = ( params) => {
 			salesInfo.salesByChannel = await fetchSalesByChannel(params);
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:75}} ));
 
-			salesInfo.salesByChannelHistory = await fetchSalesByChannelHistory(params);
+			// Decimate the results by 'month' for periods a year or longer
+			let groupBy = null;
+			if( params.hasOwnProperty("groupBy") &&
+				(params.groupBy === "none" || params.groupBy === "year")){
+				groupBy = "month";
+			}
+
+			salesInfo.salesByChannelHistory = await fetchSalesByChannelHistory(params, groupBy);
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
 
 			resolve(salesInfo);
@@ -120,7 +127,7 @@ function fetchSalesByChannel( params ) {
 	});
 }
 
-function fetchSalesByChannelHistory( params ) {
+function fetchSalesByChannelHistory( params, groupBy ) {
 	return new Promise((resolve, reject ) => {
 		let url = '/sema/dashboard/site/sales-by-channel-history?site-id=' + params.kioskID;
 
@@ -129,6 +136,10 @@ function fetchSalesByChannelHistory( params ) {
 		}
 		if( params.hasOwnProperty("endDate") ){
 			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
+		}
+		if( groupBy ){
+			url = url + "&group-by=" + groupBy;
+
 		}
 		axiosService
 			.get(url)
