@@ -114,8 +114,8 @@ const getSalesByChannel = ( connection, salesChannel, kioskId, beginDate, endDat
 					semaLog.info("getSalesByChannel - processed salesChannel ", salesChannel.name );
 					resolve();
 				}else{
-					results.salesByChannel.datasets.push({ salesChannel: salesChannel.name, type:"total", data: null });
-					results.salesByChannel.datasets.push({ salesChannel: salesChannel.name, type:"cogs", data: null });
+					results.salesByChannel.datasets.push({ salesChannel: salesChannel.name, type:"total", data: [] });
+					results.salesByChannel.datasets.push({ salesChannel: salesChannel.name, type:"cogs", data: [] });
 					resolve();
 				}
 			}else{
