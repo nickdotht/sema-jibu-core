@@ -23,7 +23,8 @@ function initializeSales() {
 			customerCount:null,
 			currencyUnits:'USD',
 			customerSales:[],
-			salesByChannel: {beginDate: null, endDate: null, datasets: []}
+			salesByChannel: {beginDate: null, endDate: null, datasets: []},
+			salesByChannelHistory: {beginDate: null, endDate: null, datasets: []}
 		}
 	}
 }
@@ -32,6 +33,7 @@ function fetchSales(params) {
 	return (dispatch) => {
 		return fetchSalesData(params)
 			.then(salesInfo => {
+				console.log( JSON.stringify(salesInfo));
 				dispatch(receiveSales(salesInfo));
 			});
 	};
@@ -43,14 +45,18 @@ const fetchSalesData = ( params) => {
 		try {
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:0}} ));
 			salesInfo = await fetchSalesSummary(params);
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:33}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:25}} ));
 
 			let units = await fetchMeasureUnits();
 			salesInfo.currencyUnits = units.currencyUnits;
-			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:66}} ));
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:50}} ));
 
 			salesInfo.salesByChannel = await fetchSalesByChannel(params);
+			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:75}} ));
+
+			salesInfo.salesByChannelHistory = await fetchSalesByChannelHistory(params);
 			window.dispatchEvent(new CustomEvent("progressEvent", {detail: {progressPct:100}} ));
+
 			resolve(salesInfo);
 		} catch (error) {
 			console.log("fetchVolumeData - Failed ");
@@ -113,6 +119,32 @@ function fetchSalesByChannel( params ) {
 			});
 	});
 }
+
+function fetchSalesByChannelHistory( params ) {
+	return new Promise((resolve, reject ) => {
+		let url = '/sema/dashboard/site/sales-by-channel-history?site-id=' + params.kioskID;
+
+		if( params.hasOwnProperty("startDate") ){
+			url = url + "&begin-date=" + utilService.formatDateForUrl(params.startDate);
+		}
+		if( params.hasOwnProperty("endDate") ){
+			url = url + "&end-date=" + utilService.formatDateForUrl(params.endDate);
+		}
+		axiosService
+			.get(url)
+			.then(response => {
+				if(response.status === 200){
+					resolve(response.data)
+				}else{
+					reject({})
+				}
+			})
+			.catch(function(error){
+				reject( error)
+			});
+	});
+}
+
 function fetchMeasureUnits(){
 	return new Promise((resolve, reject ) => {
 		axiosService
