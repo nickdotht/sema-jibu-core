@@ -74,12 +74,11 @@ class SemaUsers extends Component {
     }
 
     return (
-      <div style={{ margin: '5px' }}>
+      <div>
         {alert && <Alert type="danger" message={alert.message} />}
         <div className="">
           <Button
             buttonStyle="primary"
-            buttonSize="small"
             className="pull-right"
             onClick={this.openCreateModal}
             icon="plus"
@@ -87,6 +86,7 @@ class SemaUsers extends Component {
           />
           <h2>Users</h2>
         </div>
+        <hr />
         {this.state.show && (
           <Modal
             show

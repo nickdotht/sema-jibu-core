@@ -33,41 +33,26 @@ class SeamaToolbar extends Component {
 
   render() {
     const {
+      Version,
       healthCheck,
-      currentUser: { first_name, last_name }
+      currentUser: { firstName, lastName }
     } = this.props;
 
     return (
-      <div className="SeamaNavToolbar" id="semaToolbar">
-        <Navbar
-          bsStyle="inverse"
-          style={{
-            marginBottom: '0px',
-            borderRadius: 0
-          }}
-        >
-          <Navbar.Text>
-            Welcome
-            {' '}
-            {first_name}
-            {' '}
-            {last_name}
-          </Navbar.Text>
-          <Navbar.Text>
-            Version:
-            {this.props.Version}
-          </Navbar.Text>
-          <Navbar.Text>
-            Server:
-            {healthCheck.server === 'Ok'
-              ? healthCheck.version
-              : healthCheck.server}
-          </Navbar.Text>
-          <Nav pullRight>
-            <NavItem onClick={this.logOut} href="#">
-              Logout
-            </NavItem>
-          </Nav>
+      <div>
+        <Navbar fixedTop fluid bsStyle="inverse">
+          <Navbar.Collapse>
+            <Navbar.Text>{`Welcome ${firstName} ${lastName} `}</Navbar.Text>
+            <Navbar.Text>
+              {`Version: ${Version} Server: ${healthCheck.version}`}
+            </Navbar.Text>
+            <Nav pullRight>
+              <NavItem onClick={this.logOut} href="#">
+                Logout
+              </NavItem>
+            </Nav>
+          </Navbar.Collapse>
+          <Navbar.Toggle />
         </Navbar>
       </div>
     );

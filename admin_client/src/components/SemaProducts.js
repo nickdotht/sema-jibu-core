@@ -2,33 +2,44 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as healthCheckActions from 'actions/healthCheckActions';
-import { withRouter } from 'react-router';
 import SeamaDatabaseError from './SeamaDatabaseError';
 import SeamaServiceError from './SeamaServiceError';
 
+import Button from './common/Button';
+
 class SemaProducts extends Component {
-  render() {
-    return this.showContent();
+  constructor(props) {
+    super(props);
+    this.showSeamaErrors = this.showSeamaErrors.bind(this);
   }
 
-  showContent(props) {
+  showSeamaErrors() {
     if (this.props.healthCheck.server !== 'Ok') {
-      return SeamaServiceError(props);
+      return SeamaServiceError(this.props);
     }
     if (this.props.healthCheck.database !== 'Ok') {
-      return SeamaDatabaseError(props);
+      return SeamaDatabaseError(this.props);
     }
-    return <div style={this.getHeight()}>Sema Products go here</div>;
   }
 
-  getHeight() {
-    let windowHeight = window.innerHeight;
-    // TODO 52px is the height of the toolbar. (Empirical)
-    windowHeight -= 52;
-    const height = `${windowHeight.toString()}px`;
-    return { height };
+  render() {
+    return (
+      <div className="">
+        {this.showSeamaErrors()}
+        <div className="">
+          <Button
+            buttonStyle="primary"
+            className="pull-right"
+            icon="plus"
+            buttonText="Create Product"
+          />
+          <h2>Products</h2>
+        </div>
+      </div>
+    );
   }
 }
+
 function mapStateToProps(state) {
   return {
     healthCheck: state.healthCheck
@@ -41,9 +52,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(SemaProducts)
-);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SemaProducts);

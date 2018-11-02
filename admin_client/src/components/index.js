@@ -1,4 +1,4 @@
 export * from './PrivateRoute';
-export * from './SemaContainer';
+export * from './Page';
 export * from './SemaLogin';
 export * from './SemaNotFound';
