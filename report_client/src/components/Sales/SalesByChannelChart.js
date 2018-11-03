@@ -7,7 +7,7 @@ class SalesByChannelChart extends Component {
     render() {
 		if( this.props.chartData.loaded ) {
 			return (
-					<div className="chart" style={{backgroundColor: 'white', margin: "2px"}}>
+				<div className="chart" style={{backgroundColor: 'white', margin: "2px"}}>
 						<Doughnut
 							data={this.getVolumeData()}
 							// data = {{
