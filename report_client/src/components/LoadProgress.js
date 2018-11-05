@@ -7,9 +7,10 @@ class LoadProgress extends Component {
 		this.state = {
 			percent:0
 		}
+		this.progressEventfn = this.handleProgressEvent.bind(this);
 	}
 	componentDidMount() {
-		window.addEventListener('progressEvent', this.handleProgressEvent.bind(this));
+		window.addEventListener('progressEvent', this.progressEventfn );
 
 	}
 	handleProgressEvent( event ){
@@ -18,7 +19,7 @@ class LoadProgress extends Component {
 
 	}
 	componentWillUnmount(){
-		window.removeEventListener('progressEvent', this.handleProgressEvent );
+		window.removeEventListener('progressEvent', this.progressEventfn );
 	}
 
 	render() {
