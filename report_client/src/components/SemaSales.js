@@ -8,7 +8,7 @@ import { withRouter } from 'react-router'
 import SemaServiceError from "./SemaServiceError";
 import SemaDatabaseError from "./SemaDatabaseError";
 import SalesSummaryPanel1 from "./Sales/SalesSummaryPanel1";
-import SalesSummaryPanel2 from "./Sales/SalesSummaryPanel2";
+// import SalesSummaryPanel2 from "./Sales/SalesSummaryPanel2";
 import SalesMapContainer from './Sales/SalesMapContainer';
 import SalesRetailerList from './Sales/SalesRetailerList';
 import * as salesActions from 'actions/SalesActions';
@@ -182,31 +182,31 @@ const formatRetailSalesHeader = (retailSales) =>{
 	return "No data available";
 };
 
-const formatRevenuePerCustomer = (salesInfo) =>{
-	if( salesInfo.totalRevenue.period ){
-		let revenuePerCustomer = 0;
-		switch( salesInfo.totalRevenue.period ){
-			case "none":
-				revenuePerCustomer = salesInfo.totalRevenue.total/salesInfo.customerCount;
-				break;
-			case "year":
-			case "month":
-				revenuePerCustomer = salesInfo.totalRevenue.periods[0].value/salesInfo.customerCount;
-				break;
-			default:
-				revenuePerCustomer = 0;
-		}
-		return utilService.formatDollar( salesInfo.currencyUnits, revenuePerCustomer );
-	}
-	return "N/A";
-};
+// const formatRevenuePerCustomer = (salesInfo) =>{
+// 	if( salesInfo.totalRevenue.period ){
+// 		let revenuePerCustomer = 0;
+// 		switch( salesInfo.totalRevenue.period ){
+// 			case "none":
+// 				revenuePerCustomer = salesInfo.totalRevenue.total/salesInfo.customerCount;
+// 				break;
+// 			case "year":
+// 			case "month":
+// 				revenuePerCustomer = salesInfo.totalRevenue.periods[0].value/salesInfo.customerCount;
+// 				break;
+// 			default:
+// 				revenuePerCustomer = 0;
+// 		}
+// 		return utilService.formatDollar( salesInfo.currencyUnits, revenuePerCustomer );
+// 	}
+// 	return "N/A";
+// };
 
-const formatNoOfCustomers = (salesInfo) =>{
-	if( salesInfo.totalRevenue.period ){
-		return "For " + salesInfo.customerCount + " customers";
-	}
-	return "";
-};
+// const formatNoOfCustomers = (salesInfo) =>{
+// 	if( salesInfo.totalRevenue.period ){
+// 		return "For " + salesInfo.customerCount + " customers";
+// 	}
+// 	return "";
+// };
 
 
 
