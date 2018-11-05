@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Line} from 'react-chartjs-2';
-import moment from "moment/moment";
+// import moment from "moment/moment";
 import { utilService } from 'services';
 
 
@@ -109,9 +109,9 @@ class SalesByChannelTimeChart extends Component {
 		return 'Revenue Timeline';
 	}
 	calcDate= (val)=>{
-    	if( val !== "N/A"){
-			val = moment(val).format('YYYY-MM-D');
-		}
+        // if( val !== "N/A"){
+		// 	val = moment(val).format('YYYY-MM-D');
+		// }
     	return val;
 	}
  }
