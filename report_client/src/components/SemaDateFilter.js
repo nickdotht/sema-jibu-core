@@ -24,6 +24,18 @@ const ImageStyleDisabled = {
 	opacity:'.3'
 };
 
+class PrevDate extends Component {
+	render() {
+		return (<div><img src={require('images/left-arrow.png')} alt={""} style={this.props.getStyle(true)} onClick={()=> this.props.clickFn()} /></div>);
+	}
+}
+
+class NextDate extends Component {
+	render() {
+		return (<div><img src={require('images/right-arrow.png')} alt={""} style={this.props.getStyle(false)} onClick={()=> this.props.clickFn()} /></div>);
+	}
+}
+
 class SemaDateFilter extends Component {
 
 	dateMenu = {
@@ -166,9 +178,7 @@ class SemaDateFilter extends Component {
 		return (
 			<div>
 				<Nav>
-					<div>
-						<img src={require('images/left-arrow.png')} alt={""} style={this.getImageStyle(true)} onClick={()=> this.leftArrowClick()} />
-					</div>
+					<PrevDate getStyle = {this.getImageStyle.bind(this)} clickFn = {this.leftArrowClick.bind(this)} />
 				</Nav>
 				<Nav>
 					<NavDropdown title={this.state.displayDate} onSelect={this.handleSelectDate}
@@ -177,9 +187,7 @@ class SemaDateFilter extends Component {
 					</NavDropdown>
 				</Nav>
 				<Nav>
-					<div>
-						{<img src={require('images/right-arrow.png')} alt={""} style={this.getImageStyle(false)} onClick={()=> this.rightArrowClick()} />}
-					</div>
+					<NextDate getStyle = {this.getImageStyle.bind(this)} clickFn = {this.rightArrowClick.bind(this)} />
 				</Nav>
 			</div>
 		);

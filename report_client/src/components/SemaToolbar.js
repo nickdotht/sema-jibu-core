@@ -48,7 +48,6 @@ class SemaToolbar extends Component {
 		this.state = {
 			kiosks: "--Sites--",
 		};
-		console.log("foo");
 	}
 
 	componentDidMount() {
@@ -183,7 +182,6 @@ class SemaToolbar extends Component {
 		console.log("SemaToolbar - updateData - Old Range: ", this.startDate, "-", this.endDate );
 		if( this.startDate !== this.props.dateFilter.startDate ||
 			this.endDate !== this.props.dateFilter.endDate ){
-			console.log("_______________________");
 			this.startDate = this.props.dateFilter.startDate;
 			this.endDate = this.props.dateFilter.endDate;
 			this.loadActivePage(null );
