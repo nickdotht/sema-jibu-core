@@ -36,4 +36,23 @@ module.exports = models => {
 			role: role.map(r => ({ code: r.code, authority: r.authority }))
 		};
 	};
+
+	models.product.prototype.toJSON = async function() {
+		var values = Object.assign({}, this.get());
+		return {
+			id: values.id,
+			name: values.name,
+			sku: values.sku,
+			description: values.description,
+			category: values.category_id,
+			priceAmount: values.price_amount,
+			priceCurrency: values.price_currency,
+			minQuantity: values.minimum_quantity,
+			maxQuantity: values.maximum_quantity,
+			unitsPerProduct: values.units_per_product,
+			unitMeasurement: values.unit_measurement,
+			costOfGoods: values.cogs_amount,
+			base64Image: values.base64encoded_image
+		};
+	};
 };
