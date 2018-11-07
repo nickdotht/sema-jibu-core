@@ -98,7 +98,7 @@ class PosApp extends Component {
 		});
 		NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
 		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this));
-		Events.on('ProductsUpdated', 'productUpdate1', this.onProductsUpdated.bind(this));
+		Events.on('ProductsUpdated', 'productsUpdate1', this.onProductsUpdated.bind(this));
 		Events.on('SalesChannelsUpdated', 'SalesChannelsUpdated1', this.onSalesChannelUpdated.bind(this));
 
 		console.log("PosApp = Mounted-Done");
@@ -106,7 +106,8 @@ class PosApp extends Component {
 	}
 	componentWillUnmount(){
 		Events.rm('CustomersUpdated', 'customerUpdate1');
-		Events.rm('ProductsUpdated', 'productUpdate1');
+		Events.rm('ProductsUpdated', 'productsUpdate1');
+		Events.rm('SalesChannelsUpdated', 'SalesChannelsUpdated1');
 		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );
 	}
 
