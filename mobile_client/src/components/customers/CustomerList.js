@@ -172,7 +172,7 @@ class CustomerList extends Component {
 				return salesChannels[i].name;
 			}
 		}
-		return "walkup";
+		return "direct";
 	}
 
 	_isAnonymousCustomer( customer ){
