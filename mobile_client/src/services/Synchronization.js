@@ -2,6 +2,7 @@
 import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
 import Events from "react-native-simple-events";
+import * as _ from 'lodash';
 
 class Synchronization {
 	initialize( lastCustomerSync, lastProductSync, lastSalesSync){
@@ -173,9 +174,12 @@ class Synchronization {
 	synchronizeProducts(){
 		return new Promise( resolve => {
 			console.log("Synchronization:synchronizeProducts - Begin");
-			Communications.getProducts(this.lastProductSync)
+			// Temporary get rid of this.lastProductSync
+			// TODO: Figure out why it wouldn't pull new products when using this.lastProductSync
+			Communications.getProducts()
 				.then(products => {
-					resolve( {error:null, remoteProducts: products.products.length});
+					resolve({ error: null, remoteProducts: products.products.length });
+
 					if (products.hasOwnProperty("products")) {
 						this.updateLastProductSync();
 						console.log("Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
@@ -183,7 +187,6 @@ class Synchronization {
 						if (updated) {
 							Events.trigger('ProductsUpdated', {});
 						}
-
 					}
 				})
 				.catch(error => {
@@ -201,8 +204,7 @@ class Synchronization {
 				.then(salesChannels => {
 					if (salesChannels.hasOwnProperty("salesChannels")) {
 						console.log("Synchronization:synchronizeSalesChannels. No of sales channels: " + salesChannels.salesChannels.length);
-						// TODO: Not a totally good idea because there might be name changes, not just removals and additions
-						if (savedSalesChannels.length !== salesChannels.salesChannels.length) {
+						if (!_.isEqual(savedSalesChannels, salesChannels.salesChannels)) {
 							PosStorage.saveSalesChannels(salesChannels.salesChannels);
 							Events.trigger('SalesChannelsUpdated', {});
 						}
@@ -261,24 +263,28 @@ class Synchronization {
 				});
 		});
 	}
-	synchronizeProductMrps( lastProductSync){
-		return new Promise( resolve => {
+	synchronizeProductMrps(lastProductSync){
+		return new Promise(async resolve => {
 			console.log("Synchronization:synchronizeProductMrps - Begin");
 			// Note- Because product mrps, do not currently have an 'active' flag,
 			// if a user 'deletes' a mapping by removing the row in the table, the delta won't get detected
 			// The current work around is return all mappings, (i.e. no deltas and re-write the mappings each time
 			// Note that this won't scale too well with many productMrps
 			// Communications.getProductMrps(lastProductSync)
+			const savedProductMrps = await PosStorage.loadProductMrps();
 			Communications.getProductMrps()
 				.then(productMrps => {
 					if (productMrps.hasOwnProperty("productMRPs")) {
-						resolve( {error:null, remoteProductMrps: productMrps.productMRPs.length});
 						console.log("Synchronization:synchronizeProductMrps. No of remote product MRPs: " + productMrps.productMRPs.length);
-						PosStorage.saveProductMrps(productMrps.productMRPs);
+						if (!_.isEqual(savedProductMrps, productMrps.productMRPs)) {
+							PosStorage.saveProductMrps(productMrps.productMRPs);
+							Events.trigger('ProductMrpsUpdated', {});
+						}
+						resolve({ error: null, remoteProductMrps: productMrps.productMRPs.length });
 					}
 				})
 				.catch(error => {
-					resolve( {error:error.message, remoteProducts: null});
+					resolve({ error: error.message, remoteProducts: null });
 					console.log("Synchronization.ProductsMrpsUpdated - error " + error);
 				});
 		});
