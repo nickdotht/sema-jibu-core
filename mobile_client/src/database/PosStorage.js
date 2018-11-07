@@ -626,42 +626,43 @@ class PosStorage {
 		return (productItemKey + '_' + product.productId);
 	}
 
-	mergeProducts( remoteProducts){
-		let isNewProducts = false;
-		remoteProducts.forEach( function(product){
+	mergeProducts(remoteProducts){
+		let hasNewProducts = false;
+
+		remoteProducts.forEach(function(product){
 			let productKey = this.makeProductKey(product);
 			let keyIndex = this.productsKeys.indexOf(productKey);
-			if( keyIndex === -1 && product.active ){
-				isNewProducts = true;
-				this.productsKeys.push(productKey );
+
+			if (keyIndex === -1 && product.active) {
+				hasNewProducts = true;
+				this.productsKeys.push(productKey);
 				this.products.push(product);
 				this.setKey( productKey,this.stringify(product));
-			}else if( keyIndex != -1 ){
-				if( product.active ) {
-					this.setKey(productKey, this.stringify(product));		// Just update the existing customer
+			} else if (keyIndex !== -1) {
+				if(product.active) {
+					this.setKey(productKey, this.stringify(product)); // Just update the existing product
 					this.setLocalProduct(product)
-				}else{
+				} else {
 					// Product has been deactivated - remove it
 					this.productsKeys.splice(keyIndex, 1);
-					isNewProducts = true;
+					hasNewProducts = true;
 					this.removeKey(productKey);
-					let productIndex = this.getLocalProductIndex( product );
-					if( productIndex != - 1){
+					let productIndex = this.getLocalProductIndex(product);
+					if (productIndex != -1){
 						this.products.splice(productIndex, 1);
 					}
 				}
 			}
 		}.bind(this));
-		if( isNewProducts ){
-			this.setKey( productsKey,this.stringify(this.productsKeys));
-		}
-		if(remoteProducts.length > 0 ){
+
+		if (hasNewProducts) {
+			this.setKey(productsKey,this.stringify(this.productsKeys));
 			return true;
-		}else{
-			return false;
 		}
 
+		return false;
 	}
+
 	setLocalProduct( product ){
 		for( let index = 0; index < this.products.length; index++ ){
 			if(this.products[index].productId ===  product.productId){
@@ -753,6 +754,20 @@ class PosStorage {
 				.catch(err => reject(err))
 		});
 	}
+
+	loadProductMrps() {
+		console.log("PosStorage:loadProductMrps" );
+		return new Promise((resolve, reject) => {
+			this.getKey(productMrpsKey)
+				.then(productMrps => {
+					if (!productMrps) {
+						return resolve([]);
+					}
+					resolve(this.parseJson(productMrps));
+				})
+				.catch(err => reject(err))
+		});
+	}
 	
 	getSalesChannelsForDisplay(){
 		return this.salesChannels.map( salesChannel =>{
@@ -764,7 +779,7 @@ class PosStorage {
 		});
 	}
 
-	getSalesChannelFromName( name ){
+	getSalesChannelFromName(name){
 		for( let i = 0; i < this.salesChannels.length; i++ ){
 			if( this.salesChannels[i].name === name ){
 				return this.salesChannels[i];
@@ -772,6 +787,16 @@ class PosStorage {
 		}
 		return null;
 	}
+
+	getSalesChannelFromId(id){
+		for( let i = 0; i < this.salesChannels.length; i++ ){
+			if( this.salesChannels[i].id === id ){
+				return this.salesChannels[i];
+			}
+		}
+		return null;
+	}
+
 	getCustomerTypesForDisplay(){
 		let customerTypesForDisplay = [];
 		this.customerTypes.forEach( customerType =>{
@@ -811,8 +836,8 @@ class PosStorage {
 			this.productMrpDict[key] = productMrp;
 		});
 		this.setKey( productMrpsKey, this.stringify( this.productMrpDict));
-
 	}
+
 	getProductMrps(){
 		return this.productMrpDict;
 	}
