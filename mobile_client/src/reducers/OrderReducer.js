@@ -3,7 +3,7 @@ import { ADD_PRODUCT_TO_ORDER, CLEAR_ORDER, REMOVE_PRODUCT,
 	SET_PRODUCT_QUANTITY, SET_ORDER_CHANNEL, SET_ORDER_FLOW,
 	SET_PAYMENT} from "../actions/OrderActions";
 
-let initialState = {products:[], channel:{salesChannel:'walkup'}, flow:{page:'products'}, payment:{ cash: 0, credit: 0, mobile: 0}};
+let initialState = {products:[], channel:{salesChannel:'direct'}, flow:{page:'products'}, payment:{ cash: 0, credit: 0, mobile: 0}};
 
 const orderReducer = (state = initialState, action) => {
 	console.log("orderReducer: " +action.type);
