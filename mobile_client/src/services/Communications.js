@@ -285,9 +285,11 @@ class Communications {
 			});
 	}
 
-	getProductMrps( updatedSince ) {
+	// getAll will determine whether to get all product mappings or not, if it's true,
+	// it will send a site/kiosk ID of -1 to the server
+	getProductMrps(updatedSince, getAll) {
 		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } };
-		let url = 'sema/site/product-mrps?site-id=' + this._siteId;
+		let url = `sema/site/product-mrps?site-id=${getAll ? -1 : this._siteId}`;
 
 		if( updatedSince ){
 			url = url + '&updated-date=' + updatedSince.toISOString();
