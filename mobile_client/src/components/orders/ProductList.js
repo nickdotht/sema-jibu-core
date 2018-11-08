@@ -52,25 +52,34 @@ class ProductList extends Component {
 
 	prepareData = () => {
 		let productMrp = PosStorage.getProductMrps();
+
 		if (Object.keys(productMrp).length === 0 && productMrp.constructor === Object) {
-			return this.props.products;				// No mapping table
+			return this.props.products; // No mapping tables
 		} else {
-			// There is a mapping table, exlude products not in the mapping table
-			let returnProducts = [];
 			let salesChannel = PosStorage.getSalesChannelFromName(this.props.filter);
+
 			if(salesChannel) {
-				for( let index = 0; index < this.props.products.length; index++ ){
-					let product = this.props.products[index];
-					let productMrp = PosStorage.getProductMrps()[PosStorage.getProductMrpKeyFromIds(product.productId, salesChannel.id)];
-					if( productMrp != null ){
-						returnProducts.push( product );
-					}
-				}
-				return returnProducts;
+				return this.props.products.filter(product => {
+					// If product has no mapping tables at all, display it for every kiosk and sales channel
+					if (!this.hasMappingTable(product, productMrp)) return true;
+					// If product has a mapping with the customer's sales channel and is of the same kiosk
+					// as the selected customer, display it
+					const mapping = productMrp[PosStorage.getProductMrpKeyFromIds(product.productId, salesChannel.id)];
+					if (mapping) return mapping.siteId === this.props.selectedCustomer.siteId;
+					return false;
+				});
 			} else {
 				return this.props.products;
 			}
 		}
+	}
+
+	hasMappingTable(product, productMrp) {
+		// Search through the keys of productMrp
+		return Object.keys(productMrp).reduce((hasMrp, key) => {
+			if (key.startsWith(`${product.productId}-`)) return true;
+			return hasMrp;
+		}, false);
 	}
 
 	getImage = item => {
@@ -113,7 +122,8 @@ class ProductList extends Component {
 
 function mapStateToProps(state, props) {
 	return {
-		products: state.productReducer.products
+		products: state.productReducer.products,
+		selectedCustomer: state.customerReducer.selectedCustomer
 	};
 }
 
@@ -141,13 +151,6 @@ const styles = StyleSheet.create({
 		paddingBottom:5,
 		textAlign: 'center',
 		color:'white'
-	},
-	imageLabelBackgroundWalkup: {
-		backgroundColor: '#2858a7'
-	},
-
-	imageLabelBackgroundReseller: {
-		backgroundColor: '#812629'
 	},
 
 	lightBackground:{
