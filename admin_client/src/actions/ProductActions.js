@@ -14,6 +14,18 @@ export const {
   'GET_PRODUCTS_FAILURE'
 );
 
+export const {
+  getProductRequest,
+  getProductSuccess,
+  getProductFailure
+} = createActions(
+  {
+    GET_PRODUCT_SUCCESS: payload => payload
+  },
+  'GET_PRODUCT_REQUEST',
+  'GET_PRODUCT_FAILURE'
+);
+
 // Action creators
 export const getProducts = () => dispatch => {
   dispatch(getProductsRequest());
@@ -21,4 +33,12 @@ export const getProducts = () => dispatch => {
     .get('/sema/admin/products')
     .then(response => dispatch(getProductsSuccess(response.data)))
     .catch(err => dispatch(getProductsFailure(err)));
+};
+
+export const getProduct = id => dispatch => {
+  dispatch(getProductRequest());
+  return axiosService
+    .get(`/sema/admin/products/${id}`)
+    .then(response => dispatch(getProductSuccess(response.data)))
+    .catch(err => dispatch(getProductFailure(err)));
 };

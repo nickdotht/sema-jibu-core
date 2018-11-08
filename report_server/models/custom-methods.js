@@ -39,12 +39,14 @@ module.exports = models => {
 
 	models.product.prototype.toJSON = async function() {
 		var values = Object.assign({}, this.get());
+		var category = await this.getProduct_category();
+
 		return {
 			id: values.id,
 			name: values.name,
 			sku: values.sku,
 			description: values.description,
-			category: values.category_id,
+			category: category.name,
 			priceAmount: values.price_amount,
 			priceCurrency: values.price_currency,
 			minQuantity: values.minimum_quantity,
