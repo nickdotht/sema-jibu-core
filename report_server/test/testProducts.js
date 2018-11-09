@@ -53,7 +53,7 @@ describe('Testing Products API', function () {
 	});
 
 	describe('GET /sema/site/products - no update-date', function() {
-		it('Should return info on all 4 products', (done) => {
+		it('Should return info on all 5 products', (done) => {
 			authenticate(server).then(function(token) {
 				chai.request(server)
 					.get("/sema/products")
@@ -61,7 +61,7 @@ describe('Testing Products API', function () {
 					.end(function(err, res) {
 						res.should.have.status(200);
 						expect(res.body.products).to.be.an('array');
-						expect(res.body.products.length).to.be.equal(4);
+						expect(res.body.products.length).to.be.equal(5);
 						done(err);
 					});
 			});
