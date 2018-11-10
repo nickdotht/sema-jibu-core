@@ -38,8 +38,8 @@ module.exports = models => {
 	};
 
 	models.product.prototype.toJSON = async function() {
-		var values = Object.assign({}, this.get());
-		var category = await this.getProduct_category();
+		const values = Object.assign({}, this.get());
+		const category = await this.getProduct_category();
 
 		return {
 			id: values.id,

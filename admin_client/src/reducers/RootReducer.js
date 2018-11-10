@@ -7,6 +7,7 @@ import healthCheck from './HealthcheckReducer';
 import auth from './AuthReducer';
 import userReducer from './UserReducer';
 import productReducer from './ProductReducer';
+import selectedProductReducer from './SelectedProductReducer';
 import loadingReducer from './LoadingReducer';
 import alertReducer from './AlertReducer';
 
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   users: userReducer,
   form: formReducer,
   products: productReducer,
+  selectedProduct: selectedProductReducer,
   loading: loadingReducer,
   alert: alertReducer
 });
