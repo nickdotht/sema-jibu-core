@@ -26,6 +26,10 @@ export const {
   'GET_PRODUCT_FAILURE'
 );
 
+export const { loadProductCategories } = createActions({
+  LOAD_PRODUCT_CATEGORIES: payload => payload
+});
+
 // Action creators
 export const getProducts = () => dispatch => {
   dispatch(getProductsRequest());
@@ -42,3 +46,11 @@ export const getProduct = id => dispatch => {
     .then(response => dispatch(getProductSuccess(response.data)))
     .catch(err => dispatch(getProductFailure(err)));
 };
+
+export const getProductCategories = () => dispatch =>
+  axiosService
+    .get('/sema/api/product-categories')
+    .then(response => dispatch(loadProductCategories(response.data)))
+    .catch(err => {
+      throw err;
+    });

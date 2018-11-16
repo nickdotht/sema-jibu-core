@@ -17,6 +17,11 @@ class SeamaSidebar extends Component {
         path: '/products',
         name: 'Products',
         icon: 'glyphicon-shopping-cart'
+      },
+      {
+        path: '#',
+        name: 'Kiosks',
+        icon: 'glyphicon-home'
       }
     ];
     return (

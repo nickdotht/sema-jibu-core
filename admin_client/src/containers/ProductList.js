@@ -8,7 +8,7 @@ import {
   createAlertMessageSelector
 } from '../reducers/selectors';
 
-class ProductsContainer extends Component {
+class ProductList extends Component {
   componentDidMount() {
     this.props.getProducts();
   }
@@ -35,4 +35,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ProductsContainer);
+)(ProductList);
