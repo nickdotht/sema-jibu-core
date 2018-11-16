@@ -31,6 +31,7 @@ var sema_water_summary = require('./routes/sema_water_summary');
 
 var sema_users = require('./routes/sema_user');
 var sema_admin_products = require('./routes/sema_admin_products');
+const sema_product_categories = require('./routes/sema_api/product_category');
 
 const winston = require('winston');
 
@@ -99,6 +100,11 @@ app.use('/sema/dashboard/site/water-summary/', sema_water_summary);
 
 app.use('/sema/users', isAuthenticated, sema_users);
 app.use('/sema/admin/products', isAuthenticated, sema_admin_products);
+app.use(
+	'/sema/api/product-categories',
+	isAuthenticated,
+	sema_product_categories
+);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
