@@ -1,6 +1,8 @@
 import { axiosService } from 'services';
 import { createActions } from 'redux-actions';
 
+export const LOAD_PRODUCT_CATEGORIES = 'LOAD_PRODUCT_CATEGORIES';
+
 // Actions
 export const {
   getProductsRequest,

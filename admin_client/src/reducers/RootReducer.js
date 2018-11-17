@@ -10,6 +10,7 @@ import productReducer from './ProductReducer';
 import selectedProductReducer from './SelectedProductReducer';
 import loadingReducer from './LoadingReducer';
 import alertReducer from './AlertReducer';
+import productCategoryReducer from './ProductCategory';
 
 const rootPersistConfig = {
   key: 'root',
@@ -26,7 +27,8 @@ const rootReducer = combineReducers({
   products: productReducer,
   selectedProduct: selectedProductReducer,
   loading: loadingReducer,
-  alert: alertReducer
+  alert: alertReducer,
+  productCategories: productCategoryReducer
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);

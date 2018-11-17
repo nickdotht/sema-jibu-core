@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
 		let categoryData = await Promise.all(
 			categories.map(async category => await category.toJSON())
 		);
-		res.json({ product_categories: categoryData });
+		res.json({ productCategories: categoryData });
 	} catch (err) {
 		semaLog.error(`/GET product_category failed - ${err}`);
 		res.status(400).json({
