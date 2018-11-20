@@ -7,18 +7,27 @@ class LoadProgress extends Component {
 		this.state = {
 			percent:0
 		}
+		this.progressEventfn = this.handleProgressEvent.bind(this);
+		this.mounted = false;
 	}
 	componentDidMount() {
-		window.addEventListener('progressEvent', this.handleProgressEvent.bind(this));
+		window.addEventListener('progressEvent', this.progressEventfn );
+		this.mounted = true;
 
 	}
 	handleProgressEvent( event ){
 		console.log("progressEvent" + JSON.stringify(event.detail));
-		this.setState({percent: event.detail.progressPct});
+		var that = this;
+		setTimeout( function() {
+			if( that.mounted ){
+				that.setState({percent: event.detail.progressPct})
+			}
+		},  50);
 
 	}
 	componentWillUnmount(){
-		window.removeEventListener('progressEvent', this.handleProgressEvent );
+		this.mounted = false;
+		window.removeEventListener('progressEvent', this.progressEventfn );
 	}
 
 	render() {

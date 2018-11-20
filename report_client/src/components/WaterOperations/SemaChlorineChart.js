@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import {Line, Chart} from 'react-chartjs-2';
+import {Line} from 'react-chartjs-2';
 import moment from "moment/moment";
 import { utilService } from 'services';
 import 'css/SemaChart.css';
 
+// To accsess Chart globals, change "import {Line} from 'react-chartjs-2';" to "import {Line, Chart} from 'react-chartjs-2';"
 // Chart.defaults.global.defaultFontColor = '#666';
 
 class SemaChlorineChart extends Component {
