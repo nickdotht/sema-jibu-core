@@ -19,7 +19,7 @@ class SemaSummaryPanel1 extends Component {
         );
     }
 	formatValue() {
-		if (this.props.value) {
+		if (this.props.value != null) {
 			return Math.round(this.props.value);
 		}else{
 			return "N/A";
@@ -33,7 +33,7 @@ class SemaSummaryPanel1 extends Component {
 		}
 	}
 	formatUnits() {
-		if (this.props.value) {
+		if (this.props.value != null) {
 			return this.props.units;
 		}else{
 			return "";

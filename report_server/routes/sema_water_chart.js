@@ -9,7 +9,7 @@ let parameter_id_map = {};
 let sampling_site_id_map = {};
 
 const sqlParameter=
-	'SELECT id, name FROM parameter';
+	'SELECT id, name, unit FROM parameter';
 
 const sqlSamplingSite=
 	'SELECT id, name FROM sampling_site';
@@ -98,6 +98,9 @@ router.get('/', async( request, response ) => {
 				}
 				await getParametersAndSamplingSiteIds(connection);
 				const parameterId = getParameterIdFromMap(parameter);
+				if( parameterId != -1 ){
+					waterChart.setUnit(getParameterUnitFromMap(parameter));
+				}
 				const samplingSiteId = getSamplingSiteIdFromMap(samplingSite);
 				if( request.query.type === 'production'){
 					let groupBy = "day";
@@ -178,11 +181,15 @@ const getProductionReading = (connection, siteId, beginDate, endDate, parameterI
 }
 
 const getParameterIdFromMap = ( parameter ) =>{
-	return (typeof parameter_id_map[parameter] === "undefined" ) ? -1 : parameter_id_map[parameter];
+	return (typeof parameter_id_map[parameter] === "undefined" ) ? -1 : parameter_id_map[parameter].id;
 };
 
 const getSamplingSiteIdFromMap = ( parameter ) =>{
 	return (typeof sampling_site_id_map[parameter] === "undefined" ) ? -1 : sampling_site_id_map[parameter];
+};
+
+const getParameterUnitFromMap = ( parameter ) =>{
+	return (typeof parameter_id_map[parameter] === "undefined" ) ? -1 : parameter_id_map[parameter].unit;
 };
 
 const getParametersAndSamplingSiteIds = (connection) => {
@@ -197,7 +204,7 @@ const getParametersAndSamplingSiteIds = (connection) => {
 				} else {
 					if (Array.isArray(sqlResult)){
 						parameter_id_map = sqlResult.reduce( (map, item) => {
-							map[item.name] = item.id;
+							map[item.name] = {id:item.id, unit:item.unit};
 							return map;
 						}, {});
 					}

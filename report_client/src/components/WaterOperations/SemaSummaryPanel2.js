@@ -50,7 +50,8 @@ class SemaSummaryPanel2 extends Component {
 	}
 
 	populateRow2Col1(){
-		return ( this.props.type === "pressure") ? "Units: PSI" : "Units: GPM";
+    	return "Units: " + this.props.units.toUpperCase();
+		// return ( this.props.type === "pressure") ? "Units: PSI" : "Units: GPM";
 	}
 
 	populateRow2Col2(){
