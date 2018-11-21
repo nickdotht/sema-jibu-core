@@ -9,7 +9,7 @@ let parameter_id_map = {};
 let sampling_site_id_map = {};
 
 const sqlParameter=
-	'SELECT id, name FROM parameter';
+	'SELECT id, name, unit FROM parameter';
 
 const sqlSamplingSite=
 	'SELECT id, name FROM sampling_site';
@@ -70,21 +70,28 @@ router.get('/', async( request, response ) => {
 
 				await getParametersAndSamplingSiteIds(connection);
 				let parameterId = getParameterIdFromMap("Volume");
+				if( parameterId != -1 ){
+					waterSummary.setProductionUnit(getParameterUnitFromMap("Volume"));
+				}
 				let samplingSiteId = getSamplingSiteIdFromMap("B:Product");
 				let productFirst =	await getVolume(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId, true );
 				let productLast =	await getVolume(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId, false );
-				if( productFirst && productLast ){
+				if( productFirst != null && productLast != null ){
 					waterSummary.setTotalProduction( productLast - productFirst );
 				}
 
 				samplingSiteId = getSamplingSiteIdFromMap("D:Fill");
 				let fillFirst =	await getVolume(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId, true );
 				let fillLast =	await getVolume(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId, false );
-				if( fillFirst && fillLast ){
+				if( fillFirst != null  && fillLast != null  ){
 					waterSummary.setFillStation( fillLast - fillFirst );
 				}
 
 				parameterId = getParameterIdFromMap("PRE-FILTER PRESSURE IN");
+				if( parameterId != -1 ){
+					waterSummary.setPressureUnit(getParameterUnitFromMap("PRE-FILTER PRESSURE IN"));
+				}
+
 				samplingSiteId = getSamplingSiteIdFromMap("Water Treatment Unit");
 				const pressureIn = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
 				waterSummary.setPressurePreMembrane( pressureIn );
@@ -93,6 +100,10 @@ router.get('/', async( request, response ) => {
 				waterSummary.setPressurePostMembrane( pressureOut );
 
 				parameterId = getParameterIdFromMap("Flow Rate");
+				if( parameterId != -1 ){
+					waterSummary.setFlowrateUnit(getParameterUnitFromMap("Flow Rate"));
+				}
+
 				samplingSiteId = getSamplingSiteIdFromMap("A:Feed");
 				let flowRate = await getAverage(connection, request.query["site-id"], beginDate, endDate, parameterId, samplingSiteId);
 				waterSummary.setSourceFlowRate( flowRate );
@@ -163,7 +174,10 @@ const getAverage = (connection, siteId, beginDate, endDate, parameterId, samplin
 
 
 const getParameterIdFromMap = ( parameter ) =>{
-	return (typeof parameter_id_map[parameter] === "undefined" ) ? -1 : parameter_id_map[parameter];
+	return (typeof parameter_id_map[parameter] === "undefined" ) ? -1 : parameter_id_map[parameter].id;
+};
+const getParameterUnitFromMap = ( parameter ) =>{
+	return (typeof parameter_id_map[parameter] === "undefined" ) ? -1 : parameter_id_map[parameter].unit;
 };
 
 const getSamplingSiteIdFromMap = ( parameter ) =>{
@@ -182,7 +196,7 @@ const getParametersAndSamplingSiteIds = (connection) => {
 				} else {
 					if (Array.isArray(sqlResult)){
 						parameter_id_map = sqlResult.reduce( (map, item) => {
-							map[item.name] = item.id;
+							map[item.name] = {id:item.id, unit:item.unit};
 							return map;
 						}, {});
 					}

@@ -5,11 +5,14 @@ class WaterSummary {
 		this.endDate = endDate;
 		this.totalProduction = null;
 		this.fillStation = null;
+		this.productionUnit = "gallons";
 		this.pressurePreMembrane = null;
 		this.pressurePostMembrane = null;
+		this.pressureUnit = "PSI";
 		this.distributionFlowRate = null;
 		this.productFlowRate = null;
 		this.sourceFlowRate = null;
+		this.flowrateUnit = "gpm";
 	}
 
 	setTotalProduction( value ){
@@ -33,6 +36,15 @@ class WaterSummary {
 	}
 	setSourceFlowRate( value ){
 		this.sourceFlowRate = value;
+	}
+	setProductionUnit( unit ){
+		this.productionUnit = unit;
+	}
+	setPressureUnit( unit ){
+		this.pressureUnit = unit;
+	}
+	setFlowrateUnit( unit ){
+		this.flowrateUnit = unit;
 	}
 
 	classToPlain() {

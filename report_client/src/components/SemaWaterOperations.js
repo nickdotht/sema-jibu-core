@@ -56,13 +56,13 @@ class SemaWaterOperations extends Component {
 					</div>
 					<div className = "WaterPressure">
 						<div className = "WaterSummaryItem2">
-							<SemaSummaryPanel2 data={this.props.water.waterOperationsInfo} type="pressure"/>
+							<SemaSummaryPanel2 data={this.props.water.waterOperationsInfo} type="pressure" units={this.props.water.waterOperationsInfo.waterPressureUnits}/>
 						</div>
 					</div>
 
 					<div className = "WaterFlow">
 						<div className = "WaterSummaryItem2">
-							<SemaSummaryPanel2 data={this.props.water.waterOperationsInfo} type="flowrate"/>
+							<SemaSummaryPanel2 data={this.props.water.waterOperationsInfo} type="flowrate" units={this.props.water.waterOperationsInfo.waterFlowrateUnits}/>
 						</div>
 					</div>
                 </div>

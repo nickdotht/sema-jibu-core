@@ -54,7 +54,7 @@ class SemaProductionChart extends Component {
 		}
     }
     getChartTitle(productionData){
-    	return "Production (liters)";
+    	return "Production (" + productionData.units +")";
 
 	}
     getChartData( productionData ){
