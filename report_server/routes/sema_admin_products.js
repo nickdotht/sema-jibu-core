@@ -1,3 +1,4 @@
+// TODO merge with sema-products.js
 const express = require('express');
 const Sequelize = require('sequelize');
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);

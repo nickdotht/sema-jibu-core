@@ -52,7 +52,7 @@ module.exports = models => {
 			minQuantity: values.minimum_quantity,
 			maxQuantity: values.maximum_quantity,
 			unitsPerProduct: values.units_per_product,
-			unitMeasurement: values.unit_measurement,
+			unitMeasurement: values.unit_measure,
 			costOfGoods: values.cogs_amount,
 			base64Image: values.base64encoded_image
 		};
