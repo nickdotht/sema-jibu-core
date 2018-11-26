@@ -11,6 +11,8 @@ import selectedProductReducer from './SelectedProductReducer';
 import loadingReducer from './LoadingReducer';
 import alertReducer from './AlertReducer';
 import productCategoryReducer from './ProductCategory';
+import kioskReducer from './Kiosk';
+import salesChannelReducer from './SalesChannel';
 
 const rootPersistConfig = {
   key: 'root',
@@ -28,7 +30,9 @@ const rootReducer = combineReducers({
   selectedProduct: selectedProductReducer,
   loading: loadingReducer,
   alert: alertReducer,
-  productCategories: productCategoryReducer
+  productCategories: productCategoryReducer,
+  kiosks: kioskReducer,
+  salesChannels: salesChannelReducer
 });
 
 export default persistReducer(rootPersistConfig, rootReducer);
