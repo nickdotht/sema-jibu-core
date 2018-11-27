@@ -31,7 +31,9 @@ router.get('/:id', async (req, res) => {
 
 	try {
 		let product = await db.product.findOne({ where: { id: productId } });
-		res.json({ product: await product.toJSON() });
+		res.json({
+			product: await product.toJSON()
+		});
 	} catch (err) {
 		semaLog.error(`/GET product by id failed - ${err}`);
 		res.status(400).json({

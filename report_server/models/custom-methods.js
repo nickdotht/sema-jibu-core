@@ -40,6 +40,9 @@ module.exports = models => {
 	models.product.prototype.toJSON = async function() {
 		const values = Object.assign({}, this.get());
 		const category = await this.getProduct_category();
+		const productMrp = await models.product_mrp.findAll({
+			where: { product_id: values.id }
+		});
 
 		return {
 			id: values.id,
@@ -54,7 +57,29 @@ module.exports = models => {
 			unitsPerProduct: values.units_per_product,
 			unitMeasurement: values.unit_measure,
 			costOfGoods: values.cogs_amount,
-			base64Image: values.base64encoded_image
+			base64Image: values.base64encoded_image,
+			productMrp: productMrp.map(p => ({
+				id: p.id,
+				kioskId: p.kiosk_id,
+				priceAmount: p.price_amount,
+				priceCurrency: p.price_currency,
+				productId: p.product_id,
+				salesChannelId: p.sales_channel_id,
+				costOfGoods: p.cogs_amount
+			}))
+		};
+	};
+
+	models.product_mrp.toJSON = async function() {
+		const values = Object.assign({}, this.get());
+		return {
+			id: values.id,
+			kioskId: values.kiosk_id,
+			priceAmount: values.price_amount,
+			priceCurrency: values.price_currency,
+			productId: values.product_id,
+			salesChannelId: values.sales_channel_id,
+			costOfGoods: values.cogs_amount
 		};
 	};
 };
