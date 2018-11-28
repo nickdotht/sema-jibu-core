@@ -60,6 +60,10 @@ axiosService.interceptors.response.use(response => {
 	return response
 }, error => {
 	if( error.response.status === 401){
+		if( error.config.hasOwnProperty("url") &&
+			error.config.url.indexOf("/sema/login") != -1 ){
+			return error.response;
+		}
 		console.log("401 received, redirect to login page");
 		window.dispatchEvent(new CustomEvent("tokenExpired", {
 			detail: {}} ));
