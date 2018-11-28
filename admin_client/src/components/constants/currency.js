@@ -10,5 +10,9 @@ export default [
   {
     label: 'NZD',
     value: 'NZD'
+  },
+  {
+    label: 'UGX',
+    value: 'UGX'
   }
 ];
