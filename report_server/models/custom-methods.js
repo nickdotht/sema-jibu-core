@@ -46,6 +46,7 @@ module.exports = models => {
 
 		return {
 			id: values.id,
+			active: !!values.active,
 			name: values.name,
 			sku: values.sku,
 			description: values.description,
@@ -60,6 +61,7 @@ module.exports = models => {
 			base64Image: values.base64encoded_image,
 			productMrp: productMrp.map(p => ({
 				id: p.id,
+				active: p.active,
 				kioskId: p.kiosk_id,
 				priceAmount: p.price_amount,
 				priceCurrency: p.price_currency,

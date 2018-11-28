@@ -30,7 +30,7 @@ var sema_water_chart = require('./routes/sema_water_chart');
 var sema_water_summary = require('./routes/sema_water_summary');
 
 var sema_users = require('./routes/sema_user');
-var sema_admin_products = require('./routes/sema_admin_products');
+var sema_admin_products = require('./routes/sema_api/sema_products');
 const sema_product_categories = require('./routes/sema_api/product_category');
 const sema_admin_sales_channel = require('./routes/sema_api/sales_channel');
 

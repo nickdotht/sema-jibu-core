@@ -5,7 +5,7 @@ const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const router = express.Router();
 const _ = require('lodash');
 const Op = Sequelize.Op;
-const db = require('../models');
+const db = require('../../models');
 
 router.get('/', async (req, res) => {
 	semaLog.info('/GET products - Enter');
@@ -28,7 +28,6 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
 	semaLog.info('/GET product by id - Enter');
 	const productId = req.params.id;
-
 	try {
 		let product = await db.product.findOne({ where: { id: productId } });
 		res.json({
