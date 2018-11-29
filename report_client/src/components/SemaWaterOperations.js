@@ -71,7 +71,7 @@ class SemaWaterOperations extends Component {
                 {/*</div>*/}
                 <div className = "WaterChartContainer">
                     <div className= "WaterMainChartItem">
-                        <SemaProductionChart chartData={this.props.water.waterOperationsInfo.production}/>
+                        <SemaProductionChart chartData={this.props.water.waterOperationsInfo.production} fillData={this.props.water.waterOperationsInfo.fill}/>
                     </div>
                     <div className= "WaterSecondaryChart1Item">
                         <SemaChlorineChart chartData={this.props.water.waterOperationsInfo.chlorine}/>

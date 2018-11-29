@@ -13,7 +13,7 @@ class SemaProductionChart extends Component {
 				<div className="ChartContainer">
 					<div className="chart" style={{backgroundColor: 'white', margin: "2px"}}>
 						<Bar
-							data={this.getChartData(this.props.chartData)}
+							data={this.getChartData(this.props.chartData, this.props.fillData)}
 							height={410}
 							width={800}
 							options={{
@@ -57,7 +57,7 @@ class SemaProductionChart extends Component {
     	return "Production (" + productionData.units +")";
 
 	}
-    getChartData( productionData ){
+    getChartData( productionData, fillData ){
     	if( utilService.isEmptyObject(productionData) || utilService.isEmptyObject(productionData.data )){
 			return { labels: [], datasets: []}
 		}else{
@@ -84,6 +84,23 @@ class SemaProductionChart extends Component {
 				};
 				production.datasets.unshift(lineSet);
 			}
+			if( !utilService.isEmptyObject(fillData) && ! utilService.isEmptyObject(fillData.data )){
+				if( this.getWastage( productionData, fillData) ){
+					console.log("foo");
+					let wastage = {
+						label: "Wastage",
+						data: fillData.data.values,
+						type: "line",
+						borderColor: 'rgb(231, 10, 10)',
+						backgroundColor: 'rgb(231, 10, 10)',
+						fill: false,
+						pointRadius: 0,
+						borderWidth: 3
+					};
+					production.datasets.unshift(wastage);
+
+				}
+			}
 			return production;
 		}
 	}
@@ -104,6 +121,18 @@ class SemaProductionChart extends Component {
 			// }
 		}
 		return movingAvg;
+	}
+	getWastage( productionData, fillData){
+    	let hasWastage = false;
+    	for( let i = 0; i < fillData.data.time.length && i < productionData.data.time.length; i++){
+    		if( fillData.data.time[i] == productionData.data.time[i]){
+				fillData.data.values[i] = productionData.data.values[i] - fillData.data.values[i];
+				hasWastage = true;
+			}else{
+				fillData.data.values[i] = null;
+			}
+		}
+		return hasWastage;
 	}
 }
 /**
