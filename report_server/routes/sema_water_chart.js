@@ -89,6 +89,10 @@ router.get('/', async( request, response ) => {
 						parameter = "Volume";
 						samplingSite = "B:Product";
 						break;
+					case "fill":
+						parameter = "Volume";
+						samplingSite = "D:Fill";
+						break;
 					default:
 						connection.release();
 						const msg = "sema_water_chart: Unknown chart type: " +request.query.type;
@@ -102,7 +106,7 @@ router.get('/', async( request, response ) => {
 					waterChart.setUnit(getParameterUnitFromMap(parameter));
 				}
 				const samplingSiteId = getSamplingSiteIdFromMap(samplingSite);
-				if( request.query.type === 'production'){
+				if( request.query.type === 'production' || request.query.type === 'fill'){
 					let groupBy = "day";
 					if( request.query.hasOwnProperty("group-by")){
 						groupBy = request.query["group-by"];
