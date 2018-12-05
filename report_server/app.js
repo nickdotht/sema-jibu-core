@@ -101,6 +101,7 @@ app.use('/sema/dashboard/site/water-summary/', sema_water_summary);
 
 app.use('/sema/users', isAuthenticated, sema_users);
 app.use('/sema/admin/products', isAuthenticated, sema_admin_products);
+
 app.use(
 	'/sema/api/product-categories',
 	isAuthenticated,

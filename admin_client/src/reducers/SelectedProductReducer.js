@@ -11,10 +11,7 @@ const selectedProductReducer = handleActions(
   {
     [combineActions(getProductRequest, getProductFailure)]: state => state,
     [getProductSuccess]: (state, { payload: { product } }) => product,
-    [resetProduct]: state => {
-      console.log('reset', state);
-      return initialState;
-    }
+    [resetProduct]: state => initialState
   },
   initialState
 );

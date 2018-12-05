@@ -1,14 +1,12 @@
-export const updateObjectInArray = (array, action) = {
-  return array.map((item, index) => {
-    if (index !== action.index) {
+export const updateObjectInArray = (array = [], obj = {}) =>
+  array.map(item => {
+    if (item.id !== obj.id) {
       // This isn't the item we care about - keep it as-is
-      return item
+      return item;
     }
-​
     // Otherwise, this is the one we want - return an updated value
     return {
       ...item,
-      ...action.item
-    }
-  })
-}
+      ...obj
+    };
+  });

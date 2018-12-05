@@ -93,19 +93,18 @@ class SemaUsers extends Component {
             onClose={this.closeCreateModal}
             onSave={this.props.onSave}
             title={editMode ? 'Edit User' : 'Create User'}
-            body={(
-              <UserForm
-                editMode={editMode}
-                user={this.state.editUser}
-                onSubmit={values => {
-                  editMode
-                    ? this.props.updateUser(values)
-                    : this.props.createUser(values);
-                  this.closeCreateModal();
-                }}
-              />
-)}
-          />
+          >
+            <UserForm
+              editMode={editMode}
+              user={this.state.editUser}
+              onSubmit={values => {
+                editMode
+                  ? this.props.updateUser(values)
+                  : this.props.createUser(values);
+                this.closeCreateModal();
+              }}
+            />
+          </Modal>
         )}
 
         <UserList

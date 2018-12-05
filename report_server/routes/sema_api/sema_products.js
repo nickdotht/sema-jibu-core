@@ -4,8 +4,42 @@ const Sequelize = require('sequelize');
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const router = express.Router();
 const _ = require('lodash');
+const { check, validationResult } = require('express-validator/check');
 const Op = Sequelize.Op;
 const db = require('../../models');
+
+// TODO add more validations
+const createProductValidator = [
+	check('sku')
+		.exists({ checkFalsy: true })
+		.withMessage('SKU is required')
+];
+
+const mapProductFromClient = values => ({
+	active: values.active ? 1 : 0,
+	name: values.name,
+	sku: values.sku,
+	description: values.description,
+	category_id: values.category,
+	price_amount: values.priceAmount,
+	price_currency: values.priceCurrency,
+	minimum_quantity: values.minQuantity ? values.minQuantity : null,
+	maximum_quantity: values.maxQuantity ? values.maxQuantity : null,
+	unit_per_product: values.unitsPerProduct,
+	unit_measure: values.unitMeasurement,
+	cogs_amount: values.costOfGoods,
+	base64encoded_image: values.image
+});
+
+const mapProductMrpFromClient = values => ({
+	active: values.active,
+	kiosk_id: values.kioskId,
+	price_amount: values.priceAmount,
+	price_currency: values.priceCurrency,
+	product_id: values.productId,
+	sales_channel_id: values.salesChannelId,
+	cogs_amount: values.costOfGoods
+});
 
 router.get('/', async (req, res) => {
 	semaLog.info('/GET products - Enter');
@@ -20,6 +54,42 @@ router.get('/', async (req, res) => {
 		semaLog.error(`GET products failed - ${err}`);
 		res.status(400).json({
 			message: `Failed to GET products ${err}`,
+			err: `${err}`
+		});
+	}
+});
+
+router.post('/', async (req, res) => {
+	semaLog.info('/POST products - Enter');
+	const payload = req.body.data;
+
+	try {
+		let product = await db.product.findOne({ where: { sku: payload.sku } });
+		if (product) throw new Error('SKU must be unique');
+
+		const productObject = mapProductFromClient(payload);
+		let createdProduct = await db.product.create(productObject);
+
+		const productMrps = payload.productMrp.map(values => ({
+			active: values.active ? 1 : 0,
+			kiosk_id: values.kioskId,
+			price_amount: values.priceAmount,
+			price_currency: values.priceCurrency,
+			product_id: createdProduct.id,
+			sales_channel_id: values.salesChannelId,
+			cogs_amount: values.costOfGoods
+		}));
+		let mrps = await db.product_mrp.bulkCreate(productMrps);
+
+		res.json({
+			data: {
+				product: await createdProduct.toJSON()
+			}
+		});
+	} catch (err) {
+		semaLog.error(`/POST product failed - ${err}`);
+		res.status(400).json({
+			message: `Failed to /POST product  ${err}`,
 			err: `${err}`
 		});
 	}
@@ -40,6 +110,11 @@ router.get('/:id', async (req, res) => {
 			err: `${err}`
 		});
 	}
+});
+
+router.delete('/:id', async (req, res) => {
+	semaLog.info('/DELETE products - Enter');
+	res.send('/DELETE product - not implemented yet');
 });
 
 module.exports = router;
