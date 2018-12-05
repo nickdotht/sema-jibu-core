@@ -19,3 +19,6 @@ export const validateUserForm = values => {
   }
   return errors;
 };
+
+export const required = value =>
+  value || typeof value === 'number' ? undefined : 'Required';
