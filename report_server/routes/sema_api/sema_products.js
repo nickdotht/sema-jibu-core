@@ -4,6 +4,7 @@ const Sequelize = require('sequelize');
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const router = express.Router();
 const omit = require('lodash').omit;
+const isNull = require('lodash').isNull;
 const { check, validationResult } = require('express-validator/check');
 const Op = Sequelize.Op;
 const db = require('../../models');
@@ -33,7 +34,7 @@ const mapProductFromClient = values => ({
 
 const mapProductMrpFromClient = values => ({
 	id: values.id ? values.id : null,
-	active: values.active,
+	active: values.active ? 1 : 0,
 	kiosk_id: values.kioskId,
 	price_amount: values.priceAmount,
 	price_currency: values.priceCurrency,
@@ -116,34 +117,31 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
 	semaLog.info('/PUT products - Enter');
 	const payload = req.body.data;
-	console.log('payload ===', payload);
 
 	try {
 		let product = await db.product.findOne({
 			where: { id: req.params.id }
 		});
 		if (!product) throw new Error('Product not found');
-		console.log('product ====', product);
 
 		const productObject = mapProductFromClient(payload);
-		console.log('productObject', productObject);
-		omit(productObject, 'id');
 		let updatedObject = await product.update(productObject);
-		const productMrps = payload.productMrp.map(mapProductMrpFromClient);
+		const productMrps = payload.productMrp
+			.map(mapProductMrpFromClient)
+			.filter(key => key !== isNull);
 
-		await Promise.all(
-			productMrps.map(async mrp => {
-				if (mrp.id) {
-					let updateMrp = await db.product_mrp.find({
-						where: { id: mrp.id }
-					});
-					omit(mrp, 'id');
-					updateMrp.update(mrp);
-				} else {
-					let createdMrp = await db.product_mrp.create(mrp);
-				}
-			})
-		);
+		productMrps.map(async mrp => {
+			if (mrp.id) {
+				let updateMrp = await db.product_mrp.find({
+					where: { id: mrp.id }
+				});
+				omit(mrp, 'id');
+				updateMrp.update(mrp);
+			} else {
+				let createdMrp = await db.product_mrp.create(mrp);
+			}
+		});
+
 		res.json({
 			data: {
 				product: await updatedObject.toJSON()
