@@ -23,7 +23,10 @@ export const {
   resetProduct,
   createProductRequest,
   createProductSuccess,
-  createProductFailure
+  createProductFailure,
+  updateProductRequest,
+  updateProductSuccess,
+  updateProductFailure
 } = createActions(
   {
     GET_PRODUCT_SUCCESS: payload => payload
@@ -33,7 +36,10 @@ export const {
   'RESET_PRODUCT',
   'CREATE_PRODUCT_REQUEST',
   'CREATE_PRODUCT_SUCCESS',
-  'CREATE_PRODUCT_FAILURE'
+  'CREATE_PRODUCT_FAILURE',
+  'UPDATE_PRODUCT_REQUEST',
+  'UPDATE_PRODUCT_SUCCESS',
+  'UPDATE_PRODUCT_ERROR'
 );
 
 export const { loadProductCategories } = createActions({
@@ -68,11 +74,20 @@ export const getProductCategories = () => dispatch =>
     });
 
 export const createProduct = data => dispatch => {
-  console.log('create product values', data);
   dispatch(createProductRequest());
   axiosService
     .post('/sema/admin/products', { data })
     .then(response => dispatch(createProductSuccess(response.data)))
+    .catch(err => {
+      throw err;
+    });
+};
+
+export const updateProduct = data => dispatch => {
+  dispatch(updateProductRequest());
+  axiosService
+    .put(`/sema/admin/products/${data.id}`, { data })
+    .then(response => dispatch(updateProductSuccess(response.data)))
     .catch(err => {
       throw err;
     });

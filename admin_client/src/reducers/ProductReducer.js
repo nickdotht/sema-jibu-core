@@ -6,7 +6,10 @@ import {
   getProductsFailure,
   createProductRequest,
   createProductSuccess,
-  createProductFailure
+  createProductFailure,
+  updateProductRequest,
+  updateProductSuccess,
+  updateProductFailure
 } from '../actions/ProductActions';
 
 // State
@@ -16,14 +19,16 @@ const productReducer = handleActions(
     [combineActions(
       getProductsRequest,
       getProductsFailure,
-      createProductRequest
+      createProductRequest,
+      updateProductRequest
     )]: state => state,
     [getProductsSuccess]: (state, { payload: { products } }) => products,
-    [createProductSuccess]: (state, { payload: { data: product } }) => {
-      console.log('createproductsuccess', state.products, product);
-      return updateObjectInArray(state.products, product);
-    },
-    [createProductFailure]: (state, { payload: error }) => error
+    [createProductSuccess]: (state, { payload: { data: product } }) =>
+      updateObjectInArray(state.products, product),
+    [createProductFailure]: (state, { payload: error }) => error,
+    [updateProductSuccess]: (state, { payload: { data: product } }) =>
+      updateObjectInArray(state.products, product),
+    [updateProductFailure]: (state, { payload: error }) => error
   },
   initialState
 );

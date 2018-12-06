@@ -3,7 +3,7 @@ const express = require('express');
 const Sequelize = require('sequelize');
 const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const router = express.Router();
-const _ = require('lodash');
+const omit = require('lodash').omit;
 const { check, validationResult } = require('express-validator/check');
 const Op = Sequelize.Op;
 const db = require('../../models');
@@ -32,6 +32,7 @@ const mapProductFromClient = values => ({
 });
 
 const mapProductMrpFromClient = values => ({
+	id: values.id ? values.id : null,
 	active: values.active,
 	kiosk_id: values.kioskId,
 	price_amount: values.priceAmount,
@@ -54,6 +55,23 @@ router.get('/', async (req, res) => {
 		semaLog.error(`GET products failed - ${err}`);
 		res.status(400).json({
 			message: `Failed to GET products ${err}`,
+			err: `${err}`
+		});
+	}
+});
+
+router.get('/:id', async (req, res) => {
+	semaLog.info('/GET product by id - Enter');
+	const productId = req.params.id;
+	try {
+		let product = await db.product.findOne({ where: { id: productId } });
+		res.json({
+			product: await product.toJSON()
+		});
+	} catch (err) {
+		semaLog.error(`/GET product by id failed - ${err}`);
+		res.status(400).json({
+			message: `Failed to /GET product by id ${err}`,
 			err: `${err}`
 		});
 	}
@@ -95,18 +113,46 @@ router.post('/', async (req, res) => {
 	}
 });
 
-router.get('/:id', async (req, res) => {
-	semaLog.info('/GET product by id - Enter');
-	const productId = req.params.id;
+router.put('/:id', async (req, res) => {
+	semaLog.info('/PUT products - Enter');
+	const payload = req.body.data;
+	console.log('payload ===', payload);
+
 	try {
-		let product = await db.product.findOne({ where: { id: productId } });
+		let product = await db.product.findOne({
+			where: { id: req.params.id }
+		});
+		if (!product) throw new Error('Product not found');
+		console.log('product ====', product);
+
+		const productObject = mapProductFromClient(payload);
+		console.log('productObject', productObject);
+		omit(productObject, 'id');
+		let updatedObject = await product.update(productObject);
+		const productMrps = payload.productMrp.map(mapProductMrpFromClient);
+
+		await Promise.all(
+			productMrps.map(async mrp => {
+				if (mrp.id) {
+					let updateMrp = await db.product_mrp.find({
+						where: { id: mrp.id }
+					});
+					omit(mrp, 'id');
+					updateMrp.update(mrp);
+				} else {
+					let createdMrp = await db.product_mrp.create(mrp);
+				}
+			})
+		);
 		res.json({
-			product: await product.toJSON()
+			data: {
+				product: await updatedObject.toJSON()
+			}
 		});
 	} catch (err) {
-		semaLog.error(`/GET product by id failed - ${err}`);
+		semaLog.error(`/PUT product failed - ${err}`);
 		res.status(400).json({
-			message: `Failed to /GET product by id ${err}`,
+			message: `/PUT product failed ${err}`,
 			err: `${err}`
 		});
 	}
