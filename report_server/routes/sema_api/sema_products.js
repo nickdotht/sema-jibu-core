@@ -93,10 +93,10 @@ router.post('/', async (req, res) => {
 			active: values.active ? 1 : 0,
 			kiosk_id: values.kioskId,
 			price_amount: values.priceAmount,
-			price_currency: values.priceCurrency,
+			price_currency: createdProduct.price_currency,
 			product_id: createdProduct.id,
 			sales_channel_id: values.salesChannelId,
-			cogs_amount: values.costOfGoods
+			cogs_amount: createdProduct.cogs_amount
 		}));
 		let mrps = await db.product_mrp.bulkCreate(productMrps);
 
@@ -125,9 +125,19 @@ router.put('/:id', async (req, res) => {
 		if (!product) throw new Error('Product not found');
 
 		const productObject = mapProductFromClient(payload);
+
 		let updatedObject = await product.update(productObject);
 		const productMrps = payload.productMrp
-			.map(mapProductMrpFromClient)
+			.map(values => ({
+				id: values.id ? values.id : null,
+				active: values.active ? 1 : 0,
+				kiosk_id: values.kioskId,
+				price_amount: values.priceAmount,
+				price_currency: updatedObject.price_currency,
+				product_id: updatedObject.id,
+				sales_channel_id: values.salesChannelId,
+				cogs_amount: updatedObject.cogs_amount
+			}))
 			.filter(key => key !== isNull);
 
 		productMrps.map(async mrp => {
