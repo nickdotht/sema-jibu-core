@@ -1,10 +1,11 @@
 process.env.NODE_ENV = 'test';
 const chai = require('chai');
-const request = require('supertest')(app);
 
 const should = chai.should();
 const expect = require('chai').expect;
+
 const app = require('../bin/www');
+const request = require('supertest')(app);
 const db = require('../models');
 
 describe('Products', () => {
