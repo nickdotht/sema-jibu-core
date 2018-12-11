@@ -17,11 +17,11 @@ describe('Products', () => {
 		const product = await db.product.findOne({
 			where: { name: 'unittests_product123' }
 		});
-		const productMrp = await db.product_mrp.findOne({
-			where: { product_id: product.id }
-		});
 
-		if (product || productMrp) {
+		if (product) {
+			const productMrp = await db.product_mrp.findOne({
+				where: { product_id: product.id }
+			});
 			await productMrp.destroy();
 			await product.destroy();
 		}
