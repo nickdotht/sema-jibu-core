@@ -369,7 +369,7 @@ class OrderPaymentScreen extends Component {
 				products: []
 			};
 			if (!receipt.siteId) {
-				// This fixes issues with the pseudo walkup customer
+				// This fixes issues with the pseudo direct customer
 				receipt.siteId = PosStorage.getSettings().siteId;
 			}
 

@@ -10,8 +10,9 @@ const Product = require('../model_layer/Product');
 // Note that the query for updated products must include products recently deactivated as well
 // as active products
 var sqlQueryDate = "SELECT * FROM product WHERE updated_at > ? ";
-var sqlQuery = "SELECT * FROM product WHERE active = b'1'";
-
+// We're sending all products, whether active or not because we determine this
+// on the client side
+var sqlQuery = "SELECT * FROM product";
 
 router.get('/', function(req, res) {
 	semaLog.info('GET products - Enter');

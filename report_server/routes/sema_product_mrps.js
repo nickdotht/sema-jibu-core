@@ -5,6 +5,7 @@ const ProductMrp = require('../model_layer/ProductMrp');
 
 var sqlQueryDate = "SELECT * FROM product_mrp WHERE kiosk_id = ? AND updated_at > ? ";
 var sqlQuery = "SELECT * FROM product_mrp WHERE kiosk_id = ?";
+var sqlQuerySimple = "SELECT * FROM product_mrp";
 
 router.get('/', function(req, res) {
 	semaLog.info('GET product mrps - Enter');
@@ -22,6 +23,9 @@ router.get('/', function(req, res) {
 			if (req.query.hasOwnProperty("updated-date")) {
 				params = [req.query["site-id"], getUTCDate(new Date( req.query["updated-date"]))];
 				query = sqlQueryDate;
+			} else if (req.query['site-id'] === '-1') {
+				params = null;
+				query = sqlQuerySimple;
 			}
 
 			__pool.getConnection((err, connection) => {
