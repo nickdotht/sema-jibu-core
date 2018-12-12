@@ -100,6 +100,7 @@ class PosApp extends Component {
 		Events.on('CustomersUpdated', 'customerUpdate1', this.onCustomersUpdated.bind(this));
 		Events.on('ProductsUpdated', 'productsUpdate1', this.onProductsUpdated.bind(this));
 		Events.on('SalesChannelsUpdated', 'SalesChannelsUpdated1', this.onSalesChannelUpdated.bind(this));
+		Events.on('UILanguageUpdated', 'UILanguageUpdated1', this.onLanguageUpdated.bind(this));
 
 		console.log("PosApp = Mounted-Done");
 
@@ -108,6 +109,7 @@ class PosApp extends Component {
 		Events.rm('CustomersUpdated', 'customerUpdate1');
 		Events.rm('ProductsUpdated', 'productsUpdate1');
 		Events.rm('SalesChannelsUpdated', 'SalesChannelsUpdated1');
+		Events.rm('UILanguageUpdated', 'UILanguageUpdated1');
 		NetInfo.isConnected.removeEventListener( 'connectionChange',this.handleConnectivityChange );
 	}
 
@@ -121,6 +123,13 @@ class PosApp extends Component {
 
 	onSalesChannelUpdated() {
 		console.log('Update sales channels bar');
+		CustomerViews.buildNavigator().then(() => {
+			this.forceUpdate();
+		});
+	}
+
+	onLanguageUpdated() {
+		console.log('New UI language set - Update sales channels bar');
 		CustomerViews.buildNavigator().then(() => {
 			this.forceUpdate();
 		});
