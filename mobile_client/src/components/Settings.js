@@ -13,6 +13,8 @@ import * as ToolbarActions from "../actions/ToolBarActions";
 import * as CustomerActions from "../actions/CustomerActions";
 import ModalDropdown from 'react-native-modal-dropdown';
 
+import Events from "react-native-simple-events";
+
 import Communications from '../services/Communications';
 import i18n from '../app/i18n';
 
@@ -444,6 +446,7 @@ ${syncResult.productMrps.remoteProductMrps} ${i18n.t('product-sales-channel-pric
 		}, () => {
 			console.log(`Selected language is ${this.state.selectedLanguage.name}`);
 			i18n.locale = this.state.selectedLanguage.iso_code;
+			Events.trigger('SalesChannelsUpdated', {});
 			this.onSaveSettings();
 		});
 	}
