@@ -32,6 +32,20 @@ describe('Products', () => {
     salesChannel = await db.sales_channel.findOne();
   });
 
+  after(async () => {
+    const product = await db.product.findOne({
+      where: { name: 'unittests_product123' },
+    });
+
+    if (product) {
+      const productMrp = await db.product_mrp.findOne({
+        where: { product_id: product.id },
+      });
+      await productMrp.destroy();
+      await product.destroy();
+    }
+  });
+
   beforeEach((done) => {
     request
       .post('/sema/login')
