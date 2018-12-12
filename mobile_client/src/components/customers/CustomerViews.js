@@ -4,6 +4,8 @@ import CustomerList from "./CustomerList";
 import PosStorage from "../../database/PosStorage";
 import { capitalizeWord } from '../../services/Utilities';
 
+import i18n from '../../app/i18n';
+
 // Create a generic class for all sales channels
 class SalesChannelScreen extends React.Component {
 	constructor(props) {
@@ -76,8 +78,8 @@ class CustomerViews {
 		let channelScreen;
 
 		// Add the defaults
-		salesChannels.unshift({name: 'all'});
-		salesChannels.push({name: 'credit'});
+		salesChannels.unshift({name: i18n.t('all')});
+		salesChannels.push({name: i18n.t('credit')});
 		
 		salesChannels.forEach(salesChannel => {
 			channelScreen = props => (<SalesChannelScreen
