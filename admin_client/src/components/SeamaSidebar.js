@@ -1,82 +1,57 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import { ListGroup } from "react-bootstrap";
-import "App.css";
-
-const SeamaListStyleActive = {
-  textAlign: "left",
-  paddingLeft: "20px",
-  backgroundColor: "rgb(24,55,106)",
-  color: "white"
-};
-
-const ImageStyle = {
-  resize: "both",
-  width: "100%",
-  height: "100%",
-  maxWidth: "100%",
-  marginBottom: "5px"
-};
-
-function CustomComponent1({ children }) {
-  return (
-    <li className="list-group-item" style={SeamaListStyleActive}>
-      {children}
-    </li>
-  );
-}
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router';
+import logo from 'images/swe-logo.png';
+import 'App.css';
 
 class SeamaSidebar extends Component {
+  renderLinks() {
+    const currentPath = this.props.location.pathname;
+    const dashboardRoutes = [
+      {
+        path: '/',
+        name: 'Users',
+        icon: 'glyphicon-user'
+      },
+      {
+        path: '/products',
+        name: 'Products',
+        icon: 'glyphicon-shopping-cart'
+      },
+      {
+        path: '#',
+        name: 'Kiosks',
+        icon: 'glyphicon-home'
+      }
+    ];
+    return (
+      <ul className="nav nav-sidebar">
+        {dashboardRoutes.map(route => (
+          <li
+            key={route.name}
+            className={route.path === currentPath ? 'active' : ''}
+          >
+            <Link to={route.path}>
+              <i
+                className={`glyphicon ${route.icon}`}
+                style={{ paddingRight: '20px' }}
+              />
+              {route.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
   render() {
     return (
-      <div className="SeamaNavSidebar" style={this.getStyle()}>
-        <div>
-          {
-            <img
-              src={require("images/swe-logo.png")}
-              alt="logo"
-              style={ImageStyle}
-            />
-          }
-        </div>
-        <ListGroup>
-          <CustomComponent1>
-            <i
-              className="glyphicon glyphicon-tint"
-              style={{ paddingRight: "15px" }}
-            />
-            <Link to="/">Users</Link>
-          </CustomComponent1>
-          <CustomComponent1>
-            <i
-              className="glyphicon glyphicon-user"
-              style={{ paddingRight: "15px" }}
-            />
-            <Link to="/Products">Products</Link>
-          </CustomComponent1>
-          {/*<CustomComponent1><i className="glyphicon glyphicon-globe" style={{paddingRight:"15px"}}/>*/}
-          {/*<Link to='/DistributionMap'>Distribution Map</Link></CustomComponent1>*/}
-          {/*<CustomComponent1><i className="glyphicon glyphicon-time" style={{paddingRight:"15px"}}/>*/}
-          {/*<Link to='/DeliverySchedule'>Delivery Schedule</Link></CustomComponent1>*/}
-          {/*<CustomComponent1><i className="glyphicon glyphicon-inbox" style={{paddingRight:"15px"}}/>*/}
-          {/*<Link to='/InventoryManagement'>Inventory Management</Link></CustomComponent1>*/}
-          {/*<CustomComponent1><i className="glyphicon glyphicon-usd" style={{paddingRight:"15px"}}/>*/}
-          {/*<Link to='/Financials'>Financials</Link></CustomComponent1>*/}
-        </ListGroup>
+      <div>
+        <div>{<img src={logo} alt="logo" />}</div>
+        {this.renderLinks()}
       </div>
     );
   }
-  getStyle() {
-    let windowHeight = window.innerHeight;
-    // TODO 52px is the height of the toolbar. (Empirical)
-    windowHeight -= 52;
-    let height = windowHeight.toString() + "px";
-    return {
-      background: "rgb(24,55,106)",
-      width: "240px",
-      height: height
-    };
-  }
 }
 
-export default SeamaSidebar;
+export default withRouter(SeamaSidebar);

@@ -10,8 +10,19 @@ describe('Users', () => {
 	var token;
 	let user;
 
+	before(async () => {
+		//delete the user if it already exists
+		const u = await db.user.findOne({
+			where: { username: 'testuserjs123' }
+		});
+		if (u) {
+			await u.setRoles([]); // clear roles
+			await u.destroy();
+		}
+	});
+
 	after(async () => {
-		const u = await db.user.find({ where: { id: user.id } });
+		const u = await db.user.findOne({ where: { id: user.id } });
 		if (u) {
 			await u.setRoles([]); // clear roles
 			await u.destroy();

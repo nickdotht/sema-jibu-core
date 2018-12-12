@@ -19,3 +19,18 @@ export const validateUserForm = values => {
   }
   return errors;
 };
+
+export const required = value =>
+  value || typeof value === 'number' ? undefined : 'Required';
+
+export const minLength = min => value =>
+  value && value.length < min ? `Must be ${min} characters or more` : undefined;
+
+export const maxLength = max => value =>
+  value && value.length > max ? `Must be ${max} characters or less` : undefined;
+
+export const maxLength3 = maxLength(3);
+export const minLength3 = minLength(3);
+
+export const exactLength3 = value =>
+  value && value.length !== 3 ? `Must be 3 characters` : undefined;

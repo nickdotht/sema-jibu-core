@@ -74,12 +74,11 @@ class SemaUsers extends Component {
     }
 
     return (
-      <div style={{ margin: '5px' }}>
+      <div>
         {alert && <Alert type="danger" message={alert.message} />}
         <div className="">
           <Button
             buttonStyle="primary"
-            buttonSize="small"
             className="pull-right"
             onClick={this.openCreateModal}
             icon="plus"
@@ -87,25 +86,25 @@ class SemaUsers extends Component {
           />
           <h2>Users</h2>
         </div>
+        <hr />
         {this.state.show && (
           <Modal
             show
             onClose={this.closeCreateModal}
             onSave={this.props.onSave}
             title={editMode ? 'Edit User' : 'Create User'}
-            body={(
-              <UserForm
-                editMode={editMode}
-                user={this.state.editUser}
-                onSubmit={values => {
-                  editMode
-                    ? this.props.updateUser(values)
-                    : this.props.createUser(values);
-                  this.closeCreateModal();
-                }}
-              />
-)}
-          />
+          >
+            <UserForm
+              editMode={editMode}
+              user={this.state.editUser}
+              onSubmit={values => {
+                editMode
+                  ? this.props.updateUser(values)
+                  : this.props.createUser(values);
+                this.closeCreateModal();
+              }}
+            />
+          </Modal>
         )}
 
         <UserList

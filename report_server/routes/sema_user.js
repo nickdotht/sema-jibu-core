@@ -4,10 +4,8 @@ const semaLog = require(`${__basedir}/seama_services/sema_logger`);
 const router = express.Router();
 const _ = require('lodash');
 const Op = Sequelize.Op;
-
 const db = require('../models');
 
-/* GET users listing. */
 router.get('/', async (req, res) => {
 	semaLog.info('GET users - Enter');
 
@@ -94,7 +92,7 @@ router.put('/:id', async (req, res) => {
 	}
 
 	try {
-		const user = await db.user.find({ where: { id: req.params.id } });
+		const user = await db.user.findOne({ where: { id: req.params.id } });
 		if (!user) {
 			throw new Error('User not found');
 		}
@@ -125,7 +123,7 @@ router.delete('/:id', async (req, res) => {
 	semaLog.info(`Enter delete user ${id}`);
 
 	try {
-		let user = await db.user.find({ where: { id } });
+		let user = await db.user.findOne({ where: { id } });
 		let role = await user.getRoles();
 		if (!user) throw new Error('User not found');
 		if (user.active) throw new Error('User must be deactivated');
@@ -148,7 +146,7 @@ router.put('/toggle/:id', async (req, res) => {
 	semaLog.info('Users activate/deactivate - Enter ');
 	const id = req.params.id;
 	try {
-		let user = await db.user.find({ where: { id: id } });
+		let user = await db.user.findOne({ where: { id: id } });
 		if (!user) {
 			throw new Error('User not found');
 		}
