@@ -17,6 +17,9 @@ class Sidebar extends Component {
 					<TouchableHighlight onPress={() => this.onInventory()}>
 						<Text style={this.getInventoryMenuStyle()}>{i18n.t('inventory')}</Text>
 					</TouchableHighlight>
+					<TouchableHighlight onPress={() => this.onSalesLogging()}>
+						<Text style={this.getSalesLoggingMenuStyle()}>Sales Logging</Text>
+					</TouchableHighlight>
 				</View>
 		);
 	}
@@ -24,8 +27,13 @@ class Sidebar extends Component {
 	onSales = () =>{
 		this.props.reportActions.setReportType("sales");
 	};
+
 	onInventory = () =>{
 		this.props.reportActions.setReportType("inventory");
+	};
+
+	onSalesLogging = () =>{
+		this.props.reportActions.setReportType("salesLogging");
 	};
 
 	getSalesMenuStyle(){
@@ -33,8 +41,15 @@ class Sidebar extends Component {
 			[styles.menuText, { color: "#3C93FC" }] :
 			[styles.menuText]
 	}
+
 	getInventoryMenuStyle(){
 		return (this.props.reportType === "inventory") ?
+			[styles.menuText, { color: "#3C93FC" }] :
+			[styles.menuText]
+	}
+
+	getSalesLoggingMenuStyle(){
+		return (this.props.reportType === "salesLogging") ?
 			[styles.menuText, { color: "#3C93FC" }] :
 			[styles.menuText]
 	}
