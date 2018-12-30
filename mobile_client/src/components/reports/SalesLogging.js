@@ -4,6 +4,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as reportActions from "../../actions/ReportActions";
 import { Table, Row } from 'react-native-table-component';
+import PosStorage from '../../database/PosStorage';
 
 import i18n from '../../app/i18n';
 
@@ -18,6 +19,10 @@ class SalesLogging extends Component {
 
     componentDidMount() {
         console.log("SalesLogging - componentDidMount");
+        PosStorage.loadSalesReceipts()
+            .then(sales => {
+                console.dir(sales);
+            });
     }
 
     render() {
