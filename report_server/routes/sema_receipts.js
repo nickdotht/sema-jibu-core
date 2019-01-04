@@ -3,18 +3,48 @@ const router = express.Router();
 const semaLog = require('../seama_services/sema_logger');
 const bodyParser = require('body-parser');
 const Receipt = require('../model_layer/Receipt');
+const R = require('../models/receipts');
+const validator = require('validator');
 
 var sqlInsertReceipt = "INSERT INTO receipt " +
-				"(id, created_at, updated_at, currency_code, " +
+	"(id, created_at, updated_at, currency_code, " +
 	"customer_account_id, amount_cash, amount_mobile, amount_loan, amount_card, " +
 	"kiosk_id, payment_type, sales_channel_id, customer_type_id, total, cogs, uuid )" +
 	"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? )";
 
 var sqlInsertReceiptLineItem = "INSERT INTO receipt_line_item " +
-				"(created_at, updated_at, currency_code, price_total, quantity, receipt_id, product_id, cogs_total) " +
-				"VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+	"(created_at, updated_at, currency_code, price_total, quantity, receipt_id, product_id, cogs_total) " +
+	"VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
+// Returns all receipts for the site and the date passed
+router.get('/:siteId', async (req, res) => {
+	semaLog.info('sema_receipts - Fetch');
 
+	// Gather data sent
+	const {
+		date
+	} = req.body;
+	const { kioskId } = req.params;
+
+	const [err, receipts] = __hp(R.findAll({
+		where: {
+			kiosk_id: kioskId,
+			created_at: {
+				between: [date, moment(date).add(1, 'days')]
+			}
+		},
+		raw: true
+	}));
+
+	// On error, return a generic error message and log the error
+	if (err) {
+		semaLog.warn(`sema_receipts - Fetch - Error: ${JSON.stringify(err)}`);
+		return res.status(500).json({ msg: "Internal Server Error" });
+	}
+
+	// On success, return a success message containing the data
+	return res.json({ receipts });
+});
 
 
 router.post('/', async (req, res) => {
@@ -32,18 +62,18 @@ router.post('/', async (req, res) => {
 	req.check("receiptId", "receiptId is missing").exists();
 	req.check("products", "products is missing").exists();
 
-	req.getValidationResult().then(function(result) {
+	req.getValidationResult().then(function (result) {
 		if (!result.isEmpty()) {
 			const errors = result.array().map((elem) => {
 				return elem.msg;
 			});
 			semaLog.error("Validation error: " + errors.toString());
 			res.status(400).send(errors.toString());
-		}else{
+		} else {
 			const products = req.body["products"];
 
-			for (let i=0; i < products.length; i++){
-				if ( !products[i].productId || !products[i].quantity || !products[i].priceTotal || ! products[i].cogsTotal) {
+			for (let i = 0; i < products.length; i++) {
+				if (!products[i].productId || !products[i].quantity || !products[i].priceTotal || !products[i].cogsTotal) {
 					semaLog.error("CREATE RECEIPT - Bad request, missing parts of product");
 					return res.status(400).send({ msg: "Bad request, missing parts of receipt.product." });
 				}
@@ -52,11 +82,11 @@ router.post('/', async (req, res) => {
 			try {
 				let receipt = new Receipt(req.body);
 
-				let postSqlParams = [ receipt.id, receipt.createdDate, receipt.updatedDate,receipt.currencyCode,
-					receipt.customerId, receipt.amountCash, receipt.amountMobile, receipt.amountLoan, receipt.amountCard,
-					receipt.siteId, receipt.paymentType, receipt.salesChannelId, receipt.customerTypeId, receipt.total, receipt.cogs, receipt.receiptId ];
+				let postSqlParams = [receipt.id, receipt.createdDate, receipt.updatedDate, receipt.currencyCode,
+				receipt.customerId, receipt.amountCash, receipt.amountMobile, receipt.amountLoan, receipt.amountCard,
+				receipt.siteId, receipt.paymentType, receipt.salesChannelId, receipt.customerTypeId, receipt.total, receipt.cogs, receipt.receiptId];
 				insertReceipt(receipt, sqlInsertReceipt, postSqlParams, res);
-			} catch(err) {
+			} catch (err) {
 				semaLog.warn(`sema_receipts - Error: ${err}`);
 				return res.status(500).send({ msg: "Internal Server Error" });
 			}
@@ -65,23 +95,23 @@ router.post('/', async (req, res) => {
 
 });
 
-const insertReceipt = (receipt, query, params, res ) => {
+const insertReceipt = (receipt, query, params, res) => {
 	__pool.getConnection((err, connection) => {
-		connection.beginTransaction(function(err) {
-			connection.query(query, params, function(err, result) {
+		connection.beginTransaction(function (err) {
+			connection.query(query, params, function (err, result) {
 				if (err) {
 					semaLog.error('insertReceipt- receipts - failed(1)', { err });
 					connection.rollback();
 
-						// Use http 'conflict if this is a duplicate
-					res.status(err.code === "ER_DUP_ENTRY" ? 409: 500).send(err.message);
+					// Use http 'conflict if this is a duplicate
+					res.status(err.code === "ER_DUP_ENTRY" ? 409 : 500).send(err.message);
 					connection.release();
 				}
 				else {
 					semaLog.info('receipts - succeeded');
-					if( receipt.products.length === 0 ){
+					if (receipt.products.length === 0) {
 						commitTransaction(receipt, connection, res);
-					}else {
+					} else {
 						let receiptId = result.insertId;
 						let successCount = 0;
 						let resolveCount = 0;
@@ -97,7 +127,7 @@ const insertReceipt = (receipt, query, params, res ) => {
 								receipt.products[i].cogsTotal
 							];
 							semaLog.info("Inserting line item #" + i);
-							insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams, connection).then(function(result) {
+							insertReceiptLineItem(sqlInsertReceiptLineItem, sqlProductParams, connection).then(function (result) {
 								semaLog.info("Inserted line item #" + resolveCount);
 								resolveCount++;
 								if (result) {
@@ -108,7 +138,7 @@ const insertReceipt = (receipt, query, params, res ) => {
 									if (successCount == resolveCount) {
 										commitTransaction(receipt, connection, res);
 									} else {
-										connection.rollback(function() {
+										connection.rollback(function () {
 											semaLog.error('insertReceipt- receipts - failed(2)', { err });
 											res.status(500).send("Error");
 											connection.release();
@@ -124,10 +154,10 @@ const insertReceipt = (receipt, query, params, res ) => {
 	});
 };
 
-const commitTransaction = ( receipt, connection, res) => {
-	connection.commit(function(err) {
+const commitTransaction = (receipt, connection, res) => {
+	connection.commit(function (err) {
 		if (err) {
-			connection.rollback(function() {
+			connection.rollback(function () {
 				semaLog.error('CommitTransaction- Create receipt - failed', { err });
 				res.status(500).send(err.message);
 				connection.release();
@@ -150,9 +180,9 @@ const commitTransaction = ( receipt, connection, res) => {
 
 const insertReceiptLineItem = (query, params, connection) => {
 	return new Promise((resolve, reject) => {
-		connection.query(query, params, function(err, result) {
+		connection.query(query, params, function (err, result) {
 			if (err) {
-				semaLog.error('insertReceiptLineItem - Failed, err: ' +err.message);
+				semaLog.error('insertReceiptLineItem - Failed, err: ' + err.message);
 				resolve(false);
 			}
 			else {
