@@ -479,6 +479,12 @@ class PosStorage {
 		console.log("PosStorage: getCustomers. Count " + this.customers.length);
 		return this.customers;
 	}
+
+	getRemoteSales() {
+		console.log("PosStorage: getRemoteSales. Count " + this.remoteSales.length);
+		return this.remoteSales;
+	}
+
 	getPendingCustomers() {
 		console.log("PosStorage: getPendingCustomers. Count " + this.pendingCustomers.length);
 		return this.pendingCustomers;
