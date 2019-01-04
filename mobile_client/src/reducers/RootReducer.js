@@ -8,6 +8,7 @@ import orderReducer from "./OrderReducer";
 import toolBarReducer from "./ToolbarReducer";
 import reportReducer from "./ReportReducer";
 import settingsReducer from "./SettingsReducer";
+import salesLoggingReducer from "./SalesLoggingReducer";
 
 // Combine all the reducers
 const RootReducer = combineReducers({
@@ -18,8 +19,8 @@ const RootReducer = combineReducers({
 	orderReducer,
 	toolBarReducer,
 	reportReducer,
-	settingsReducer
-
+	settingsReducer,
+	salesLoggingReducer
 });
 
 export default RootReducer;
