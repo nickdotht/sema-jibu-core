@@ -1,7 +1,7 @@
 // import mock_customers from "../mock_data/customers";
 import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
-import Eventss from "react-native-simple-eventss";
+import Events from "react-native-simple-events";
 import * as _ from 'lodash';
 
 class Synchronization {
@@ -166,7 +166,7 @@ class Synchronization {
 								});
 						});
 						if (updated) {
-							Eventss.trigger('CustomersUpdated', {});
+							Events.trigger('CustomersUpdated', {});
 						}
 					}
 				})
@@ -190,7 +190,7 @@ class Synchronization {
 						console.log("Synchronization:synchronizeProducts. No of new remote products: " + products.products.length);
 						const updated = PosStorage.mergeProducts(products.products);
 						if (updated) {
-							Eventss.trigger('ProductsUpdated', {});
+							Events.trigger('ProductsUpdated', {});
 						}
 					}
 				})
@@ -211,7 +211,7 @@ class Synchronization {
 						console.log("Synchronization:synchronizeSalesChannels. No of sales channels: " + salesChannels.salesChannels.length);
 						if (!_.isEqual(savedSalesChannels, salesChannels.salesChannels)) {
 							PosStorage.saveSalesChannels(salesChannels.salesChannels);
-							Eventss.trigger('SalesChannelsUpdated', {});
+							Events.trigger('SalesChannelsUpdated', {});
 						}
 					}
 					resolve(salesChannels);
@@ -296,7 +296,7 @@ class Synchronization {
 						console.log("Synchronization:synchronizeProductMrps. No of remote product MRPs: " + productMrps.productMRPs.length);
 						if (!_.isEqual(savedProductMrps, productMrps.productMRPs)) {
 							PosStorage.saveProductMrps(productMrps.productMRPs);
-							Eventss.trigger('ProductMrpsUpdated', {});
+							Events.trigger('ProductMrpsUpdated', {});
 						}
 						resolve({ error: null, remoteProductMrps: productMrps.productMRPs.length });
 					}
