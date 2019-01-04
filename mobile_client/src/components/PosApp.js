@@ -20,15 +20,14 @@ import * as CustomerActions from '../actions/CustomerActions';
 import * as NetworkActions from '../actions/NetworkActions';
 import * as SettingsActions from '../actions/SettingsActions';
 import * as ProductActions from '../actions/ProductActions';
-
+import * as ToolbarActions from "../actions/ToolBarActions";
+import * as SalesLoggingActions from "../actions/SalesLoggingActions";
 
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
 import SiteReport from "./reports/SiteReport";
 import Communications from "../services/Communications";
 import Events from "react-native-simple-events";
-import * as ToolbarActions from "../actions/ToolBarActions";
-import SalesLogging from "./reports/SalesLogging";
 
 console.ignoredYellowBox = ['Warning: isMounted', 'Setting a timer'];
 
