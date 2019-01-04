@@ -13,7 +13,7 @@ class SalesLogging extends Component {
         super(props);
 
         this.state = {
-            tableHead: ['Date', 'Name', 'SKU', 'Quantity', 'Cost', 'Action']
+            tableHead: ['Status', 'Date', 'Name', 'SKU', 'Quantity', 'Cost', 'Action']
         }
     }
 
