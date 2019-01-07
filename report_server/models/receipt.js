@@ -114,6 +114,11 @@ module.exports = function(sequelize, DataTypes) {
 		uuid: {
 			type: DataTypes.STRING(255),
 			allowNull: false
+		},
+		active: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+			defaultValue: '1'
 		}
 	}, {
 		tableName: 'receipt',
