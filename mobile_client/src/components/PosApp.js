@@ -21,7 +21,7 @@ import * as NetworkActions from '../actions/NetworkActions';
 import * as SettingsActions from '../actions/SettingsActions';
 import * as ProductActions from '../actions/ProductActions';
 import * as ToolbarActions from "../actions/ToolBarActions";
-import * as SalesLoggingActions from "../actions/SalesLoggingActions";
+import * as receiptActions from "../actions/ReceiptActions";
 
 import PosStorage from "../database/PosStorage";
 import Synchronization from "../services/Synchronization";
@@ -45,6 +45,12 @@ class PosApp extends Component {
 		console.log("PosApp - componentDidMount enter");
 		this.posStorage.initialize(false).then((isInitialized) => {
 			console.log("PosApp - componentDidMount - Storage initialized");
+
+			this.posStorage.loadSalesReceipts()
+				.then(receipts => {
+					if (!receipts.length) return;
+					this.props.receiptActions.setLocalReceipts(receipts);
+				});
 
 			let settings = this.posStorage.getSettings();
 			this.props.settingsActions.setSettings(settings);
@@ -103,8 +109,9 @@ class PosApp extends Component {
 		Events.on('ProductsUpdated', 'productsUpdate1', this.onProductsUpdated.bind(this));
 		Events.on('SalesChannelsUpdated', 'SalesChannelsUpdated1', this.onSalesChannelUpdated.bind(this));
 		Events.on('UILanguageUpdated', 'UILanguageUpdated1', this.onLanguageUpdated.bind(this));
-		Events.on('RemoteSalesUpdated', 'RemoteSalesUpdated1', this.onRemoteSalesUpdated.bind(this));
-
+		Events.on('ReceiptsFetched', 'ReceiptsFetched1', this.onReceiptsFetched.bind(this));
+		Events.on('NewSaleAdded', 'NewSaleAdded1', this.onNewSaleAdded.bind(this));
+		Events.on('LocalReceiptsUpdated', 'LocalReceiptsUpdated1', this.onLocalReceiptsUpdated.bind(this));
 		console.log("PosApp = Mounted-Done");
 
 	}
@@ -113,17 +120,30 @@ class PosApp extends Component {
 		Events.rm('ProductsUpdated', 'productsUpdate1');
 		Events.rm('SalesChannelsUpdated', 'SalesChannelsUpdated1');
 		Events.rm('UILanguageUpdated', 'UILanguageUpdated1');
-		Events.rm('RemoteSalesUpdated', 'RemoteSalesUpdated1');
+		Events.rm('ReceiptsFetched', 'ReceiptsFetched1');
+		Events.rm('NewSaleAdded', 'NewSaleAdded1');
+		Events.rm('LocalReceiptsUpdated', 'LocalReceiptsUpdated1');
 		NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
+	}
+
+	onLocalReceiptsUpdated() {
+		this.posStorage.loadSalesReceipts()
+			.then(receipts => {
+				this.props.receiptActions.setLocalReceipts(receipts);
+			});
+	}
+
+	onNewSaleAdded(receipt) {
+		this.props.receiptActions.addLocalReceipt(receipt);
 	}
 
 	onCustomersUpdated = () => {
 		this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 	};
 
-	onRemoteSalesUpdated = () => {
-		this.props.salesLoggingActions.setRemoteSales(this.posStorage.getRemoteSales());
-	};
+	onReceiptsFetched(receipts) {
+		this.props.receiptActions.setRemoteReceipts(receipts.receipts);
+	}
 
 	onProductsUpdated = () => {
 		this.props.productActions.setProducts(this.posStorage.getProducts());
@@ -243,7 +263,7 @@ function mapStateToProps(state, props) {
 		showView: state.customerBarReducer.showView,
 		showScreen: state.toolBarReducer.showScreen,
 		settings: state.settingsReducer.settings,
-		remoteSales: state.salesLoggingReducer.remoteSales
+		receipts: state.receiptReducer.receipts
 	};
 }
 
@@ -254,7 +274,7 @@ function mapDispatchToProps(dispatch) {
 		networkActions: bindActionCreators(NetworkActions, dispatch),
 		toolbarActions: bindActionCreators(ToolbarActions, dispatch),
 		settingsActions: bindActionCreators(SettingsActions, dispatch),
-		salesLoggingActions: bindActionCreators(SalesLoggingActions, dispatch)
+		receiptActions: bindActionCreators(receiptActions, dispatch)
 	};
 }
 
