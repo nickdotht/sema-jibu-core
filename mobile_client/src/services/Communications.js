@@ -1,5 +1,6 @@
 import React from 'react';
 import PosStorage from "../database/PosStorage";
+import moment from 'moment';
 
 class Communications {
 	constructor() {
@@ -310,13 +311,41 @@ class Communications {
 		return receipt;
 	}
 
-	getRemoteSales() {
-		let options = { method: 'GET', headers: { Authorization: 'Bearer ' + this._token } }
-		let url = 'sema/remote-sales';
+	getReceipts(siteId) {
+		let options = {
+			method: 'GET',
+			headers: {
+				Authorization: 'Bearer ' + this._token
+			}
+		};
+
+		let url = `sema/site/receipts/${siteId}?date=${moment(new Date()).format('YYYY-MM-DD')}`;
+
 		return fetch(this._url + url, options)
 			.then(response => response.json())
 			.catch(error => {
-				console.log("Communications:getRemoteSales: " + error);
+				console.log("Communications:getReceipts: " + error);
+				throw (error);
+			});
+	}
+
+	sendUpdatedReceipts(receipts) {
+		let options = {
+			method: 'PUT',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + this._token
+			},
+			body: JSON.stringify({receipts}) 
+		};
+
+		let url = `sema/site/receipts`;
+
+		return fetch(this._url + url, options)
+			.then(response => response.json())
+			.catch(error => {
+				console.log("Communications:sendUpdatedReceipts: " + error);
 				throw (error);
 			});
 	}
