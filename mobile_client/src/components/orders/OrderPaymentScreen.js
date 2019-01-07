@@ -10,6 +10,7 @@ import PosStorage from '../../database/PosStorage';
 
 import * as Utilities from "../../services/Utilities";
 import i18n from "../../app/i18n";
+import Events from "react-native-simple-events";
 
 class PaymentDescription extends Component {
 	render() {
@@ -366,7 +367,8 @@ class OrderPaymentScreen extends Component {
 				paymentType: "",		// NOT sure what this is
 				salesChannelId: this.props.selectedCustomer.salesChannelId,
 				customerTypeId: this.props.selectedCustomer.customerTypeId,
-				products: []
+				products: [],
+				active: 1
 			};
 			if (!receipt.siteId) {
 				// This fixes issues with the pseudo direct customer
@@ -418,7 +420,13 @@ class OrderPaymentScreen extends Component {
 			console.log("formatAndSaveSale " + err.message);
 		}
 		if (receipt != null){
-			PosStorage.addSale(receipt);
+			PosStorage.addSale(receipt)
+				.then(saleKey => {
+					Events.trigger('NewSaleAdded', {
+						key: saleKey,
+						sale: receipt
+					});
+				});
 
 			// Update dueAmount if required
 			if (receipt.amountLoan > 0) {
