@@ -3,8 +3,14 @@ const router = express.Router();
 const semaLog = require('../seama_services/sema_logger');
 const bodyParser = require('body-parser');
 const Receipt = require('../model_layer/Receipt');
-const R = require('../models/receipts');
+const R = require(`${__basedir}/models`).receipt;
+const CustomerAccount = require(`${__basedir}/models`).customer_account;
+const ReceiptLineItem = require(`${__basedir}/models`).receipt_line_item;
+const Product = require(`${__basedir}/models`).product;
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op
 const validator = require('validator');
+const moment = require('moment');
 
 var sqlInsertReceipt = "INSERT INTO receipt " +
 	"(id, created_at, updated_at, currency_code, " +
@@ -20,20 +26,28 @@ var sqlInsertReceiptLineItem = "INSERT INTO receipt_line_item " +
 router.get('/:siteId', async (req, res) => {
 	semaLog.info('sema_receipts - Fetch');
 
+	R.belongsTo(CustomerAccount);
+	R.hasMany(ReceiptLineItem);
+	ReceiptLineItem.belongsTo(Product);
+
 	// Gather data sent
 	const {
 		date
-	} = req.body;
-	const { kioskId } = req.params;
+	} = req.query;
+	const { siteId } = req.params;
 
-	const [err, receipts] = __hp(R.findAll({
+	const [err, receipts] = await __hp(R.findAll({
 		where: {
-			kiosk_id: kioskId,
+			kiosk_id: siteId,
 			created_at: {
-				between: [date, moment(date).add(1, 'days')]
+				gte: date,
+				lt: moment(date).add(1, 'days').format('YYYY-MM-DD')
 			}
 		},
-		raw: true
+		include: [{
+			all: true,
+			nested: true
+		}]
 	}));
 
 	// On error, return a generic error message and log the error
@@ -42,7 +56,49 @@ router.get('/:siteId', async (req, res) => {
 		return res.status(500).json({ msg: "Internal Server Error" });
 	}
 
+	console.log(`${receipts.length} Receipts found for the day`);
+
 	// On success, return a success message containing the data
+	return res.json({ receipts });
+});
+
+router.put('/', async (req, res) => {
+	// Gather data sent
+	const {
+		receipts
+	} = req.body;
+
+	console.dir(req.body);
+
+	let updatePromises = receipts.map(receipt => {
+		return R.update({
+			active: receipt.active
+		}, {
+			where: {
+				id: receipt.id
+			}
+		}).then(async () => {
+			if (receipt.lineItems.length) {
+				let lineItemUpdatePromises = receipt.lineItems.map(lineItem => {
+					return ReceiptLineItem.update({
+						active: lineItem.active
+					}, {
+						where: {
+							id: lineItem.id
+						}
+					})
+				});
+
+				await Promise.all(lineItemUpdatePromises);
+			}
+			return null;
+		})
+	});
+
+	// TODO: Also set the associated receipt line items as inactive
+
+	await Promise.all(updatePromises);
+
 	return res.json({ receipts });
 });
 
