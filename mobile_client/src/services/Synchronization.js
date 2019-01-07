@@ -2,6 +2,7 @@
 import PosStorage from '../database/PosStorage';
 import Communications from '../services/Communications';
 import Events from "react-native-simple-events";
+import moment from 'moment';
 import * as _ from 'lodash';
 
 class Synchronization {
@@ -90,12 +91,12 @@ class Synchronization {
 									syncResult.productMrps = productMrpSync;
 								});
 
-							const promiseRemoteSales = this.synchronizeRemoteSales()
-								.then(remoteSales => {
-									syncResult.remoteSales = remoteSales;
+							const promiseReceipts = this.synchronizeReceipts()
+								.then(receipts => {
+									syncResult.receipts = receipts;
 								});
 
-							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseRemoteSales])
+							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseReceipts])
 								.then(values => {
 									resolve(syncResult);
 								});
@@ -269,12 +270,67 @@ class Synchronization {
 		});
 	}
 
-	synchronizeRemoteSales() {
-		Communications.getRemoteSales()
-			.then(remoteSales => {
-				PosStorage.saveRemoteSales(remoteSales);
-				Events.trigger('RemoteSalesUpdated', remoteSales);
+	async synchronizeReceipts() {
+		let settings = PosStorage.getSettings();
+		let remoteReceipts = await PosStorage.loadRemoteReceipts();
+		let updatedReceipts = remoteReceipts.filter(receipt => receipt.updated).map(receipt => {
+			lineItems = [];
+
+			if (receipt.updatedLineItem) {
+				lineItems = receipt.receipt_line_items.filter(lineItem => lineItem.updated).map(lineItem => {
+					return {
+						id: lineItem.id,
+						active: lineItem.active
+					}
+				});
+			}
+
+			return {
+				id: receipt.id,
+				active: receipt.active,
+				lineItems
+			}
+		});
+
+		if (updatedReceipts.length) {
+			console.dir(updatedReceipts);
+			return Communications.sendUpdatedReceipts(updatedReceipts)
+				.then(() => {
+					return new Promise(resolve => {
+						Communications.getReceipts(settings.siteId)
+							.then(receipts => {
+								resolve({
+									error: null,
+									receipts: receipts.receipts.length
+								});
+								PosStorage.saveRemoteReceipts(receipts.receipts);
+								console.log(receipts.receipts.length);
+								Events.trigger('ReceiptsFetched', receipts);
+							})
+							.catch(error => {
+								resolve({ error: error.message, receipts: null });
+								console.log("Synchronization.synchronizeReceipts - error " + error);
+							})
+					});
+				});
+		} else {
+			return new Promise(resolve => {
+				Communications.getReceipts(settings.siteId)
+					.then(receipts => {
+						resolve({
+							error: null,
+							receipts: receipts.receipts.length
+						});
+						PosStorage.saveRemoteReceipts(receipts.receipts);
+						console.log(receipts.receipts.length);
+						Events.trigger('ReceiptsFetched', receipts);
+					})
+					.catch(error => {
+						resolve({ error: error.message, receipts: null });
+						console.log("Synchronization.synchronizeReceipts - error " + error);
+					})
 			});
+		}
 	}
 
 	synchronizeProductMrps(lastProductSync) {
