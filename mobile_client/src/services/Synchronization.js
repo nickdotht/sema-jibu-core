@@ -272,7 +272,7 @@ class Synchronization {
 
 	async synchronizeReceipts() {
 		let settings = PosStorage.getSettings();
-		let remoteReceipts = await PosStorage.loadRemoteReceipts();
+		let remoteReceipts = await PosStorage.loadRemoteReceipts() || [];
 		let updatedReceipts = remoteReceipts.filter(receipt => receipt.updated).map(receipt => {
 			lineItems = [];
 
