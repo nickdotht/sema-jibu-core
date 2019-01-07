@@ -4,6 +4,7 @@ This class contains the persistence implementation of the tablet business object
  */
 const { React, AsyncStorage } = require('react-native');
 import { capitalizeWord } from '../services/Utilities';
+import Events from "react-native-simple-events";
 
 const uuidv1 = require('uuid/v1');
 
@@ -27,7 +28,7 @@ const tokenExpirationKey = '@Sema:TokenExpirationKey';
 const salesChannelsKey = '@Sema:SalesChannelsKey';
 const customerTypesKey = '@Sema:CustomerTypesKey';
 const productMrpsKey = '@Sema:ProductMrpsKey';
-const remoteSalesKey = '@Sema:remoteSalesKey';
+const remoteReceiptsKey = '@Sema:remoteReceiptsKey';
 
 const syncIntervalKey = '@Sema:SyncIntervalKey';
 
@@ -71,7 +72,7 @@ class PosStorage {
 		this.settings = { semaUrl: "", site: "", user: "", password: "", uiLanguage: {}, token: "", siteId: "" };
 		this.salesChannels = [];
 		this.customerTypes = [];
-		this.remoteSales = [];
+		this.receipts = [];
 		this.productMrpDict = {};
 
 		this.syncInterval = { interval: 2 * 60 * 1000 };
@@ -480,9 +481,9 @@ class PosStorage {
 		return this.customers;
 	}
 
-	getRemoteSales() {
-		console.log("PosStorage: getRemoteSales. Count " + this.remoteSales.length);
-		return this.remoteSales;
+	getReceipts() {
+		console.log("PosStorage: getReceipts. Count " + this.receipts.length);
+		return this.receipts;
 	}
 
 	getPendingCustomers() {
@@ -532,6 +533,7 @@ class PosStorage {
 						if (error) {
 							console.log("error removing " + oldest.saleKey);
 						} else {
+							Events.trigger('LocalReceiptsUpdated');
 							console.log("Removed " + oldest.saleKey)
 						}
 					});
@@ -546,7 +548,7 @@ class PosStorage {
 				if (error) {
 					reject(error);
 				} else {
-					resolve(true);
+					resolve(saleItemKey + saleDateKey);
 				}
 			});
 		});
@@ -573,7 +575,7 @@ class PosStorage {
 				resolve(results)
 			} else {
 				for (let index = 0; index < sales.length; index++) {
-					this._loadPendingSale(sales[index]).then((sale) => {
+					this._loadPendingSale(sales[index].key).then((sale) => {
 						results.push({ key: sales[resolvedCount], sale: sale });
 						resolvedCount++;
 						if ((resolvedCount) === sales.length) {
@@ -593,7 +595,25 @@ class PosStorage {
 			let keyArray = [[pendingSalesKey, this.stringify(this.pendingSales)]];
 			AsyncStorage.multiSet(keyArray).then(error => {
 				if (error) {
-					console.log("PosStorage:removePendingSale: Error: " + error);
+					return console.log("PosStorage:removePendingSale: Error: " + error);
+				}
+
+				Events.trigger('LocalReceiptsUpdated');
+			});
+
+		}
+
+	}
+
+	updatePendingSale(saleKey, newSaleValue) {
+		console.log("PostStorage:updatePendingSale");
+		const index = this.pendingSales.indexOf(saleKey);
+		if (index > -1) {
+			this.pendingSales[index] = newSaleValue;
+			let keyArray = [[pendingSalesKey, this.stringify(this.pendingSales)]];
+			AsyncStorage.multiSet(keyArray).then(error => {
+				if (error) {
+					console.log("PosStorage:updatePendingSale: Error: " + error);
 				}
 			});
 
@@ -943,9 +963,18 @@ class PosStorage {
 
 	}
 
-	saveRemoteSales(remoteSales) {
-		this.remoteSales = remoteSales;
-		this.setKey(remoteSalesKey, this.stringify(remoteSales));
+	saveRemoteReceipts(receipts) {
+		this.receipts = receipts;
+		this.setKey(remoteReceiptsKey, this.stringify(receipts));
+	}
+
+	loadRemoteReceipts() {
+		return this.getKey(remoteReceiptsKey)
+			.then(receipts => {
+				receipts = JSON.parse(receipts);
+				this.receipts = receipts;
+				return receipts;
+			});
 	}
 
 	// Return existing inventory item key or null
