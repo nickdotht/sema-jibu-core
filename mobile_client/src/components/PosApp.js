@@ -59,6 +59,7 @@ class PosApp extends Component {
 				// Data already configured
 				this.props.customerActions.setCustomers(this.posStorage.getCustomers());
 				this.props.productActions.setProducts(this.posStorage.getProducts());
+				this.props.receiptActions.setRemoteReceipts(this.posStorage.getRemoteReceipts());
 			}
 			// if (isInitialized && this.posStorage.getCustomers().length > 0) {
 			// 	// Data already configured
