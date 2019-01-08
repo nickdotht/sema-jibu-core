@@ -69,6 +69,7 @@ class Synchronization {
 			try {
 				this._refreshToken().then(() => {
 					let lastProductSync = this.lastProductSync;
+					this.synchronizeReceipts();
 					const promiseSalesChannels = this.synchronizeSalesChannels();
 					const promiseCustomerTypes = this.synchronizeCustomerTypes();
 					Promise.all([promiseSalesChannels, promiseCustomerTypes])
@@ -91,12 +92,7 @@ class Synchronization {
 									syncResult.productMrps = productMrpSync;
 								});
 
-							const promiseReceipts = this.synchronizeReceipts()
-								.then(receipts => {
-									syncResult.receipts = receipts;
-								});
-
-							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseReceipts])
+							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps])
 								.then(values => {
 									resolve(syncResult);
 								});
@@ -270,6 +266,9 @@ class Synchronization {
 		});
 	}
 
+	// NOTE: This used to be in the promise chain in the `synchronize` function, that's why
+	// it's returning a promise with some weird results. I decided to keep it this way just
+	// in case we ever decide to add it back in there - for sync results on the UI.
 	async synchronizeReceipts() {
 		let settings = PosStorage.getSettings();
 		let remoteReceipts = await PosStorage.loadRemoteReceipts() || [];
@@ -292,6 +291,8 @@ class Synchronization {
 			}
 		});
 
+		// TODO: Fix that ugly receipt.receipt syntax
+		// TODO: Also, make this chunk more modular
 		if (updatedReceipts.length) {
 			console.dir(updatedReceipts);
 			return Communications.sendUpdatedReceipts(updatedReceipts)
@@ -299,13 +300,13 @@ class Synchronization {
 					return new Promise(resolve => {
 						Communications.getReceipts(settings.siteId)
 							.then(receipts => {
+								PosStorage.saveRemoteReceipts(receipts.receipts || []);
+								console.log(receipts.receipts.length);
+								Events.trigger('ReceiptsFetched', receipts);
 								resolve({
 									error: null,
 									receipts: receipts.receipts.length
 								});
-								PosStorage.saveRemoteReceipts(receipts.receipts || []);
-								console.log(receipts.receipts.length);
-								Events.trigger('ReceiptsFetched', receipts);
 							})
 							.catch(error => {
 								resolve({ error: error.message, receipts: null });
@@ -317,13 +318,13 @@ class Synchronization {
 			return new Promise(resolve => {
 				Communications.getReceipts(settings.siteId)
 					.then(receipts => {
+						PosStorage.saveRemoteReceipts(receipts.receipts || []);
+						console.log(receipts.receipts.length);
+						Events.trigger('ReceiptsFetched', receipts);
 						resolve({
 							error: null,
 							receipts: receipts.receipts.length
 						});
-						PosStorage.saveRemoteReceipts(receipts.receipts || []);
-						console.log(receipts.receipts.length);
-						Events.trigger('ReceiptsFetched', receipts);
 					})
 					.catch(error => {
 						resolve({ error: error.message, receipts: null });
