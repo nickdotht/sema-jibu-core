@@ -303,7 +303,7 @@ class Synchronization {
 									error: null,
 									receipts: receipts.receipts.length
 								});
-								PosStorage.saveRemoteReceipts(receipts.receipts);
+								PosStorage.saveRemoteReceipts(receipts.receipts || []);
 								console.log(receipts.receipts.length);
 								Events.trigger('ReceiptsFetched', receipts);
 							})
@@ -321,7 +321,7 @@ class Synchronization {
 							error: null,
 							receipts: receipts.receipts.length
 						});
-						PosStorage.saveRemoteReceipts(receipts.receipts);
+						PosStorage.saveRemoteReceipts(receipts.receipts || []);
 						console.log(receipts.receipts.length);
 						Events.trigger('ReceiptsFetched', receipts);
 					})
