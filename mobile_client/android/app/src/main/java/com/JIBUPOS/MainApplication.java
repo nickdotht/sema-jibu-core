@@ -1,4 +1,4 @@
-package com.SEMAPOS;
+package com.JIBUPOS;
 
 import android.app.Application;
 
