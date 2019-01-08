@@ -77,29 +77,20 @@ router.put('/', async (req, res) => {
 			where: {
 				id: receipt.id
 			}
-		}).then(async () => {
-			if (receipt.lineItems.length) {
-				let lineItemUpdatePromises = receipt.lineItems.map(lineItem => {
-					return ReceiptLineItem.update({
-						active: lineItem.active
-					}, {
-						where: {
-							id: lineItem.id
-						}
-					})
-				});
-
-				await Promise.all(lineItemUpdatePromises);
-			}
-			return null;
+		}).then(() => {
+			return ReceiptLineItem.update({
+				active: receipt.active
+			}, {
+				where: {
+					receipt_id: receipt.id
+				}
+			})
 		})
 	});
 
-	// TODO: Also set the associated receipt line items as inactive
-
 	await Promise.all(updatePromises);
 
-	return res.json({ receipts });
+	return res.json({ });
 });
 
 
