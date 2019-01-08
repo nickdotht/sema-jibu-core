@@ -33,7 +33,6 @@ class ReceiptLineItem extends Component {
                     style={styles.productImage}>
                 </Image>
                 <View>
-                    <Text style={{color: this.props.item.active ? 'green' : 'red'}}>{this.props.item.active ? 'ACTIVE' : 'INACTIVE'}</Text>
                     <View style={styles.itemData}>
                         <Text style={styles.label}>Product SKU: </Text>
                         <Text>{this.props.item.product.sku}</Text>
@@ -162,7 +161,7 @@ class SalesLog extends Component {
                         <Text style={styles.receiptDeleteButtonText}>X</Text>
                     </TouchableOpacity>
                 </View>
-                <Text style={{color: item.active ? 'green' : 'red'}}>{item.active ? 'ACTIVE' : 'INACTIVE'}</Text>
+                { !item.active && <Text style={styles.receiptStatusText}>DELETED</Text> }
                 <View style={styles.itemData}>
                     <Text style={styles.label}>Receipt Id: </Text>
                     <Text>{item.id}</Text>
@@ -286,6 +285,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff'
+    },
+
+    receiptStatusText: {
+        color: 'red',
+        fontWeight: 'bold'
     },
 
     deleteButtonContainer: {
