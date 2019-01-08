@@ -284,12 +284,11 @@ class Settings extends Component {
 		if (syncResult.hasOwnProperty("products") && syncResult.products.error != null) return i18n.t('sync-error', { error: syncResult.products.error });
 		if (syncResult.hasOwnProperty("sales") && syncResult.sales.error != null) return i18n.t('sync-error', { error: syncResult.sales.error });
 		if (syncResult.hasOwnProperty("productMrps") && syncResult.productMrps.error != null) return i18n.t('sync-error', { error: syncResult.productMrps.error });
-		if (syncResult.hasOwnProperty("receipts") && syncResult.receipts.error != null) return i18n.t('sync-error', { error: syncResult.receipts.error });
 
 		else {
 			if (syncResult.customers.localCustomers == 0 && syncResult.customers.remoteCustomers == 0 &&
 				syncResult.products.remoteProducts == 0 && syncResult.sales.localReceipts == 0 &&
-				syncResult.productMrps.remoteProductMrps == 0 && syncResult.receipts.receipts == 0) {
+				syncResult.productMrps.remoteProductMrps == 0) {
 				return i18n.t('data-is-up-to-date');
 			} else {
 				return `${syncResult.customers.localCustomers + syncResult.customers.remoteCustomers} ${i18n.t('customers-updated')}
