@@ -46,12 +46,6 @@ class PosApp extends Component {
 		this.posStorage.initialize(false).then((isInitialized) => {
 			console.log("PosApp - componentDidMount - Storage initialized");
 
-			this.posStorage.loadSalesReceipts()
-				.then(receipts => {
-					if (!receipts.length) return;
-					this.props.receiptActions.setLocalReceipts(receipts);
-				});
-
 			let settings = this.posStorage.getSettings();
 			this.props.settingsActions.setSettings(settings);
 			// this.props.settingsActions.setConfiguration(configuration);
@@ -111,7 +105,7 @@ class PosApp extends Component {
 		Events.on('UILanguageUpdated', 'UILanguageUpdated1', this.onLanguageUpdated.bind(this));
 		Events.on('ReceiptsFetched', 'ReceiptsFetched1', this.onReceiptsFetched.bind(this));
 		Events.on('NewSaleAdded', 'NewSaleAdded1', this.onNewSaleAdded.bind(this));
-		Events.on('LocalReceiptsUpdated', 'LocalReceiptsUpdated1', this.onLocalReceiptsUpdated.bind(this));
+		// Events.on('LocalReceiptsUpdated', 'LocalReceiptsUpdated1', this.onLocalReceiptsUpdated.bind(this));
 		console.log("PosApp = Mounted-Done");
 
 	}
@@ -122,16 +116,16 @@ class PosApp extends Component {
 		Events.rm('UILanguageUpdated', 'UILanguageUpdated1');
 		Events.rm('ReceiptsFetched', 'ReceiptsFetched1');
 		Events.rm('NewSaleAdded', 'NewSaleAdded1');
-		Events.rm('LocalReceiptsUpdated', 'LocalReceiptsUpdated1');
+		// Events.rm('LocalReceiptsUpdated', 'LocalReceiptsUpdated1');
 		NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
 	}
 
-	onLocalReceiptsUpdated() {
-		this.posStorage.loadSalesReceipts()
-			.then(receipts => {
-				this.props.receiptActions.setLocalReceipts(receipts);
-			});
-	}
+	// onLocalReceiptsUpdated() {
+	// 	this.posStorage.loadSalesReceipts()
+	// 		.then(receipts => {
+	// 			this.props.receiptActions.setLocalReceipts(receipts);
+	// 		});
+	// }
 
 	onNewSaleAdded(receipt) {
 		this.props.receiptActions.addLocalReceipt(receipt);

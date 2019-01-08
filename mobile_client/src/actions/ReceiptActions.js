@@ -49,31 +49,31 @@ export function updateReceiptLineItem(receiptIndex, lineItemIndex, updatedFields
     };
 }
 
-export function updateLocalReceipt(item, updatedFields) {
-    console.log('updateLocalReceipt - action');
+// export function updateLocalReceipt(item, updatedFields) {
+//     console.log('updateLocalReceipt - action');
 
-    PosStorage._loadPendingSale(item.id).then((sale) => {
-        return ({ key: item.id, sale });
-    })
-        .then(receipt => {
-            const saleData = {
-                key: item.id,
-                sale: {
-                    ...receipt.sale,
-                    ...updatedFields
-                }
-            }
+//     PosStorage._loadPendingSale(item.id).then((sale) => {
+//         return ({ key: item.id, sale });
+//     })
+//         .then(receipt => {
+//             const saleData = {
+//                 key: item.id,
+//                 sale: {
+//                     ...receipt.sale,
+//                     ...updatedFields
+//                 }
+//             }
 
-            PosStorage.updatePendingSale(item.id, saleData);
-        });
+//             PosStorage.updatePendingSale(item.id, saleData);
+//         });
 
-    return dispatch => {
-        dispatch({
-            type: UPDATE_LOCAL_RECEIPT,
-            data: {
-                localReceiptIndex: item.index,
-                updatedLocalFields: updatedFields
-            }
-        })
-    };
-}
+//     return dispatch => {
+//         dispatch({
+//             type: UPDATE_LOCAL_RECEIPT,
+//             data: {
+//                 localReceiptIndex: item.index,
+//                 updatedLocalFields: updatedFields
+//             }
+//         })
+//     };
+// }
