@@ -96,10 +96,6 @@ class SalesLog extends Component {
 
     componentDidMount() {
         console.log("SalesLog - componentDidMount");
-        PosStorage.loadRemoteReceipts()
-            .then(receipts => {
-                this.props.receiptActions.setRemoteReceipts(receipts || []);
-            });
     }
 
     render() {
