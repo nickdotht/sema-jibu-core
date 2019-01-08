@@ -103,7 +103,8 @@ class PosStorage {
 							[customerTypesKey, this.stringify(this.customerTypes)],
 							[productMrpsKey, this.stringify(this.productMrpDict)],
 							[syncIntervalKey, this.stringify(this.syncInterval)],
-							[inventoriesKey, this.stringify(this.inventoriesKeys)]];
+							[inventoriesKey, this.stringify(this.inventoriesKeys)],
+							[remoteReceiptsKey, this.stringify(this.receipts)]];
 						AsyncStorage.multiSet(keyArray).then(error => {
 							console.log("PosStorage:initialize: Error: " + error);
 							resolve(false)
@@ -116,7 +117,7 @@ class PosStorage {
 							lastSalesSyncKey, lastProductsSyncKey,
 							pendingCustomersKey, pendingSalesKey,
 							settingsKey, tokenExpirationKey, salesChannelsKey,
-							customerTypesKey, productMrpsKey, syncIntervalKey, inventoriesKey];
+							customerTypesKey, productMrpsKey, syncIntervalKey, inventoriesKey, remoteReceiptsKey];
 						AsyncStorage.multiGet(keyArray).then(function (results) {
 							console.log("PosStorage Multi-Key" + results.length);
 							for (let i = 0; i < results.length; i++) {
@@ -136,7 +137,8 @@ class PosStorage {
 							this.customerTypes = this.parseJson(results[11][1]);		// array of customer types
 							this.productMrpDict = this.parseJson(results[12][1]);		// products MRP dictionary
 							this.syncInterval = this.parseJson(results[13][1]);		// SyncInterval
-							this.inventoriesKeys = this.parseJson(results[14][1]); //inventoriesKey
+							this.inventoriesKeys = this.parseJson(results[14][1]); // inventoriesKey
+							this.receipts = this.parseJson(results[15][1]); // remoteReceiptsKey
 							this.loadCustomersFromKeys()
 								.then(() => {
 									this.loadProductsFromKeys()
@@ -966,6 +968,11 @@ class PosStorage {
 	saveRemoteReceipts(receipts) {
 		this.receipts = receipts;
 		this.setKey(remoteReceiptsKey, this.stringify(receipts));
+	}
+
+	getRemoteReceipts() {
+		console.log("PosStorage: getRemoteReceipts. Count " + this.receipts.length);
+		return this.receipts;
 	}
 
 	loadRemoteReceipts() {
