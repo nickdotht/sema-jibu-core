@@ -6,7 +6,8 @@ import {
     FlatList,
     Image,
     TouchableOpacity,
-    Alert
+    Alert,
+    ToastAndroid
 } from 'react-native';
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -24,24 +25,33 @@ class ReceiptLineItem extends Component {
 
     render() {
         return (
-            <TouchableOpacity
+            <View
                 style={{ flex: 1, flexDirection: 'row', marginBottom: 10, marginTop: 10}}
-                onPress={this.onDeleteReceiptLineItem(this.props.receiptIndex, this.props.item)}
             >
                 <Image
                     source={{ uri: this.getImage(this.props.item.product) }}
-                    style={{ width: 50, height: 50, marginRight: 5, marginLeft: 20 }}>
+                    style={styles.productImage}>
                 </Image>
                 <View>
                     <Text style={{color: this.props.item.active ? 'green' : 'red'}}>{this.props.item.active ? 'ACTIVE' : 'INACTIVE'}</Text>
-                    <Text>Product SKU: {this.props.item.product.sku}</Text>
-                    <Text>Quantity: {this.props.item.quantity}</Text>
-                    <Text>Cost: {this.props.item.price_total}</Text>
+                    <View style={styles.itemData}>
+                        <Text style={styles.label}>Product SKU: </Text>
+                        <Text>{this.props.item.product.sku}</Text>
+                    </View>
+                    <View style={styles.itemData}>
+                        <Text style={styles.label}>Quantity: </Text>
+                        <Text>{this.props.item.quantity}</Text>
+                    </View>
+                    <View style={styles.itemData}>
+                        <Text style={styles.label}>Cost: </Text>
+                        <Text>{this.props.item.price_total}</Text>
+                    </View>
                 </View>
-            </TouchableOpacity>
+            </View>
         );
     }
 
+    // We'll keep this feature for later
     onDeleteReceiptLineItem(receiptIndex, item) {
         return () => {
             Alert.alert(
@@ -59,16 +69,6 @@ class ReceiptLineItem extends Component {
             );
         }
     }
-
-    // deleteReceipt(item, updatedFields) {
-    //     if (!item.isLocal) {
-    //         this.props.receiptActions.updateRemoteReceipt(item.index, updatedFields);
-    //         PosStorage.saveRemoteReceipts(this.props.remoteReceipts);
-    //     } else {
-    //         // this.props.receiptActions.updateLocalReceipt(item, updatedFields);            
-    //     }
-	// 	this.setState({refresh: !this.state.refresh});
-    // }
 
     deleteReceiptLineItem(receiptIndex, receiptLineItemIndex, updatedFields) {
         this.props.receiptActions.updateReceiptLineItem(receiptIndex, receiptLineItemIndex, updatedFields);
@@ -152,22 +152,44 @@ class SalesLog extends Component {
         });
 
         return (
-            <TouchableOpacity
+            <View
                 key={index}
-                onPress={this.onDeleteReceipt(item)}
                 style={{padding: 15}}
             >
-                <Text>Receipt Id: {item.id}</Text>
+                <View
+                    style={styles.deleteButtonContainer}
+                >
+                    <TouchableOpacity
+                        onPress={this.onDeleteReceipt(item)}
+                        style={[styles.receiptDeleteButton, {backgroundColor: item.active ? 'red' : 'grey'}]}
+                    >
+                        <Text style={styles.receiptDeleteButtonText}>X</Text>
+                    </TouchableOpacity>
+                </View>
                 <Text style={{color: item.active ? 'green' : 'red'}}>{item.active ? 'ACTIVE' : 'INACTIVE'}</Text>
-                <Text>Date Created: {moment.utc(item.createdAt).format('YYYY-MM-DD hh:mm:ss')}</Text>
-                <Text>Customer Name: {item.customerAccount.name}</Text>
+                <View style={styles.itemData}>
+                    <Text style={styles.label}>Receipt Id: </Text>
+                    <Text>{item.id}</Text>
+                </View>
+                <View style={styles.itemData}>
+                    <Text style={styles.label}>Date Created: </Text>
+                    <Text>{moment.utc(item.createdAt).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                </View>
+                <View style={styles.itemData}>
+                    <Text style={styles.label}>Customer Name: </Text>
+                    <Text>{item.customerAccount.name}</Text>
+                </View>
                 {receiptLineItems}
-            </TouchableOpacity>
+            </View>
         );
     }
 
     onDeleteReceipt(item) {
         return () => {
+            if (!item.active) {
+                return ToastAndroid.show('Receipt already deleted', ToastAndroid.SHORT);
+            }
+
             Alert.alert(
                 'Confirm Receipt Deletion',
                 'Are you sure you want to delete this receipt? (this cannot be undone)',
@@ -268,5 +290,48 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff'
+    },
+
+    deleteButtonContainer: {
+        width: 40,
+        height: 40,
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
+        zIndex: 1,
+        top: 15,
+        right: 15
+    },
+
+    receiptDeleteButton: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+
+    receiptDeleteButtonText: {
+        fontSize: 25,
+        color: '#fff',
+        fontWeight: 'bold'
+    },
+
+    productImage: {
+        width: 80,
+        height: 80,
+        marginRight: 5,
+        marginLeft: 20,
+        borderWidth: 5,
+        borderColor: '#eee'
+    },
+
+    label: {
+        color: '#111'
+    },
+
+    itemData: {
+        flex: 1,
+        flexDirection: 'row'
     }
 });
