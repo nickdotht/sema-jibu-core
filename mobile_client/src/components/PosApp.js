@@ -137,7 +137,7 @@ class PosApp extends Component {
 	};
 
 	onReceiptsFetched(receipts) {
-		this.props.receiptActions.setRemoteReceipts(receipts.receipts);
+		this.props.receiptActions.setRemoteReceipts(receipts);
 	}
 
 	onProductsUpdated = () => {
