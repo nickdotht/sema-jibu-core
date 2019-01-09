@@ -315,6 +315,7 @@ class Communications {
 		let options = {
 			method: 'GET',
 			headers: {
+				Accept: 'application/json',
 				Authorization: 'Bearer ' + this._token
 			}
 		};
@@ -322,7 +323,7 @@ class Communications {
 		let url = `sema/site/receipts/${siteId}?date=${moment(new Date()).format('YYYY-MM-DD')}`;
 
 		return fetch(this._url + url, options)
-			.then(response => response.json())
+			.then(async response => await response.json())
 			.catch(error => {
 				console.log("Communications:getReceipts: " + error);
 				throw (error);
