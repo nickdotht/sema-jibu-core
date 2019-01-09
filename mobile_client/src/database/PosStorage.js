@@ -535,7 +535,7 @@ class PosStorage {
 						if (error) {
 							console.log("error removing " + oldest.saleKey);
 						} else {
-							Events.trigger('LocalReceiptsUpdated');
+							// Events.trigger('LocalReceiptsUpdated');
 							console.log("Removed " + oldest.saleKey)
 						}
 					});
@@ -600,7 +600,7 @@ class PosStorage {
 					return console.log("PosStorage:removePendingSale: Error: " + error);
 				}
 
-				Events.trigger('LocalReceiptsUpdated');
+				// Events.trigger('LocalReceiptsUpdated');
 			});
 
 		}
@@ -965,22 +965,21 @@ class PosStorage {
 
 	}
 
-	saveRemoteReceipts(receipts) {
+	saveRemoteReceipts(receipts = []) {
 		this.receipts = receipts;
 		this.setKey(remoteReceiptsKey, this.stringify(receipts));
 	}
 
 	getRemoteReceipts() {
-		console.log("PosStorage: getRemoteReceipts. Count " + this.receipts.length);
+		console.log("PosStorage: getRemoteReceipts. Count " + this.receipts.length, JSON.stringify(this.receipts));
 		return this.receipts;
 	}
 
 	loadRemoteReceipts() {
 		return this.getKey(remoteReceiptsKey)
 			.then(receipts => {
-				receipts = JSON.parse(receipts);
-				this.receipts = receipts;
-				return receipts;
+				this.receipts = JSON.parse(receipts);
+				return this.receipts;
 			});
 	}
 
