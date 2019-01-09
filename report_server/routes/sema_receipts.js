@@ -59,7 +59,7 @@ router.get('/:siteId', async (req, res) => {
 	console.log(`${receipts.length} Receipts found for the day`);
 
 	// On success, return a success message containing the data
-	return res.json({ receipts });
+	return res.json(receipts.length ? receipts : []);
 });
 
 router.put('/', async (req, res) => {

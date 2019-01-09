@@ -63,9 +63,9 @@ class Synchronization {
 			console.log("Communications:doSynchronize - Won't sync - Network not connected");
 		}
 	}
-	synchronize() {
-		let syncResult = { status: "success", error: "" }
-		return new Promise((resolve) => {
+	synchronize(){
+		let syncResult = {status:"success", error:""}
+		return new Promise((resolve ) => {
 			try {
 				this._refreshToken().then(() => {
 					let lastProductSync = this.lastProductSync;
@@ -73,7 +73,7 @@ class Synchronization {
 					const promiseSalesChannels = this.synchronizeSalesChannels();
 					const promiseCustomerTypes = this.synchronizeCustomerTypes();
 					Promise.all([promiseSalesChannels, promiseCustomerTypes])
-						.then((values) => {
+						.then( (values) => {
 							console.log("synchronize - SalesChannels and Customer Types: " + values);
 							const promiseCustomers = this.synchronizeCustomers()
 								.then(customerSync => {
@@ -291,7 +291,6 @@ class Synchronization {
 			}
 		});
 
-		// TODO: Fix that ugly receipt.receipt syntax
 		// TODO: Also, make this chunk more modular
 		if (updatedReceipts.length) {
 			console.dir(updatedReceipts);
@@ -300,13 +299,13 @@ class Synchronization {
 					return new Promise(resolve => {
 						Communications.getReceipts(settings.siteId)
 							.then(receipts => {
-								PosStorage.saveRemoteReceipts(receipts.receipts || []);
-								console.log(receipts.receipts.length);
-								Events.trigger('ReceiptsFetched', receipts);
+								PosStorage.saveRemoteReceipts(receipts);
+								console.log(receipts.length);
 								resolve({
 									error: null,
-									receipts: receipts.receipts.length
+									receipts: receipts.length
 								});
+								Events.trigger('ReceiptsFetched', receipts);
 							})
 							.catch(error => {
 								resolve({ error: error.message, receipts: null });
@@ -318,13 +317,12 @@ class Synchronization {
 			return new Promise(resolve => {
 				Communications.getReceipts(settings.siteId)
 					.then(receipts => {
-						PosStorage.saveRemoteReceipts(receipts.receipts || []);
-						console.log(receipts.receipts.length);
-						Events.trigger('ReceiptsFetched', receipts);
+						PosStorage.saveRemoteReceipts(receipts);
 						resolve({
 							error: null,
-							receipts: receipts.receipts.length
+							receipts: receipts.length
 						});
+						Events.trigger('ReceiptsFetched', receipts);
 					})
 					.catch(error => {
 						resolve({ error: error.message, receipts: null });
