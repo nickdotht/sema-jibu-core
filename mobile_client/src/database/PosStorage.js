@@ -577,7 +577,7 @@ class PosStorage {
 				resolve(results)
 			} else {
 				for (let index = 0; index < sales.length; index++) {
-					this._loadPendingSale(sales[index].key).then((sale) => {
+					this._loadPendingSale(sales[index]).then((sale) => {
 						results.push({ key: sales[resolvedCount], sale: sale });
 						resolvedCount++;
 						if ((resolvedCount) === sales.length) {
