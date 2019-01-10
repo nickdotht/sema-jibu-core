@@ -1,6 +1,6 @@
 {
-  "name": "DLOPOS",
-  "version": "0.4.3",
+  "name": "JIBUPOS",
+  "version": "0.4.4-alpha",
   "private": true,
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
