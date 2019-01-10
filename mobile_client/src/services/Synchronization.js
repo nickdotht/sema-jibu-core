@@ -69,7 +69,6 @@ class Synchronization {
 			try {
 				this._refreshToken().then(() => {
 					let lastProductSync = this.lastProductSync;
-					this.synchronizeReceipts();
 					const promiseSalesChannels = this.synchronizeSalesChannels();
 					const promiseCustomerTypes = this.synchronizeCustomerTypes();
 					Promise.all([promiseSalesChannels, promiseCustomerTypes])
@@ -92,7 +91,12 @@ class Synchronization {
 									syncResult.productMrps = productMrpSync;
 								});
 
-							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps])
+							const promiseReceipts = this.synchronizeReceipts()
+								.then(results => {
+									syncResult.receipts = results;
+								});
+
+							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseReceipts])
 								.then(values => {
 									resolve(syncResult);
 								});
