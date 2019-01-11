@@ -44,7 +44,7 @@ const receiptReducer = (state = initialState, action) => {
                 updatedRemoteFields
             } = action.data;
             newState = { ...state };
-            newState.remoteReceipts[remoteReceiptIndex] = { ...newState.remoteReceipts[remoteReceiptIndex], ...updatedRemoteFields };
+            newState.remoteReceipts[remoteReceiptIndex] = { ...newState.remoteReceipts[remoteReceiptIndex], ...updatedRemoteFields, updated: true};
             newState.remoteReceipts[remoteReceiptIndex].receipt_line_items = newState.remoteReceipts[remoteReceiptIndex].receipt_line_items.map(item => {
                 item.active = updatedRemoteFields.active;
                 return item;
