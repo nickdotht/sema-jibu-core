@@ -970,6 +970,14 @@ class PosStorage {
 		this.setKey(remoteReceiptsKey, this.stringify(receipts));
 	}
 
+	addRemoteReceipts(receipts) {
+		this.receipts = this.getReceipts();
+		return this.setKey(remoteReceiptsKey, this.stringify([...this.receipts, ...receipts]))
+			.then(() => {
+				return [...this.receipts, ...receipts];
+			});
+	}
+
 	getRemoteReceipts() {
 		console.log("PosStorage: getRemoteReceipts. Count " + this.receipts.length, JSON.stringify(this.receipts));
 		return this.receipts;
