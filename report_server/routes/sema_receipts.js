@@ -22,33 +22,80 @@ var sqlInsertReceiptLineItem = "INSERT INTO receipt_line_item " +
 	"(created_at, updated_at, currency_code, price_total, quantity, receipt_id, product_id, cogs_total) " +
 	"VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-// Returns all receipts for the site and the date passed
-router.get('/:siteId', async (req, res) => {
-	semaLog.info('sema_receipts - Fetch');
-
+// Returns all receipts for the site and the date passed, except for those in `exceptionList`
+const getReceipts = (siteId, exceptionList, date) => {
 	R.belongsTo(CustomerAccount);
 	R.hasMany(ReceiptLineItem);
 	ReceiptLineItem.belongsTo(Product);
 
+	return new Promise(async (resolve, reject) => {
+		const [err, receipts] = await __hp(R.findAll({
+			where: {
+				kiosk_id: siteId,
+				created_at: {
+					gte: date,
+					lt: moment(date).add(1, 'days').format('YYYY-MM-DD')
+				},
+				id: {
+					notIn: exceptionList
+				}
+			},
+			include: [{
+				model: CustomerAccount
+			}, {
+				model: ReceiptLineItem,
+				include: [{
+					model: Product,
+					// we don't want the product image, too heavy. We'll take care of it client-side
+					attributes: { exclude: 'base64encoded_image'}
+				}]
+			}]
+		}));
+	
+		if (err) {
+			return reject(err);
+		}
+	
+		console.log(JSON.stringify(receipts));
+
+		console.log(`${receipts.length} Receipts found for the day`);
+
+		resolve(receipts);
+	});
+};
+
+router.put('/:siteId', async (req, res) => {
 	// Gather data sent
+	const {
+		receipts,
+		exceptionList
+	} = req.body;
 	const {
 		date
 	} = req.query;
 	const { siteId } = req.params;
 
-	const [err, receipts] = await __hp(R.findAll({
-		where: {
-			kiosk_id: siteId,
-			created_at: {
-				gte: date,
-				lt: moment(date).add(1, 'days').format('YYYY-MM-DD')
-			}
-		},
-		include: [{
-			all: true,
-			nested: true
-		}]
-	}));
+	let updatePromises = receipts.filter(receipt => receipt.updated).map(receipt => {
+		return R.update({
+			active: receipt.active
+		}, {
+				where: {
+					id: receipt.id
+				}
+			}).then(() => {
+				return ReceiptLineItem.update({
+					active: receipt.active
+				}, {
+						where: {
+							receipt_id: receipt.id
+						}
+					})
+			})
+	});
+
+	await Promise.all(updatePromises);
+
+	const [err, newReceipts] = await __hp(getReceipts(siteId, exceptionList, date));
 
 	// On error, return a generic error message and log the error
 	if (err) {
@@ -56,41 +103,10 @@ router.get('/:siteId', async (req, res) => {
 		return res.status(500).json({ msg: "Internal Server Error" });
 	}
 
-	console.log(`${receipts.length} Receipts found for the day`);
+	console.log(`${newReceipts.length} new receipts found for the day`);
 
 	// On success, return a success message containing the data
-	return res.json(receipts.length ? receipts : []);
-});
-
-router.put('/', async (req, res) => {
-	// Gather data sent
-	const {
-		receipts
-	} = req.body;
-
-	console.dir(req.body);
-
-	let updatePromises = receipts.map(receipt => {
-		return R.update({
-			active: receipt.active
-		}, {
-			where: {
-				id: receipt.id
-			}
-		}).then(() => {
-			return ReceiptLineItem.update({
-				active: receipt.active
-			}, {
-				where: {
-					receipt_id: receipt.id
-				}
-			})
-		})
-	});
-
-	await Promise.all(updatePromises);
-
-	return res.json({ });
+	return res.json({newReceipts});
 });
 
 
