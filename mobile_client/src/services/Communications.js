@@ -330,7 +330,9 @@ class Communications {
 			});
 	}
 
-	sendUpdatedReceipts(receipts) {
+	// Sends the kiosk ID, the logged receipts and the list of IDs that the client already
+	// has to the API
+	sendLoggedReceipts(siteId, receipts, exceptionList) {
 		let options = {
 			method: 'PUT',
 			headers: {
@@ -338,10 +340,10 @@ class Communications {
 				'Content-Type': 'application/json',
 				Authorization: 'Bearer ' + this._token
 			},
-			body: JSON.stringify({receipts}) 
+			body: JSON.stringify({receipts, exceptionList})
 		};
 
-		let url = `sema/site/receipts`;
+		let url = `sema/site/receipts/${siteId}?date=${moment(new Date()).format('YYYY-MM-DD')}`;
 
 		return fetch(this._url + url, options)
 			.then(response => response.json())
