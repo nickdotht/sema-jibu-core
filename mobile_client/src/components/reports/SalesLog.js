@@ -32,7 +32,7 @@ class ReceiptLineItem extends Component {
                     source={{ uri: this.getImage(this.props.item.product) }}
                     style={styles.productImage}>
                 </Image>
-                <View>
+                <View style={{justifyContent: 'space-around'}}>
                     <View style={styles.itemData}>
                         <Text style={styles.label}>Product SKU: </Text>
                         <Text>{this.props.item.product.sku}</Text>
@@ -76,10 +76,15 @@ class ReceiptLineItem extends Component {
     }
 
     getImage = item => {
-        if (item.base64encoded_image.startsWith('data:image')) {
-            return item.base64encoded_image;
+        const productImage = this.props.products.reduce((image, product) => {
+            if (product.productId === item.id) return product.base64encodedImage;
+            return image;
+        }, '');
+
+        if (productImage.startsWith('data:image')) {
+            return productImage;
         } else {
-            return 'data:image/png;base64,' + item.base64encoded_image
+            return 'data:image/png;base64,' + productImage
         }
     }
 }
@@ -142,6 +147,7 @@ class SalesLog extends Component {
                 item={lineItem}
                 key={lineItem.id}
                 lineItemIndex={idx}
+                products={this.props.products}
                 handleUpdate={this.handleUpdate.bind(this)}
                 receiptIndex={item.index}></ReceiptLineItem>
         });
@@ -222,6 +228,10 @@ class SalesLog extends Component {
                 isLocal: false,
                 index
             };
+        });
+
+        remoteReceipts.sort((a, b) => {
+            return moment(a.createdAt).isBefore(b.createdAt);
         });
 
         // let localReceipts = this.props.localReceipts.map((receipt, index) => {
@@ -331,7 +341,6 @@ const styles = StyleSheet.create({
     },
 
     itemData: {
-        flex: 1,
         flexDirection: 'row'
     }
 });
