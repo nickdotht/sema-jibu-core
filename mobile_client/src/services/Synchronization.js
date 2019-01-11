@@ -77,29 +77,45 @@ class Synchronization {
 							const promiseCustomers = this.synchronizeCustomers()
 								.then(customerSync => {
 									syncResult.customers = customerSync;
+									return customerSync;
 								});
 							const promiseProducts = this.synchronizeProducts()
 								.then(productSync => {
 									syncResult.products = productSync;
+									return productSync;
 								});
 							const promiseSales = this.synchronizeSales()
 								.then(saleSync => {
 									syncResult.sales = saleSync;
+									return saleSync;
 								});
 							const promiseProductMrps = this.synchronizeProductMrps(lastProductSync)
 								.then(productMrpSync => {
 									syncResult.productMrps = productMrpSync;
+									return productMrpSync;
 								});
 
 							const promiseReceipts = this.synchronizeReceipts()
 								.then(results => {
 									syncResult.receipts = results;
+									return results;
 								});
 
-							Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseReceipts])
-								.then(values => {
+							[promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseReceipts]
+								.reduce((promiseChain, currentTask) => {
+									return promiseChain.then(chainResults =>
+										currentTask.then(currentResult =>
+											[ ...chainResults, currentResult ]
+										)
+									);
+								}, Promise.resolve([])).then(arrayOfResults => {
 									resolve(syncResult);
-								});
+								});	
+
+							// Promise.all([promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseReceipts])
+							// 	.then(values => {
+							// 		resolve(syncResult);
+							// 	});
 						});
 				}).catch(error => {
 					syncResult.error = error.message;
@@ -270,70 +286,46 @@ class Synchronization {
 		});
 	}
 
-	// NOTE: This used to be in the promise chain in the `synchronize` function, that's why
-	// it's returning a promise with some weird results. I decided to keep it this way just
-	// in case we ever decide to add it back in there - for sync results on the UI.
 	async synchronizeReceipts() {
 		let settings = PosStorage.getSettings();
-		let remoteReceipts = await PosStorage.loadRemoteReceipts() || [];
-		let updatedReceipts = remoteReceipts.filter(receipt => receipt.updated).map(receipt => {
-			lineItems = [];
+		let remoteReceipts = await PosStorage.getRemoteReceipts();
+		const receiptIds = [];
+		remoteReceipts = remoteReceipts.map(receipt => {
+			let receiptData = {
+					id: receipt.id,
+					active: receipt.active,
+					lineItems: []
+				};
 
-			if (receipt.updatedLineItem) {
-				lineItems = receipt.receipt_line_items.filter(lineItem => lineItem.updated).map(lineItem => {
+			if (receipt.updated) {
+				receiptData.lineItems = receipt.receipt_line_items.map(lineItem => {
 					return {
 						id: lineItem.id,
 						active: lineItem.active
 					}
 				});
+
+				receiptData.updated = true;
 			}
 
-			return {
-				id: receipt.id,
-				active: receipt.active,
-				lineItems
-			}
+			receiptIds.push(receipt.id);
+			return receiptData;
 		});
 
-		// TODO: Also, make this chunk more modular
-		if (updatedReceipts.length) {
-			console.dir(updatedReceipts);
-			return Communications.sendUpdatedReceipts(updatedReceipts)
-				.then(() => {
-					return new Promise(resolve => {
-						Communications.getReceipts(settings.siteId)
-							.then(receipts => {
-								PosStorage.saveRemoteReceipts(receipts);
-								console.log(receipts.length);
-								resolve({
-									error: null,
-									receipts: receipts.length
-								});
-								Events.trigger('ReceiptsFetched', receipts);
-							})
-							.catch(error => {
-								resolve({ error: error.message, receipts: null });
-								console.log("Synchronization.synchronizeReceipts - error " + error);
-							})
-					});
-				});
-		} else {
-			return new Promise(resolve => {
-				Communications.getReceipts(settings.siteId)
-					.then(receipts => {
-						PosStorage.saveRemoteReceipts(receipts);
+		return Communications.sendLoggedReceipts(settings.siteId, remoteReceipts, receiptIds)
+			.then(result => {
+				// result.newReceipts is the list of today's receipts that we don't have in the local storage already
+				return new Promise(resolve => {
+					if (!result.newReceipts.length) return resolve();
+					PosStorage.addRemoteReceipts(result.newReceipts).then(allReceipts => {
 						resolve({
 							error: null,
-							receipts: receipts.length
+							receipts: result.newReceipts.length
 						});
-						Events.trigger('ReceiptsFetched', receipts);
-					})
-					.catch(error => {
-						resolve({ error: error.message, receipts: null });
-						console.log("Synchronization.synchronizeReceipts - error " + error);
-					})
+						Events.trigger('ReceiptsFetched', allReceipts);
+					});
+				});
 			});
-		}
 	}
 
 	synchronizeProductMrps(lastProductSync) {
