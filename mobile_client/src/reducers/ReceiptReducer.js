@@ -1,11 +1,12 @@
 
 import {
     SET_REMOTE_RECEIPTS,
-    ADD_LOCAL_RECEIPT,
+    ADD_REMOTE_RECEIPT,
     SET_LOCAL_RECEIPTS,
     UPDATE_REMOTE_RECEIPT,
     UPDATE_LOCAL_RECEIPT,
-    UPDATE_RECEIPT_LINE_ITEM
+    UPDATE_RECEIPT_LINE_ITEM,
+    REMOVE_LOCAL_RECEIPT
 } from "../actions/ReceiptActions";
 
 let initialState = {
@@ -25,13 +26,10 @@ const receiptReducer = (state = initialState, action) => {
             newState = { ...state };
             newState.remoteReceipts = remoteReceipts;
             return newState;
-        case ADD_LOCAL_RECEIPT:
+        case ADD_REMOTE_RECEIPT:
             let { receipt } = action.data;
-            receipt.isLocal = true;
             newState = { ...state };
-            newState.localReceipts.length ?
-                newState.localReceipts.push(receipt) :
-                newState.localReceipts = [receipt];
+            newState.remoteReceipts.push(receipt);
             return newState;
         case SET_LOCAL_RECEIPTS:
             let { localReceipts } = action.data;
@@ -67,6 +65,17 @@ const receiptReducer = (state = initialState, action) => {
             } = action.data;
             newState = { ...state };
             newState.localReceipts[localReceiptIndex] = { ...newState.localReceipts[localReceiptIndex], ...updatedLocalFields };
+            return newState;
+        case REMOVE_LOCAL_RECEIPT:
+            let {
+                receiptId
+            } = action.data;
+            newState = { ...state };
+            newState.remoteReceipts = newState.remoteReceipts.reduce((final, receipt) => {
+                if (receipt.id === receiptId) return final;
+                final.push(receipt);
+                return final;
+            }, []);
             return newState;
         default:
             return state;

@@ -367,8 +367,7 @@ class OrderPaymentScreen extends Component {
 				paymentType: "",		// NOT sure what this is
 				salesChannelId: this.props.selectedCustomer.salesChannelId,
 				customerTypeId: this.props.selectedCustomer.customerTypeId,
-				products: [],
-				active: 1
+				products: []
 			};
 			if (!receipt.siteId) {
 				// This fixes issues with the pseudo direct customer

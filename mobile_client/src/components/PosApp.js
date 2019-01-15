@@ -105,8 +105,8 @@ class PosApp extends Component {
 		Events.on('SalesChannelsUpdated', 'SalesChannelsUpdated1', this.onSalesChannelUpdated.bind(this));
 		Events.on('UILanguageUpdated', 'UILanguageUpdated1', this.onLanguageUpdated.bind(this));
 		Events.on('ReceiptsFetched', 'ReceiptsFetched1', this.onReceiptsFetched.bind(this));
-		// Events.on('NewSaleAdded', 'NewSaleAdded1', this.onNewSaleAdded.bind(this));
-		// Events.on('LocalReceiptsUpdated', 'LocalReceiptsUpdated1', this.onLocalReceiptsUpdated.bind(this));
+		Events.on('NewSaleAdded', 'NewSaleAdded1', this.onNewSaleAdded.bind(this));
+		Events.on('RemoveLocalReceipt', 'RemoveLocalReceipt1', this.onRemoveLocalReceipt.bind(this));
 		console.log("PosApp = Mounted-Done");
 
 	}
@@ -116,21 +116,54 @@ class PosApp extends Component {
 		Events.rm('SalesChannelsUpdated', 'SalesChannelsUpdated1');
 		Events.rm('UILanguageUpdated', 'UILanguageUpdated1');
 		Events.rm('ReceiptsFetched', 'ReceiptsFetched1');
-		// Events.rm('NewSaleAdded', 'NewSaleAdded1');
-		// Events.rm('LocalReceiptsUpdated', 'LocalReceiptsUpdated1');
+		Events.rm('NewSaleAdded', 'NewSaleAdded1');
+		Events.rm('RemoveLocalReceipt', 'RemoveLocalReceipt1');
 		NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
 	}
 
-	// onLocalReceiptsUpdated() {
-	// 	this.posStorage.loadSalesReceipts()
-	// 		.then(receipts => {
-	// 			this.props.receiptActions.setLocalReceipts(receipts);
-	// 		});
-	// }
-
-	onNewSaleAdded(receipt) {
-		this.props.receiptActions.addLocalReceipt(receipt);
+	onRemoveLocalReceipt(saleKey) {
+		this.props.receiptActions.removeLocalReceipt(saleKey);
 	}
+
+	onNewSaleAdded(receiptData) {
+		const newReceipt = {
+			active: 1,
+			id: receiptData.key,
+			created_at: receiptData.sale.createdDate,
+			customer_account: this.getCustomer(receiptData.sale.customerId),
+			receipt_line_items: this.getProducts(receiptData.sale.products),
+			isLocal: true
+		};
+
+		this.props.receiptActions.addRemoteReceipt(newReceipt);
+	}
+
+	getProducts(products) {
+        return products.map(product => {
+			let newProduct = {};
+
+			newProduct.id = product.productId;
+			newProduct.price_total = product.priceTotal;
+			newProduct.quantity = product.quantity;
+			newProduct.product = this.getProduct(product.productId);
+            newProduct.active = 1;
+            return newProduct;
+        })
+    }
+
+    getProduct(productId) {
+        return this.props.products.reduce((final, product) => {
+			if (product.productId === productId) return product;
+			return final;
+        }, {});
+	}
+
+	getCustomer(customerId) {
+        return this.props.customers.reduce((final, customer) => {
+			if (customer.customerId === customerId) return customer;
+			return final;
+		}, {});
+    }
 
 	onCustomersUpdated = () => {
 		this.props.customerActions.setCustomers(this.posStorage.getCustomers());
@@ -258,7 +291,8 @@ function mapStateToProps(state, props) {
 		showView: state.customerBarReducer.showView,
 		showScreen: state.toolBarReducer.showScreen,
 		settings: state.settingsReducer.settings,
-		receipts: state.receiptReducer.receipts
+		receipts: state.receiptReducer.receipts,
+        products: state.productReducer.products
 	};
 }
 

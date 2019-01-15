@@ -17,6 +17,7 @@ import * as receiptActions from "../../actions/ReceiptActions";
 import i18n from '../../app/i18n';
 import moment from 'moment';
 import PosStorage from '../../database/PosStorage';
+import Events from 'react-native-simple-events';
 
 class ReceiptLineItem extends Component {
     constructor(props) {
@@ -76,7 +77,7 @@ class ReceiptLineItem extends Component {
     }
 
     getImage = item => {
-        const productImage = this.props.products.reduce((image, product) => {
+        const productImage = item.base64encodedImage || this.props.products.reduce((image, product) => {
             if (product.productId === item.id) return product.base64encodedImage;
             return image;
         }, '');
@@ -100,6 +101,16 @@ class SalesLog extends Component {
 
     componentDidMount() {
         console.log("SalesLog - componentDidMount");
+        console.dir(this.props.remoteReceipts[0]);
+		Events.on('RemoveLocalReceipt', 'RemoveLocalReceipt2', this.onRemoveLocalReceipt.bind(this));
+    }
+
+    componentWillUnmount() {
+		Events.rm('RemoveLocalReceipt', 'RemoveLocalReceipt2');
+    }
+
+    onRemoveLocalReceipt() {
+		this.setState({refresh: !this.state.refresh});
     }
 
     render() {
@@ -174,7 +185,7 @@ class SalesLog extends Component {
                 </View>
                 <View style={styles.itemData}>
                     <Text style={styles.label}>Date Created: </Text>
-                    <Text>{moment.utc(item.createdAt).format('YYYY-MM-DD hh:mm:ss')}</Text>
+                    <Text>{moment.utc(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}</Text>
                 </View>
                 <View style={styles.itemData}>
                     <Text style={styles.label}>Customer Name: </Text>
@@ -208,12 +219,14 @@ class SalesLog extends Component {
     }
 
     deleteReceipt(item, updatedFields) {
+        this.props.receiptActions.updateRemoteReceipt(item.index, updatedFields);
+
         if (!item.isLocal) {
-            this.props.receiptActions.updateRemoteReceipt(item.index, updatedFields);
             PosStorage.saveRemoteReceipts(this.props.remoteReceipts);
         } else {
-            // this.props.receiptActions.updateLocalReceipt(item, updatedFields);            
+            PosStorage.updatePendingSale(item.id);
         }
+
 		this.setState({refresh: !this.state.refresh});
     }
 
@@ -225,13 +238,13 @@ class SalesLog extends Component {
                 createdAt: receipt.created_at,
                 customerAccount: receipt.customer_account,
                 receiptLineItems: receipt.receipt_line_items,
-                isLocal: false,
+                isLocal: receipt.isLocal || false,
                 index
             };
         });
 
         remoteReceipts.sort((a, b) => {
-            return moment(a.createdAt).isBefore(b.createdAt);
+            return moment.utc(a.createdAt).isBefore(b.createdAt) ? 1 : -1;
         });
 
         // let localReceipts = this.props.localReceipts.map((receipt, index) => {

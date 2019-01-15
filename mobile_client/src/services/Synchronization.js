@@ -101,6 +101,7 @@ class Synchronization {
 									return results;
 								});
 
+							// This will make sure they run synchronously
 							[promiseCustomers, promiseProducts, promiseSales, promiseProductMrps, promiseReceipts]
 								.reduce((promiseChain, currentTask) => {
 									return promiseChain.then(chainResults =>
@@ -290,7 +291,7 @@ class Synchronization {
 		let settings = PosStorage.getSettings();
 		let remoteReceipts = await PosStorage.getRemoteReceipts();
 		const receiptIds = [];
-		remoteReceipts = remoteReceipts.map(receipt => {
+		remoteReceipts = remoteReceipts.filter(receipt => !receipt.isLocal).map(receipt => {
 			let receiptData = {
 					id: receipt.id,
 					active: receipt.active,
