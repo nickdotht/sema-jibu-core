@@ -101,7 +101,6 @@ class SalesLog extends Component {
 
     componentDidMount() {
         console.log("SalesLog - componentDidMount");
-        console.dir(this.props.remoteReceipts[0]);
 		Events.on('RemoveLocalReceipt', 'RemoveLocalReceipt2', this.onRemoveLocalReceipt.bind(this));
     }
 

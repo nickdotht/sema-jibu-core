@@ -535,7 +535,7 @@ class PosStorage {
 						if (error) {
 							console.log("error removing " + oldest.saleKey);
 						} else {
-							// Events.trigger('RemoveLocalReceipt', saleItemKey + saleDateKey);
+							Events.trigger('RemoveLocalReceipt', saleItemKey + saleDateKey);
 							console.log("Removed " + oldest.saleKey)
 						}
 					});
@@ -600,7 +600,7 @@ class PosStorage {
 					return console.log("PosStorage:removePendingSale: Error: " + error);
 				}
 
-				// Events.trigger('RemoveLocalReceipt', saleKey);
+				Events.trigger('RemoveLocalReceipt', saleKey);
 			});
 
 		}
